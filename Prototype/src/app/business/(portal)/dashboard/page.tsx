@@ -69,7 +69,7 @@ export default async function BusinessDashboardPage() {
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-[#FFCE06] mb-2">Welcome back, Grace</p>
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">{business.name}</h1>
-            <p className="text-slate-200">Here's what's happening with your business today.</p>
+            <p className="text-slate-200">Here&apos;s what&apos;s happening with your business today.</p>
           </div>
           <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-black mt-2 sm:mt-0 shrink-0">
             View business profile <ExternalLink className="ml-2 h-4 w-4" />
@@ -128,7 +128,7 @@ export default async function BusinessDashboardPage() {
         <Card className="rounded-2xl shadow-sm border-slate-100 flex flex-col justify-between">
           <CardContent className="pt-6 pb-6 flex flex-col h-full">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">This month's revenue</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">This month&apos;s revenue</p>
               <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
                 <Database className="h-4 w-4 text-green-600" />
               </div>
@@ -284,7 +284,7 @@ export default async function BusinessDashboardPage() {
                         </span>
                       </div>
                       <p className="text-xs text-slate-500">{review.author.name ?? "Verified guest"} • 2 days ago</p>
-                      <p className="text-sm text-slate-700 mt-2 line-clamp-1 italic">"{review.content}"</p>
+                      <p className="text-sm text-slate-700 mt-2 line-clamp-1 italic">&quot;{review.content}&quot;</p>
                     </div>
                   </div>
                 ))}
