@@ -153,7 +153,7 @@ export function DashboardCharts() {
                   tick={{ fontSize: 10, fill: '#64748b' }} 
                   tickFormatter={(value) => `${value / 1000}K`}
                 />
-                <Tooltip formatter={(value: number) => `UGX ${value.toLocaleString()}`} />
+                <Tooltip formatter={(value: any) => `UGX ${Number(value).toLocaleString()}`} />
                 <Bar dataKey="amount" fill="#0B4928" radius={[2, 2, 0, 0]} barSize={16} />
               </BarChart>
             </ResponsiveContainer>

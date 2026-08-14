@@ -284,7 +284,7 @@ export default async function BusinessDashboardPage() {
                         </span>
                       </div>
                       <p className="text-xs text-slate-500">{review.author.name ?? "Verified guest"} • 2 days ago</p>
-                      <p className="text-sm text-slate-700 mt-2 line-clamp-1 italic">&quot;{review.content}&quot;</p>
+                      <p className="text-sm text-slate-700 mt-2 line-clamp-1 italic">&quot;{review.body}&quot;</p>
                     </div>
                   </div>
                 ))}

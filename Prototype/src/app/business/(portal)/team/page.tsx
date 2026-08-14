@@ -24,7 +24,7 @@ type UnifiedMember = {
 };
 
 export default async function BusinessTeamPage() {
-  const { business, businessId, userId } = await requireBusinessSession();
+  const { session, business, businessId } = await requireBusinessSession();
 
   if (!business || !businessId) {
     return (
@@ -54,7 +54,7 @@ export default async function BusinessTeamPage() {
       role: m.role,
       joinedAt: m.createdAt,
       status: "ACTIVE" as const,
-      isCurrentUser: m.user.id === userId
+      isCurrentUser: m.userId === session.user.id
     })),
     ...invitations.map(i => ({
       id: i.id,
@@ -368,7 +368,7 @@ export default async function BusinessTeamPage() {
             </span>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="icon" className="h-8 w-8 rounded-full border-slate-200 text-slate-400"><span className="text-xs font-bold">&lt;</span></Button>
-              <Button variant="solid" size="icon" className="h-8 w-8 rounded-full bg-[#1e613c] hover:bg-[#164a2e] text-white"><span className="text-xs font-bold">1</span></Button>
+              <Button variant="default" size="icon" className="h-8 w-8 rounded-full bg-[#1e613c] hover:bg-[#164a2e] text-white"><span className="text-xs font-bold">1</span></Button>
               <Button variant="outline" size="icon" className="h-8 w-8 rounded-full border-slate-200 text-slate-400"><span className="text-xs font-bold">&gt;</span></Button>
             </div>
           </div>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { SquarePen } from "lucide-react";
 
 export default async function BusinessMessagesPage() {
-  const { businessId, userId } = await requireBusinessSession();
+  const { session, businessId } = await requireBusinessSession();
 
   if (!businessId) return null;
 
@@ -62,7 +62,7 @@ export default async function BusinessMessagesPage() {
       </div>
 
       <div className="mt-2">
-        <MessageInbox initialThreads={threads} businessUserId={userId!} />
+        <MessageInbox initialThreads={threads} businessUserId={session.user.id} />
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ export function RevenueOverviewChart() {
             tickFormatter={(value) => value === 0 ? "UGX 0" : `UGX ${(value/1000)}k`} 
           />
           <Tooltip 
-            formatter={(value: number) => formatUGX(value)}
+            formatter={(value: any) => formatUGX(Number(value))}
             contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
           />
           <Line type="monotone" dataKey="gross" name="Gross revenue" stroke="#16a34a" strokeWidth={2} dot={false} activeDot={{ r: 6 }} fill="url(#colorGross)" />
@@ -69,7 +69,7 @@ export function PayoutBreakdownChart({ netMinor }: { netMinor: number }) {
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
-          <Tooltip formatter={(value: number) => formatUGX(value)} />
+          <Tooltip formatter={(value: any) => formatUGX(Number(value))} />
         </PieChart>
       </ResponsiveContainer>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
