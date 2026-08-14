@@ -1,0 +1,857 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Surface {
+  CUSTOMER
+  BUSINESS
+  ADMIN
+}
+
+enum UserRole {
+  CUSTOMER
+  BUSINESS_OWNER
+  BUSINESS_STAFF
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum BusinessUserRole {
+  OWNER
+  MANAGER
+  STAFF
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum VerificationStatus {
+  NOT_STARTED
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  NEEDS_CHANGES
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum AdminUserStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+  INACTIVE
+}
+
+enum ListingType {
+  ACCOMMODATION
+  TOUR
+  RESTAURANT
+  TRANSPORT
+}
+
+enum ListingStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum TransportCategory {
+  AIRPORT_TRANSFER
+  KAMPALA_SPECIAL_HIRE
+}
+
+enum BookingStatus {
+  DRAFT
+  AUTH_REQUIRED
+  PENDING_TRAVELLER_DETAILS
+  PENDING_PAYMENT
+  PAYMENT_PROCESSING
+  PAYMENT_FAILED
+  PAYMENT_SUCCESSFUL
+  BOOKING_CREATED
+  AWAITING_BUSINESS_CONFIRMATION
+  CONFIRMED
+  CANCELLED_BY_CUSTOMER
+  CANCELLED_BY_BUSINESS
+  CANCELLED_BY_ADMIN
+  REFUND_REQUESTED
+  REFUND_PROCESSING
+  REFUNDED
+  COMPLETED
+  REVIEW_PENDING
+  REVIEWED
+  SUPPORT_CASE_OPEN
+}
+
+enum PaymentStatus {
+  NOT_STARTED
+  METHOD_SELECTED
+  PROCESSING
+  PENDING_PROVIDER_CONFIRMATION
+  SUCCESSFUL
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentProvider {
+  FLUTTERWAVE
+  MTN_MOBILE_MONEY
+  AIRTEL_MONEY
+  CARD
+  STRIPE
+}
+
+enum RefundStatus {
+  REQUESTED
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+enum ReviewStatus {
+  PENDING
+  PUBLISHED
+  HIDDEN
+  FLAGGED
+}
+
+enum NotificationType {
+  BOOKING_UPDATE
+  PAYMENT_UPDATE
+  REVIEW_PROMPT
+  SUPPORT_UPDATE
+  SAFETY_ADVISORY
+  SYSTEM
+}
+
+enum SupportCaseStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_ON_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum AuditOutcome {
+  SUCCESS
+  FAILURE
+  DENIED
+}
+
+// ---------------------------------------------------------------------------
+// Identity, auth and authorization
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  name          String?
+  phone         String?
+  image         String?
+  role          UserRole  @default(CUSTOMER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  customerProfile CustomerProfile?
+  businessUsers   BusinessUser[]
+  adminUser       AdminUser?
+
+  orders             Order[]
+  bookings           Booking[]
+  savedItems         SavedItem[]
+  tripPlans          TripPlan[]
+  reviews            Review[]
+  messageThreads     MessageThread[]
+  messages           Message[]
+  notifications      Notification[]
+  supportCasesOpened SupportCase[]    @relation("SupportCaseOpener")
+  supportMessages    SupportMessage[]
+  auditLogs          AuditLog[]
+}
+
+/// Represents the SafariNexa "AuthProviderAccount" entity: a linked external
+/// identity (e.g. Google) for a User. Named `Account` so @auth/prisma-adapter
+/// can use it directly.
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Used for email OTP verification, password reset, and email-ownership
+/// verification before linking a Google provider to an existing account.
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+/// Short-lived record bridging a denied Google sign-in (existing email,
+/// provider not yet linked) to the /auth/google/link ownership-verification
+/// step, so we don't silently auto-link on Google's say-so alone.
+model PendingProviderLink {
+  id                String   @id @default(cuid())
+  email             String
+  provider          String
+  providerAccountId String
+  expiresAt         DateTime
+  createdAt         DateTime @default(now())
+
+  @@index([email, provider])
+}
+
+model CustomerProfile {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  dateOfBirth      DateTime?
+  nationality      String?
+  emergencyContact String?
+  preferences      Json?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BusinessProfile {
+  id                 String             @id @default(cuid())
+  name               String
+  slug               String             @unique
+  type               String
+  description        String?
+  logoUrl            String?
+  coverImageUrl      String?
+  contactEmail       String
+  contactPhone       String?
+  city               String?
+  country            String             @default("Uganda")
+  verificationStatus VerificationStatus @default(NOT_STARTED)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  users          BusinessUser[]
+  invitations    BusinessInvitation[]
+  verifications  BusinessVerification[]
+  listings       Listing[]
+  bookings       Booking[]
+  reviews        Review[]
+  guides         Guide[]
+  messageThreads MessageThread[]
+}
+
+model BusinessUser {
+  id         String           @id @default(cuid())
+  businessId String
+  userId     String
+  role       BusinessUserRole @default(STAFF)
+  createdAt  DateTime         @default(now())
+
+  business BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, userId])
+}
+
+model BusinessInvitation {
+  id              String           @id @default(cuid())
+  businessId      String
+  email           String
+  role            BusinessUserRole @default(STAFF)
+  status          InvitationStatus @default(PENDING)
+  token           String           @unique
+  invitedByUserId String?
+  expiresAt       DateTime
+  createdAt       DateTime         @default(now())
+
+  business BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+}
+
+model BusinessVerification {
+  id                String             @id @default(cuid())
+  businessId        String
+  status            VerificationStatus @default(SUBMITTED)
+  submittedAt       DateTime           @default(now())
+  reviewedAt        DateTime?
+  reviewedByAdminId String?
+  reviewNotes       String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  business  BusinessProfile   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  documents BusinessDocument[]
+}
+
+model BusinessDocument {
+  id                     String   @id @default(cuid())
+  businessVerificationId String
+  type                   String
+  fileUrl                String
+  uploadedAt             DateTime @default(now())
+
+  verification BusinessVerification @relation(fields: [businessVerificationId], references: [id], onDelete: Cascade)
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  permissions RolePermission[]
+  adminUsers  AdminUser[]
+}
+
+model Permission {
+  id          String  @id @default(cuid())
+  key         String  @unique
+  description String?
+
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+/// Admin users are never auto-created from Google OAuth. A row must exist
+/// here (created by a super admin) before any Google/email sign-in succeeds.
+model AdminUser {
+  id          String          @id @default(cuid())
+  userId      String          @unique
+  roleId      String
+  status      AdminUserStatus @default(INVITED)
+  lastLoginAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id])
+}
+
+model AuditLog {
+  id          String       @id @default(cuid())
+  actorUserId String?
+  actorEmail  String?
+  surface     Surface
+  action      String
+  outcome     AuditOutcome
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+
+  actor User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([surface, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Marketplace catalogue
+// ---------------------------------------------------------------------------
+
+model Destination {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  region       String?
+  country      String   @default("Uganda")
+  summary      String
+  description  String?
+  heroImageUrl String?
+  safetyNotes  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  listings Listing[]
+  guides   Guide[]
+}
+
+model Listing {
+  id             String        @id @default(cuid())
+  businessId     String
+  type           ListingType
+  title          String
+  slug           String        @unique
+  destinationId  String?
+  city           String?
+  address        String?
+  latitude       Float?
+  longitude      Float?
+  description    String
+  basePriceMinor Int
+  currency       String        @default("UGX")
+  status         ListingStatus @default(DRAFT)
+  coverImageUrl  String?
+  images         String[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  publishedAt    DateTime?
+
+  business    BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  destination Destination?    @relation(fields: [destinationId], references: [id])
+
+  accommodation AccommodationListing?
+  tour          TourListing?
+  restaurant    RestaurantProfile?
+  transport     TransportOption?
+
+  availability  Availability[]
+  bookings      Booking[]
+  savedBy       SavedItem[]
+  reviews       Review[]
+  tripPlanItems TripPlanItem[]
+
+  @@index([type, status])
+}
+
+model AccommodationListing {
+  listingId          String   @id
+  propertyType       String
+  amenities          String[]
+  checkInTime        String?
+  checkOutTime       String?
+  maxGuests           Int      @default(2)
+  cancellationPolicy String?
+
+  listing   Listing    @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  roomTypes RoomType[]
+  addOns    AddOn[]
+}
+
+model RoomType {
+  id                String   @id @default(cuid())
+  accommodationId   String
+  name              String
+  description       String?
+  images            String[]
+  priceMinor        Int
+  currency          String   @default("UGX")
+  breakfastIncluded Boolean  @default(false)
+  maxOccupancy      Int      @default(2)
+  totalRooms        Int      @default(1)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  accommodation AccommodationListing @relation(fields: [accommodationId], references: [listingId], onDelete: Cascade)
+  bookings      Booking[]
+
+  @@index([accommodationId])
+}
+
+model AddOn {
+  id              String   @id @default(cuid())
+  accommodationId String
+  name            String
+  description     String?
+  priceMinor      Int
+  currency        String   @default("UGX")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  accommodation AccommodationListing @relation(fields: [accommodationId], references: [listingId], onDelete: Cascade)
+  bookingAddOns BookingAddOn[]
+
+  @@index([accommodationId])
+}
+
+enum GuideSpecialization {
+  GENERAL
+  DESTINATION_SPECIALIST
+}
+
+model Guide {
+  id               String              @id @default(cuid())
+  businessId       String
+  name             String
+  bio              String
+  experienceYears  Int
+  languages        String[]
+  specialization   GuideSpecialization @default(GENERAL)
+  destinationId    String?
+  hasOwnVehicle    Boolean             @default(false)
+  photoUrl         String?
+  hourlyRateMinor  Int?
+  isTopGuide       Boolean             @default(false)
+  availabilityNote String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  business    BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  destination Destination?    @relation(fields: [destinationId], references: [id])
+  tours       TourListing[]
+
+  @@index([businessId])
+}
+
+model TourListing {
+  listingId    String   @id
+  guideId      String?
+  durationDays Int
+  itinerary    Json?
+  groupSizeMin Int      @default(1)
+  groupSizeMax Int      @default(12)
+  difficulty   String?
+  inclusions   String[]
+  exclusions   String[]
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  guide   Guide?  @relation(fields: [guideId], references: [id])
+}
+
+model RestaurantProfile {
+  listingId                  String  @id
+  cuisineType                String?
+  priceRange                 String?
+  openingHours               Json?
+  menuUrl                    String?
+  seatingCapacity             Int?
+  acceptsReservationRequests Boolean @default(true)
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model TransportOption {
+  listingId                String            @id
+  category                 TransportCategory
+  vehicleType              String
+  capacity                 Int
+  estimatedDurationMinutes Int?
+  pricingModel             String?
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model Availability {
+  id                 String   @id @default(cuid())
+  listingId          String
+  date               DateTime
+  capacity           Int
+  remaining          Int
+  priceOverrideMinor Int?
+  createdAt          DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, date])
+}
+
+// ---------------------------------------------------------------------------
+// Booking, payments and reviews
+// ---------------------------------------------------------------------------
+
+model Order {
+  id          String   @id @default(cuid())
+  customerId  String
+  totalMinor  Int
+  currency    String   @default("UGX")
+  status      BookingStatus @default(DRAFT)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  customer User      @relation(fields: [customerId], references: [id])
+  bookings Booking[]
+  payments Payment[]
+}
+
+model Booking {
+  id                String        @id @default(cuid())
+  bookingRef        String        @unique
+  orderId           String?
+  customerId        String
+  listingId         String
+  businessId        String
+  roomTypeId        String?
+  status            BookingStatus @default(DRAFT)
+  startDate         DateTime?
+  endDate           DateTime?
+  participantsCount Int           @default(1)
+  totalMinor        Int
+  currency          String        @default("UGX")
+  notes             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  confirmedAt       DateTime?
+  cancelledAt       DateTime?
+  cancelReason      String?
+  completedAt       DateTime?
+
+  order    Order?          @relation(fields: [orderId], references: [id])
+  customer User            @relation(fields: [customerId], references: [id])
+  listing  Listing         @relation(fields: [listingId], references: [id])
+  business BusinessProfile @relation(fields: [businessId], references: [id])
+  roomType RoomType?       @relation(fields: [roomTypeId], references: [id])
+
+  participants   BookingParticipant[]
+  addOns         BookingAddOn[]
+  payments       Payment[]
+  messageThreads MessageThread[]
+  refunds        Refund[]
+  review         Review?
+  notifications  Notification[]
+  supportCases   SupportCase[]
+
+  @@index([orderId])
+  @@index([customerId, status])
+  @@index([businessId, status])
+}
+
+model BookingParticipant {
+  id             String  @id @default(cuid())
+  bookingId      String
+  fullName       String
+  email          String?
+  phone          String?
+  documentType   String?
+  documentNumber String?
+  isPrimary      Boolean @default(false)
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+/// Snapshots the add-on's name/price at booking time (mirrors BookingParticipant),
+/// so a later price change on the AddOn doesn't rewrite booking history.
+model BookingAddOn {
+  id         String @id @default(cuid())
+  bookingId  String
+  addOnId    String
+  name       String
+  priceMinor Int
+  quantity   Int    @default(1)
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  addOn   AddOn   @relation(fields: [addOnId], references: [id])
+
+  @@index([bookingId])
+}
+
+model Payment {
+  id                String          @id @default(cuid())
+  orderId           String?
+  bookingId         String?
+  provider          PaymentProvider
+  status            PaymentStatus   @default(NOT_STARTED)
+  amountMinor       Int
+  currency          String          @default("UGX")
+  providerReference String?
+  failureReason     String?
+  initiatedAt       DateTime        @default(now())
+  completedAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  order    Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  booking  Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  refunds  Refund[]
+}
+
+model Refund {
+  id                String       @id @default(cuid())
+  paymentId         String
+  bookingId         String
+  amountMinor       Int
+  reason            String
+  status            RefundStatus @default(REQUESTED)
+  requestedByUserId String?
+  reviewedByAdminId String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id                String       @id @default(cuid())
+  bookingId         String       @unique
+  authorUserId      String
+  listingId         String
+  businessId        String
+  rating            Int
+  title             String?
+  body              String
+  status            ReviewStatus @default(PUBLISHED)
+  businessReplyBody String?
+  businessRepliedAt DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  booking  Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  author   User            @relation(fields: [authorUserId], references: [id])
+  listing  Listing         @relation(fields: [listingId], references: [id])
+  business BusinessProfile @relation(fields: [businessId], references: [id])
+
+  @@index([listingId, status])
+}
+
+// ---------------------------------------------------------------------------
+// Notifications, saved items, trip planner, support
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id                   String           @id @default(cuid())
+  userId               String
+  type                 NotificationType
+  title                String
+  body                 String
+  isRead               Boolean          @default(false)
+  relatedBookingId     String?
+  relatedSupportCaseId String?
+  createdAt            DateTime         @default(now())
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relatedBooking Booking?     @relation(fields: [relatedBookingId], references: [id])
+  supportCase    SupportCase? @relation(fields: [relatedSupportCaseId], references: [id])
+
+  @@index([userId, isRead])
+}
+
+model SavedItem {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+}
+
+model TripPlan {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  startDate DateTime?
+  endDate   DateTime?
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items TripPlanItem[]
+}
+
+model TripPlanItem {
+  id          String    @id @default(cuid())
+  tripPlanId  String
+  listingId   String?
+  customLabel String?
+  date        DateTime?
+  notes       String?
+  position    Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  tripPlan TripPlan @relation(fields: [tripPlanId], references: [id], onDelete: Cascade)
+  listing  Listing? @relation(fields: [listingId], references: [id])
+}
+
+model SupportCase {
+  id               String            @id @default(cuid())
+  caseRef          String            @unique
+  openedByUserId   String
+  surface          Surface           @default(CUSTOMER)
+  subject          String
+  category         String
+  status           SupportCaseStatus @default(OPEN)
+  relatedBookingId String?
+  assignedAdminId  String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  closedAt         DateTime?
+
+  openedBy       User             @relation("SupportCaseOpener", fields: [openedByUserId], references: [id])
+  relatedBooking Booking?         @relation(fields: [relatedBookingId], references: [id])
+  messages       SupportMessage[]
+  notifications  Notification[]
+}
+
+model SupportMessage {
+  id            String   @id @default(cuid())
+  supportCaseId String
+  authorUserId  String
+  authorRole    Surface
+  body          String
+  attachmentUrl String?
+  createdAt     DateTime @default(now())
+
+  supportCase SupportCase @relation(fields: [supportCaseId], references: [id], onDelete: Cascade)
+  author      User        @relation(fields: [authorUserId], references: [id])
+}
+
+model MessageThread {
+  id         String   @id @default(cuid())
+  bookingId  String?
+  businessId String
+  customerId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  business   BusinessProfile @relation(fields: [businessId], references: [id])
+  customer   User            @relation(fields: [customerId], references: [id])
+  booking    Booking?        @relation(fields: [bookingId], references: [id])
+  messages   Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  threadId  String
+  senderId  String
+  content   String
+  createdAt DateTime @default(now())
+  
+  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender    User          @relation(fields: [senderId], references: [id])
+}
