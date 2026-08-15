@@ -146,8 +146,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // SafariNexa DB (link, create, or send to onboarding).
     Google({
       id: "google",
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID || "dummy",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "dummy",
       allowDangerousEmailAccountLinking: false
     }),
 
@@ -156,8 +156,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // can be gated independently and much more strictly in signIn() below.
     Google({
       id: "google-admin",
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID || "dummy",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "dummy",
       allowDangerousEmailAccountLinking: false
     })
   ],

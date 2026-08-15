@@ -12,14 +12,15 @@ import { isAuthDevMode } from "@/lib/dev-mode";
  * components, server actions).
  */
 export default {
+  secret: process.env.AUTH_SECRET || "dummy-secret-for-prototype-safari-nexa",
   session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 30 },
   pages: {
     signIn: "/auth/sign-in",
     error: "/auth/sign-in"
   },
   providers: [
-    Google({ id: "google", clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET }),
-    Google({ id: "google-admin", clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET })
+    Google({ id: "google", clientId: process.env.GOOGLE_CLIENT_ID || "dummy", clientSecret: process.env.GOOGLE_CLIENT_SECRET || "dummy" }),
+    Google({ id: "google-admin", clientId: process.env.GOOGLE_CLIENT_ID || "dummy", clientSecret: process.env.GOOGLE_CLIENT_SECRET || "dummy" })
   ],
   callbacks: {
     // Projects whatever the full Node-runtime config already put in the JWT
