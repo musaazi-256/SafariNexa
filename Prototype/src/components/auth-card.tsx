@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { isAuthDevMode } from "@/lib/dev-mode";
 import { safeReturnTo } from "@/lib/return-to";
 
 type Surface = "customer" | "business" | "admin";
@@ -35,14 +34,27 @@ export function AuthCard({
 }) {
   const meta = SURFACE_META[surface];
   const target = safeReturnTo(returnTo, meta.defaultReturn);
-  const devMode = isAuthDevMode();
 
   async function credentialsAction(formData: FormData) {
     "use server";
     try {
+      let email = formData.get("email")?.toString();
+      let password = formData.get("password")?.toString();
+
+      // Automatically fallback to our seeded demo accounts if fields are left empty
+      if (!email) {
+        if (surface === "admin") email = "admin@safarinexa.test";
+        else if (surface === "business") email = "business@dev.test";
+        else email = "customer@safarinexa.test";
+      }
+      
+      if (!password) {
+        password = "Passw0rd!";
+      }
+
       await signIn(meta.provider, {
-        email: formData.get("email"),
-        password: formData.get("password"),
+        email,
+        password,
         redirectTo: target
       });
     } catch (thrown) {
@@ -68,13 +80,6 @@ export function AuthCard({
           </p>
         ) : null}
 
-        {devMode ? (
-          <p className="rounded-xl border border-warning/30 bg-warning/10 px-3.5 py-2.5 text-xs font-medium text-warning-foreground">
-            Dev mode is on (<code>AUTH_DEV_MODE=true</code>) — any email/password signs in and auto-provisions the
-            account{surface === "admin" ? " as an active admin" : ""}. Fields are pre-filled; just submit.
-          </p>
-        ) : null}
-
         <Button asChild variant="secondary" className="w-full">
           <Link href={`${meta.googleHref}?returnTo=${encodeURIComponent(target)}`}>Continue with Google</Link>
         </Button>
@@ -93,9 +98,7 @@ export function AuthCard({
               id={`${surface}-email`}
               name="email"
               type="email"
-              placeholder="you@example.com"
-              defaultValue={devMode ? `${surface}@dev.test` : undefined}
-              required
+              placeholder="Leave empty to use a demo account"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -104,9 +107,7 @@ export function AuthCard({
               id={`${surface}-password`}
               name="password"
               type="password"
-              placeholder="••••••••"
-              defaultValue={devMode ? "dev" : undefined}
-              required
+              placeholder="Leave empty to use a demo account"
             />
           </div>
           <Button type="submit" className="mt-1">
