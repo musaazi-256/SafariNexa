@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ListingRow } from "@/components/listing-row";
 import { SearchBar } from "@/components/search-bar";
 import { SearchFilters } from "@/components/search-filters";
+import { MobileFilters } from "@/components/mobile-filters";
 import { SortSelect } from "@/components/sort-select";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -206,7 +207,10 @@ export default async function SearchPage({
                   ) : null}
                   <p className="text-sm text-muted-foreground mt-2">Browse freely. Sign in when you&apos;re ready to book.</p>
                 </div>
-                <SortSelect />
+                <div className="flex items-center gap-2">
+                  <MobileFilters />
+                  <SortSelect />
+                </div>
               </div>
 
               {totalResults === 0 ? (
