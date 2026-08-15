@@ -170,7 +170,7 @@ export function SearchBar({ className }: { className?: string }) {
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-2">
+      <div className="-mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 no-scrollbar flex gap-1.5 overflow-x-auto pb-2">
         {CATEGORIES.map((item) => (
           <button
             key={item.id}
