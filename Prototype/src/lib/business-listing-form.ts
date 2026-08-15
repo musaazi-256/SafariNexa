@@ -25,7 +25,7 @@ export function parseBaseFields(formData: FormData) {
     longitude: formData.get("longitude") ? Number(formData.get("longitude")) : undefined,
     basePriceMinor: Math.max(0, Number(formData.get("basePriceMinor")) || 0),
     coverImageUrl: String(formData.get("coverImageUrl") ?? "").trim() || undefined,
-    images: linesToArray(formData.get("images"))
+    images: Array.from(formData.getAll("images")).map(String).filter(Boolean)
   };
 }
 
@@ -51,7 +51,7 @@ export function parseRoomTypeRows(formData: FormData) {
       totalRooms: Math.max(1, Number(formData.get(`roomTypeTotalRooms_${i}`)) || 1),
       breakfastIncluded: formData.get(`roomTypeBreakfast_${i}`) === "on",
       description: String(formData.get(`roomTypeDescription_${i}`) ?? "").trim() || undefined,
-      images: []
+      images: Array.from(formData.getAll(`roomTypeImages_${i}`)).map(String).filter(Boolean)
     });
   }
   return rows;

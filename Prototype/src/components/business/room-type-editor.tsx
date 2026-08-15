@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ImageUploader } from "@/components/ui/image-uploader";
 
 export type RoomTypeRow = {
   name: string;
@@ -15,9 +16,10 @@ export type RoomTypeRow = {
   totalRooms: string;
   breakfastIncluded: boolean;
   description: string;
+  images: string[];
 };
 
-const EMPTY_ROOM: RoomTypeRow = { name: "", priceMinor: "", maxOccupancy: "2", totalRooms: "1", breakfastIncluded: false, description: "" };
+const EMPTY_ROOM: RoomTypeRow = { name: "", priceMinor: "", maxOccupancy: "2", totalRooms: "1", breakfastIncluded: false, description: "", images: [] };
 
 export function RoomTypeEditor({ initial }: { initial: RoomTypeRow[] }) {
   const [rows, setRows] = React.useState<RoomTypeRow[]>(initial.length > 0 ? initial : [EMPTY_ROOM]);
@@ -86,6 +88,13 @@ export function RoomTypeEditor({ initial }: { initial: RoomTypeRow[] }) {
               <Label>Description (optional)</Label>
               <Input name={`roomTypeDescription_${index}`} value={row.description} onChange={(e) => updateRow(index, { description: e.target.value })} />
             </div>
+            
+            <div className="flex flex-col gap-1.5 sm:col-span-2 pt-2 border-t border-border mt-2">
+              <Label>Room Photos</Label>
+              <p className="text-xs text-muted-foreground mb-2">Upload photos specifically for this room type.</p>
+              <ImageUploader name={`roomTypeImages_${index}`} multiple={true} defaultValue={row.images} />
+            </div>
+            
             {rows.length > 1 ? (
               <Button
                 type="button"

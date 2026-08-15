@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { ImageUploader } from "@/components/ui/image-uploader";
 
 export type ListingBaseInitial = {
   title?: string;
@@ -98,38 +99,13 @@ export function ListingBaseFields({ initial }: { initial?: ListingBaseInitial })
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="coverImageUrl" className="font-semibold text-slate-700">Cover photo</Label>
-          <div className="flex gap-2">
-            <Input id="coverImageUrl" name="coverImageUrl" type="url" defaultValue={initial?.coverImageUrl ?? ""} className="flex-1" placeholder="https://" />
-            <div className="h-10 w-10 shrink-0 rounded-md bg-slate-100 border border-slate-200 overflow-hidden relative group">
-              {initial?.coverImageUrl ? (
-                <img src={initial.coverImageUrl} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <div className="h-full w-full bg-slate-100" />
-              )}
-            </div>
-            <Button type="button" variant="outline" className="shrink-0 text-slate-700 font-semibold border-slate-200">
-              Change
-            </Button>
-          </div>
+          <ImageUploader name="coverImageUrl" multiple={false} defaultValue={initial?.coverImageUrl ?? ""} />
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">
           <Label htmlFor="images" className="font-semibold text-slate-700">Gallery photos</Label>
-          <p className="text-xs text-slate-500 mb-1">Add up to 10 high-quality photos. One photo URL per line.</p>
-          <div className="flex flex-col md:flex-row gap-4">
-            <Textarea 
-              id="images" 
-              name="images" 
-              defaultValue={initial?.images?.join("\n") ?? ""} 
-              className="flex-1 resize-none h-40" 
-              placeholder="https://..."
-            />
-            <div className="md:w-48 shrink-0 h-40 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center bg-slate-50 text-center p-4 cursor-pointer hover:bg-slate-100 transition-colors">
-              <Upload className="h-5 w-5 text-slate-400 mb-2" />
-              <p className="text-sm font-semibold text-slate-700">Upload photos</p>
-              <p className="text-xs text-slate-500 mt-1">or drag and drop<br/>JPG, PNG up to 10MB</p>
-            </div>
-          </div>
+          <p className="text-xs text-slate-500 mb-1">Add up to 10 high-quality photos to showcase your property.</p>
+          <ImageUploader name="images" multiple={true} defaultValue={initial?.images ?? []} />
         </div>
       </CardContent>
     </Card>
