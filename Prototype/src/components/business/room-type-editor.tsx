@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { ImageUploader } from "@/components/ui/image-uploader";
 
 export type RoomTypeRow = {
+  id?: string;
   name: string;
   priceMinor: string;
   maxOccupancy: string;
@@ -37,6 +38,7 @@ export function RoomTypeEditor({ initial }: { initial: RoomTypeRow[] }) {
         <input type="hidden" name="roomTypeCount" value={rows.length} />
         {rows.map((row, index) => (
           <div key={index} className="grid gap-3 rounded-xl border border-border p-4 sm:grid-cols-2">
+            {row.id && <input type="hidden" name={`roomTypeId_${index}`} value={row.id} />}
             <div className="flex flex-col gap-1.5 sm:col-span-2">
               <Label>Room name</Label>
               <Input name={`roomTypeName_${index}`} value={row.name} onChange={(e) => updateRow(index, { name: e.target.value })} required />

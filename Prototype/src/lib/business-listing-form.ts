@@ -25,7 +25,8 @@ export function parseBaseFields(formData: FormData) {
     longitude: formData.get("longitude") ? Number(formData.get("longitude")) : undefined,
     basePriceMinor: Math.max(0, Number(formData.get("basePriceMinor")) || 0),
     coverImageUrl: String(formData.get("coverImageUrl") ?? "").trim() || undefined,
-    images: Array.from(formData.getAll("images")).map(String).filter(Boolean)
+    images: Array.from(formData.getAll("images")).map(String).filter(Boolean),
+    destinationId: String(formData.get("destinationId") ?? "").trim() || null
   };
 }
 
@@ -44,7 +45,9 @@ export function parseRoomTypeRows(formData: FormData) {
   for (let i = 0; i < count; i++) {
     const name = String(formData.get(`roomTypeName_${i}`) ?? "").trim();
     if (!name) continue;
+    
     rows.push({
+      id: String(formData.get(`roomTypeId_${i}`) ?? "").trim() || undefined,
       name,
       priceMinor: Math.max(0, Number(formData.get(`roomTypePrice_${i}`)) || 0),
       maxOccupancy: Math.max(1, Number(formData.get(`roomTypeMaxOccupancy_${i}`)) || 1),
@@ -65,6 +68,7 @@ export function parseAddOnRows(formData: FormData) {
     const name = String(formData.get(`addOnName_${i}`) ?? "").trim();
     if (!name) continue;
     rows.push({
+      id: String(formData.get(`addOnId_${i}`) ?? "").trim() || undefined,
       name,
       priceMinor: Math.max(0, Number(formData.get(`addOnPrice_${i}`)) || 0),
       description: String(formData.get(`addOnDescription_${i}`) ?? "").trim() || undefined

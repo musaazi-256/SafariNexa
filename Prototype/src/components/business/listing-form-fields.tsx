@@ -17,9 +17,16 @@ export type ListingBaseInitial = {
   basePriceMinor?: number;
   coverImageUrl?: string | null;
   images?: string[];
+  destinationId?: string | null;
 };
 
-export function ListingBaseFields({ initial }: { initial?: ListingBaseInitial }) {
+export function ListingBaseFields({ 
+  initial, 
+  destinations = [] 
+}: { 
+  initial?: ListingBaseInitial;
+  destinations?: { id: string; name: string }[];
+}) {
   return (
     <Card className="rounded-2xl shadow-sm border-slate-200">
       <CardHeader className="border-b border-slate-100 pb-4 flex flex-row items-center justify-between">
@@ -75,6 +82,22 @@ export function ListingBaseFields({ initial }: { initial?: ListingBaseInitial })
             <option value="Gulu">Gulu</option>
             <option value="Fort Portal">Fort Portal</option>
           </select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="destinationId" className="font-semibold text-slate-700">Destination (optional)</Label>
+          <select
+            id="destinationId"
+            name="destinationId"
+            defaultValue={initial?.destinationId ?? ""}
+            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="">None / Unassigned</option>
+            {destinations.map(d => (
+              <option key={d.id} value={d.id}>{d.name}</option>
+            ))}
+          </select>
+          <p className="text-xs text-slate-500 font-medium">Link this listing to a curated destination page.</p>
         </div>
 
         <div className="flex flex-col gap-1.5">

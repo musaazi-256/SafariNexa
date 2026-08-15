@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export type AddOnRow = { name: string; priceMinor: string; description: string };
+export type AddOnRow = { id?: string; name: string; priceMinor: string; description: string };
 
 const EMPTY_ADD_ON: AddOnRow = { name: "", priceMinor: "", description: "" };
 
@@ -28,6 +28,7 @@ export function AddOnEditor({ initial }: { initial: AddOnRow[] }) {
         <input type="hidden" name="addOnCount" value={rows.length} />
         {rows.map((row, index) => (
           <div key={index} className="grid gap-3 rounded-xl border border-border p-4 sm:grid-cols-2">
+            {row.id && <input type="hidden" name={`addOnId_${index}`} value={row.id} />}
             <div className="flex flex-col gap-1.5">
               <Label>Add-on name</Label>
               <Input name={`addOnName_${index}`} value={row.name} onChange={(e) => updateRow(index, { name: e.target.value })} required />

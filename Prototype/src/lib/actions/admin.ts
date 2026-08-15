@@ -43,16 +43,22 @@ export async function updateVerificationStatus(verificationId: string, status: V
       }
     });
 
-    // 3. Simulated: Send email notification to business owner
+    // 3. Send email notification to business owners
     // In a production app, we would integrate Resend/SendGrid here.
-    await tx.notification.create({
-      data: {
-        userId: session.user.id, // Should ideally be the business owner's ID
-        type: "SYSTEM",
-        title: `Business Verification ${status}`,
-        body: `Your business verification for ${verification.business.name} has been marked as ${status}.`
-      }
+    const owners = await tx.businessUser.findMany({
+      where: { businessId: verification.businessId, role: "OWNER" }
     });
+
+    for (const owner of owners) {
+      await tx.notification.create({
+        data: {
+          userId: owner.userId,
+          type: "SYSTEM",
+          title: `Business Verification ${status}`,
+          body: `Your business verification for ${verification.business.name} has been marked as ${status}.`
+        }
+      });
+    }
   });
 
   await logAuditEvent({

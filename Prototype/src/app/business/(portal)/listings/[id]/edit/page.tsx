@@ -51,6 +51,11 @@ export default async function EditListingPage({ params }: { params: { id: string
     });
   }
 
+  const destinations = await db.destination.findMany({
+    select: { id: true, name: true },
+    orderBy: { name: "asc" }
+  });
+
   async function updateListing(formData: FormData) {
     "use server";
     const activeSession = await auth();
@@ -68,12 +73,49 @@ export default async function EditListingPage({ params }: { params: { id: string
 
       const roomTypeRows = parseRoomTypeRows(formData);
       const addOnRows = parseAddOnRows(formData);
-      await db.$transaction([
-        db.roomType.deleteMany({ where: { accommodationId: target.id } }),
-        db.addOn.deleteMany({ where: { accommodationId: target.id } }),
-        ...roomTypeRows.map((row) => db.roomType.create({ data: { ...row, accommodationId: target.id } })),
-        ...addOnRows.map((row) => db.addOn.create({ data: { ...row, accommodationId: target.id } }))
-      ]);
+      
+      const incomingRoomIds = roomTypeRows.map((r) => r.id).filter(Boolean) as string[];
+      const incomingAddOnIds = addOnRows.map((a) => a.id).filter(Boolean) as string[];
+
+      await db.$transaction(async (tx) => {
+        // Find existing to check for bookings before deleting
+        const existingRooms = await tx.roomType.findMany({
+          where: { accommodationId: target.id },
+          include: { _count: { select: { bookings: true } } }
+        });
+        const existingAddOns = await tx.addOn.findMany({
+          where: { accommodationId: target.id },
+          include: { _count: { select: { bookingAddOns: true } } }
+        });
+
+        const roomsToDelete = existingRooms.filter((r) => !incomingRoomIds.includes(r.id) && r._count.bookings === 0);
+        const addOnsToDelete = existingAddOns.filter((a) => !incomingAddOnIds.includes(a.id) && a._count.bookingAddOns === 0);
+
+        if (roomsToDelete.length > 0) {
+          await tx.roomType.deleteMany({ where: { id: { in: roomsToDelete.map((r) => r.id) } } });
+        }
+        if (addOnsToDelete.length > 0) {
+          await tx.addOn.deleteMany({ where: { id: { in: addOnsToDelete.map((a) => a.id) } } });
+        }
+
+        for (const row of roomTypeRows) {
+          if (row.id) {
+            const { id, ...data } = row;
+            await tx.roomType.update({ where: { id }, data });
+          } else {
+            await tx.roomType.create({ data: { ...row, accommodationId: target.id } });
+          }
+        }
+
+        for (const row of addOnRows) {
+          if (row.id) {
+            const { id, ...data } = row;
+            await tx.addOn.update({ where: { id }, data });
+          } else {
+            await tx.addOn.create({ data: { ...row, accommodationId: target.id } });
+          }
+        }
+      });
     } else if (target.type === "TOUR") {
       await db.tourListing.update({ where: { listingId: target.id }, data: parseTourFields(formData) });
     } else if (target.type === "RESTAURANT") {
@@ -119,6 +161,7 @@ export default async function EditListingPage({ params }: { params: { id: string
 
       <form action={updateListing} className="flex flex-col gap-6">
         <ListingBaseFields
+          destinations={destinations}
           initial={{
             title: listing.title,
             description: listing.description,
@@ -128,7 +171,8 @@ export default async function EditListingPage({ params }: { params: { id: string
             longitude: listing.longitude,
             basePriceMinor: listing.basePriceMinor,
             coverImageUrl: listing.coverImageUrl,
-            images: listing.images
+            images: listing.images,
+            destinationId: listing.destinationId
           }}
         />
 
@@ -146,6 +190,7 @@ export default async function EditListingPage({ params }: { params: { id: string
             />
             <RoomTypeEditor
               initial={listing.accommodation.roomTypes.map((room) => ({
+                id: room.id,
                 name: room.name,
                 priceMinor: String(room.priceMinor),
                 maxOccupancy: String(room.maxOccupancy),
@@ -157,6 +202,7 @@ export default async function EditListingPage({ params }: { params: { id: string
             />
             <AddOnEditor
               initial={listing.accommodation.addOns.map((addOn) => ({
+                id: addOn.id,
                 name: addOn.name,
                 priceMinor: String(addOn.priceMinor),
                 description: addOn.description ?? ""

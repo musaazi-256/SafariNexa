@@ -51,11 +51,14 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
     });
   }
 
+  const destinations = await db.destination.findMany({
+    select: { id: true, name: true },
+    orderBy: { name: "asc" }
+  });
+
   async function createListing(formData: FormData) {
     "use server";
-    const activeSession = await auth();
-    if (!activeSession?.user) redirect("/business/auth/sign-in");
-    const activeBusinessId = activeSession.user.businessIds[0];
+    const { businessId: activeBusinessId } = await requireBusinessSession();
     if (!activeBusinessId) redirect("/business/auth/sign-in");
 
     const submittedType = String(formData.get("listingType")) as ListingType;
@@ -143,7 +146,7 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
 
       <form action={createListing} className="flex flex-col gap-6">
         <input type="hidden" name="listingType" value={type} />
-        <ListingBaseFields />
+        <ListingBaseFields destinations={destinations} />
 
         {type === "ACCOMMODATION" ? (
           <>
