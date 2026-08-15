@@ -150,7 +150,13 @@ export default async function SearchPage({
   }
 
   const dateLabel = [searchParams.checkIn, searchParams.checkOut].filter(Boolean).join(" – ") || searchParams.startDate || searchParams.date;
-  const summaryParts = [dateLabel, searchParams.time, hasGuestFilter ? `${guests} guests` : undefined].filter(Boolean);
+  const summaryParts = [
+    hasGuestFilter ? `${guests} ${guests === 1 ? 'adult' : 'adults'}` : undefined,
+    dateLabel,
+    searchParams.time
+  ].filter(Boolean);
+
+  const noun = activeType === "Accommodation" ? "stays" : activeType === "Tour" ? "safaris" : activeType === "Restaurant" ? "restaurants" : activeType === "Transport" ? "rides" : "results";
 
   const totalResults = results.length;
   const page = parsePage(searchParams.page);
@@ -178,8 +184,8 @@ export default async function SearchPage({
         <Container className="py-8">
           <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
             <aside className="hidden lg:block">
-              <Card className="sticky top-24">
-                <CardContent className="flex flex-col gap-6 pt-6">
+              <Card className="sticky top-24 border-0 shadow-none bg-transparent">
+                <CardContent className="flex flex-col gap-6 p-0">
                   <div className="flex items-center gap-2 text-sm font-bold">
                     <SlidersHorizontal className="h-4 w-4" />
                     Filter results
@@ -190,18 +196,23 @@ export default async function SearchPage({
             </aside>
 
             <div>
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-muted-foreground">
-                  {totalResults} results{summaryParts.length ? ` · ${summaryParts.join(" · ")}` : ""} — search and filtering are open to
-                  guests. Booking asks for an account only when you&apos;re ready.
-                </p>
+              <div className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
+                <div>
+                  <h1 className="text-2xl font-bold text-foreground">
+                    {totalResults} {noun} found{query ? ` in ${query}` : ""}
+                  </h1>
+                  {summaryParts.length > 0 ? (
+                    <p className="text-sm text-muted-foreground mt-1">{summaryParts.join(" · ")}</p>
+                  ) : null}
+                  <p className="text-sm text-muted-foreground mt-2">Browse freely. Sign in when you&apos;re ready to book.</p>
+                </div>
                 <SortSelect />
               </div>
 
               {totalResults === 0 ? (
                 <EmptyState title="No results" description="Try a different destination, category, party size, or filter." />
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-6">
                   {pagedResults.map((listing) => (
                     <ListingRow key={listing.id} {...listing} tags={["Verified partner"]} />
                   ))}

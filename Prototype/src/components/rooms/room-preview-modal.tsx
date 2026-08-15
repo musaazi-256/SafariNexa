@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -44,10 +44,10 @@ export function RoomPreviewModal({ listingId, title }: { listingId: string; titl
       <DialogTrigger asChild>
         <Button 
           variant="secondary" 
-          className="relative z-20 mt-3 w-full"
+          className="relative z-20 mt-3 w-full px-6 font-semibold"
           onClick={(e) => e.stopPropagation()}
         >
-          View Rooms & Prices
+          View stay
         </Button>
       </DialogTrigger>
       <DialogContent 

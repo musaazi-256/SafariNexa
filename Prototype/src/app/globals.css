@@ -5,8 +5,8 @@
 @layer base {
   :root {
     /* SafariNexa brand tokens — warm, trustworthy, travel-oriented */
-    --background: 0 0% 100%; /* pure white — cards distinguish themselves via border/shadow, not a tinted page bg */
-    --foreground: 150 10% 8%;
+    --background: 90 14% 97%; /* #F8F9F7 */
+    --foreground: 144 11% 9%; /* #151A17 */
 
     --card: 0 0% 100%;
     --card-foreground: 150 10% 8%;
@@ -14,14 +14,14 @@
     --popover: 0 0% 100%;
     --popover-foreground: 150 10% 8%;
 
-    --primary: 146 82% 25%; /* #0C763A accessible action green */
+    --primary: 148 88% 25%; /* #087A3E */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 45 30% 94%;
     --secondary-foreground: 148 74% 16%; /* #0B4928 — rich brand green used for section headings */
 
     --muted: 42 24% 94%;
-    --muted-foreground: 40 6% 40%;
+    --muted-foreground: 103 3% 42%; /* #6B6F68 */
 
     /* Gold is an accent for ratings/highlights only — never a default CTA background,
        and never paired with white text (see design system rules). */
@@ -39,8 +39,8 @@
     --warning: 38 92% 50%;
     --warning-foreground: 150 10% 10%;
 
-    --border: 41 25% 83%;
-    --input: 41 25% 83%;
+    --border: 39 26% 87%; /* #E6E1D8 */
+    --input: 39 26% 87%;
     --ring: 146 82% 25%;
 
     --radius: 1rem;

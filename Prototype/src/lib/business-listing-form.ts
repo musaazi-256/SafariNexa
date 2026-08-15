@@ -76,7 +76,7 @@ export function parseAddOnRows(formData: FormData) {
 export function parseAccommodationFields(formData: FormData) {
   return {
     propertyType: String(formData.get("propertyType") ?? "").trim(),
-    amenities: linesToArray(formData.get("amenities")),
+    amenities: formData.getAll("amenities").map(String),
     checkInTime: String(formData.get("checkInTime") ?? "").trim() || undefined,
     checkOutTime: String(formData.get("checkOutTime") ?? "").trim() || undefined,
     maxGuests: Math.max(1, Number(formData.get("maxGuests")) || 2),
@@ -87,6 +87,7 @@ export function parseAccommodationFields(formData: FormData) {
 export function parseTourFields(formData: FormData) {
   const guideId = String(formData.get("guideId") ?? "").trim();
   return {
+    tourType: String(formData.get("tourType") ?? "").trim() || undefined,
     durationDays: Math.max(1, Number(formData.get("durationDays")) || 1),
     groupSizeMin: Math.max(1, Number(formData.get("groupSizeMin")) || 1),
     groupSizeMax: Math.max(1, Number(formData.get("groupSizeMax")) || 12),

@@ -170,12 +170,10 @@ export function AccommodationTypeFields({
             defaultValue={initial?.propertyType ?? "Lodge"}
             className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <option value="Lodge">Lodge</option>
-            <option value="Hotel">Hotel</option>
-            <option value="Guesthouse">Guesthouse</option>
-            <option value="Resort">Resort</option>
-            <option value="Campsite">Campsite</option>
-            <option value="Apartment">Apartment</option>
+            <option value="hotel">Hotel</option>
+            <option value="guesthouse">Guesthouse</option>
+            <option value="lodge">Lodge</option>
+            <option value="apartment">Apartment</option>
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
@@ -190,10 +188,28 @@ export function AccommodationTypeFields({
           <Label htmlFor="checkOutTime" className="font-semibold text-slate-700">Check-out time <span className="text-red-500">*</span></Label>
           <Input id="checkOutTime" name="checkOutTime" placeholder="11:00" defaultValue={initial?.checkOutTime ?? ""} />
         </div>
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label htmlFor="amenities" className="font-semibold text-slate-700">Amenities</Label>
-          <p className="text-xs text-slate-500 mb-1">One amenity per line.</p>
-          <Textarea id="amenities" name="amenities" defaultValue={initial?.amenities?.join("\n") ?? ""} />
+        <div className="flex flex-col gap-3 sm:col-span-2">
+          <Label className="font-semibold text-slate-700">Amenities</Label>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {[
+              { value: "wifi", label: "Wi-Fi" },
+              { value: "parking", label: "Parking" },
+              { value: "breakfast", label: "Breakfast" },
+              { value: "pool", label: "Swimming pool" },
+              { value: "airport-transfer", label: "Airport transfer" }
+            ].map((amenity) => (
+              <label key={amenity.value} className="flex items-center gap-2 text-sm text-slate-600">
+                <input
+                  type="checkbox"
+                  name="amenities"
+                  value={amenity.value}
+                  defaultChecked={initial?.amenities?.includes(amenity.value) ?? false}
+                  className="h-4 w-4 rounded border-input text-primary focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                {amenity.label}
+              </label>
+            ))}
+          </div>
         </div>
         <div className="flex flex-col gap-1.5 sm:col-span-2">
           <Label htmlFor="cancellationPolicy" className="font-semibold text-slate-700">Cancellation policy</Label>
@@ -210,6 +226,7 @@ export function TourTypeFields({
 }: {
   initial?: {
     durationDays?: number;
+    tourType?: string | null;
     groupSizeMin?: number;
     groupSizeMax?: number;
     difficulty?: string | null;
@@ -234,6 +251,20 @@ export function TourTypeFields({
         </div>
       </CardHeader>
       <CardContent className="grid gap-6 sm:grid-cols-2 pt-6">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="tourType" className="font-semibold text-slate-700">Safari type <span className="text-red-500">*</span></Label>
+          <select
+            id="tourType"
+            name="tourType"
+            defaultValue={initial?.tourType ?? "wildlife"}
+            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="wildlife">Wildlife Safari</option>
+            <option value="primate">Gorilla & Chimp Trekking</option>
+            <option value="cultural">Cultural Tour</option>
+            <option value="adventure">Adventure & Hiking</option>
+          </select>
+        </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="durationDays" className="font-semibold text-slate-700">Duration (days) <span className="text-red-500">*</span></Label>
           <Input id="durationDays" name="durationDays" type="number" min={1} defaultValue={initial?.durationDays ?? 1} required />
@@ -327,10 +358,10 @@ export function RestaurantTypeFields({
             defaultValue={initial?.cuisineType ?? "Ugandan home cooking"}
             className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <option value="Ugandan home cooking">Ugandan home cooking</option>
-            <option value="International">International</option>
-            <option value="Street Food">Street Food</option>
-            <option value="Fine Dining">Fine Dining</option>
+            <option value="local">Local Ugandan</option>
+            <option value="continental">Continental</option>
+            <option value="indian">Indian</option>
+            <option value="cafe">Café & Bakery</option>
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
@@ -432,7 +463,16 @@ export function TransportTypeFields({
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="vehicleType" className="font-semibold text-slate-700">Vehicle type <span className="text-red-500">*</span></Label>
-          <Input id="vehicleType" name="vehicleType" placeholder="Sedan, 4x4, Minivan…" defaultValue={initial?.vehicleType} required />
+          <select
+            id="vehicleType"
+            name="vehicleType"
+            defaultValue={initial?.vehicleType ?? "suv"}
+            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="suv">SUV / 4x4</option>
+            <option value="van">Safari Minivan</option>
+            <option value="sedan">Sedan</option>
+          </select>
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="capacity" className="font-semibold text-slate-700">Passenger capacity <span className="text-red-500">*</span></Label>

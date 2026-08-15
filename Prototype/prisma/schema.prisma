@@ -539,6 +539,7 @@ model Guide {
 model TourListing {
   listingId    String   @id
   guideId      String?
+  tourType     String?
   durationDays Int
   itinerary    Json?
   groupSizeMin Int      @default(1)

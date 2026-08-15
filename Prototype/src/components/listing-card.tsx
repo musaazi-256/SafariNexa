@@ -93,7 +93,11 @@ export function ListingCard({
         {showWishlist && rating ? <Rating value={rating} /> : null}
         {availability ? <p className="text-xs font-semibold text-primary">{availability}</p> : null}
         <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground">{description}</p>
-        <strong className="mt-2 text-base font-extrabold">{price}</strong>
+        <div>
+          <p className="text-xs text-muted-foreground">From</p>
+          <strong className="text-lg font-extrabold">{price}</strong>
+          {type === "Accommodation" ? <p className="text-xs text-muted-foreground mt-0.5">per night</p> : null}
+        </div>
         {type === "Accommodation" ? (
           <RoomPreviewModal listingId={id} title={title} />
         ) : null}

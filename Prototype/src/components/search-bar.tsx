@@ -33,56 +33,53 @@ const CATEGORIES: Array<{ id: CategoryId; label: string; icon: React.ComponentTy
 const GUEST_OPTIONS = ["1", "2", "3", "4", "5", "6"];
 
 function Field({
-  icon: Icon,
   label,
   children,
   className
 }: {
-  icon: React.ComponentType<{ className?: string }>;
   label: string;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
-    <div className={cn("flex min-w-[140px] flex-1 flex-col gap-1", className)}>
-      <label className="text-xs font-semibold text-muted-foreground">{label}</label>
-      <div className="flex h-11 items-center gap-2 rounded-xl border border-input bg-card px-3">
-        <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+    <div className={cn("flex flex-1 flex-col justify-center px-6 py-3 hover:bg-muted/50 transition-colors", className)}>
+      <label className="text-xs font-bold tracking-wide text-foreground">{label}</label>
+      <div className="flex items-center mt-0.5">
         {children}
       </div>
     </div>
   );
 }
 
-function TextField(props: React.InputHTMLAttributes<HTMLInputElement> & { icon: React.ComponentType<{ className?: string }>; label: string }) {
-  const { icon, label, className, ...inputProps } = props;
+function TextField(props: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
+  const { label, className, ...inputProps } = props;
   return (
-    <Field icon={icon} label={label}>
-      <input {...inputProps} className={cn("w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground", className)} />
+    <Field label={label} className={className}>
+      <input {...inputProps} className="w-full bg-transparent text-sm font-medium text-muted-foreground outline-none placeholder:text-muted-foreground/70" />
     </Field>
   );
 }
 
 function SelectField({
-  icon,
   label,
   value,
   onChange,
-  options
+  options,
+  className
 }: {
-  icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
   onChange: (value: string) => void;
   options: Array<{ value: string; label: string }>;
+  className?: string;
 }) {
   return (
-    <Field icon={icon} label={label} className="min-w-[120px]">
+    <Field label={label} className={className}>
       <div className="relative w-full">
         <select
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="w-full appearance-none bg-transparent pr-5 text-sm font-medium outline-none"
+          className="w-full appearance-none bg-transparent pr-5 text-sm font-medium text-muted-foreground outline-none"
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -90,7 +87,7 @@ function SelectField({
             </option>
           ))}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       </div>
     </Field>
   );
@@ -182,7 +179,7 @@ export function SearchBar({ className }: { className?: string }) {
             className={cn(
               "flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors",
               category === item.id
-                ? "border-transparent bg-accent text-accent-foreground"
+                ? "border-transparent bg-[#0B4928] text-white"
                 : "border-border bg-card text-foreground hover:bg-secondary"
             )}
           >
@@ -192,9 +189,9 @@ export function SearchBar({ className }: { className?: string }) {
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-4 shadow-card-hover">
+      <form onSubmit={handleSubmit} className="mt-4 flex flex-col sm:flex-row sm:items-center rounded-3xl sm:rounded-full border border-border bg-card shadow-sm overflow-hidden">
         {category === "transport" ? (
-          <div className="mb-3 flex gap-2">
+          <div className="flex border-b border-border sm:border-b-0 sm:border-r p-3 gap-2">
             {(
               [
                 { id: "airport", label: "Airport transfer" },
@@ -206,7 +203,7 @@ export function SearchBar({ className }: { className?: string }) {
                 type="button"
                 onClick={() => setTransportSubcategory(option.id)}
                 className={cn(
-                  "rounded-full px-3 py-1 text-xs font-semibold transition-colors",
+                  "rounded-full px-4 py-2 text-xs font-semibold transition-colors",
                   transportSubcategory === option.id ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
                 )}
               >
@@ -216,78 +213,64 @@ export function SearchBar({ className }: { className?: string }) {
           </div>
         ) : null}
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+        <div className="flex flex-col sm:flex-row flex-1 divide-y sm:divide-y-0 sm:divide-x divide-border">
           {category === "accommodation" ? (
             <>
-              <TextField icon={MapPin} label="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Where in East Africa?" />
-              <TextField icon={CalendarDays} label="Check-in" type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
-              <TextField icon={CalendarDays} label="Check-out" type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
-              <SelectField icon={Users} label="Guests" value={guests} onChange={setGuests} options={guestOptions("Adult")} />
-              <Button type="submit" size="lg" className="gap-2 sm:w-auto">
-                <Search className="h-4 w-4" />
-                Search stays
-              </Button>
+              <TextField label="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-full sm:min-w-[200px]" />
+              <TextField label="Check-in" type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
+              <TextField label="Check-out" type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
+              <SelectField label="Guests" value={guests} onChange={setGuests} options={guestOptions("Adult")} />
             </>
           ) : null}
 
           {category === "tours" ? (
             <>
-              <TextField icon={MapPin} label="Destination" value={tourDestination} onChange={(e) => setTourDestination(e.target.value)} placeholder="Where in East Africa?" />
-              <TextField icon={CalendarDays} label="Start date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-              <SelectField icon={Users} label="Guests" value={tourGuests} onChange={setTourGuests} options={guestOptions("Adult")} />
-              <Button type="submit" size="lg" className="gap-2 sm:w-auto">
-                <Search className="h-4 w-4" />
-                Search safaris
-              </Button>
+              <TextField label="Destination" value={tourDestination} onChange={(e) => setTourDestination(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-full" />
+              <TextField label="Start date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+              <SelectField label="Guests" value={tourGuests} onChange={setTourGuests} options={guestOptions("Adult")} />
             </>
           ) : null}
 
           {category === "restaurants" ? (
             <>
-              <TextField icon={MapPin} label="Area" value={area} onChange={(e) => setArea(e.target.value)} placeholder="Where in East Africa?" />
-              <TextField icon={CalendarDays} label="Check-in" type="date" value={reservationDate} onChange={(e) => setReservationDate(e.target.value)} />
-              <TextField icon={Clock} label="Time" type="time" value={reservationTime} onChange={(e) => setReservationTime(e.target.value)} />
-              <SelectField icon={Users} label="Guests" value={partySize} onChange={setPartySize} options={guestOptions("Adult")} />
-              <Button type="submit" size="lg" className="gap-2 sm:w-auto">
-                <Search className="h-4 w-4" />
-                Search restaurants
-              </Button>
+              <TextField label="Area" value={area} onChange={(e) => setArea(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-full" />
+              <TextField label="Date" type="date" value={reservationDate} onChange={(e) => setReservationDate(e.target.value)} />
+              <TextField label="Time" type="time" value={reservationTime} onChange={(e) => setReservationTime(e.target.value)} />
+              <SelectField label="Guests" value={partySize} onChange={setPartySize} options={guestOptions("Adult")} />
             </>
           ) : null}
 
           {category === "transport" ? (
             <>
-              <TextField icon={MapPin} label="Pick up" value={pickup} onChange={(e) => setPickup(e.target.value)} placeholder="Pickup location" />
+              <TextField label="Pick up" value={pickup} onChange={(e) => setPickup(e.target.value)} placeholder="Pickup location" />
               {transportSubcategory === "airport" ? (
-                <TextField icon={MapPin} label="Drop-off" value={dropoff} onChange={(e) => setDropoff(e.target.value)} placeholder="Drop-off location" />
+                <TextField label="Drop-off" value={dropoff} onChange={(e) => setDropoff(e.target.value)} placeholder="Drop-off location" />
               ) : (
                 <SelectField
-                  icon={Clock}
                   label="Duration"
                   value={duration}
                   onChange={setDuration}
                   options={["2", "4", "6", "8"].map((value) => ({ value, label: `${value} hours` }))}
                 />
               )}
-              <TextField icon={CalendarDays} label="Date" type="date" value={transportDate} onChange={(e) => setTransportDate(e.target.value)} />
-              <TextField icon={Clock} label="Time" type="time" value={transportTime} onChange={(e) => setTransportTime(e.target.value)} />
-              <SelectField icon={Users} label="Passengers" value={passengers} onChange={setPassengers} options={guestOptions("Adult")} />
-              <Button type="submit" size="lg" className="gap-2 sm:w-auto">
-                <Search className="h-4 w-4" />
-                Search rides
-              </Button>
+              <TextField label="Date" type="date" value={transportDate} onChange={(e) => setTransportDate(e.target.value)} />
+              <TextField label="Time" type="time" value={transportTime} onChange={(e) => setTransportTime(e.target.value)} />
+              <SelectField label="Passengers" value={passengers} onChange={setPassengers} options={guestOptions("Adult")} />
             </>
           ) : null}
 
           {category === "guides" ? (
             <>
-              <TextField icon={MapPin} label="Destination" value={guideDestination} onChange={(e) => setGuideDestination(e.target.value)} placeholder="Where in East Africa?" />
-              <Button type="submit" size="lg" className="gap-2 sm:w-auto">
-                <Search className="h-4 w-4" />
-                Search guides
-              </Button>
+              <TextField label="Destination" value={guideDestination} onChange={(e) => setGuideDestination(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-full" />
             </>
           ) : null}
+        </div>
+
+        <div className="p-2 sm:p-2 sm:shrink-0 bg-card sm:bg-transparent">
+          <Button type="submit" size="lg" className="w-full sm:w-auto rounded-full px-8 h-12 text-base font-bold bg-primary hover:bg-[#066130]">
+            <Search className="h-5 w-5 mr-2" />
+            Search stays
+          </Button>
         </div>
       </form>
     </div>
