@@ -34,16 +34,31 @@ export function MobileNav({
           </SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col gap-1">
-          {links.map((link) => (
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground hover:bg-secondary"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Separator className="my-1" />
             <Link
-              key={link.href}
-              href={link.href}
+              href="/business"
               onClick={() => setOpen(false)}
-              className="rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground hover:bg-secondary"
+              className="rounded-xl px-3 py-2.5 text-sm font-semibold text-muted-foreground hover:bg-secondary hover:text-foreground"
             >
-              {link.label}
+              Business Portal
             </Link>
-          ))}
+            <Link
+              href="/admin/dashboard"
+              onClick={() => setOpen(false)}
+              className="rounded-xl px-3 py-2.5 text-sm font-semibold text-muted-foreground hover:bg-secondary hover:text-foreground"
+            >
+              Admin Portal
+            </Link>
         </nav>
         {!authed ? (
           <>

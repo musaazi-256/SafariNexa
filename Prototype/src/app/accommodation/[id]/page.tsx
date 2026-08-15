@@ -241,7 +241,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
             </div>
 
             {/* Right Column: Sticky Sidebar with Map & Checkout */}
-            <div className="hidden lg:block">
+            <div className="relative">
               <div className="sticky top-[140px] flex flex-col gap-6">
                 
                 {/* Map Section */}
