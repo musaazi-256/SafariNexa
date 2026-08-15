@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Heart, LayoutDashboard, LifeBuoy, MapPin, Settings, User } from "lucide-react";
+import { Bell, Heart, LayoutDashboard, LifeBuoy, MapPin, Settings, User, Building2 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -72,6 +72,14 @@ export function UserMenu({
             Trip planner
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/business">
+            <Building2 className="h-4 w-4" />
+            Business Portal
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/notifications">
             <Bell className="h-4 w-4" />

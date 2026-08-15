@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Check, ChevronsUpDown } from "lucide-react";
+import Link from "next/link";
+import { Building2, Check, ChevronsUpDown, Plus } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -63,6 +64,13 @@ export function BusinessSwitcher({
             {business.id === active?.id ? <Check className="h-4 w-4 text-primary" /> : null}
           </DropdownMenuItem>
         ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/business/onboarding" className="cursor-pointer">
+            <Plus className="mr-2 h-4 w-4" />
+            <span>Create new workspace</span>
+          </Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
