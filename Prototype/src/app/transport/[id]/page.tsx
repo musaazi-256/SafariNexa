@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Car, Clock, Users, MapPin } from "lucide-react";
+import { Car, Clock, Users, ShieldCheck, MapPin } from "lucide-react";
 
 import { auth } from "@/auth";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { PhotoGallery } from "@/components/rooms/photo-gallery";
+import { RelatedListings } from "@/components/related-listings";
 import { ReviewList } from "@/components/reviews/review-list";
 import { ReviewSummary } from "@/components/reviews/review-summary";
 import { ReviewForm } from "@/components/reviews/review-form";
@@ -113,13 +115,10 @@ export default async function TransportDetailPage({ params }: { params: { id: st
             ]}
           />
 
-          <div className="relative mb-6 h-64 overflow-hidden rounded-2xl sm:h-80">
-            {listing.coverImageUrl ? (
-              <Image src={listing.coverImageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover" />
-            ) : (
-              <div className="h-full w-full bg-gradient-to-br from-brand-green to-[#062617]" />
-            )}
-          </div>
+          <PhotoGallery
+            images={listing.images.length > 0 ? listing.images : listing.coverImageUrl ? [listing.coverImageUrl] : []}
+            title={listing.title}
+          />
 
           <ListingTabs 
             tabs={[
@@ -143,7 +142,13 @@ export default async function TransportDetailPage({ params }: { params: { id: st
                 <h1 className="text-3xl font-extrabold sm:text-4xl">{listing.title}</h1>
                 <p className="mt-1 text-muted-foreground">{listing.city}</p>
 
-                <p className="mt-6 text-base leading-relaxed text-muted-foreground">{listing.description}</p>
+                <h2 className="mt-10 text-xl font-bold">About this transport</h2>
+                <p className="mt-3 text-base leading-relaxed text-muted-foreground">{listing.description}</p>
+
+                <div className="mt-4 flex max-w-fit items-start gap-2 rounded-xl bg-primary/5 p-3 text-xs text-primary">
+                  <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  <span>Business verified by SafariNexa — publishing and payouts are gated on approved verification.</span>
+                </div>
               </section>
 
               <section id="vehicle" className="mt-12 scroll-mt-32 border-t border-border pt-10">

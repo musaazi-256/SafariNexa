@@ -588,6 +588,13 @@ function generateBulkAccommodation(count: number) {
           breakfastIncluded: i % 2 === 0,
           maxOccupancy: maxGuests,
           description: "Comfortable en-suite room with everyday essentials."
+        },
+        {
+          name: "Deluxe Room",
+          priceMinor: priceValue + 50000,
+          breakfastIncluded: true,
+          maxOccupancy: maxGuests,
+          description: "Spacious upgraded room with premium amenities."
         }
       ],
       addOns: []
@@ -1001,7 +1008,7 @@ async function main() {
             checkOutTime: item.checkOutTime,
             maxGuests: item.maxGuests,
             cancellationPolicy: item.cancellationPolicy,
-            roomTypes: { create: item.roomTypes.map((room) => ({ ...room, images: [] })) },
+            roomTypes: { create: item.roomTypes.map((room) => ({ ...room, images: galleryFor(item.coverImageUrl) })) },
             addOns: { create: item.addOns }
           }
         }

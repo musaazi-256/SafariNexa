@@ -68,13 +68,15 @@ function MonthGrid({
           const key = dateKey(year, month, day);
           const isBooked = bookedDates.has(key);
           const isToday = key === todayKey;
+          const isPast = key < todayKey;
           return (
             <span
               key={index}
               className={cn(
-                "mx-auto flex h-6 w-6 items-center justify-center rounded-full text-[11px]",
-                isBooked ? "bg-secondary text-muted-foreground line-through" : "text-foreground",
-                isToday && !isBooked ? "border border-primary font-bold" : ""
+                "mx-auto flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold",
+                isBooked ? "bg-[#dcdcdc] text-[#6e6e6e] line-through" : 
+                isPast ? "text-muted-foreground/40 opacity-50" : "text-foreground hover:bg-secondary cursor-default",
+                isToday ? "border-2 border-brand-green font-bold" : ""
               )}
             >
               {day}

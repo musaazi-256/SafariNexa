@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { CheckCircle2, Clock, Signal, Users, XCircle, MapPin } from "lucide-react";
+import { CheckCircle2, Clock, Signal, Users, XCircle, MapPin, ShieldCheck } from "lucide-react";
 
 import { auth } from "@/auth";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { GuideProfile } from "@/components/guide-profile";
+import { PhotoGallery } from "@/components/rooms/photo-gallery";
 import { RelatedListings } from "@/components/related-listings";
 import { ReviewList } from "@/components/reviews/review-list";
 import { ReviewSummary } from "@/components/reviews/review-summary";
@@ -15,6 +16,7 @@ import { SimpleReservationFields } from "@/components/simple-reservation-fields"
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ListingTabs } from "@/components/listing-tabs";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { ScoreBadge } from "@/components/ui/rating";
@@ -116,13 +118,10 @@ export default async function TourDetailPage({ params }: { params: { id: string 
             ]}
           />
 
-          <div className="relative mb-6 h-72 overflow-hidden rounded-2xl sm:h-96">
-            {listing.coverImageUrl ? (
-              <Image src={listing.coverImageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover" />
-            ) : (
-              <div className="h-full w-full bg-gradient-to-br from-brand-green to-[#062617]" />
-            )}
-          </div>
+          <PhotoGallery
+            images={listing.images.length > 0 ? listing.images : listing.coverImageUrl ? [listing.coverImageUrl] : []}
+            title={listing.title}
+          />
 
           <ListingTabs 
             tabs={[
@@ -137,6 +136,9 @@ export default async function TourDetailPage({ params }: { params: { id: string 
           <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_360px]">
             <div className="min-w-0">
               <section id="overview" className="scroll-mt-32">
+                <Badge variant="secondary" className="mb-2">
+                  {tour.tourType ? `${tour.tourType} Safari` : "Tour"}
+                </Badge>
                 <div className="flex items-start justify-between gap-3">
                   <h1 className="text-3xl font-extrabold sm:text-4xl">{listing.title}</h1>
                   {session?.user ? (
@@ -147,8 +149,6 @@ export default async function TourDetailPage({ params }: { params: { id: string 
                 <div className="mt-3">
                   {average ? <ScoreBadge value={average} count={count} /> : <p className="text-sm text-muted-foreground">No reviews yet</p>}
                 </div>
-
-                <p className="mt-6 text-base leading-relaxed text-muted-foreground">{listing.description}</p>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-3">
                   <div className="flex items-center gap-2 text-sm">
@@ -163,6 +163,14 @@ export default async function TourDetailPage({ params }: { params: { id: string 
                     <Signal className="h-4 w-4 text-primary" />
                     {tour.difficulty}
                   </div>
+                </div>
+
+                <h2 className="mt-10 text-xl font-bold">About this tour</h2>
+                <p className="mt-3 text-base leading-relaxed text-muted-foreground">{listing.description}</p>
+                
+                <div className="mt-4 flex max-w-fit items-start gap-2 rounded-xl bg-primary/5 p-3 text-xs text-primary">
+                  <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  <span>Business verified by SafariNexa — publishing and payouts are gated on approved verification.</span>
                 </div>
               </section>
 

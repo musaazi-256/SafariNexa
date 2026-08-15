@@ -27,14 +27,16 @@ export function RoomDetailsModal({
 }) {
   const [open, setOpen] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState(0);
+  
+  const validImages = React.useMemo(() => images?.filter((img) => img && img.trim().length > 0) || [], [images]);
 
   const nextImage = React.useCallback(() => {
-    setActiveIndex((current) => (current + 1) % images.length);
-  }, [images.length]);
+    setActiveIndex((current) => (current + 1) % validImages.length);
+  }, [validImages.length]);
 
   const prevImage = React.useCallback(() => {
-    setActiveIndex((current) => (current - 1 + images.length) % images.length);
-  }, [images.length]);
+    setActiveIndex((current) => (current - 1 + validImages.length) % validImages.length);
+  }, [validImages.length]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -52,10 +54,10 @@ export function RoomDetailsModal({
           <DialogDescription>Detailed information about {name}</DialogDescription>
         </DialogHeader>
 
-        {images.length > 0 ? (
+        {validImages.length > 0 ? (
           <div className="group relative h-64 w-full overflow-hidden bg-muted sm:h-80">
-            <Image src={images[activeIndex]} alt={name} fill sizes="(max-width: 640px) 100vw, 768px" className="object-cover transition-opacity duration-300" />
-            {images.length > 1 ? (
+            <Image src={validImages[activeIndex]} alt={name} fill sizes="(max-width: 640px) 100vw, 768px" className="object-cover transition-opacity duration-300" />
+            {validImages.length > 1 ? (
               <>
                 <button
                   type="button"
@@ -72,7 +74,7 @@ export function RoomDetailsModal({
                   <ChevronRight className="h-5 w-5" />
                 </button>
                 <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5">
-                  {images.map((_, i) => (
+                  {validImages.map((_, i) => (
                     <div key={i} className={`h-2 rounded-full transition-all ${i === activeIndex ? "w-4 bg-white" : "w-2 bg-white/50"}`} />
                   ))}
                 </div>
@@ -80,7 +82,9 @@ export function RoomDetailsModal({
             ) : null}
           </div>
         ) : (
-          <div className="h-64 w-full bg-gradient-to-br from-brand-green to-[#062617] sm:h-80" />
+          <div className="flex h-64 w-full items-center justify-center bg-gradient-to-br from-brand-green to-[#062617] sm:h-80">
+            <BedDouble className="h-10 w-10 text-white/50" />
+          </div>
         )}
 
         <div className="px-6 pt-6">

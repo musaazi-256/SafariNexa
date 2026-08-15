@@ -23,17 +23,18 @@ export function RoomPreviewCard({
   };
   accommodationAmenities: string[];
 }) {
+  const validImages = React.useMemo(() => room.images?.filter((img) => img && img.trim().length > 0) || [], [room.images]);
   const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
-  const hasImages = room.images && room.images.length > 0;
+  const hasImages = validImages.length > 0;
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev + 1) % room.images.length);
+    setCurrentImageIndex((prev) => (prev + 1) % validImages.length);
   };
 
   const prevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev - 1 + room.images.length) % room.images.length);
+    setCurrentImageIndex((prev) => (prev - 1 + validImages.length) % validImages.length);
   };
 
   const handleReserve = () => {
@@ -54,13 +55,13 @@ export function RoomPreviewCard({
               </span>
             </div>
             <Image
-              src={room.images[currentImageIndex]}
+              src={validImages[currentImageIndex]}
               alt={`${room.name} image ${currentImageIndex + 1}`}
               fill
               sizes="(max-width: 640px) 100vw, 320px"
               className="object-cover transition-opacity duration-300"
             />
-            {room.images.length > 1 && (
+            {validImages.length > 1 && (
               <>
                 <button
                   onClick={prevImage}
@@ -78,14 +79,14 @@ export function RoomPreviewCard({
                 </button>
                 <div className="absolute bottom-3 right-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white flex items-center gap-1.5 backdrop-blur-sm">
                   <ImageIcon className="h-3.5 w-3.5" />
-                  {room.images.length}
+                  {validImages.length}
                 </div>
               </>
             )}
           </>
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-green to-[#062617]">
-            <BedDouble className="h-8 w-8 text-white/50" />
+          <div className="flex h-full w-full items-center justify-center bg-[#0d5932]">
+            <BedDouble className="h-10 w-10 text-white/80" />
           </div>
         )}
       </div>
@@ -145,7 +146,7 @@ export function RoomPreviewCard({
             breakfastIncluded={room.breakfastIncluded}
             amenities={accommodationAmenities}
             trigger={
-              <button className="text-sm font-semibold text-brand-blue hover:underline focus-visible:outline-none">
+              <button className="text-sm font-bold text-foreground hover:underline focus-visible:outline-none">
                 More details &gt;
               </button>
             }
@@ -155,13 +156,13 @@ export function RoomPreviewCard({
         {/* Pricing & Action Column */}
         <div className="mt-6 flex flex-col justify-end sm:mt-0 sm:ml-6 sm:w-48 sm:items-end sm:text-right border-t sm:border-t-0 sm:border-l border-border pt-6 sm:pt-0 sm:pl-6">
           <div className="mb-4 hidden sm:block w-full">
-            <div className="rounded-md bg-brand-blue/10 px-3 py-1.5 text-xs font-semibold text-brand-blue text-center flex items-center justify-center gap-1.5">
+            <div className="text-xs font-bold text-foreground text-center">
               Member Price $38 off
             </div>
           </div>
           
           <div className="flex flex-row sm:flex-col justify-between items-end sm:items-end w-full mb-4">
-            <div className="text-sm text-brand-red font-medium sm:hidden">
+            <div className="text-sm text-foreground font-semibold sm:hidden">
               We have 1 left
             </div>
             <div className="text-right">
@@ -170,12 +171,12 @@ export function RoomPreviewCard({
             </div>
           </div>
           
-          <div className="hidden sm:block text-xs text-brand-red font-medium mb-3 w-full text-left">
+          <div className="hidden sm:block text-xs text-foreground font-semibold mb-3 w-full text-left">
             We have 1 left
           </div>
 
           <Button 
-            className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white font-bold h-11"
+            className="w-full bg-[#0d5932] hover:bg-[#0a4526] text-white font-bold h-11"
             onClick={handleReserve}
           >
             Reserve
