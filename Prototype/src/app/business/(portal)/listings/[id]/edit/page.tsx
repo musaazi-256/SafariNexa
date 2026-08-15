@@ -151,7 +151,8 @@ export default async function EditListingPage({ params }: { params: { id: string
                 maxOccupancy: String(room.maxOccupancy),
                 totalRooms: String(room.totalRooms),
                 breakfastIncluded: room.breakfastIncluded,
-                description: room.description ?? ""
+                description: room.description ?? "",
+                images: room.images
               }))}
             />
             <AddOnEditor
