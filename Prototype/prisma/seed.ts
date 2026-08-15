@@ -1014,6 +1014,17 @@ async function main() {
         }
       }
     });
+
+    // Self-healing for existing deployments (like Vercel) where rooms were seeded without images
+    const existingRooms = await db.roomType.findMany({ where: { accommodationId: item.id } });
+    for (const room of existingRooms) {
+      if (!room.images || room.images.length === 0) {
+        await db.roomType.update({
+          where: { id: room.id },
+          data: { images: galleryFor(item.coverImageUrl) }
+        });
+      }
+    }
   }
 
   // --- Tours -------------------------------------------------------------------
