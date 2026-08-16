@@ -18,7 +18,7 @@ const CUSTOMER_PROTECTED_PREFIXES = [
   "/trip-planner"
 ];
 
-const BUSINESS_PUBLIC_PREFIXES = ["/business/auth", "/business/onboarding"];
+const BUSINESS_PUBLIC_PREFIXES = ["/business/auth"];
 const ADMIN_PUBLIC_PREFIXES = ["/admin/login", "/admin/auth"];
 
 export default auth((req) => {

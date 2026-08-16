@@ -43,7 +43,7 @@ export default async function AdminSettingsPage() {
               </div>
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
-              <Button>Save changes</Button>
+              <Button disabled className="bg-slate-200 text-slate-500 hover:bg-slate-200">Save changes (Coming Soon)</Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -71,7 +71,7 @@ export default async function AdminSettingsPage() {
               </div>
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
-              <Button>Save fees</Button>
+              <Button disabled className="bg-slate-200 text-slate-500 hover:bg-slate-200">Save fees (Coming Soon)</Button>
             </CardFooter>
           </Card>
         </TabsContent>

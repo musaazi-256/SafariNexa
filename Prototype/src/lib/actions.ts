@@ -38,9 +38,14 @@ export async function setActiveBusiness(businessId: string) {
   if (!session?.user) throw new Error("Sign in required.");
 
   // Never trust the client-picked id blindly — only switch to a business this
-  // user actually belongs to.
-  if (!session.user.businessIds.includes(businessId)) throw new Error("Not a member of this business.");
+  // user actually belongs to. The session JWT might be stale, so query the DB.
+  const dbUser = await db.user.findUnique({
+    where: { id: session.user.id },
+    include: { businessUsers: true }
+  });
+  const memberBusinessIds = dbUser?.businessUsers.map((bu) => bu.businessId) || [];
 
+  if (!memberBusinessIds.includes(businessId)) throw new Error("Not a member of this business.");
   cookies().set(ACTIVE_BUSINESS_COOKIE, businessId, { httpOnly: true, sameSite: "lax", path: "/" });
   revalidatePath("/business", "layout");
 }

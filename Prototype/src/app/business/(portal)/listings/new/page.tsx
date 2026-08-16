@@ -96,45 +96,48 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
   }
 
   if (!type) {
+    if (business.verificationStatus !== "APPROVED") {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[50vh] max-w-lg mx-auto text-center space-y-6">
+          <div className="h-16 w-16 bg-orange-100 rounded-full flex items-center justify-center mb-2">
+            <Building2 className="h-8 w-8 text-orange-600" />
+          </div>
+          <h1 className="text-2xl font-extrabold text-slate-900">Your account is under review</h1>
+          <p className="text-slate-500 font-medium">
+            You cannot create listings yet. Our admins are currently reviewing your submitted verification documents. Once you are fully approved, you will be able to start adding your services here.
+          </p>
+          <Button asChild variant="outline" className="mt-4">
+            <Link href="/business/dashboard">Return to Dashboard</Link>
+          </Button>
+        </div>
+      );
+    }
+
     return (
       <>
         <Breadcrumbs items={[{ label: "Listings", href: "/business/listings" }, { label: "Create listing" }]} />
         <h1 className="mb-6 text-3xl font-extrabold">What are you listing?</h1>
         <div className="grid gap-5 sm:grid-cols-2">
-          {TYPE_OPTIONS.sort((a, b) => {
-             // Basic sort to float primary type to top
-             const isAPrimary = business.type.toLowerCase().includes(a.value.toLowerCase()) || 
-               (business.type.toLowerCase().includes("tour") && a.value === "TOUR");
-             const isBPrimary = business.type.toLowerCase().includes(b.value.toLowerCase()) ||
-               (business.type.toLowerCase().includes("tour") && b.value === "TOUR");
-             if (isAPrimary && !isBPrimary) return -1;
-             if (!isAPrimary && isBPrimary) return 1;
-             return 0;
-          }).map((option) => {
-            const isPrimary = business.type.toLowerCase().includes(option.value.toLowerCase()) || 
-               (business.type.toLowerCase().includes("tour") && option.value === "TOUR");
-            
-            return (
+          {TYPE_OPTIONS.map((option) => (
             <Link key={option.value} href={`/business/listings/new?type=${option.value.toLowerCase()}`}>
-              <Card className={`h-full transition-shadow hover:shadow-card-hover ${isPrimary ? "border-primary bg-primary/5" : ""}`}>
+              <Card className="h-full transition-shadow hover:shadow-card-hover">
                 <CardContent className="flex flex-col gap-2 pt-6">
                   <div className="flex items-center justify-between">
                     <option.icon className="h-6 w-6 text-primary" />
-                    {isPrimary && <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-full">Primary</span>}
                   </div>
                   <p className="font-bold">{option.label}</p>
                   <p className="text-sm text-muted-foreground">{option.description}</p>
                 </CardContent>
               </Card>
             </Link>
-          )})}
+          ))}
         </div>
       </>
     );
   }
 
   return (
-    <>
+    <div className="max-w-4xl mx-auto pb-32">
       <Breadcrumbs
         items={[
           { label: "Listings", href: "/business/listings" },
@@ -163,6 +166,6 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
           Create draft listing
         </Button>
       </form>
-    </>
+    </div>
   );
 }

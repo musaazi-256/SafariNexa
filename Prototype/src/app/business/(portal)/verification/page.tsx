@@ -1,27 +1,23 @@
-import { FileText } from "lucide-react";
+import { Link2, Upload, HelpCircle, MessageCircle, Hourglass } from "lucide-react";
 
-import { PageHero } from "@/components/page-hero";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { VerificationStatusBadge } from "@/components/ui/status-badge";
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
-import { toVerificationStatus } from "@/lib/status";
-
-const IN_FLIGHT_STATUSES = ["SUBMITTED", "UNDER_REVIEW", "NEEDS_CHANGES"] as const;
+import { submitVerificationDocument } from "@/lib/actions/verification";
+import { VerificationTimeline, VerificationStatus } from "@/components/business/verification-timeline";
+import { VerificationDocuments } from "@/components/business/verification-documents";
 
 export default async function BusinessVerificationPage() {
   const { business, businessId } = await requireBusinessSession();
 
   if (!business || !businessId) {
     return (
-      <>
-        <PageHero variant="portal" eyebrow="Business portal" title="Business verification" description="Submit documents and track approval." />
+      <div className="max-w-4xl mx-auto space-y-10 pb-20 pt-8">
         <EmptyState title="No business linked to this account" description="Your account isn't attached to a verified business yet." />
-      </>
+      </div>
     );
   }
 
@@ -31,101 +27,89 @@ export default async function BusinessVerificationPage() {
     orderBy: { submittedAt: "desc" }
   });
 
-  async function submitDocument(formData: FormData) {
-    "use server";
-    const { businessId: activeBusinessId } = await requireBusinessSession();
-    if (!activeBusinessId) return;
-
-    const type = String(formData.get("type") ?? "").trim();
-    const fileUrl = String(formData.get("fileUrl") ?? "").trim();
-    if (!type || !fileUrl) return;
-
-    const current = await db.businessVerification.findFirst({
-      where: { businessId: activeBusinessId },
-      orderBy: { submittedAt: "desc" }
-    });
-
-    const isInFlight = current && (IN_FLIGHT_STATUSES as readonly string[]).includes(current.status);
-
-    if (isInFlight && current) {
-      await db.$transaction([
-        db.businessDocument.create({ data: { businessVerificationId: current.id, type, fileUrl } }),
-        db.businessVerification.update({ where: { id: current.id }, data: { status: "SUBMITTED", submittedAt: new Date() } }),
-        db.businessProfile.update({ where: { id: activeBusinessId }, data: { verificationStatus: "SUBMITTED" } })
-      ]);
-    } else {
-      await db.$transaction([
-        db.businessVerification.create({
-          data: { businessId: activeBusinessId, documents: { create: { type, fileUrl } } }
-        }),
-        db.businessProfile.update({ where: { id: activeBusinessId }, data: { verificationStatus: "SUBMITTED" } })
-      ]);
-    }
-  }
+  const documents = latestVerification?.documents || [];
 
   return (
-    <>
-      <PageHero variant="portal"
-        eyebrow="Business portal"
-        title="Business verification"
-        description="Submit documents and track approval before publishing or receiving bookings."
-      />
-
-      <div>
-          <div className="mb-6 flex items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">Status</h2>
-            <VerificationStatusBadge status={toVerificationStatus(business.verificationStatus)} />
-          </div>
-
-          {latestVerification?.reviewNotes ? (
-            <Card className="mb-6 border-warning/30 bg-warning/10">
-              <CardContent className="pt-6">
-                <p className="text-sm font-semibold">Notes from the review team</p>
-                <p className="mt-1 text-sm text-muted-foreground">{latestVerification.reviewNotes}</p>
-              </CardContent>
-            </Card>
-          ) : null}
-
-          <h2 className="mb-3 text-lg font-bold">Documents</h2>
-          {latestVerification && latestVerification.documents.length > 0 ? (
-            <div className="mb-6 flex flex-wrap gap-2">
-              {latestVerification.documents.map((doc) => (
-                <a
-                  key={doc.id}
-                  href={doc.fileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-secondary"
-                >
-                  <FileText className="h-3.5 w-3.5" />
-                  {doc.type}
-                </a>
-              ))}
-            </div>
-          ) : (
-            <EmptyState title="No documents yet" description="Upload registration documents, licenses, and other evidence below." className="mb-6" />
-          )}
-
-          <Card>
-            <CardContent className="pt-6">
-              <h2 className="text-lg font-bold">Add a document</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Registration documents, licenses, tax IDs, and other evidence. Submitting moves your business back into review.
-              </p>
-              <form action={submitDocument} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-                <div className="flex flex-1 flex-col gap-1.5">
-                  <Label htmlFor="type">Document type</Label>
-                  <Input id="type" name="type" placeholder="e.g. Business registration certificate" required />
-                </div>
-                <div className="flex flex-1 flex-col gap-1.5">
-                  <Label htmlFor="fileUrl">File URL</Label>
-                  <Input id="fileUrl" name="fileUrl" type="url" placeholder="https://…" required />
-                </div>
-                <Button type="submit">Submit for review</Button>
-              </form>
-            </CardContent>
-          </Card>
+    <div className="max-w-4xl mx-auto space-y-10 pb-20 pt-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Business verification</h1>
+        <p className="text-slate-500 mt-2 text-lg">Submit documents and track approval before publishing or receiving bookings.</p>
       </div>
-    </>
+
+      {/* Verification Status Banner */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8 items-center">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">Verification status</h3>
+              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50 border border-orange-100 text-orange-700 text-xs font-bold uppercase tracking-wider">
+                <Hourglass className="h-3.5 w-3.5" /> 
+                {business.verificationStatus.replace("_", " ")}
+              </div>
+              <p className="text-sm text-slate-500 mt-4 leading-relaxed">
+                Your documents are under review. We&apos;ll notify you once there&apos;s an update.
+              </p>
+            </div>
+            
+            <div className="lg:border-l lg:border-slate-100 lg:pl-10 w-full overflow-x-auto pb-4 lg:pb-0">
+               <VerificationTimeline 
+                 status={business.verificationStatus as VerificationStatus} 
+                 submittedAt={latestVerification?.submittedAt} 
+               />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <VerificationDocuments documents={documents} />
+
+      {/* Bottom Add Document Form (Fallback URL method) */}
+      <div className="bg-slate-50 rounded-2xl p-6 sm:p-8 border border-slate-200">
+        <h3 className="text-lg font-bold text-slate-900">Add a document</h3>
+        <p className="text-sm text-slate-500 mt-1">Registration documents, licenses, tax IDs, and other evidence. Submitting moves your business back into review.</p>
+        
+        <form action={async (fd) => { "use server"; await submitVerificationDocument(fd); }} className="mt-6 flex flex-col sm:flex-row gap-4 items-end">
+           <div className="flex-1 w-full space-y-2">
+             <Label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Document type</Label>
+             <select name="type" className="flex h-11 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+               <option value="">Select document type</option>
+               <option value="INCORPORATION">Incorporation</option>
+               <option value="LICENSES">Licenses & permits</option>
+               <option value="TAX">Tax documents</option>
+               <option value="IDENTITY">Identity documents</option>
+               <option value="OTHER">Other</option>
+             </select>
+           </div>
+           
+           <div className="flex-[2] w-full space-y-2 relative">
+             <Label className="text-xs font-bold text-slate-700 uppercase tracking-wider">File</Label>
+             <div className="relative">
+               <Input name="fileUrl" className="h-11 pl-4 pr-10 rounded-lg border-slate-200" placeholder="Paste file URL here" />
+               <Link2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+             </div>
+           </div>
+
+           <Button type="submit" className="h-11 rounded-lg bg-green-700 hover:bg-green-800 shrink-0 px-6 font-bold">
+             <Upload className="mr-2 h-4 w-4" /> Submit for review
+           </Button>
+        </form>
+      </div>
+
+      {/* Need help footer */}
+      <div className="bg-slate-50 rounded-2xl p-6 sm:p-8 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+         <div className="flex items-center gap-4">
+            <div className="h-10 w-10 rounded-full border-2 border-slate-300 flex items-center justify-center shrink-0 bg-white shadow-sm">
+              <HelpCircle className="h-5 w-5 text-slate-600" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900">Need help?</h4>
+              <p className="text-sm text-slate-500 mt-0.5">If you&apos;re not sure what to upload, contact our support team.</p>
+            </div>
+         </div>
+         <Button variant="outline" className="bg-white font-bold h-10 px-6 shrink-0">
+           <MessageCircle className="mr-2 h-4 w-4" /> Contact support
+         </Button>
+      </div>
+    </div>
   );
 }

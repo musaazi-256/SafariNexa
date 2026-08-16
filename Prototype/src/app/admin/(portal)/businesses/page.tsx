@@ -21,12 +21,23 @@ const TABS: Array<{ value: string; label: string }> = [
   { value: "SUSPENDED", label: "Suspended" }
 ];
 
-export default async function AdminBusinessesPage({ searchParams }: { searchParams: { status?: string; page?: string } }) {
+export default async function AdminBusinessesPage({ searchParams }: { searchParams: { status?: string; page?: string; q?: string } }) {
   await requireAdminSession();
 
   const activeStatus = searchParams.status?.toUpperCase();
   const page = parsePage(searchParams.page);
-  const where = activeStatus ? { verificationStatus: activeStatus as never } : undefined;
+  const q = searchParams.q?.trim();
+
+  const where: any = {};
+  if (activeStatus && activeStatus !== "ALL") {
+    where.verificationStatus = activeStatus;
+  }
+  if (q) {
+    where.OR = [
+      { name: { contains: q, mode: "insensitive" } },
+      { contactEmail: { contains: q, mode: "insensitive" } }
+    ];
+  }
 
   const [businesses, totalCount] = await Promise.all([
     db.businessProfile.findMany({
@@ -52,8 +63,11 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
       {/* Pill Filters */}
       <div className="flex flex-wrap gap-2">
         {TABS.map((tab) => {
-          const isActive = tab.value === "ALL" ? !activeStatus : activeStatus === tab.value;
-          const href = tab.value === "ALL" ? "/admin/businesses" : `/admin/businesses?status=${tab.value.toLowerCase()}`;
+          const isActive = tab.value === "ALL" ? !activeStatus || activeStatus === "ALL" : activeStatus === tab.value;
+          const params = new URLSearchParams();
+          if (tab.value !== "ALL") params.set("status", tab.value.toLowerCase());
+          if (q) params.set("q", q);
+          const href = `/admin/businesses?${params.toString()}`;
           return (
             <Link
               key={tab.value}
@@ -73,20 +87,25 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
 
       {/* Table Toolbar */}
       <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Search businesses..." 
-            className="w-full h-10 pl-9 pr-4 rounded-lg border border-slate-200 text-[13px] font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1e613c] focus:ring-1 focus:ring-[#1e613c] shadow-sm"
-          />
-        </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Button variant="outline" className="h-10 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm flex-1 sm:flex-none">
-            <Filter className="mr-2 h-4 w-4" /> Filters
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <form className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            {activeStatus && activeStatus !== "ALL" && <input type="hidden" name="status" value={activeStatus.toLowerCase()} />}
+            <input 
+              type="search" 
+              name="q" 
+              defaultValue={q} 
+              placeholder="Search businesses..." 
+              className="w-full h-9 pl-9 pr-4 rounded-full border border-slate-200 text-[13px] outline-none focus:border-[#1e613c] focus:ring-1 focus:ring-[#1e613c] transition-all bg-white"
+            />
+          </form>
+          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0">
+            <Filter className="h-4 w-4 mr-2 text-slate-400" />
+            Filter
           </Button>
-          <Button variant="outline" className="h-10 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm flex-1 sm:flex-none">
-            <Download className="mr-2 h-4 w-4" /> Export
+          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0 hidden lg:inline-flex">
+            <Download className="h-4 w-4 mr-2 text-slate-400" />
+            Export
           </Button>
         </div>
       </div>
@@ -129,7 +148,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E4F2E8]">
                     <Building2 className="h-5 w-5 text-[#1e613c]" />
                   </div>
-                  <span className="font-bold text-[14px] text-slate-900 truncate">{business.name}</span>
+                  <Link href={`/admin/businesses/${business.id}`} className="font-bold text-[14px] text-slate-900 truncate hover:text-[#1e613c] hover:underline transition-colors">{business.name}</Link>
                 </div>
                 
                 {/* Type */}
@@ -153,11 +172,13 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                 </div>
                 
                 {/* Joined & Actions */}
-                <div className="col-span-1 flex items-center justify-between pl-4">
-                  <span className="text-[12px] font-semibold text-slate-500 whitespace-nowrap">
-                    {business.createdAt.toLocaleDateString("en-UG", { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </span>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600 -mr-2">
+                <div className="col-span-1 flex items-center justify-end gap-2 pl-4">
+                  <Link href={`/admin/businesses/${business.id}`}>
+                    <Button variant="outline" size="sm" className="h-7 px-3 text-[11px] font-bold text-slate-600 border-slate-200 shadow-none rounded-full hover:bg-slate-50 hidden xl:inline-flex">
+                      View
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-slate-700 hover:bg-slate-50 rounded-full shrink-0">
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </div>
@@ -174,7 +195,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
             <Pagination
               currentPage={page}
               totalPages={totalPagesFor(totalCount)}
-              buildHref={(p) => `/admin/businesses?${new URLSearchParams({ ...(activeStatus ? { status: activeStatus.toLowerCase() } : {}), page: String(p) }).toString()}`}
+              buildHref={(p) => `/admin/businesses?${new URLSearchParams({ ...(activeStatus && activeStatus !== "ALL" ? { status: activeStatus.toLowerCase() } : {}), ...(q ? { q } : {}), page: String(p) }).toString()}`}
             />
           </div>
 

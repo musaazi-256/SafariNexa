@@ -16,7 +16,7 @@ export async function submitBusinessOnboarding(formData: FormData) {
   }
 
   // Parse fields
-  const type = String(formData.get("type") || "ACCOMMODATION");
+  const type = "GENERAL";
   const businessName = String(formData.get("businessName") || "Untitled Business");
   const contactEmail = String(formData.get("contactEmail") || session.user.email || "");
   const contactPhone = String(formData.get("contactPhone") || "");
@@ -106,5 +106,5 @@ export async function submitBusinessOnboarding(formData: FormData) {
   });
 
   revalidatePath("/business/(portal)/dashboard", "layout");
-  redirect("/business/dashboard"); // Redirect to the portal
+  return { success: true };
 }

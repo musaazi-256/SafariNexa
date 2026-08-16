@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { AccountLayout } from "@/components/account-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 
 export default async function PaymentSettingsPage() {
   const session = await auth();
@@ -53,6 +54,22 @@ export default async function PaymentSettingsPage() {
             <Button variant="outline" className="w-full mt-2">
               <Plus className="mr-2 h-4 w-4" /> Add Payment Method
             </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-sm rounded-2xl">
+          <CardHeader>
+            <CardTitle>Billing preferences</CardTitle>
+            <CardDescription>Your payment methods will be used for bookings and other purchases.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col">
+                <p className="font-semibold text-slate-900">Email receipts</p>
+                <p className="text-sm text-muted-foreground">Receive receipts for payments and refunds.</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
           </CardContent>
         </Card>
       </div>

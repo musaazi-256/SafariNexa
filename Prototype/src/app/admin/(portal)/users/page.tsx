@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search, Filter, Download } from "lucide-react";
 import type { UserRole } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
@@ -19,12 +20,23 @@ const TABS: Array<{ value: UserRole | "ALL"; label: string }> = [
   { value: "ADMIN", label: "Admins" }
 ];
 
-export default async function AdminUsersPage({ searchParams }: { searchParams: { role?: string; page?: string } }) {
+export default async function AdminUsersPage({ searchParams }: { searchParams: { role?: string; page?: string; q?: string } }) {
   await requireAdminSession();
 
   const activeRole = (searchParams.role?.toUpperCase() as UserRole | undefined) ?? undefined;
   const page = parsePage(searchParams.page);
-  const where = activeRole ? { role: activeRole } : undefined;
+  const q = searchParams.q?.trim();
+  
+  const where: any = {};
+  if (activeRole) {
+    where.role = activeRole;
+  }
+  if (q) {
+    where.OR = [
+      { name: { contains: q, mode: "insensitive" } },
+      { email: { contains: q, mode: "insensitive" } }
+    ];
+  }
 
   const [users, totalCount] = await Promise.all([
     db.user.findMany({
@@ -61,8 +73,11 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex flex-wrap gap-2">
           {TABS.map((tab) => {
-            const isActive = tab.value === "ALL" ? !activeRole : activeRole === tab.value;
-            const href = tab.value === "ALL" ? "/admin/users" : `/admin/users?role=${tab.value.toLowerCase()}`;
+            const isActive = tab.value === "ALL" ? !activeRole : (activeRole as string) === tab.value;
+            const params = new URLSearchParams();
+            if (tab.value !== "ALL") params.set("role", tab.value.toLowerCase());
+            if (q) params.set("q", q);
+            const href = `/admin/users?${params.toString()}`;
             return (
               <Link
                 key={tab.value}
@@ -79,13 +94,27 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
             );
           })}
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full">
-            Export
+        <div className="flex items-center gap-3 w-full sm:w-auto mt-4 sm:mt-0">
+          <form className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            {activeRole && (activeRole as string) !== "ALL" && <input type="hidden" name="role" value={activeRole.toLowerCase()} />}
+            <input 
+              type="search" 
+              name="q" 
+              defaultValue={q} 
+              placeholder="Search users..." 
+              className="w-full h-9 pl-9 pr-4 rounded-full border border-slate-200 text-[13px] outline-none focus:border-[#1e613c] focus:ring-1 focus:ring-[#1e613c] transition-all bg-white"
+            />
+          </form>
+          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0">
+            <Filter className="h-4 w-4 mr-2 text-slate-400" />
+            Filter
           </Button>
-          <Button className="h-9 px-4 text-[13px] font-bold bg-[#1e613c] text-white hover:bg-[#15462b] shadow-sm rounded-full">
-            Add user
-          </Button>
+          <Link href="/admin/users/new">
+            <Button className="h-9 px-4 text-[13px] font-bold bg-[#1e613c] text-white hover:bg-[#15462b] shadow-sm rounded-full shrink-0">
+              Add user
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -158,7 +187,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
             <Pagination
               currentPage={page}
               totalPages={totalPagesFor(totalCount)}
-              buildHref={(p) => `/admin/users?${new URLSearchParams({ ...(activeRole ? { role: activeRole.toLowerCase() } : {}), page: String(p) }).toString()}`}
+              buildHref={(p) => `/admin/users?${new URLSearchParams({ ...(activeRole ? { role: activeRole.toLowerCase() } : {}), ...(q ? { q } : {}), page: String(p) }).toString()}`}
             />
           </div>
 

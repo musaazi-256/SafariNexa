@@ -1687,21 +1687,30 @@ async function main() {
   }
 
   // --- Availability overrides for one listing, for business/availability ------
-  for (let i = 0; i < 14; i++) {
-    const date = new Date(Date.UTC(2026, 7, 1 + i));
+  const demoLodge = await db.listing.findUnique({
+    where: { id: "demo-lodge" },
+    include: { accommodation: { include: { roomTypes: true } } }
+  });
+  const demoLodgeRoomId = demoLodge?.accommodation?.roomTypes[0]?.id;
+
+  if (demoLodgeRoomId) {
+    for (let i = 0; i < 14; i++) {
+      const date = new Date(Date.UTC(2026, 7, 1 + i));
     const capacity = 5;
     const remaining = i % 5 === 0 ? 0 : capacity - (i % capacity);
     await db.availability.upsert({
-      where: { listingId_date: { listingId: "demo-lodge", date } },
+      where: { listingId_roomTypeId_date: { listingId: "demo-lodge", roomTypeId: demoLodgeRoomId, date } },
       update: {},
       create: {
         listingId: "demo-lodge",
+        roomTypeId: demoLodgeRoomId,
         date,
         capacity,
         remaining,
         priceOverrideMinor: i % 7 === 0 ? 550000 : undefined
       }
     });
+    }
   }
 
   // --- A draft (unpublished) listing, so business/listings shows both states --

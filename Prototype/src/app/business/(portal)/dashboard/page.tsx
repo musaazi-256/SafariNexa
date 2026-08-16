@@ -9,6 +9,8 @@ import { db } from "@/lib/db";
 import { ratingSummary } from "@/lib/listings";
 import { summarizePayments } from "@/lib/revenue";
 import { DashboardCharts } from "@/components/business/dashboard-charts";
+import { DashboardQuickActions } from "@/components/business/dashboard-quick-actions";
+import { VerificationWelcomeModal } from "@/components/business/verification-modals";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export default async function BusinessDashboardPage() {
@@ -53,6 +55,7 @@ export default async function BusinessDashboardPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
+      <VerificationWelcomeModal verificationStatus={business.verificationStatus} />
       
       {/* Hero Section */}
       <div className="relative overflow-hidden rounded-2xl bg-slate-900 text-white min-h-[180px] flex items-center">
@@ -168,25 +171,7 @@ export default async function BusinessDashboardPage() {
       {/* Quick Actions */}
       <Card className="rounded-2xl shadow-sm border-slate-100">
         <CardContent className="p-2 sm:p-4">
-          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 overflow-x-auto custom-scrollbar whitespace-nowrap">
-            <span className="text-sm font-bold text-slate-900 shrink-0 px-2 sm:px-4">Quick actions</span>
-            <div className="w-px h-6 bg-slate-200 hidden sm:block shrink-0" />
-            <Button variant="ghost" className="text-slate-700 font-medium shrink-0">
-              <Plus className="mr-2 h-4 w-4 text-[#0B4928]" /> Add new listing
-            </Button>
-            <Button variant="ghost" className="text-slate-700 font-medium shrink-0">
-              <Ticket className="mr-2 h-4 w-4 text-orange-500" /> Create promotion
-            </Button>
-            <Button variant="ghost" className="text-slate-700 font-medium shrink-0">
-              <CalendarIcon className="mr-2 h-4 w-4 text-green-600" /> View calendar
-            </Button>
-            <Button variant="ghost" className="text-slate-700 font-medium shrink-0">
-              <Star className="mr-2 h-4 w-4 text-amber-400" /> Respond to reviews
-            </Button>
-            <Button variant="ghost" className="text-slate-700 font-medium shrink-0 ml-auto hidden md:flex">
-              <Download className="mr-2 h-4 w-4 text-[#0B4928]" /> Download report
-            </Button>
-          </div>
+          <DashboardQuickActions verificationStatus={business.verificationStatus} />
         </CardContent>
       </Card>
 

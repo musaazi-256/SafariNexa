@@ -33,6 +33,7 @@ export function DashboardCharts() {
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div className="flex items-center gap-2">
             <CardTitle className="text-base font-bold text-slate-900">Bookings overview</CardTitle>
+            <span className="bg-orange-100 text-orange-700 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">Simulated Data</span>
             <Info className="h-4 w-4 text-muted-foreground" />
           </div>
           <Select defaultValue="this-month">
@@ -103,6 +104,7 @@ export function DashboardCharts() {
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div className="flex items-center gap-2">
             <CardTitle className="text-base font-bold text-slate-900">Revenue overview</CardTitle>
+            <span className="bg-orange-100 text-orange-700 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">Simulated Data</span>
             <Info className="h-4 w-4 text-muted-foreground" />
           </div>
           <Select defaultValue="this-month">

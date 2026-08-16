@@ -72,24 +72,8 @@ export default async function TourDetailPage({ params }: { params: { id: string 
     const body = String(formData.get("body") ?? "").trim();
     if (!rating || !body) return;
 
-    let booking = eligibleBooking;
-    
-    if (!booking) {
-      booking = await db.booking.create({
-        data: {
-          listingId: listing.id,
-          businessId: listing.businessId,
-          customerId: activeSession.user.id,
-          bookingRef: `TEST-REV-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-          status: "COMPLETED",
-          totalMinor: 0,
-          currency: "UGX",
-          participantsCount: 1,
-          startDate: new Date(),
-          endDate: new Date(),
-        }
-      });
-    }
+    const booking = eligibleBooking;
+    if (!booking) return;
 
     await db.review.create({
       data: {
@@ -234,10 +218,16 @@ export default async function TourDetailPage({ params }: { params: { id: string 
                 
                 <div className="mt-10">
                   {session?.user ? (
-                    <div className="rounded-2xl bg-secondary p-6">
-                      <h3 className="font-bold mb-4">Add your review</h3>
-                      <ReviewForm bookingId={eligibleBooking?.id ?? ""} listingTitle={listing.title} action={submitDirectReview} />
-                    </div>
+                    eligibleBooking ? (
+                      <div className="rounded-2xl bg-secondary p-6">
+                        <h3 className="font-bold mb-4">Add your review</h3>
+                        <ReviewForm bookingId={eligibleBooking.id} listingTitle={listing.title} action={submitDirectReview} />
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl border border-border p-6 text-center text-sm text-muted-foreground">
+                        You can only review places you have booked.
+                      </div>
+                    )
                   ) : (
                     <div className="rounded-2xl border border-border p-6 text-center text-sm text-muted-foreground">
                       Please <Link href={`/auth/sign-in?returnTo=/tours/${listing.id}`} className="font-semibold text-blue-600 hover:underline">sign in</Link> to leave a review.

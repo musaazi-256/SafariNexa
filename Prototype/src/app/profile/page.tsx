@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
-import { CalendarClock, ShieldCheck } from "lucide-react";
+import { CalendarClock, ChevronRight, Key, ShieldCheck } from "lucide-react";
 
 import { auth } from "@/auth";
 import { AccountLayout } from "@/components/account-layout";
@@ -128,25 +128,33 @@ export default async function ProfilePage() {
         <div className="order-1 lg:order-2">
           <Card className="sticky top-24 overflow-hidden border-none shadow-sm rounded-2xl text-center">
             <CardContent className="flex flex-col items-center gap-4 pt-10 pb-8">
-              <Avatar className="h-28 w-28 border-4 border-white shadow-md">
+              <Avatar className="h-24 w-24 border-0 shadow-sm mt-4">
                 {user.image ? <AvatarImage src={user.image} alt={user.name ?? "Account"} /> : null}
-                <AvatarFallback className="text-3xl bg-brand-green/10 text-brand-green">
+                <AvatarFallback className="text-3xl font-bold bg-[#E4F2E8] text-[#1e613c]">
                   {initials(user.name, user.email)}
                 </AvatarFallback>
               </Avatar>
-              <div className="space-y-1">
-                <p className="text-2xl font-extrabold">{user.name ?? "Traveller"}</p>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
+              <div className="space-y-1 mb-2">
+                <p className="text-xl font-extrabold">{user.name ?? "Traveller"}</p>
+                <p className="text-[13px] font-medium text-slate-500">{user.email}</p>
               </div>
               
-              <div className="mt-4 flex flex-col gap-2 w-full text-left bg-muted/30 rounded-xl p-4">
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <CalendarClock className="h-4 w-4 text-brand-green" />
-                  <span>Member since {user.createdAt.toLocaleDateString("en-UG", { dateStyle: "medium" })}</span>
+              <div className="mt-4 flex flex-col w-full text-left">
+                <div className="flex items-center justify-between text-[13px] border-t border-slate-100 py-4">
+                  <div className="flex items-center gap-3">
+                    <ShieldCheck className="h-4 w-4 text-[#1e613c]" />
+                    <span className="font-semibold text-slate-700">Member since</span>
+                  </div>
+                  <span className="text-slate-500 font-medium">
+                    {user.createdAt.toLocaleDateString("en-UG", { dateStyle: "medium" })}
+                  </span>
                 </div>
-                <div className="flex items-center gap-3 text-sm font-semibold text-primary">
-                  <ShieldCheck className="h-4 w-4 text-brand-green" />
-                  <span>{hasGoogle ? "Google connected" : "Email & password"}</span>
+                <div className="flex items-center justify-between text-[13px] border-t border-slate-100 py-4 cursor-pointer hover:bg-slate-50 transition-colors -mx-6 px-6">
+                  <div className="flex items-center gap-3">
+                    <Key className="h-4 w-4 text-[#1e613c]" />
+                    <span className="font-semibold text-slate-700">{hasGoogle ? "Google connected" : "Email & password"}</span>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-slate-400" />
                 </div>
               </div>
             </CardContent>

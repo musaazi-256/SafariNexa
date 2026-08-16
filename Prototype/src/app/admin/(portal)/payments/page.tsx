@@ -7,9 +7,13 @@ import { PaymentStatusBadge, RefundStatusBadge } from "@/components/ui/status-ba
 import { formatUGX } from "@/lib/booking";
 import { requireAdminSession } from "@/lib/admin";
 import { db } from "@/lib/db";
+import { stripe } from "@/lib/stripe";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { PLATFORM_COMMISSION_RATE, summarizePayments } from "@/lib/revenue";
 import { toPaymentStatus, toRefundStatus } from "@/lib/status";
+import { logAuditEvent } from "@/lib/audit";
+import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 
 export default async function AdminPaymentsPage({ searchParams }: { searchParams: { page?: string } }) {
   await requireAdminSession();
@@ -33,6 +37,58 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
   ]);
 
   const { grossMinor, commissionMinor, netMinor, refundedMinor } = summarizePayments(allPayments);
+
+  async function approveRefund(formData: FormData) {
+    "use server";
+    const adminSession = await requireAdminSession();
+    const refundId = String(formData.get("refundId"));
+
+    const targetRefund = await db.refund.findUnique({
+      where: { id: refundId },
+      include: { payment: true }
+    });
+
+    if (!targetRefund || targetRefund.status !== "REQUESTED") {
+      throw new Error("Invalid refund request.");
+    }
+
+    if (targetRefund.payment.provider === "STRIPE" && targetRefund.payment.providerReference) {
+      try {
+        await stripe.refunds.create({
+          payment_intent: targetRefund.payment.providerReference,
+          amount: targetRefund.amountMinor,
+        });
+      } catch (err: any) {
+        throw new Error(`Stripe Refund Failed: ${err.message}`);
+      }
+    }
+
+    await db.$transaction([
+      db.refund.update({
+        where: { id: refundId },
+        data: { status: "COMPLETED", reviewedByAdminId: adminSession.user.id }
+      }),
+      db.payment.update({
+        where: { id: targetRefund.paymentId },
+        data: { status: "REFUNDED" }
+      }),
+      db.booking.update({
+        where: { id: targetRefund.bookingId },
+        data: { status: "REFUNDED" }
+      })
+    ]);
+
+    await logAuditEvent({
+      actorUserId: adminSession.user.id,
+      actorEmail: adminSession.user.email ?? undefined,
+      surface: "ADMIN",
+      action: "admin_approved_refund",
+      outcome: "SUCCESS",
+      metadata: { refundId, amount: targetRefund.amountMinor }
+    });
+
+    redirect("/admin/payments");
+  }
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20 font-sans">
@@ -185,9 +241,10 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
             <div className="grid grid-cols-12 bg-slate-50 border-b border-slate-200 px-6 py-3 items-center">
               <div className="col-span-2 text-[12px] font-bold text-slate-500 uppercase tracking-wider">Date</div>
               <div className="col-span-3 text-[12px] font-bold text-slate-500 uppercase tracking-wider">Booking</div>
-              <div className="col-span-4 text-[12px] font-bold text-slate-500 uppercase tracking-wider">Reason</div>
-              <div className="col-span-1 text-[12px] font-bold text-slate-500 uppercase tracking-wider">Status</div>
-              <div className="col-span-2 text-right text-[12px] font-bold text-slate-500 uppercase tracking-wider">Amount</div>
+              <div className="col-span-2 text-[12px] font-bold text-slate-500 uppercase tracking-wider">Reason</div>
+              <div className="col-span-2 text-[12px] font-bold text-slate-500 uppercase tracking-wider">Status</div>
+              <div className="col-span-1 text-right text-[12px] font-bold text-slate-500 uppercase tracking-wider">Amount</div>
+              <div className="col-span-2 text-right text-[12px] font-bold text-slate-500 uppercase tracking-wider">Action</div>
             </div>
 
             {/* Table Body */}
@@ -200,14 +257,26 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
                   <div className="col-span-3 text-[13px] font-semibold text-slate-900 truncate pr-4">
                     {refund.booking.listing.title}
                   </div>
-                  <div className="col-span-4 text-[13px] font-semibold text-slate-600 truncate pr-4">
+                  <div className="col-span-2 text-[13px] font-semibold text-slate-600 truncate pr-4">
                     {refund.reason}
                   </div>
-                  <div className="col-span-1">
+                  <div className="col-span-2">
                     <RefundStatusBadge status={toRefundStatus(refund.status)} />
                   </div>
-                  <div className="col-span-2 text-[13px] font-bold text-slate-900 text-right whitespace-nowrap">
+                  <div className="col-span-1 text-[13px] font-bold text-slate-900 text-right whitespace-nowrap pr-4">
                     {formatUGX(refund.amountMinor)}
+                  </div>
+                  <div className="col-span-2 flex justify-end">
+                    {refund.status === "REQUESTED" ? (
+                      <form action={approveRefund}>
+                        <input type="hidden" name="refundId" value={refund.id} />
+                        <Button type="submit" size="sm" variant="outline" className="text-xs font-semibold h-8 border-[#1e613c] text-[#1e613c] hover:bg-[#E4F2E8]">
+                          Approve Refund
+                        </Button>
+                      </form>
+                    ) : (
+                      <span className="text-[11px] font-semibold text-slate-400">Processed</span>
+                    )}
                   </div>
                 </div>
               ))}

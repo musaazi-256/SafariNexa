@@ -128,7 +128,7 @@ export default async function EditListingPage({ params }: { params: { id: string
   }
 
   return (
-    <div className="max-w-[1000px] mx-auto pb-32">
+    <div className="max-w-4xl mx-auto pb-32">
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2 text-sm text-slate-500 font-medium mb-8">
         <Link href="/business/dashboard" className="hover:text-slate-900 transition-colors">Home</Link>
@@ -254,7 +254,7 @@ export default async function EditListingPage({ params }: { params: { id: string
 
         {/* Sticky Bottom Bar */}
         <div className="fixed bottom-0 left-0 right-0 sm:left-64 p-4 bg-white/80 backdrop-blur-md border-t border-slate-200 z-50 flex items-center justify-between gap-4">
-          <div className="max-w-[1000px] w-full mx-auto flex items-center justify-between gap-4">
+          <div className="max-w-4xl w-full mx-auto flex items-center justify-between gap-4">
             <Button asChild type="button" variant="outline" className="h-12 px-8 font-semibold text-slate-700 bg-white hover:bg-slate-50 border-slate-200 rounded-lg">
               <Link href="/business/listings">Cancel</Link>
             </Button>

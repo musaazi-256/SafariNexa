@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { logAuditEvent } from "@/lib/audit";
-import { VerificationStatus } from "@prisma/client";
+import { VerificationStatus, UserRole, AdminUserStatus } from "@prisma/client";
 
 export async function updateVerificationStatus(verificationId: string, status: VerificationStatus, notes: string = "") {
   const session = await auth();
@@ -72,4 +72,68 @@ export async function updateVerificationStatus(verificationId: string, status: V
 
   revalidatePath("/admin/(portal)/verification", "page");
   revalidatePath("/admin/(portal)/businesses", "page");
+}
+
+export async function inviteAdmin(email: string) {
+  const session = await auth();
+  if (!session?.user?.isAdmin) {
+    throw new Error("Unauthorized: Admin access required");
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  // Find "Super Admin" role
+  let superAdminRole = await db.role.findUnique({ where: { name: "Super Admin" } });
+  if (!superAdminRole) {
+    superAdminRole = await db.role.create({ data: { name: "Super Admin" } });
+  }
+
+  await db.$transaction(async (tx) => {
+    // Check if user exists
+    let targetUser = await tx.user.findUnique({ where: { email: normalizedEmail } });
+    
+    if (!targetUser) {
+      // Create a skeleton user for the admin
+      targetUser = await tx.user.create({
+        data: {
+          email: normalizedEmail,
+          role: "ADMIN",
+        }
+      });
+    } else {
+      // Promote existing user to ADMIN
+      await tx.user.update({
+        where: { id: targetUser.id },
+        data: { role: "ADMIN" }
+      });
+    }
+
+    // Check if AdminUser already exists
+    const existingAdminUser = await tx.adminUser.findUnique({ where: { userId: targetUser.id } });
+    if (!existingAdminUser) {
+      await tx.adminUser.create({
+        data: {
+          userId: targetUser.id,
+          roleId: superAdminRole.id,
+          status: "INVITED"
+        }
+      });
+    } else if (existingAdminUser.status === "SUSPENDED") {
+       await tx.adminUser.update({
+         where: { id: existingAdminUser.id },
+         data: { status: "ACTIVE" }
+       });
+    }
+  });
+
+  await logAuditEvent({
+    actorUserId: session.user.id,
+    actorEmail: session.user.email ?? undefined,
+    surface: "ADMIN",
+    action: "admin_invite_user",
+    outcome: "SUCCESS",
+    metadata: { targetEmail: normalizedEmail }
+  });
+
+  revalidatePath("/admin/(portal)/users", "page");
 }

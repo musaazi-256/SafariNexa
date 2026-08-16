@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { PageHero } from "@/components/page-hero";
-import { Store, Trash2, Bell, CalendarDays, XCircle, BarChart2, Info, Save, Users, UserPlus, ShieldCheck, MoreVertical } from "lucide-react";
+import { Store, Trash2, Bell, CalendarDays, XCircle, BarChart2, Info, Save, Users, UserPlus, ShieldCheck, MoreVertical, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,7 @@ export default async function BusinessSettingsPage() {
   if (!business) return null;
 
   return (
-    <>
+    <div className="max-w-4xl mx-auto space-y-8 pb-20 pt-4">
       <PageHero variant="portal" eyebrow="Business portal" title="Settings" description="Manage your business profile and preferences." />
 
       <Tabs defaultValue="profile" className="w-full">
@@ -85,19 +86,34 @@ export default async function BusinessSettingsPage() {
               </div>
             </div>
 
-            <div className="mt-10 pt-6 border-t border-slate-200 flex items-center justify-between">
+            <div className="mt-8 pt-8 border-t border-slate-200">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50">
+                  <FileText className="h-5 w-5 text-orange-600" />
+                </div>
+                <div className="flex flex-col">
+                  <h3 className="text-lg font-bold text-slate-900">Verification & Documents</h3>
+                  <p className="text-sm font-medium text-slate-500">Manage your business registration and compliance documents.</p>
+                </div>
+              </div>
+              
+              <div className="rounded-xl border border-slate-200 p-5 flex items-center justify-between">
+                <div>
+                  <h4 className="text-[15px] font-bold text-slate-900">Verification Status</h4>
+                  <p className="text-[13px] font-semibold text-slate-500 mt-1 uppercase">Status: {business.verificationStatus.replace("_", " ")}</p>
+                </div>
+                <Link href="/business/verification">
+                  <Button variant="outline" className="font-bold border-slate-200">View Documents</Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-10 pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <Button className="bg-[#1e613c] hover:bg-[#164a2e] text-white font-bold h-11 px-6 rounded-lg shadow-sm">
-                  Save changes
-                </Button>
-                <Button variant="ghost" className="text-[#1e613c] hover:text-[#164a2e] hover:bg-green-50 font-bold h-11 px-6 rounded-lg">
-                  Discard changes
+                <Button disabled className="bg-slate-200 text-slate-400 font-bold h-11 px-6 rounded-lg shadow-sm">
+                  Save changes (Coming Soon)
                 </Button>
               </div>
-              <Button variant="outline" className="text-red-600 border-slate-200 hover:bg-red-50 hover:text-red-700 font-bold h-11 px-6 rounded-lg shadow-sm gap-2">
-                <Trash2 className="h-4 w-4" />
-                Delete business profile
-              </Button>
             </div>
             
           </div>
@@ -208,9 +224,9 @@ export default async function BusinessSettingsPage() {
             </div>
 
             <div className="px-8 py-6 border-t border-slate-200 bg-white">
-              <Button className="bg-[#1e613c] hover:bg-[#164a2e] text-white font-bold h-11 px-6 rounded-lg shadow-sm gap-2">
+              <Button disabled className="bg-slate-200 text-slate-400 font-bold h-11 px-6 rounded-lg shadow-sm gap-2">
                 <Save className="h-4 w-4" />
-                Save preferences
+                Save preferences (Coming Soon)
               </Button>
             </div>
             
@@ -231,9 +247,9 @@ export default async function BusinessSettingsPage() {
                   <p className="text-sm font-medium text-slate-500 mt-1">Manage who can access and manage this business portal.</p>
                 </div>
               </div>
-              <Button className="bg-[#1e613c] hover:bg-[#164a2e] text-white font-bold h-10 px-5 rounded-lg shadow-sm gap-2">
+              <Button disabled className="bg-slate-200 text-slate-400 font-bold h-10 px-5 rounded-lg shadow-sm gap-2">
                 <UserPlus className="h-4 w-4" />
-                Invite team member
+                Invite team member (Coming Soon)
               </Button>
             </div>
 
@@ -344,6 +360,6 @@ export default async function BusinessSettingsPage() {
           </div>
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   );
 }

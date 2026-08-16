@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ChevronRight } from "lucide-react";
 import {
   Banknote,
   Building2,
@@ -13,7 +14,8 @@ import {
   ShieldCheck,
   Star,
   Users,
-  Settings
+  Settings,
+  UserCircle
 } from "lucide-react";
 
 import { signOutAction } from "@/lib/actions";
@@ -59,7 +61,6 @@ const GROUPS = [
   {
     label: "Insights",
     items: [
-      { href: "/admin/reports", label: "Reports", icon: Gauge },
       { href: "/admin/settings", label: "Settings", icon: Settings }
     ]
   }
@@ -75,9 +76,10 @@ export function AdminSidebar() {
           <SidebarMenuItem className="mb-2 px-1.5 flex items-center">
             <Logo size="sm" />
           </SidebarMenuItem>
-          <SidebarMenuItem className="px-1.5">
-            <span className="text-sm font-bold">Admin portal</span>
-          </SidebarMenuItem>
+            <div className="flex flex-col ml-2">
+              <span className="text-[14px] font-bold text-slate-900 leading-none">Admin Portal</span>
+              <span className="text-[12px] font-semibold text-slate-500 mt-1">SafariNexa</span>
+            </div>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
@@ -102,8 +104,42 @@ export function AdminSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="p-4 gap-4">
+        {/* System Status Widget */}
+        <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100">
+          <div className="flex flex-col mb-4">
+            <span className="text-[13px] font-bold text-slate-900 mb-2">System status</span>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-[#1e613c]"></div>
+              <span className="text-[12px] font-bold text-[#1e613c]">All systems operational</span>
+            </div>
+            <span className="text-[11px] font-semibold text-slate-400 mt-0.5">Updated 2 mins ago</span>
+          </div>
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] font-semibold text-slate-500">Uptime</span>
+              <span className="text-[12px] font-bold text-[#1e613c]">99.98%</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] font-semibold text-slate-500">Response time</span>
+              <span className="text-[12px] font-bold text-[#1e613c]">145ms</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] font-semibold text-slate-500">Active users</span>
+              <span className="text-[12px] font-bold text-[#1e613c]">128</span>
+            </div>
+          </div>
+        </div>
+
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={pathname === "/admin/profile"}>
+              <Link href="/admin/profile">
+                <UserCircle />
+                Profile
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <form action={signOutAction}>
               <SidebarMenuButton type="submit" className="text-destructive hover:bg-destructive/10">

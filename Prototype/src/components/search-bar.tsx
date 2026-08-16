@@ -189,7 +189,7 @@ export function SearchBar({ className }: { className?: string }) {
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-4 flex flex-col sm:flex-row sm:items-center rounded-3xl sm:rounded-full border border-border bg-card shadow-sm overflow-hidden">
+      <form onSubmit={handleSubmit} className="mt-1 flex flex-col sm:flex-row sm:items-center rounded-3xl sm:rounded-full border border-border bg-card shadow-sm overflow-hidden">
         {category === "transport" ? (
           <div className="flex border-b border-border sm:border-b-0 sm:border-r p-3 gap-2">
             {(

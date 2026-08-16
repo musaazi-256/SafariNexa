@@ -487,6 +487,7 @@ model RoomType {
 
   accommodation AccommodationListing @relation(fields: [accommodationId], references: [listingId], onDelete: Cascade)
   bookings      Booking[]
+  availabilities Availability[]
 
   @@index([accommodationId])
 }
@@ -578,15 +579,17 @@ model TransportOption {
 model Availability {
   id                 String   @id @default(cuid())
   listingId          String
+  roomTypeId         String?
   date               DateTime
   capacity           Int
   remaining          Int
   priceOverrideMinor Int?
   createdAt          DateTime @default(now())
 
-  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listing  Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  roomType RoomType? @relation(fields: [roomTypeId], references: [id])
 
-  @@unique([listingId, date])
+  @@unique([listingId, roomTypeId, date])
 }
 
 // ---------------------------------------------------------------------------

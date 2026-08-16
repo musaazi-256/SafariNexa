@@ -33,6 +33,7 @@ export function parseBaseFields(formData: FormData) {
 export function parseRoomTypeRows(formData: FormData) {
   const count = Number(formData.get("roomTypeCount") ?? 0);
   const rows: Array<{
+    id?: string;
     name: string;
     priceMinor: number;
     maxOccupancy: number;
@@ -62,7 +63,7 @@ export function parseRoomTypeRows(formData: FormData) {
 
 export function parseAddOnRows(formData: FormData) {
   const count = Number(formData.get("addOnCount") ?? 0);
-  const rows: Array<{ name: string; priceMinor: number; description?: string }> = [];
+  const rows: Array<{ id?: string; name: string; priceMinor: number; description?: string }> = [];
 
   for (let i = 0; i < count; i++) {
     const name = String(formData.get(`addOnName_${i}`) ?? "").trim();

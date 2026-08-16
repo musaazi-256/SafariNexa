@@ -43,14 +43,36 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
     const activeSession = await auth();
     if (!activeSession?.user) redirect("/auth/sign-in");
 
-    const target = await db.booking.findUnique({ where: { id: params.id } });
+    const target = await db.booking.findUnique({ 
+      where: { id: params.id },
+      include: { payments: true }
+    });
     if (!target || target.customerId !== activeSession.user.id) throw new Error("Booking not found.");
     if (!CANCELLABLE.includes(target.status)) return;
 
-    await db.booking.update({
-      where: { id: target.id },
-      data: { status: "CANCELLED_BY_CUSTOMER", cancelledAt: new Date(), cancelReason: "Cancelled by customer" }
-    });
+    const successfulPayment = target.payments.find((p) => p.status === "SUCCESSFUL");
+
+    if (successfulPayment) {
+      await db.booking.update({
+        where: { id: target.id },
+        data: { status: "REFUND_REQUESTED", cancelledAt: new Date(), cancelReason: "Cancelled by customer" }
+      });
+      await db.refund.create({
+        data: {
+          paymentId: successfulPayment.id,
+          bookingId: target.id,
+          amountMinor: successfulPayment.amountMinor,
+          reason: "Customer cancellation",
+          status: "REQUESTED",
+          requestedByUserId: activeSession.user.id
+        }
+      });
+    } else {
+      await db.booking.update({
+        where: { id: target.id },
+        data: { status: "CANCELLED_BY_CUSTOMER", cancelledAt: new Date(), cancelReason: "Cancelled by customer" }
+      });
+    }
 
     redirect(`/bookings/${target.id}`);
   }
