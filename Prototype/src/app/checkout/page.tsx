@@ -76,12 +76,25 @@ export default async function CheckoutPage({
     if (!activeSession?.user) redirect("/auth/sign-in");
 
     const submittedListingId = formData.get("listingId") as string;
-    const submittedType = formData.get("type") as string;
+    const submittedType = String(formData.get("type")).toUpperCase();
+    
+    // 1. Fetch authoritative listing
     const dbListing = await db.listing.findUnique({
       where: { id: submittedListingId },
-      include: { restaurant: true, accommodation: { include: { roomTypes: true, addOns: true } } }
+      include: { 
+        business: true,
+        restaurant: true, 
+        tour: true, 
+        transport: true,
+        accommodation: { include: { roomTypes: true, addOns: true } } 
+      }
     });
+
+    // 2. Validate publication & verification state
     if (!dbListing) throw new Error("Listing not found");
+    if (dbListing.status !== "PUBLISHED") throw new Error("This listing is not currently published.");
+    if (dbListing.business.verificationStatus !== "APPROVED") throw new Error("This business is not fully verified yet.");
+    if (dbListing.type !== submittedType) throw new Error("Listing type mismatch.");
 
     const participantsCount = Math.max(1, Number(formData.get("participants")) || 1);
     const fullName = String(formData.get("fullName") ?? "").trim();
@@ -94,15 +107,41 @@ export default async function CheckoutPage({
     let selectedAddOns: { id: string; name: string; priceMinor: number }[] = [];
     let totalMinor: number;
 
-    if (submittedType === "accommodation") {
+    // 3. Type-specific validations
+    if (submittedType === "ACCOMMODATION") {
       startDate = new Date(String(formData.get("startDate")));
       endDate = new Date(String(formData.get("endDate")));
+      
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error("Invalid dates provided.");
+      }
+      if (startDate < new Date(new Date().setHours(0,0,0,0))) {
+        throw new Error("Check-in date cannot be in the past.");
+      }
+      
       const nights = nightsBetween(String(formData.get("startDate")), String(formData.get("endDate")));
+      if (nights <= 0) throw new Error("Check-out must be after check-in.");
 
       const submittedRoomTypeId = String(formData.get("roomTypeId") ?? "");
       const room = dbListing.accommodation?.roomTypes.find((r) => r.id === submittedRoomTypeId);
-      roomTypeId = room?.id;
-      const roomRate = room?.priceMinor ?? dbListing.basePriceMinor;
+      if (!room) throw new Error("Selected room type is invalid or no longer exists.");
+      if (participantsCount > room.maxOccupancy) throw new Error(`Maximum occupancy for this room is ${room.maxOccupancy}.`);
+      
+      // Availability Check
+      const overlappingBookings = await db.booking.count({
+        where: {
+          roomTypeId: room.id,
+          status: { notIn: ["DRAFT", "CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN", "REFUNDED"] },
+          startDate: { lt: endDate },
+          endDate: { gt: startDate }
+        }
+      });
+      if (overlappingBookings >= room.totalRooms) {
+        throw new Error("This room is fully booked for the selected dates.");
+      }
+
+      roomTypeId = room.id;
+      const roomRate = room.priceMinor ?? dbListing.basePriceMinor;
 
       const submittedAddOnIds = formData.getAll("addOnIds").map(String);
       selectedAddOns = (dbListing.accommodation?.addOns ?? [])
@@ -111,15 +150,40 @@ export default async function CheckoutPage({
       const addOnsRate = selectedAddOns.reduce((sum, addOn) => sum + addOn.priceMinor, 0);
 
       totalMinor = (roomRate + addOnsRate) * nights;
-    } else if (submittedType === "tour") {
+    } else if (submittedType === "TOUR") {
       startDate = new Date(String(formData.get("date")));
+      if (isNaN(startDate.getTime()) || startDate < new Date(new Date().setHours(0,0,0,0))) {
+        throw new Error("Invalid or past date provided.");
+      }
+      
+      if (dbListing.tour && participantsCount > dbListing.tour.groupSizeMax) {
+         throw new Error(`Participants exceed maximum group size of ${dbListing.tour.groupSizeMax}.`);
+      }
+      
       totalMinor = dbListing.basePriceMinor * participantsCount;
-    } else {
+    } else if (submittedType === "TRANSPORT") {
       const dateStr = String(formData.get("date"));
       const timeStr = String(formData.get("time") || "12:00");
       startDate = new Date(`${dateStr}T${timeStr}`);
-      const unitPrice =
-        dbListing.basePriceMinor > 0 ? dbListing.basePriceMinor : parseFirstUgxAmount(dbListing.restaurant?.priceRange ?? "0");
+      if (isNaN(startDate.getTime()) || startDate < new Date()) {
+        throw new Error("Invalid or past date/time provided.");
+      }
+      
+      if (dbListing.transport && participantsCount > dbListing.transport.passengerLimit) {
+         throw new Error(`Passengers exceed vehicle capacity of ${dbListing.transport.passengerLimit}.`);
+      }
+      
+      totalMinor = dbListing.basePriceMinor * participantsCount;
+    } else {
+      // Restaurant
+      const dateStr = String(formData.get("date"));
+      const timeStr = String(formData.get("time") || "12:00");
+      startDate = new Date(`${dateStr}T${timeStr}`);
+      if (isNaN(startDate.getTime()) || startDate < new Date()) {
+        throw new Error("Invalid or past date/time provided.");
+      }
+      
+      const unitPrice = dbListing.basePriceMinor > 0 ? dbListing.basePriceMinor : parseFirstUgxAmount(dbListing.restaurant?.priceRange ?? "0");
       totalMinor = unitPrice * participantsCount;
     }
 
