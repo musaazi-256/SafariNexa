@@ -74,7 +74,7 @@ export function ListingCard({
           <Link
             href={`/auth/sign-in?reason=${encodeURIComponent("Save")}&returnTo=${encodeURIComponent(returnTo)}`}
             aria-label="Save to wishlist"
-            className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-foreground transition-colors hover:text-destructive"
+            className="absolute right-3 top-3 z-20 flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-white/90 text-foreground transition-colors hover:text-destructive"
           >
             <Heart className="h-4 w-4" />
           </Link>

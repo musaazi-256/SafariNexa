@@ -63,6 +63,17 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
 
     const submittedType = String(formData.get("listingType")) as ListingType;
     const base = parseBaseFields(formData);
+    
+    let parsedTourData;
+    if (submittedType === "TOUR") {
+      parsedTourData = parseTourFields(formData);
+      if (parsedTourData.guideId) {
+        const guide = await db.guide.findUnique({ where: { id: parsedTourData.guideId } });
+        if (!guide || guide.businessId !== activeBusinessId) {
+          throw new Error("Invalid guide selected.");
+        }
+      }
+    }
 
     const typeData =
       submittedType === "ACCOMMODATION"

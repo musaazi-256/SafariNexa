@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Search, Filter, Download } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { BookingStatusBadge } from "@/components/ui/status-badge";
 import { formatUGX } from "@/lib/booking";
@@ -24,12 +26,23 @@ const TABS = [
   { value: "CANCELLED", label: "Cancelled" }
 ];
 
-export default async function AdminBookingsPage({ searchParams }: { searchParams: { status?: string; page?: string } }) {
+export default async function AdminBookingsPage({ searchParams }: { searchParams: { status?: string; page?: string; q?: string } }) {
   await requireAdminSession();
 
   const activeTab = searchParams.status?.toUpperCase();
   const page = parsePage(searchParams.page);
-  const where = activeTab && STATUS_GROUPS[activeTab] ? { status: { in: STATUS_GROUPS[activeTab] } } : undefined;
+  const q = searchParams.q?.trim();
+
+  const where: any = activeTab && STATUS_GROUPS[activeTab] ? { status: { in: STATUS_GROUPS[activeTab] } } : {};
+  if (q) {
+    where.OR = [
+      { bookingRef: { contains: q, mode: "insensitive" } },
+      { customer: { name: { contains: q, mode: "insensitive" } } },
+      { customer: { email: { contains: q, mode: "insensitive" } } },
+      { business: { name: { contains: q, mode: "insensitive" } } },
+      { listing: { title: { contains: q, mode: "insensitive" } } }
+    ];
+  }
 
   const [bookings, totalCount] = await Promise.all([
     db.booking.findMany({
@@ -60,7 +73,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
           return (
             <Link
               key={tab.value}
-              href={href}
+              href={tab.value === "ALL" ? (q ? `/admin/bookings?q=${q}` : "/admin/bookings") : `/admin/bookings?status=${tab.value.toLowerCase()}${q ? `&q=${q}` : ''}`}
               className={cn(
                 "rounded-full border px-4 py-1.5 text-[13px] font-bold transition-all",
                 isActive 
@@ -72,6 +85,31 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
             </Link>
           );
         })}
+      </div>
+
+      {/* Table Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <form className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            {activeTab && activeTab !== "ALL" && <input type="hidden" name="status" value={activeTab.toLowerCase()} />}
+            <input 
+              type="search" 
+              name="q" 
+              defaultValue={q} 
+              placeholder="Search bookings..." 
+              className="w-full h-9 pl-9 pr-4 rounded-full border border-slate-200 text-[13px] outline-none focus:border-[#1e613c] focus:ring-1 focus:ring-[#1e613c] transition-all bg-white"
+            />
+          </form>
+          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0">
+            <Filter className="h-4 w-4 mr-2 text-slate-400" />
+            Filter
+          </Button>
+          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0 hidden lg:inline-flex">
+            <Download className="h-4 w-4 mr-2 text-slate-400" />
+            Export
+          </Button>
+        </div>
       </div>
 
       {/* Table Container */}
@@ -150,7 +188,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               currentPage={page}
               totalPages={totalPagesFor(totalCount)}
               buildHref={(p) =>
-                `/admin/bookings?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), page: String(p) }).toString()}`
+                `/admin/bookings?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), ...(q ? { q } : {}), page: String(p) }).toString()}`
               }
             />
           </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, Percent, Landmark, Undo2, ArrowRight } from "lucide-react";
+import { Banknote, Percent, Landmark, Undo2, ArrowRight, Search, Filter, Download } from "lucide-react";
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
@@ -12,23 +12,44 @@ import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { PLATFORM_COMMISSION_RATE, summarizePayments } from "@/lib/revenue";
 import { toPaymentStatus, toRefundStatus } from "@/lib/status";
 import { logAuditEvent } from "@/lib/audit";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 
-export default async function AdminPaymentsPage({ searchParams }: { searchParams: { page?: string } }) {
+const TABS = [
+  { value: "ALL", label: "All" },
+  { value: "SUCCESSFUL", label: "Successful" },
+  { value: "PENDING", label: "Pending" },
+  { value: "FAILED", label: "Failed" },
+  { value: "REFUNDED", label: "Refunded" }
+];
+
+export default async function AdminPaymentsPage({ searchParams }: { searchParams: { page?: string; q?: string; status?: string } }) {
   await requireAdminSession();
 
   const page = parsePage(searchParams.page);
 
+  const activeTab = searchParams.status?.toUpperCase();
+  const q = searchParams.q?.trim();
+
+  const where: any = activeTab && activeTab !== "ALL" ? { status: activeTab } : {};
+  if (q) {
+    where.OR = [
+      { booking: { listing: { title: { contains: q, mode: "insensitive" } } } },
+      { booking: { business: { name: { contains: q, mode: "insensitive" } } } }
+    ];
+  }
+
   const [allPayments, pagePayments, totalCount, refunds] = await Promise.all([
-    db.payment.findMany({ select: { status: true, amountMinor: true } }),
+    db.payment.findMany({ select: { status: true, amountMinor: true, payoutId: true } }),
     db.payment.findMany({
+      where,
       include: { booking: { include: { listing: true, business: true } }, order: true },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE
     }),
-    db.payment.count(),
+    db.payment.count({ where }),
     db.refund.findMany({
       include: { booking: { include: { listing: true } } },
       orderBy: { createdAt: "desc" },
@@ -36,7 +57,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
     })
   ]);
 
-  const { grossMinor, commissionMinor, netMinor, refundedMinor } = summarizePayments(allPayments);
+  const { grossMinor, commissionMinor, netMinor, refundedMinor, unsettledNetMinor } = summarizePayments(allPayments);
 
   async function approveRefund(formData: FormData) {
     "use server";
@@ -87,6 +108,57 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
       metadata: { refundId, amount: targetRefund.amountMinor }
     });
 
+    redirect("/admin/payments");
+  }
+
+  async function processAllPayouts() {
+    "use server";
+    const adminSession = await requireAdminSession();
+    
+    const unsettled = await db.payment.findMany({
+      where: { status: "SUCCESSFUL", payoutId: null, bookingId: { not: null } },
+      include: { booking: true }
+    });
+    
+    if (unsettled.length === 0) return;
+    
+    const byBusiness = unsettled.reduce((acc, p) => {
+      const bId = p.booking!.businessId;
+      if (!acc[bId]) acc[bId] = [];
+      acc[bId].push(p);
+      return acc;
+    }, {} as Record<string, typeof unsettled>);
+    
+    await db.$transaction(async (tx) => {
+      for (const [businessId, payments] of Object.entries(byBusiness)) {
+        const gross = payments.reduce((sum, p) => sum + p.amountMinor, 0);
+        const net = gross - Math.round(gross * PLATFORM_COMMISSION_RATE);
+        
+        const payout = await tx.payout.create({
+          data: {
+            businessId,
+            amountMinor: net,
+            status: "COMPLETED",
+            notes: "Batch platform settlement",
+          }
+        });
+        
+        await tx.payment.updateMany({
+          where: { id: { in: payments.map(p => p.id) } },
+          data: { payoutId: payout.id }
+        });
+      }
+    });
+    
+    await logAuditEvent({
+      actorUserId: adminSession.user.id,
+      actorEmail: adminSession.user.email ?? undefined,
+      surface: "ADMIN",
+      action: "admin_processed_payouts",
+      outcome: "SUCCESS",
+      metadata: { batchCount: Object.keys(byBusiness).length }
+    });
+    
     redirect("/admin/payments");
   }
 
@@ -168,13 +240,57 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
         </div>
       </div>
 
-      {/* Tabs / Content Area */}
-      <div className="flex items-center gap-6 border-b border-slate-200 mb-6">
-        <div className="pb-3 border-b-2 border-[#1e613c] text-[14px] font-bold text-[#1e613c]">
-          Transactions
-        </div>
-        <div className="pb-3 text-[14px] font-bold text-slate-400">
-          Refunds
+      {/* Pill Filters */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {TABS.map((tab) => {
+          const isActive = tab.value === "ALL" ? !activeTab || activeTab === "ALL" : activeTab === tab.value;
+          const href = tab.value === "ALL" ? (q ? `/admin/payments?q=${q}` : "/admin/payments") : `/admin/payments?status=${tab.value.toLowerCase()}${q ? `&q=${q}` : ''}`;
+          return (
+            <Link
+              key={tab.value}
+              href={href}
+              className={cn(
+                "rounded-full border px-4 py-1.5 text-[13px] font-bold transition-all",
+                isActive 
+                  ? "border-[#1e613c] bg-[#1e613c] text-white shadow-sm" 
+                  : "border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+              )}
+            >
+              {tab.label}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Table Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-6">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <form className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            {activeTab && activeTab !== "ALL" && <input type="hidden" name="status" value={activeTab.toLowerCase()} />}
+            <input 
+              type="search" 
+              name="q" 
+              defaultValue={q} 
+              placeholder="Search payments..." 
+              className="w-full h-9 pl-9 pr-4 rounded-full border border-slate-200 text-[13px] outline-none focus:border-[#1e613c] focus:ring-1 focus:ring-[#1e613c] transition-all bg-white"
+            />
+          </form>
+          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0">
+            <Filter className="h-4 w-4 mr-2 text-slate-400" />
+            Filter
+          </Button>
+          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0 hidden lg:inline-flex">
+            <Download className="h-4 w-4 mr-2 text-slate-400" />
+            Export
+          </Button>
+          {unsettledNetMinor > 0 && (
+            <form action={processAllPayouts}>
+              <Button type="submit" className="h-9 px-4 text-[13px] font-bold bg-[#1e613c] hover:bg-[#1e613c]/90 text-white rounded-full shrink-0 shadow-sm transition-all">
+                Settle Payouts ({formatUGX(unsettledNetMinor)})
+              </Button>
+            </form>
+          )}
         </div>
       </div>
 
@@ -225,7 +341,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
             <span className="text-[13px] font-semibold text-slate-500">
               Showing {pagePayments.length > 0 ? (page - 1) * PAGE_SIZE + 1 : 0} to {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount} transactions
             </span>
-            <Pagination currentPage={page} totalPages={totalPagesFor(totalCount)} buildHref={(p) => `/admin/payments?page=${p}`} />
+            <Pagination currentPage={page} totalPages={totalPagesFor(totalCount)} buildHref={(p) => `/admin/payments?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), ...(q ? { q } : {}), page: String(p) }).toString()}`} />
           </div>
         </div>
       )}

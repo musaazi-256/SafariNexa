@@ -47,12 +47,15 @@ export function parseRoomTypeRows(formData: FormData) {
     const name = String(formData.get(`roomTypeName_${i}`) ?? "").trim();
     if (!name) continue;
     
+    const maxOccupancy = Math.max(1, Number(formData.get(`roomTypeMaxOccupancy_${i}`)) || 1);
+    const totalRooms = Math.max(1, Number(formData.get(`roomTypeTotalRooms_${i}`)) || 1);
+    
     rows.push({
       id: String(formData.get(`roomTypeId_${i}`) ?? "").trim() || undefined,
       name,
       priceMinor: Math.max(0, Number(formData.get(`roomTypePrice_${i}`)) || 0),
-      maxOccupancy: Math.max(1, Number(formData.get(`roomTypeMaxOccupancy_${i}`)) || 1),
-      totalRooms: Math.max(1, Number(formData.get(`roomTypeTotalRooms_${i}`)) || 1),
+      maxOccupancy,
+      totalRooms,
       breakfastIncluded: formData.get(`roomTypeBreakfast_${i}`) === "on",
       description: String(formData.get(`roomTypeDescription_${i}`) ?? "").trim() || undefined,
       images: Array.from(formData.getAll(`roomTypeImages_${i}`)).map(String).filter(Boolean)
@@ -91,11 +94,18 @@ export function parseAccommodationFields(formData: FormData) {
 
 export function parseTourFields(formData: FormData) {
   const guideId = String(formData.get("guideId") ?? "").trim();
+  const groupSizeMin = Math.max(1, Number(formData.get("groupSizeMin")) || 1);
+  const groupSizeMax = Math.max(1, Number(formData.get("groupSizeMax")) || 12);
+  
+  if (groupSizeMin > groupSizeMax) {
+    throw new Error("Minimum group size cannot be greater than maximum group size.");
+  }
+
   return {
     tourType: String(formData.get("tourType") ?? "").trim() || undefined,
     durationDays: Math.max(1, Number(formData.get("durationDays")) || 1),
-    groupSizeMin: Math.max(1, Number(formData.get("groupSizeMin")) || 1),
-    groupSizeMax: Math.max(1, Number(formData.get("groupSizeMax")) || 12),
+    groupSizeMin,
+    groupSizeMax,
     difficulty: String(formData.get("difficulty") ?? "").trim() || undefined,
     inclusions: linesToArray(formData.get("inclusions")),
     exclusions: linesToArray(formData.get("exclusions")),

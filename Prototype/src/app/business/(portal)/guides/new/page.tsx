@@ -17,9 +17,7 @@ export default async function NewGuidePage() {
 
   async function createGuide(formData: FormData) {
     "use server";
-    const activeSession = await auth();
-    if (!activeSession?.user) redirect("/business/auth/sign-in");
-    const activeBusinessId = activeSession.user.businessIds[0];
+    const { businessId: activeBusinessId } = await requireBusinessSession();
     if (!activeBusinessId) redirect("/business/auth/sign-in");
 
     const name = String(formData.get("name") ?? "").trim();

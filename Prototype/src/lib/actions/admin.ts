@@ -137,3 +137,26 @@ export async function inviteAdmin(email: string) {
 
   revalidatePath("/admin/(portal)/users", "page");
 }
+
+export async function updateAdminProfile(name: string, phone: string) {
+  const session = await auth();
+  if (!session?.user?.isAdmin) {
+    throw new Error("Unauthorized: Admin access required");
+  }
+
+  await db.user.update({
+    where: { id: session.user.id },
+    data: { name, phone }
+  });
+
+  await logAuditEvent({
+    actorUserId: session.user.id,
+    actorEmail: session.user.email ?? undefined,
+    surface: "ADMIN",
+    action: "admin_update_profile",
+    outcome: "SUCCESS",
+    metadata: { name, phone }
+  });
+
+  revalidatePath("/admin/(portal)/profile");
+}

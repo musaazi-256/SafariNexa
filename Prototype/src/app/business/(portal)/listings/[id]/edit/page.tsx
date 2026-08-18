@@ -117,7 +117,14 @@ export default async function EditListingPage({ params }: { params: { id: string
         }
       });
     } else if (target.type === "TOUR") {
-      await db.tourListing.update({ where: { listingId: target.id }, data: parseTourFields(formData) });
+      const parsedTourData = parseTourFields(formData);
+      if (parsedTourData.guideId) {
+        const guide = await db.guide.findUnique({ where: { id: parsedTourData.guideId } });
+        if (!guide || guide.businessId !== target.businessId) {
+          throw new Error("Invalid guide selected.");
+        }
+      }
+      await db.tourListing.update({ where: { listingId: target.id }, data: parsedTourData as any });
     } else if (target.type === "RESTAURANT") {
       await db.restaurantProfile.update({ where: { listingId: target.id }, data: parseRestaurantFields(formData) });
     } else if (target.type === "TRANSPORT") {

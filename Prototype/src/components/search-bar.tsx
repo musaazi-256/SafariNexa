@@ -18,6 +18,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 type CategoryId = "accommodation" | "tours" | "restaurants" | "transport" | "guides";
 type TransportSubcategory = "airport" | "special";
@@ -97,6 +98,7 @@ const guestOptions = (noun: string) => GUEST_OPTIONS.map((value) => ({ value, la
 
 export function SearchBar({ className }: { className?: string }) {
   const router = useRouter();
+  const [open, setOpen] = React.useState(false);
   const [category, setCategory] = React.useState<CategoryId>("accommodation");
 
   // Accommodation
@@ -134,6 +136,7 @@ export function SearchBar({ className }: { className?: string }) {
     if (category === "guides") {
       const params = new URLSearchParams();
       if (guideDestination) params.set("q", guideDestination);
+      setOpen(false);
       router.push(`/guides${params.toString() ? `?${params.toString()}` : ""}`);
       return;
     }
@@ -165,11 +168,12 @@ export function SearchBar({ className }: { className?: string }) {
       params.set("passengers", passengers);
     }
 
+    setOpen(false);
     router.push(`/search?${params.toString()}`);
   }
 
-  return (
-    <div className={cn("w-full", className)}>
+  const searchContent = (
+    <>
       <div className="-mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 no-scrollbar flex gap-1.5 overflow-x-auto pb-2">
         {CATEGORIES.map((item) => (
           <button
@@ -266,13 +270,42 @@ export function SearchBar({ className }: { className?: string }) {
           ) : null}
         </div>
 
-        <div className="p-2 sm:p-2 sm:shrink-0 bg-card sm:bg-transparent">
+        <div className="p-4 sm:p-2 sm:shrink-0 bg-card sm:bg-transparent mt-auto sm:mt-0 pb-10 sm:pb-2">
           <Button type="submit" size="lg" className="w-full sm:w-auto rounded-full px-8 h-12 text-base font-bold bg-primary hover:bg-[#066130]">
             <Search className="h-5 w-5 mr-2" />
             Search stays
           </Button>
         </div>
       </form>
+    </>
+  );
+
+  return (
+    <div className={cn("w-full", className)}>
+      <div className="hidden sm:block">
+        {searchContent}
+      </div>
+      <div className="sm:hidden">
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <button className="flex w-full items-center gap-3 rounded-full border border-border bg-card px-4 py-3 shadow-sm transition-colors hover:bg-secondary">
+              <Search className="h-5 w-5 text-primary" />
+              <div className="flex flex-col items-start">
+                <span className="text-sm font-bold text-foreground">Where to?</span>
+                <span className="text-xs text-muted-foreground">Anywhere • Any week • Add guests</span>
+              </div>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="h-[100dvh] w-full rounded-none p-0 overflow-y-auto bg-background flex flex-col">
+            <SheetHeader className="px-4 py-4 border-b border-border/50 text-left sticky top-0 bg-background z-10 shrink-0">
+              <SheetTitle className="text-xl font-bold">Where to?</SheetTitle>
+            </SheetHeader>
+            <div className="flex-1 p-4 sm:p-0">
+              {searchContent}
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
     </div>
   );
 }

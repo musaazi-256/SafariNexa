@@ -44,7 +44,8 @@ export default async function AdminDashboardPage() {
     closedSupportCount,
     recentVerifications,
     recentSupportCases,
-    topBusinessesRaw
+    topBusinessesRaw,
+    recentAudits
   ] = await Promise.all([
     db.listing.count({ where: { status: "PUBLISHED" } }),
     db.businessProfile.count({ where: { verificationStatus: "APPROVED" } }),
@@ -79,6 +80,10 @@ export default async function AdminDashboardPage() {
       },
       orderBy: { bookings: { _count: "desc" } },
       take: 4
+    }),
+    db.auditLog.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5
     })
   ]);
 
@@ -152,8 +157,8 @@ export default async function AdminDashboardPage() {
         </div>
       </section>
 
-      {/* 3-Column Layout */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      {/* Multi-Column Layout */}
+      <div className="grid lg:grid-cols-4 gap-6">
         
         {/* Verification Queue */}
         <div className="bg-white rounded-[20px] border border-slate-200 shadow-sm flex flex-col h-[420px]">
@@ -272,6 +277,37 @@ export default async function AdminDashboardPage() {
               <Link href="/admin/businesses" className="block px-6 py-4 text-[12px] font-bold text-[#1e613c] hover:underline flex items-center gap-1">
                 View all businesses <ArrowRight className="h-3 w-3" />
               </Link>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Actions (Audit Logs) */}
+        <div className="bg-white rounded-[20px] border border-slate-200 shadow-sm flex flex-col h-[420px]">
+          <div className="border-b border-slate-100 px-6 py-5 flex justify-between items-start">
+            <div>
+              <h3 className="text-[15px] font-bold text-slate-900">Recent Actions</h3>
+              <p className="text-[11px] font-semibold text-slate-500 mt-0.5">Platform audit log</p>
+            </div>
+          </div>
+          
+          <div className="divide-y divide-slate-50 flex-1 overflow-y-auto">
+            {recentAudits.length === 0 ? (
+              <div className="p-8 text-center text-sm text-slate-500 font-medium">No recent actions.</div>
+            ) : (
+              recentAudits.map((audit) => (
+                <div key={audit.id} className="px-6 py-4 flex flex-col gap-1 hover:bg-slate-50/50 transition-colors">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[13px] font-bold text-slate-900 truncate pr-2" title={audit.action}>{audit.action.replace(/_/g, " ")}</span>
+                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm ${audit.outcome === 'SUCCESS' ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50'}`}>
+                      {audit.outcome}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-[11px] font-semibold text-slate-500 truncate" title={audit.actorEmail || "System"}>{audit.actorEmail || "System"}</span>
+                    <span className="text-[10px] font-semibold text-slate-400 shrink-0">{audit.createdAt.toLocaleTimeString("en-UG", { hour: "2-digit", minute: "2-digit" })}</span>
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Heart, LayoutDashboard, LifeBuoy, MapPin, Settings, User, Building2 } from "lucide-react";
+import { Bell, Heart, LayoutDashboard, LifeBuoy, MapPin, Settings, User, Building2, MessageSquare } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +64,12 @@ export function UserMenu({
           <Link href="/profile/saved">
             <Heart className="h-4 w-4" />
             Saved
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/profile/messages">
+            <MessageSquare className="h-4 w-4" />
+            Messages
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

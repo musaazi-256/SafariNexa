@@ -51,7 +51,7 @@ export function ScrollRow({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative">
-      <div ref={scrollRef} className="no-scrollbar -mx-4 flex snap-x gap-4 overflow-x-auto scroll-smooth px-4 sm:mx-0 sm:px-0">
+      <div ref={scrollRef} className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 sm:mx-0 sm:px-0">
         {children}
       </div>
       <button

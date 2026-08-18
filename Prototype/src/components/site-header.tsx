@@ -11,6 +11,7 @@ import { UserMenu } from "@/components/user-menu";
 import { SignOutMenuItem } from "@/components/sign-out-button";
 import { getUnreadNotificationCount } from "@/lib/notifications";
 import { CartDropdown } from "@/components/cart/cart-dropdown";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 const NAV_LINKS = [
   { href: "/explore", label: "Explore" },
@@ -30,8 +31,9 @@ export async function SiteHeader() {
   const unreadCount = session?.user ? await getUnreadNotificationCount(session.user.id) : 0;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur">
-      <Container className="flex h-[72px] items-center justify-between gap-4">
+    <>
+      <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur">
+        <Container className="flex h-[72px] items-center justify-between gap-4">
         <Link href="/">
           <Logo />
         </Link>
@@ -71,9 +73,13 @@ export async function SiteHeader() {
             </div>
           )}
 
-          <MobileNav links={NAV_LINKS} authed={Boolean(session?.user)} authLinks={AUTH_LINKS} />
+          <div className="hidden md:flex">
+            <MobileNav links={NAV_LINKS} authed={Boolean(session?.user)} authLinks={AUTH_LINKS} />
+          </div>
         </div>
       </Container>
-    </header>
+      </header>
+      <MobileBottomNav />
+    </>
   );
 }

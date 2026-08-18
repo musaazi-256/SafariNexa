@@ -27,13 +27,17 @@ export default async function BusinessDashboardPage() {
   const now = new Date();
   const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
 
-  const [publishedCount, draftCount, awaitingCount, monthPayments, publishedReviews, recentBookings, recentReviews] = await Promise.all([
+  const [publishedCount, draftCount, awaitingCount, monthPayments, monthPayouts, publishedReviews, recentBookings, recentReviews] = await Promise.all([
     db.listing.count({ where: { businessId, status: "PUBLISHED" } }),
     db.listing.count({ where: { businessId, status: "DRAFT" } }),
     db.booking.count({ where: { businessId, status: "AWAITING_BUSINESS_CONFIRMATION" } }),
     db.payment.findMany({
       where: { booking: { businessId }, completedAt: { gte: startOfMonth } },
-      select: { status: true, amountMinor: true }
+      select: { status: true, amountMinor: true, payoutId: true }
+    }),
+    db.payout.findMany({
+      where: { businessId, createdAt: { gte: startOfMonth }, status: "COMPLETED" },
+      select: { amountMinor: true }
     }),
     db.review.findMany({ where: { businessId, status: "PUBLISHED" }, select: { rating: true } }),
     db.booking.findMany({
@@ -50,7 +54,8 @@ export default async function BusinessDashboardPage() {
     })
   ]);
 
-  const { grossMinor } = summarizePayments(monthPayments);
+  const { grossMinor, unsettledNetMinor } = summarizePayments(monthPayments);
+  const settledMinor = monthPayouts.reduce((sum, p) => sum + p.amountMinor, 0);
   const { average, count } = ratingSummary(publishedReviews);
 
   return (
@@ -136,13 +141,12 @@ export default async function BusinessDashboardPage() {
                 <Database className="h-4 w-4 text-green-600" />
               </div>
             </div>
-            <p className="text-2xl font-extrabold text-slate-900">{formatUGX(grossMinor)}</p>
-            <p className="text-sm text-slate-500 mt-1">Gross, before commission</p>
+            <p className="text-2xl font-extrabold text-slate-900">{formatUGX(settledMinor)}</p>
+            <p className="text-sm text-slate-500 mt-1">Settled payouts to you</p>
             <div className="mt-auto pt-4 flex items-center gap-2">
-              <span className="flex items-center text-xs font-semibold text-green-700 bg-green-50 px-1.5 py-0.5 rounded">
-                ↑ 18.6%
+              <span className="text-xs font-semibold text-slate-600">
+                {formatUGX(unsettledNetMinor)} pending
               </span>
-              <span className="text-xs text-slate-500">vs last month</span>
             </div>
           </CardContent>
         </Card>

@@ -109,6 +109,13 @@ enum PaymentStatus {
   PARTIALLY_REFUNDED
 }
 
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 enum PaymentProvider {
   FLUTTERWAVE
   MTN_MOBILE_MONEY
@@ -282,6 +289,7 @@ model BusinessProfile {
   reviews        Review[]
   guides         Guide[]
   messageThreads MessageThread[]
+  payouts        Payout[]
 }
 
 model BusinessUser {
@@ -685,6 +693,7 @@ model Payment {
   id                String          @id @default(cuid())
   orderId           String?
   bookingId         String?
+  payoutId          String?
   provider          PaymentProvider
   status            PaymentStatus   @default(NOT_STARTED)
   amountMinor       Int
@@ -698,7 +707,23 @@ model Payment {
 
   order    Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   booking  Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  payout   Payout?  @relation(fields: [payoutId], references: [id])
   refunds  Refund[]
+}
+
+model Payout {
+  id                String       @id @default(cuid())
+  businessId        String
+  amountMinor       Int
+  currency          String       @default("UGX")
+  status            PayoutStatus @default(PENDING)
+  providerReference String?
+  notes             String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  business BusinessProfile @relation(fields: [businessId], references: [id])
+  payments Payment[]
 }
 
 model Refund {

@@ -69,14 +69,14 @@ export default async function HomePage() {
     <>
       <SiteHeader />
       <main>
-        <section className="relative overflow-hidden pb-24 pt-14 text-white sm:pb-28 sm:pt-20">
+        <section className="relative overflow-hidden pb-20 pt-10 text-white sm:pb-28 sm:pt-20">
           <Image src={HERO_IMAGE} alt="" fill className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/70" />
           <Container className="relative">
             <Badge variant="accent" className="mb-4">
               See it all first
             </Badge>
-            <h1 className="max-w-3xl text-5xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl">
+            <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl">
               See it all first. Book only when <span className="text-accent">you&apos;re ready</span>.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/90 sm:text-xl">
@@ -86,7 +86,7 @@ export default async function HomePage() {
           </Container>
         </section>
 
-        <Container className="relative z-10 -mt-16 sm:-mt-20">
+        <Container className="relative z-10 -mt-12 sm:-mt-20">
           <SearchBar />
         </Container>
 

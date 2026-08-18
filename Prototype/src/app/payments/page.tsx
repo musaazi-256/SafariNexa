@@ -34,6 +34,23 @@ export default async function PaymentsPage({ searchParams }: { searchParams: { o
     metadata = { bookingId: booking.id };
   }
 
+  // Bypass Stripe checkout if we're using a dummy key in development
+  const stripeKey = process.env.STRIPE_SECRET_KEY || "sk_test_dummy";
+  if (stripeKey.includes("ummy")) {
+    await db.payment.create({
+      data: {
+        orderId: orderId || undefined,
+        bookingId: bookingId || undefined,
+        provider: "STRIPE",
+        status: "PROCESSING",
+        amountMinor: totalMinor,
+        currency: "UGX",
+        providerReference: "mock_session_" + Date.now()
+      }
+    });
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/payments/success?session_id=mock_session`);
+  }
+
   // Create Stripe Checkout Session
   const stripeSession = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],

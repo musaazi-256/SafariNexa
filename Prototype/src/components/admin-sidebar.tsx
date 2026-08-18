@@ -54,8 +54,7 @@ const GROUPS = [
     label: "Community",
     items: [
       { href: "/admin/users", label: "Users", icon: Users },
-      { href: "/admin/reviews", label: "Reviews", icon: Star },
-      { href: "/admin/support", label: "Support", icon: LifeBuoy }
+      { href: "/admin/reviews", label: "Reviews", icon: Star }
     ]
   },
   {

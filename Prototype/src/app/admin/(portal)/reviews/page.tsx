@@ -12,6 +12,7 @@ import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { toReviewStatus } from "@/lib/status";
+import { logAuditEvent } from "@/lib/audit";
 
 const TABS: Array<{ value: PrismaReviewStatus | "ALL"; label: string }> = [
   { value: "ALL", label: "All" },
@@ -48,7 +49,51 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
     const reviewId = String(formData.get("reviewId"));
     const status = String(formData.get("status")) as PrismaReviewStatus;
 
-    await db.review.update({ where: { id: reviewId }, data: { status } });
+    const review = await db.review.findUnique({
+      where: { id: reviewId },
+      include: { listing: { select: { title: true } } }
+    });
+
+    if (!review) return;
+
+    await db.$transaction(async (tx) => {
+      await tx.review.update({ where: { id: reviewId }, data: { status } });
+      
+      // Notify customer
+      await tx.notification.create({
+        data: {
+          userId: review.authorUserId,
+          type: "SYSTEM",
+          title: "Review Moderated",
+          body: `Your review for ${review.listing.title} has been marked as ${status.toLowerCase()}.`
+        }
+      });
+      
+      // Notify business owners
+      const businessUsers = await tx.businessUser.findMany({
+        where: { businessId: review.businessId, role: "OWNER" }
+      });
+      
+      for (const bu of businessUsers) {
+        await tx.notification.create({
+          data: {
+            userId: bu.userId,
+            type: "SYSTEM",
+            title: "Review Moderated",
+            body: `A review for ${review.listing.title} has been marked as ${status.toLowerCase()}.`
+          }
+        });
+      }
+    });
+
+    await logAuditEvent({
+      actorUserId: activeSession.user.id,
+      actorEmail: activeSession.user.email ?? undefined,
+      surface: "ADMIN",
+      action: "admin_moderate_review",
+      outcome: "SUCCESS",
+      metadata: { reviewId, status }
+    });
   }
 
   return (
