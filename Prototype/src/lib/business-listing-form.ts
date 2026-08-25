@@ -41,6 +41,12 @@ export function parseRoomTypeRows(formData: FormData) {
     breakfastIncluded: boolean;
     description?: string;
     images: string[];
+    bedType?: string;
+    bedrooms: number;
+    roomFeatures: string[];
+    isRefundable: boolean;
+    refundPolicyText?: string;
+    discountNotice?: string;
   }> = [];
 
   for (let i = 0; i < count; i++) {
@@ -49,7 +55,17 @@ export function parseRoomTypeRows(formData: FormData) {
     
     const maxOccupancy = Math.max(1, Number(formData.get(`roomTypeMaxOccupancy_${i}`)) || 1);
     const totalRooms = Math.max(1, Number(formData.get(`roomTypeTotalRooms_${i}`)) || 1);
+    const bedrooms = Math.max(1, Number(formData.get(`roomTypeBedrooms_${i}`)) || 1);
     
+    const featuresRaw = String(formData.get(`roomTypeFeatures_${i}`) ?? "");
+    const roomFeatures = featuresRaw
+      .split(/[\n,]+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    
+    const isRefundableInput = formData.get(`roomTypeIsRefundable_${i}`);
+    const isRefundable = isRefundableInput ? isRefundableInput === "on" : true;
+
     rows.push({
       id: String(formData.get(`roomTypeId_${i}`) ?? "").trim() || undefined,
       name,
@@ -58,7 +74,13 @@ export function parseRoomTypeRows(formData: FormData) {
       totalRooms,
       breakfastIncluded: formData.get(`roomTypeBreakfast_${i}`) === "on",
       description: String(formData.get(`roomTypeDescription_${i}`) ?? "").trim() || undefined,
-      images: Array.from(formData.getAll(`roomTypeImages_${i}`)).map(String).filter(Boolean)
+      images: Array.from(formData.getAll(`roomTypeImages_${i}`)).map(String).filter(Boolean),
+      bedType: String(formData.get(`roomTypeBedType_${i}`) ?? "").trim() || "1 Double Bed",
+      bedrooms,
+      roomFeatures,
+      isRefundable,
+      refundPolicyText: String(formData.get(`roomTypeRefundPolicyText_${i}`) ?? "").trim() || undefined,
+      discountNotice: String(formData.get(`roomTypeDiscountNotice_${i}`) ?? "").trim() || undefined
     });
   }
   return rows;

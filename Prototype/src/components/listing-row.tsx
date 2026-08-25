@@ -12,7 +12,8 @@ const TYPE_HREF: Record<string, (id: string) => string> = {
   Accommodation: (id) => `/accommodation/${id}`,
   Tour: (id) => `/tours/${id}`,
   Restaurant: (id) => `/restaurants/${id}`,
-  Transport: (id) => `/transport/${id}`
+  Transport: (id) => `/transport/${id}`,
+  Guide: (id) => `/guides/${id}`
 };
 
 export function ListingRow({
@@ -87,7 +88,11 @@ export function ListingRow({
             <p className="text-[13px] text-muted-foreground mb-0.5">From</p>
             <div className="flex items-baseline gap-1">
               <strong className="text-[20px] font-extrabold text-foreground">{price}</strong>
-              <span className="text-[13px] text-muted-foreground">/ night</span>
+              {!price.includes("/") ? (
+                <span className="text-[13px] text-muted-foreground">
+                  {type === "Guide" ? "/ hr" : type === "Transport" ? "/ trip" : "/ night"}
+                </span>
+              ) : null}
             </div>
           </div>
           {type === "Accommodation" ? (

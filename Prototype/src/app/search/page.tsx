@@ -1,5 +1,8 @@
+import { Suspense } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import type { Prisma } from "@prisma/client";
+
+export const dynamic = "force-dynamic";
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { ListingRow } from "@/components/listing-row";
@@ -12,17 +15,18 @@ import { SiteFooter } from "@/components/site-footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { Pagination } from "@/components/ui/pagination";
-import { parseFirstUgxAmount } from "@/lib/booking";
+import { parseFirstUgxAmount, formatUGX } from "@/lib/booking";
 import { db } from "@/lib/db";
 import { LISTING_TYPE_TO_SERVICE_TYPE, SERVICE_TYPE_TO_LISTING_TYPE, type ServiceType } from "@/lib/listing-types";
-import { formatListingPrice, ratingSummary } from "@/lib/listings";
+import { formatListingPrice, ratingSummary, guideRatingSummary } from "@/lib/listings";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 
-const CATEGORY_TO_TYPE: Record<string, ServiceType> = {
+const CATEGORY_TO_TYPE: Record<string, ServiceType | "Guide"> = {
   accommodation: "Accommodation",
   tours: "Tour",
   restaurants: "Restaurant",
-  transport: "Transport"
+  transport: "Transport",
+  guides: "Guide"
 };
 
 const PRICE_RANGE_BOUNDS: Record<string, { min?: number; max?: number }> = {
@@ -63,6 +67,13 @@ export default async function SearchPage({
     transportCategory?: string;
     price?: string | string[];
     rating?: string | string[];
+    propertyType?: string | string[];
+    tourType?: string | string[];
+    vehicleType?: string | string[];
+    cuisine?: string | string[];
+    specialty?: string | string[];
+    location?: string | string[];
+    amenities?: string | string[];
     page?: string;
   };
 }) {
@@ -74,7 +85,7 @@ export default async function SearchPage({
   const where: Prisma.ListingWhereInput = {
     status: "PUBLISHED",
     business: { verificationStatus: "APPROVED" },
-    type: activeType ? SERVICE_TYPE_TO_LISTING_TYPE[activeType] : undefined,
+    type: activeType && activeType !== "Guide" ? SERVICE_TYPE_TO_LISTING_TYPE[activeType] : undefined,
     ...(query ? { OR: [{ title: { contains: query, mode: "insensitive" } }, { city: { contains: query, mode: "insensitive" } }] } : {})
   };
 
@@ -100,27 +111,87 @@ export default async function SearchPage({
     }
   }
 
-  const listings = await db.listing.findMany({
-    where,
-    include: { restaurant: true, reviews: { where: { status: "PUBLISHED" }, select: { rating: true } } }
-  });
+  let results: Array<{
+    id: string;
+    type: string;
+    title: string;
+    location: string;
+    price: string;
+    priceValue: number;
+    description: string;
+    rating?: number;
+    reviewCount?: number;
+    imageUrl?: string | null;
+  }> = [];
 
-  let results = listings.map((listing) => {
-    const { average, count } = ratingSummary(listing.reviews);
-    const numericPrice = listing.type === "RESTAURANT" ? parseFirstUgxAmount(listing.restaurant?.priceRange ?? "0") : listing.basePriceMinor;
-    return {
-      id: listing.id,
-      type: LISTING_TYPE_TO_SERVICE_TYPE[listing.type],
-      title: listing.title,
-      location: listing.city ?? "",
-      price: formatListingPrice(listing),
-      priceValue: numericPrice,
-      description: listing.description,
-      rating: average,
-      reviewCount: count,
-      imageUrl: listing.coverImageUrl
-    };
-  });
+  if (activeType === "Guide") {
+    const guides = await db.guide.findMany({
+      where: query
+        ? {
+            OR: [
+              { name: { contains: query, mode: "insensitive" as const } },
+              { bio: { contains: query, mode: "insensitive" as const } },
+              { destination: { name: { contains: query, mode: "insensitive" as const } } }
+            ]
+          }
+        : {},
+      include: {
+        destination: true,
+        business: { select: { verificationStatus: true } },
+        tours: {
+          include: {
+            listing: {
+              include: {
+                reviews: {
+                  where: { status: "PUBLISHED" },
+                  select: { rating: true }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    results = guides.map((guide) => {
+      const { average, count } = guideRatingSummary(guide.tours);
+      const numericPrice = (guide.hourlyRateMinor ?? 50000) * 3700;
+      return {
+        id: guide.id,
+        type: "Guide",
+        title: guide.name,
+        location: guide.destination?.name ?? "Uganda",
+        price: guide.hourlyRateMinor ? formatUGX(guide.hourlyRateMinor * 3700) : "UGX 185,000",
+        priceValue: numericPrice,
+        description: guide.bio,
+        rating: average,
+        reviewCount: count,
+        imageUrl: guide.photoUrl
+      };
+    });
+  } else {
+    const listings = await db.listing.findMany({
+      where,
+      include: { restaurant: true, reviews: { where: { status: "PUBLISHED" }, select: { rating: true } } }
+    });
+
+    results = listings.map((listing) => {
+      const { average, count } = ratingSummary(listing.reviews);
+      const numericPrice = listing.type === "RESTAURANT" ? parseFirstUgxAmount(listing.restaurant?.priceRange ?? "0") : listing.basePriceMinor;
+      return {
+        id: listing.id,
+        type: LISTING_TYPE_TO_SERVICE_TYPE[listing.type],
+        title: listing.title,
+        location: listing.city ?? "",
+        price: formatListingPrice(listing),
+        priceValue: numericPrice,
+        description: listing.description,
+        rating: average,
+        reviewCount: count,
+        imageUrl: listing.coverImageUrl
+      };
+    });
+  }
 
   const selectedPriceRanges = toStringArray(searchParams.price);
   if (selectedPriceRanges.length > 0) {
@@ -142,6 +213,85 @@ export default async function SearchPage({
     );
   }
 
+  const selectedPropertyTypes = toStringArray(searchParams.propertyType);
+  if (selectedPropertyTypes.length > 0) {
+    results = results.filter((item) =>
+      selectedPropertyTypes.some((pt) =>
+        item.title.toLowerCase().includes(pt.toLowerCase()) ||
+        item.description.toLowerCase().includes(pt.toLowerCase())
+      )
+    );
+  }
+
+  const selectedTourTypes = toStringArray(searchParams.tourType);
+  if (selectedTourTypes.length > 0) {
+    results = results.filter((item) =>
+      selectedTourTypes.some((tt) =>
+        item.title.toLowerCase().includes(tt.toLowerCase()) ||
+        item.description.toLowerCase().includes(tt.toLowerCase())
+      )
+    );
+  }
+
+  const selectedDurations = toStringArray(searchParams.duration);
+  if (selectedDurations.length > 0) {
+    results = results.filter((item) =>
+      selectedDurations.some((dur) =>
+        item.title.toLowerCase().includes(dur.toLowerCase()) ||
+        item.description.toLowerCase().includes(dur.toLowerCase())
+      )
+    );
+  }
+
+  const selectedVehicleTypes = toStringArray(searchParams.vehicleType);
+  if (selectedVehicleTypes.length > 0) {
+    results = results.filter((item) =>
+      selectedVehicleTypes.some((vt) =>
+        item.title.toLowerCase().includes(vt.toLowerCase()) ||
+        item.description.toLowerCase().includes(vt.toLowerCase())
+      )
+    );
+  }
+
+  const selectedCuisines = toStringArray(searchParams.cuisine);
+  if (selectedCuisines.length > 0) {
+    results = results.filter((item) =>
+      selectedCuisines.some((c) =>
+        item.title.toLowerCase().includes(c.toLowerCase()) ||
+        item.description.toLowerCase().includes(c.toLowerCase())
+      )
+    );
+  }
+
+  const selectedSpecialties = toStringArray(searchParams.specialty);
+  if (selectedSpecialties.length > 0) {
+    results = results.filter((item) =>
+      selectedSpecialties.some((s) =>
+        item.title.toLowerCase().includes(s.toLowerCase()) ||
+        item.description.toLowerCase().includes(s.toLowerCase())
+      )
+    );
+  }
+
+  const selectedLocations = toStringArray(searchParams.location);
+  if (selectedLocations.length > 0) {
+    results = results.filter((item) =>
+      selectedLocations.some((loc) =>
+        item.location.toLowerCase().includes(loc.toLowerCase()) ||
+        item.title.toLowerCase().includes(loc.toLowerCase())
+      )
+    );
+  }
+
+  const selectedAmenities = toStringArray(searchParams.amenities);
+  if (selectedAmenities.length > 0) {
+    results = results.filter((item) =>
+      selectedAmenities.some((am) =>
+        item.description.toLowerCase().includes(am.toLowerCase())
+      )
+    );
+  }
+
   if (searchParams.sort === "price-asc") {
     results = [...results].sort((a, b) => a.priceValue - b.priceValue);
   } else if (searchParams.sort === "price-desc") {
@@ -157,7 +307,18 @@ export default async function SearchPage({
     searchParams.time
   ].filter(Boolean);
 
-  const noun = activeType === "Accommodation" ? "stays" : activeType === "Tour" ? "safaris" : activeType === "Restaurant" ? "restaurants" : activeType === "Transport" ? "rides" : "results";
+  const noun =
+    activeType === "Accommodation"
+      ? "accommodations"
+      : activeType === "Tour"
+      ? "safaris"
+      : activeType === "Restaurant"
+      ? "restaurants"
+      : activeType === "Transport"
+      ? "rides"
+      : activeType === "Guide"
+      ? "tour guides"
+      : "results";
 
   const totalResults = results.length;
   const page = parsePage(searchParams.page);
@@ -179,7 +340,9 @@ export default async function SearchPage({
       <main>
         <div className="border-b border-border bg-card py-6">
           <Container>
-            <SearchBar />
+            <Suspense fallback={null}>
+              <SearchBar />
+            </Suspense>
           </Container>
         </div>
         <Container className="py-8">
@@ -191,7 +354,9 @@ export default async function SearchPage({
                     <SlidersHorizontal className="h-4 w-4" />
                     Filter results
                   </div>
-                  <SearchFilters />
+                  <Suspense fallback={null}>
+                    <SearchFilters />
+                  </Suspense>
                 </CardContent>
               </Card>
             </aside>
@@ -208,7 +373,9 @@ export default async function SearchPage({
                   <p className="text-sm text-muted-foreground mt-2">Browse freely. Sign in when you&apos;re ready to book.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MobileFilters />
+                  <Suspense fallback={null}>
+                    <MobileFilters />
+                  </Suspense>
                   <SortSelect />
                 </div>
               </div>
@@ -232,3 +399,4 @@ export default async function SearchPage({
     </>
   );
 }
+

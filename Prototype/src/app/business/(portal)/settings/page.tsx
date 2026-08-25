@@ -12,10 +12,13 @@ import { updateBusinessProfile } from "@/lib/actions/business-settings";
 import { inviteTeamMember, cancelInvitation, removeTeamMember } from "@/lib/actions/team";
 import { db } from "@/lib/db";
 
-export default async function BusinessSettingsPage() {
+export default async function BusinessSettingsPage({ searchParams }: { searchParams?: { tab?: string } }) {
   const { business, businessId } = await requireBusinessSession();
 
   if (!business || !businessId) return null;
+
+  const rawTab = searchParams?.tab?.toLowerCase();
+  const defaultTab = rawTab === "team" || rawTab === "staff" ? "team" : rawTab === "notifications" ? "notifications" : "profile";
 
   const [teamMembers, invitations] = await Promise.all([
     db.businessUser.findMany({
@@ -31,9 +34,9 @@ export default async function BusinessSettingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-20 pt-4">
-      <PageHero variant="portal" eyebrow="Business portal" title="Settings" description="Manage your business profile and preferences." />
+      <PageHero variant="portal" eyebrow="Business portal" title="Settings" description="Manage your business profile, staff access, and preferences." />
 
-      <Tabs defaultValue="profile" className="w-full">
+      <Tabs defaultValue={defaultTab} key={defaultTab} className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="profile">Business Profile</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>

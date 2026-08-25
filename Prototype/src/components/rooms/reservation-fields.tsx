@@ -156,6 +156,7 @@ export function AccommodationReservationFields({
       roomTypeName: selectedRoom?.name,
       addOnIds: Array.from(addOnIds),
       totalMinor: total,
+      unitPriceMinor
     });
     
     router.push("/cart");

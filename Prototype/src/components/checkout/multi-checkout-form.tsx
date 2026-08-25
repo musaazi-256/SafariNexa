@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import { useCartStore } from "@/lib/cart";
@@ -15,8 +15,23 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
 export function MultiCheckoutForm() {
-  const cartItems = useCartStore((state) => state.items);
-  const getTotalMinor = useCartStore((state) => state.getTotalMinor);
+  const allCartItems = useCartStore((state) => state.items);
+  const searchParams = useSearchParams();
+  const itemId = searchParams.get("itemId");
+
+  const cartItems = React.useMemo(() => {
+    if (itemId) {
+      const match = allCartItems.filter((item) => item.id === itemId);
+      return match.length > 0 ? match : allCartItems;
+    }
+    return allCartItems;
+  }, [allCartItems, itemId]);
+
+  const totalMinor = React.useMemo(
+    () => cartItems.reduce((sum, item) => sum + item.totalMinor, 0),
+    [cartItems]
+  );
+
   const [mounted, setMounted] = React.useState(false);
   const [isPending, startTransition] = React.useTransition();
   const router = useRouter();
@@ -35,7 +50,11 @@ export function MultiCheckoutForm() {
     startTransition(async () => {
       try {
         const orderId = await createBulkOrderAction(cartItems, { fullName, email, phone });
-        useCartStore.getState().clearCart();
+        if (itemId) {
+          cartItems.forEach((item) => useCartStore.getState().removeItem(item.id));
+        } else {
+          useCartStore.getState().clearCart();
+        }
         router.push(`/payments?orderId=${orderId}`);
       } catch (err) {
         console.error(err);
@@ -102,7 +121,7 @@ export function MultiCheckoutForm() {
         <CardContent className="flex flex-col gap-3">
           <div className="flex items-center justify-between text-base font-bold">
             <span>Total Due</span>
-            <span>{formatUGX(getTotalMinor())}</span>
+            <span>{formatUGX(totalMinor)}</span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">Includes taxes and fees.</p>
           <Separator className="my-2" />

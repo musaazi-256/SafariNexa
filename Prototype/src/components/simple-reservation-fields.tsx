@@ -73,6 +73,7 @@ export function SimpleReservationFields({
       participants: Number(participants),
       addOnIds: [],
       totalMinor: total ?? 0,
+      unitPriceMinor: priceMinor
     });
     
     router.push("/cart");

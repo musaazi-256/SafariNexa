@@ -42,12 +42,6 @@ const GROUPS = [
     ]
   },
   {
-    label: "Manage",
-    items: [
-      { href: "/business/team", label: "Team", icon: Users }
-    ]
-  },
-  {
     label: "Settings",
     items: [
       { href: "/business/settings", label: "Settings", icon: SettingsIcon }

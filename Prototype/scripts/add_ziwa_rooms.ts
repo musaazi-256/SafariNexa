@@ -35,6 +35,12 @@ async function main() {
         priceMinor: basePriceMinor + 80000,
         breakfastIncluded: true,
         maxOccupancy: 2,
+        bedType: "1 Queen Bed",
+        bedrooms: 1,
+        roomFeatures: ["River view", "Parking included", "Free WiFi", "Private Balcony"],
+        isRefundable: true,
+        refundPolicyText: "Fully refundable before check-in",
+        discountNotice: "Member Price $38 off",
         description: "Private veranda banda overlooking the river.",
         images: []
       }
@@ -47,6 +53,12 @@ async function main() {
         priceMinor: basePriceMinor + 160000,
         breakfastIncluded: true,
         maxOccupancy: 4,
+        bedType: "2 King Beds",
+        bedrooms: 2,
+        roomFeatures: ["River view", "Parking included", "Free WiFi", "Living Room"],
+        isRefundable: true,
+        refundPolicyText: "Fully refundable up to 48 hours before check-in",
+        discountNotice: "Family Special 15% off",
         description: "Two-room suite with a connecting lounge, ideal for families.",
         images: []
       }
@@ -59,7 +71,7 @@ async function main() {
     where: { accommodationId: listing.accommodation.listingId }
   });
 
-  // 2. Add images to the rooms
+  // 2. Add images & rich details to the rooms
   for (let i = 0; i < updatedRooms.length; i++) {
     const room = updatedRooms[i];
     const roomImages = [
@@ -70,9 +82,19 @@ async function main() {
     
     await db.roomType.update({
       where: { id: room.id },
-      data: { images: roomImages }
+      data: {
+        images: roomImages,
+        bedType: room.bedType || (i === 0 ? "1 Double Bed" : i === 1 ? "1 Queen Bed" : "2 King Beds"),
+        bedrooms: room.bedrooms || (i === 2 ? 2 : 1),
+        roomFeatures: room.roomFeatures && room.roomFeatures.length > 0
+          ? room.roomFeatures
+          : ["Water view", "Parking included", "Free WiFi"],
+        isRefundable: true,
+        refundPolicyText: room.refundPolicyText || "Fully refundable before check-in date",
+        discountNotice: room.discountNotice || (i === 0 ? "Member Price $38 off" : undefined)
+      }
     });
-    console.log(`Updated room ${room.name} with 3 images.`);
+    console.log(`Updated room ${room.name} with rich details & images.`);
   }
 
   // 3. Add the two new add-ons

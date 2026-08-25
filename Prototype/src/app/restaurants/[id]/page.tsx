@@ -121,14 +121,14 @@ export default async function RestaurantDetailPage({ params }: { params: { id: s
             <div className="min-w-0">
               <section id="overview" className="scroll-mt-32">
                 <div className="flex items-start justify-between gap-3">
-                  <Badge variant="secondary" className="mb-2">
-                    {restaurant.cuisineType}
-                  </Badge>
-                  {session?.user ? (
-                    <SaveButton listingId={listing.id} initialSaved={Boolean(savedItem)} className="bg-secondary hover:bg-secondary" />
-                  ) : null}
+                  <div>
+                    <Badge variant="secondary" className="mb-2">
+                      {restaurant.cuisineType}
+                    </Badge>
+                    <h1 className="text-3xl font-extrabold sm:text-4xl">{listing.title}</h1>
+                  </div>
+                  <SaveButton listingId={listing.id} initialSaved={Boolean(savedItem)} isSignedIn={Boolean(session?.user)} showLabel />
                 </div>
-                <h1 className="text-3xl font-extrabold sm:text-4xl">{listing.title}</h1>
                 <p className="mt-1 text-muted-foreground">{listing.city}</p>
                 <div className="mt-3">
                   {average ? <ScoreBadge value={average} count={count} /> : <p className="text-sm text-muted-foreground">No reviews yet</p>}

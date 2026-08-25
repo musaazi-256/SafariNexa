@@ -125,9 +125,7 @@ export default async function TourDetailPage({ params }: { params: { id: string 
                 </Badge>
                 <div className="flex items-start justify-between gap-3">
                   <h1 className="text-3xl font-extrabold sm:text-4xl">{listing.title}</h1>
-                  {session?.user ? (
-                    <SaveButton listingId={listing.id} initialSaved={Boolean(savedItem)} className="shrink-0 bg-secondary hover:bg-secondary" />
-                  ) : null}
+                  <SaveButton listingId={listing.id} initialSaved={Boolean(savedItem)} isSignedIn={Boolean(session?.user)} showLabel />
                 </div>
                 <p className="mt-1 text-muted-foreground">{listing.city}</p>
                 <div className="mt-3">

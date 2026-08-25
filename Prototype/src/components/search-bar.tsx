@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   Building2,
   CalendarDays,
@@ -30,6 +30,14 @@ const CATEGORIES: Array<{ id: CategoryId; label: string; icon: React.ComponentTy
   { id: "transport", label: "Transport", icon: Car },
   { id: "guides", label: "Tour Guides", icon: IdCard }
 ];
+
+const SEARCH_BUTTON_LABELS: Record<CategoryId, string> = {
+  accommodation: "Search stays",
+  tours: "Search safaris",
+  restaurants: "Search restaurants",
+  transport: "Search transport",
+  guides: "Search guides"
+};
 
 const GUEST_OPTIONS = ["1", "2", "3", "4", "5", "6"];
 
@@ -98,8 +106,49 @@ const guestOptions = (noun: string) => GUEST_OPTIONS.map((value) => ({ value, la
 
 export function SearchBar({ className }: { className?: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  const paramCategory = searchParams.get("category") as CategoryId | null;
+
   const [open, setOpen] = React.useState(false);
-  const [category, setCategory] = React.useState<CategoryId>("accommodation");
+  const [category, setCategory] = React.useState<CategoryId>(() => {
+    if (paramCategory && CATEGORIES.some((c) => c.id === paramCategory)) {
+      return paramCategory;
+    }
+    return "accommodation";
+  });
+
+  React.useEffect(() => {
+    if (paramCategory && CATEGORIES.some((c) => c.id === paramCategory)) {
+      setCategory(paramCategory);
+    }
+  }, [paramCategory]);
+
+  function handleTabClick(catId: CategoryId) {
+    setCategory(catId);
+    if (pathname === "/search") {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("category", catId);
+      const filtersToRemove = [
+        "propertyType",
+        "tourType",
+        "duration",
+        "vehicleType",
+        "cuisine",
+        "specialty",
+        "amenities",
+        "location",
+        "price",
+        "rating",
+        "page"
+      ];
+      for (const filterKey of filtersToRemove) {
+        params.delete(filterKey);
+      }
+      router.push(`/search?${params.toString()}`);
+    }
+  }
 
   // Accommodation
   const [destination, setDestination] = React.useState("");
@@ -133,14 +182,6 @@ export function SearchBar({ className }: { className?: string }) {
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    if (category === "guides") {
-      const params = new URLSearchParams();
-      if (guideDestination) params.set("q", guideDestination);
-      setOpen(false);
-      router.push(`/guides${params.toString() ? `?${params.toString()}` : ""}`);
-      return;
-    }
-
     const params = new URLSearchParams();
     params.set("category", category);
 
@@ -166,6 +207,8 @@ export function SearchBar({ className }: { className?: string }) {
       if (transportDate) params.set("date", transportDate);
       if (transportTime) params.set("time", transportTime);
       params.set("passengers", passengers);
+    } else if (category === "guides") {
+      if (guideDestination) params.set("q", guideDestination);
     }
 
     setOpen(false);
@@ -179,7 +222,7 @@ export function SearchBar({ className }: { className?: string }) {
           <button
             key={item.id}
             type="button"
-            onClick={() => setCategory(item.id)}
+            onClick={() => handleTabClick(item.id)}
             className={cn(
               "flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors",
               category === item.id
@@ -273,7 +316,7 @@ export function SearchBar({ className }: { className?: string }) {
         <div className="p-4 sm:p-2 sm:shrink-0 bg-card sm:bg-transparent mt-auto sm:mt-0 pb-10 sm:pb-2">
           <Button type="submit" size="lg" className="w-full sm:w-auto rounded-full px-8 h-12 text-base font-bold bg-primary hover:bg-[#066130]">
             <Search className="h-5 w-5 mr-2" />
-            Search stays
+            {SEARCH_BUTTON_LABELS[category]}
           </Button>
         </div>
       </form>

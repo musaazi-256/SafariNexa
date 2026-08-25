@@ -129,12 +129,12 @@ export default async function AdminBusinessProfilePage({ params }: { params: { i
             </div>
           </div>
 
-          {/* Team Members */}
+          {/* Staff Members */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="border-b border-slate-200 px-6 py-4 bg-slate-50/50">
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Users className="h-4 w-4 text-slate-400" />
-                Team Members
+                Staff Members
               </h2>
             </div>
             <div className="divide-y divide-slate-100">

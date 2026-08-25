@@ -490,6 +490,12 @@ model RoomType {
   breakfastIncluded Boolean  @default(false)
   maxOccupancy      Int      @default(2)
   totalRooms        Int      @default(1)
+  bedType           String?  @default("1 Double Bed")
+  bedrooms          Int      @default(1)
+  roomFeatures      String[] @default([])
+  isRefundable      Boolean  @default(true)
+  refundPolicyText  String?
+  discountNotice    String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

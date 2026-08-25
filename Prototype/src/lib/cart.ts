@@ -15,11 +15,13 @@ export type CartItem = {
   roomTypeName?: string;
   addOnIds: string[];
   totalMinor: number;
+  unitPriceMinor?: number;
 };
 
 interface CartState {
   items: CartItem[];
   addItem: (item: Omit<CartItem, 'id'>) => void;
+  updateItem: (id: string, patch: Partial<CartItem>) => void;
   removeItem: (id: string) => void;
   clearCart: () => void;
   getTotalMinor: () => number;
@@ -31,6 +33,9 @@ export const useCartStore = create<CartState>()(
       items: [],
       addItem: (item) => set((state) => ({ 
         items: [...state.items, { ...item, id: crypto.randomUUID() }] 
+      })),
+      updateItem: (id, patch) => set((state) => ({
+        items: state.items.map((item) => (item.id === id ? { ...item, ...patch } : item))
       })),
       removeItem: (id) => set((state) => ({ 
         items: state.items.filter((item) => item.id !== id) 

@@ -116,14 +116,14 @@ export default async function TransportDetailPage({ params }: { params: { id: st
             <div className="min-w-0">
               <section id="overview" className="scroll-mt-32">
                 <div className="flex items-start justify-between gap-3">
-                  <Badge variant="secondary" className="mb-2">
-                    {transport.category === "AIRPORT_TRANSFER" ? "Airport Transfer" : "Kampala Special Hire"}
-                  </Badge>
-                  {session?.user ? (
-                    <SaveButton listingId={listing.id} initialSaved={Boolean(savedItem)} className="bg-secondary hover:bg-secondary" />
-                  ) : null}
+                  <div>
+                    <Badge variant="secondary" className="mb-2">
+                      {transport.category === "AIRPORT_TRANSFER" ? "Airport Transfer" : "Kampala Special Hire"}
+                    </Badge>
+                    <h1 className="text-3xl font-extrabold sm:text-4xl">{listing.title}</h1>
+                  </div>
+                  <SaveButton listingId={listing.id} initialSaved={Boolean(savedItem)} isSignedIn={Boolean(session?.user)} showLabel />
                 </div>
-                <h1 className="text-3xl font-extrabold sm:text-4xl">{listing.title}</h1>
                 <p className="mt-1 text-muted-foreground">{listing.city}</p>
 
                 <h2 className="mt-10 text-xl font-bold">About this transport</h2>

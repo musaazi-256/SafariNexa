@@ -11,6 +11,7 @@ import { RoomPreviewCard } from "@/components/rooms/room-preview-card";
 import { ReviewList } from "@/components/reviews/review-list";
 import { ReviewSummary } from "@/components/reviews/review-summary";
 import { ReviewForm } from "@/components/reviews/review-form";
+import { SaveButton } from "@/components/save-button";
 import { revalidatePath } from "next/cache";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -127,10 +128,20 @@ export default async function AccommodationDetailPage({ params }: { params: { id
             {/* Left Column: Main Content */}
             <div className="flex min-w-0 flex-col">
               <section id="overview" className="scroll-mt-32">
-                <Badge variant="secondary" className="mb-2">
-                  {accommodation.propertyType}
-                </Badge>
-                <h1 className="text-3xl font-extrabold sm:text-4xl">{listing.title}</h1>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <Badge variant="secondary" className="mb-2">
+                      {accommodation.propertyType}
+                    </Badge>
+                    <h1 className="text-3xl font-extrabold sm:text-4xl">{listing.title}</h1>
+                  </div>
+                  <SaveButton
+                    listingId={listing.id}
+                    initialSaved={Boolean(savedItem)}
+                    isSignedIn={Boolean(session?.user)}
+                    showLabel
+                  />
+                </div>
                 <p className="mt-1 text-muted-foreground">{listing.city}</p>
                 <div className="mt-3">
                   {average ? <ScoreBadge value={average} count={count} /> : <p className="text-sm text-muted-foreground">No reviews yet</p>}
@@ -163,9 +174,20 @@ export default async function AccommodationDetailPage({ params }: { params: { id
               <section id="rooms" className="mt-12 scroll-mt-32 border-t border-border pt-10">
                 <h2 className="mb-6 text-2xl font-bold">Rooms</h2>
                 <div className="flex flex-col gap-6">
-                  {accommodation.roomTypes.map((room) => (
-                    <RoomPreviewCard key={room.id} room={room} accommodationAmenities={accommodation.amenities} />
-                  ))}
+                  {(() => {
+                    const minPrice = accommodation.roomTypes.length > 0
+                      ? Math.min(...accommodation.roomTypes.map((r) => r.priceMinor))
+                      : 0;
+                    return accommodation.roomTypes.map((room) => (
+                      <RoomPreviewCard
+                        key={room.id}
+                        room={room}
+                        accommodationAmenities={accommodation.amenities}
+                        cancellationPolicy={accommodation.cancellationPolicy}
+                        isLowestPrice={room.priceMinor === minPrice}
+                      />
+                    ));
+                  })()}
                 </div>
               </section>
 
