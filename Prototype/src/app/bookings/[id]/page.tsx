@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { Separator } from "@/components/ui/separator";
 import { BookingStatusBadge } from "@/components/ui/status-badge";
+import { BookingChat } from "@/components/booking-chat";
 
 const CANCELLABLE = ["AUTH_REQUIRED", "PENDING_TRAVELLER_DETAILS", "PENDING_PAYMENT", "AWAITING_BUSINESS_CONFIRMATION", "CONFIRMED"];
 
@@ -33,6 +34,24 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
     }
   });
   if (!booking || booking.customerId !== session.user.id) notFound();
+
+  const thread = await db.messageThread.findFirst({
+    where: { bookingId: params.id },
+    include: {
+      messages: {
+        include: { sender: { select: { name: true } } },
+        orderBy: { createdAt: "asc" }
+      }
+    }
+  });
+
+  const chatMessages = thread?.messages.map((m) => ({
+    id: m.id,
+    content: m.content,
+    createdAt: m.createdAt,
+    senderId: m.senderId,
+    senderName: m.sender.name
+  })) ?? [];
 
   const canCancel = CANCELLABLE.includes(booking.status);
   const canReview = ["COMPLETED", "REVIEW_PENDING"].includes(booking.status) && !booking.review;
@@ -174,6 +193,14 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
                   </div>
                 </>
               ) : null}
+
+              {/* Messages & Inquiries Attached to Booking */}
+              <BookingChat
+                bookingId={booking.id}
+                initialMessages={chatMessages}
+                currentUserId={session.user.id}
+                businessName={booking.business.name}
+              />
             </div>
 
             <Card className="sticky top-24 h-fit">

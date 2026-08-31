@@ -10,6 +10,7 @@ import { formatUGX } from "@/lib/booking";
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
 import { toBookingStatus } from "@/lib/status";
+import { BookingChat } from "@/components/booking-chat";
 
 export default async function BusinessBookingDetailPage({ params }: { params: { id: string } }) {
   const { business, businessId } = await requireBusinessSession();
@@ -27,6 +28,26 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
     }
   });
   if (!booking || booking.businessId !== businessId) notFound();
+
+  const session = await auth();
+
+  const thread = await db.messageThread.findFirst({
+    where: { bookingId: params.id },
+    include: {
+      messages: {
+        include: { sender: { select: { name: true } } },
+        orderBy: { createdAt: "asc" }
+      }
+    }
+  });
+
+  const chatMessages = thread?.messages.map((m) => ({
+    id: m.id,
+    content: m.content,
+    createdAt: m.createdAt,
+    senderId: m.senderId,
+    senderName: m.sender.name
+  })) ?? [];
 
   const primaryParticipant = booking.participants.find((participant) => participant.isPrimary) ?? booking.participants[0];
   const canRespond = booking.status === "AWAITING_BUSINESS_CONFIRMATION";
@@ -152,6 +173,15 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
                   </div>
                 </>
               ) : null}
+
+              {/* Customer Messages & Inquiries attached to this booking */}
+              <BookingChat
+                bookingId={booking.id}
+                initialMessages={chatMessages}
+                currentUserId={session?.user?.id ?? ""}
+                businessName={business.name}
+                isBusinessPortal={true}
+              />
             </div>
 
             <Card className="sticky top-24 h-fit">

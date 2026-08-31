@@ -11,6 +11,7 @@ import { ReviewList } from "@/components/reviews/review-list";
 import { ReviewSummary } from "@/components/reviews/review-summary";
 import { ReviewForm } from "@/components/reviews/review-form";
 import { SaveButton } from "@/components/save-button";
+import { InquiryDialog } from "@/components/inquiry-dialog";
 import { SimpleReservationFields } from "@/components/simple-reservation-fields";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -31,7 +32,7 @@ export default async function TransportDetailPage({ params }: { params: { id: st
     include: {
       transport: true,
       destination: true,
-      business: { select: { verificationStatus: true } },
+      business: { select: { name: true, verificationStatus: true } },
       reviews: { where: { status: "PUBLISHED" }, include: { author: { select: { name: true } } }, orderBy: { createdAt: "desc" } }
     }
   });
@@ -120,9 +121,12 @@ export default async function TransportDetailPage({ params }: { params: { id: st
                     <Badge variant="secondary" className="mb-2">
                       {transport.category === "AIRPORT_TRANSFER" ? "Airport Transfer" : "Kampala Special Hire"}
                     </Badge>
-                    <h1 className="text-3xl font-extrabold sm:text-4xl">{listing.title}</h1>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">{listing.title}</h1>
+                      <SaveButton listingId={listing.id} initialSaved={Boolean(savedItem)} isSignedIn={Boolean(session?.user)} showLabel />
+                      <InquiryDialog listingId={listing.id} listingTitle={listing.title} businessName={listing.business.name} isSignedIn={Boolean(session?.user)} />
+                    </div>
                   </div>
-                  <SaveButton listingId={listing.id} initialSaved={Boolean(savedItem)} isSignedIn={Boolean(session?.user)} showLabel />
                 </div>
                 <p className="mt-1 text-muted-foreground">{listing.city}</p>
 

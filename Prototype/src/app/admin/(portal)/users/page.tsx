@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { AdminAccessStatusBadge } from "@/components/ui/status-badge";
 import { requireAdminSession } from "@/lib/admin";
+import { toggleAdminUserStatus } from "@/lib/actions/admin";
 import { db } from "@/lib/db";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { toAdminAccessStatus } from "@/lib/status";
@@ -48,16 +49,6 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
     }),
     db.user.count({ where })
   ]);
-
-  async function toggleAdminAccess(formData: FormData) {
-    "use server";
-    await requireAdminSession();
-
-    const adminUserId = String(formData.get("adminUserId"));
-    const nextStatus = String(formData.get("nextStatus")) as "ACTIVE" | "SUSPENDED";
-
-    await db.adminUser.update({ where: { id: adminUserId }, data: { status: nextStatus } });
-  }
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 pb-20 font-sans">
@@ -165,9 +156,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
                 
                 <div className="col-span-1 flex justify-end">
                   {user.adminUser && user.adminUser.status !== "INVITED" ? (
-                    <form action={toggleAdminAccess}>
-                      <input type="hidden" name="adminUserId" value={user.adminUser.id} />
-                      <input type="hidden" name="nextStatus" value={user.adminUser.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE"} />
+                    <form action={toggleAdminUserStatus.bind(null, user.adminUser.id)}>
                       <Button type="submit" variant="outline" className={`h-7 px-3 text-[11px] font-bold shadow-none rounded-full ${user.adminUser.status === "ACTIVE" ? "text-slate-600 border-slate-200 hover:bg-slate-50" : "text-[#1e613c] border-[#1e613c]/30 hover:bg-[#E4F2E8]"}`}>
                         {user.adminUser.status === "ACTIVE" ? "Suspend" : "Reactivate"}
                       </Button>

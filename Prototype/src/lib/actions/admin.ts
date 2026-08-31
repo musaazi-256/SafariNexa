@@ -138,6 +138,44 @@ export async function inviteAdmin(email: string) {
   revalidatePath("/admin/(portal)/users", "page");
 }
 
+export async function toggleAdminUserStatus(adminUserId: string) {
+  const session = await auth();
+  if (!session?.user?.isAdmin) {
+    throw new Error("Unauthorized: Admin access required");
+  }
+
+  const adminUser = await db.adminUser.findUnique({
+    where: { id: adminUserId },
+    include: { user: true }
+  });
+  if (!adminUser) {
+    throw new Error("Admin user not found");
+  }
+  if (adminUser.userId === session.user.id) {
+    throw new Error("You cannot change your own admin access");
+  }
+  if (adminUser.status !== "ACTIVE" && adminUser.status !== "SUSPENDED") {
+    throw new Error("This admin's access cannot be toggled from its current state");
+  }
+
+  // Derived from the current DB record rather than trusting any client-submitted
+  // value, so a tampered form field can't force an invalid transition.
+  const nextStatus: AdminUserStatus = adminUser.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
+
+  await db.adminUser.update({ where: { id: adminUserId }, data: { status: nextStatus } });
+
+  await logAuditEvent({
+    actorUserId: session.user.id,
+    actorEmail: session.user.email ?? undefined,
+    surface: "ADMIN",
+    action: "admin_toggle_user_access",
+    outcome: "SUCCESS",
+    metadata: { targetAdminUserId: adminUserId, targetUserEmail: adminUser.user.email, newStatus: nextStatus }
+  });
+
+  revalidatePath("/admin/(portal)/users", "page");
+}
+
 export async function updateAdminProfile(name: string, phone: string) {
   const session = await auth();
   if (!session?.user?.isAdmin) {

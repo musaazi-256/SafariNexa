@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { requireBusinessSession } from "@/lib/business";
 
 export async function sendMessage(threadId: string, content: string) {
   const session = await auth();
@@ -11,12 +10,11 @@ export async function sendMessage(threadId: string, content: string) {
 
   const thread = await db.messageThread.findUnique({
     where: { id: threadId },
-    select: { businessId: true, customerId: true }
+    select: { id: true, businessId: true, customerId: true, bookingId: true }
   });
 
   if (!thread) throw new Error("Thread not found");
 
-  // Verify the sender is either the customer or has access to the business
   const isCustomer = thread.customerId === session.user.id;
   
   if (!isCustomer) {
@@ -40,7 +38,12 @@ export async function sendMessage(threadId: string, content: string) {
   });
 
   revalidatePath("/business/messages");
-  // Also revalidate customer routes when they exist
+  revalidatePath("/profile/messages");
+  if (thread.bookingId) {
+    revalidatePath(`/bookings/${thread.bookingId}`);
+    revalidatePath(`/business/bookings/${thread.bookingId}`);
+  }
+
   return message;
 }
 
@@ -55,7 +58,6 @@ export async function createThread(bookingId: string) {
 
   if (!booking) throw new Error("Booking not found");
   
-  // Verify user is customer or business owner
   const isCustomer = booking.customerId === session.user.id;
   if (!isCustomer) {
     const businessUser = await db.businessUser.findFirst({
@@ -79,4 +81,44 @@ export async function createThread(bookingId: string) {
   }
 
   return thread;
+}
+
+export async function sendBookingInquiryAction(bookingId: string, content: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const thread = await createThread(bookingId);
+  return await sendMessage(thread.id, content);
+}
+
+export async function sendListingInquiryAction(listingId: string, content: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const listing = await db.listing.findUnique({
+    where: { id: listingId },
+    select: { title: true, businessId: true }
+  });
+
+  if (!listing) throw new Error("Listing not found");
+
+  let thread = await db.messageThread.findFirst({
+    where: {
+      businessId: listing.businessId,
+      customerId: session.user.id,
+      bookingId: null
+    }
+  });
+
+  if (!thread) {
+    thread = await db.messageThread.create({
+      data: {
+        businessId: listing.businessId,
+        customerId: session.user.id
+      }
+    });
+  }
+
+  const messageText = `[Inquiry regarding "${listing.title}"]\n${content}`;
+  return await sendMessage(thread.id, messageText);
 }
