@@ -1,26 +1,28 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { format } from "date-fns";
-import { Search, Calendar, Send, CheckCheck, Smile, ImageIcon, Paperclip, Zap, Store } from "lucide-react";
+import { format, isSameDay } from "date-fns";
+import { Search, Calendar, Send, CheckCheck, Smile, Paperclip, Store, ChevronLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { sendMessage } from "@/lib/actions/messages";
+import { sendMessage, markThreadAsRead, getThreadMessages } from "@/lib/actions/messages";
 import { EmptyState } from "../ui/empty-state";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
 
 export type MessageType = {
   id: string;
   content: string;
-  createdAt: Date;
+  createdAt: Date | string;
   senderId: string;
+  readAt?: Date | string | null;
   sender: { name: string | null; image: string | null };
 };
 
 export type ThreadType = {
   id: string;
-  updatedAt: Date;
+  updatedAt: Date | string;
   business: { 
     id: string; 
     name: string; 
@@ -29,7 +31,7 @@ export type ThreadType = {
   booking: { 
     id: string; 
     bookingRef: string; 
-    startDate: Date | null;
+    startDate: Date | string | null;
     status: string;
     listing: { title: string; coverImageUrl: string | null };
   } | null;
@@ -39,6 +41,7 @@ export type ThreadType = {
 export function CustomerMessageInbox({ initialThreads, customerUserId }: { initialThreads: ThreadType[], customerUserId: string }) {
   const [threads, setThreads] = useState<ThreadType[]>(initialThreads);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(initialThreads[0]?.id || null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [draft, setDraft] = useState("");
   const [isSending, setIsSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -51,6 +54,53 @@ export function CustomerMessageInbox({ initialThreads, customerUserId }: { initi
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [activeThread?.messages]);
+
+  // Mark thread messages as read when active thread changes or opens
+  useEffect(() => {
+    if (activeThreadId) {
+      markThreadAsRead(activeThreadId).catch(console.error);
+      
+      setThreads(prev => prev.map(t => {
+        if (t.id === activeThreadId) {
+          return {
+            ...t,
+            messages: t.messages.map(m => ({
+              ...m,
+              readAt: m.senderId !== customerUserId ? (m.readAt || new Date()) : m.readAt
+            }))
+          };
+        }
+        return t;
+      }));
+    }
+  }, [activeThreadId, customerUserId]);
+
+  // Real-time message polling (every 4 seconds)
+  useEffect(() => {
+    if (!activeThreadId) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const fetchedMessages = await getThreadMessages(activeThreadId);
+        setThreads(prev => prev.map(t => {
+          if (t.id === activeThreadId) {
+            if (t.messages.length !== fetchedMessages.length) {
+              return {
+                ...t,
+                updatedAt: new Date(),
+                messages: fetchedMessages as any
+              };
+            }
+          }
+          return t;
+        }));
+      } catch (err) {
+        // Silently ignore polling errors
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [activeThreadId]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,15 +126,34 @@ export function CustomerMessageInbox({ initialThreads, customerUserId }: { initi
           };
         }
         return thread;
-      }).sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()));
+      }).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()));
       
     } catch (error) {
       console.error(error);
-      setDraft(content); // restore on error
+      setDraft(content);
     } finally {
       setIsSending(false);
     }
   };
+
+  const getUnreadCount = (thread: ThreadType) => {
+    return thread.messages.filter(m => m.senderId !== customerUserId && !m.readAt).length;
+  };
+
+  const filteredThreads = threads.filter(thread => {
+    const businessName = thread.business.name || "";
+    const listingTitle = thread.booking?.listing.title || "";
+    const bookingRef = thread.booking?.bookingRef || "";
+    const lastMsg = thread.messages[thread.messages.length - 1]?.content || "";
+
+    return (
+      !searchQuery.trim() ||
+      businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      listingTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      bookingRef.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lastMsg.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
   if (threads.length === 0) {
     return (
@@ -106,64 +175,84 @@ export function CustomerMessageInbox({ initialThreads, customerUserId }: { initi
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search messages..." 
-              className="pl-9 h-10 bg-slate-50 border-slate-200 rounded-xl"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-10 bg-slate-50 border-slate-200 rounded-xl text-xs"
             />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
         </div>
         
         {/* Thread List */}
         <div className="flex-1 overflow-y-auto">
-          <div className="flex flex-col">
-            {threads.map((thread) => {
-              const lastMessage = thread.messages[thread.messages.length - 1];
-              const isActive = thread.id === activeThreadId;
-              const businessName = thread.business.name || "Business";
-              const initials = businessName.substring(0, 2).toUpperCase();
-              
-              return (
-                <button
-                  key={thread.id}
-                  onClick={() => setActiveThreadId(thread.id)}
-                  className={cn(
-                    "relative flex items-start gap-3 p-4 text-left transition-colors border-l-[3px]",
-                    isActive 
-                      ? "bg-[#F7FAF8] border-l-[#0B4928]" 
-                      : "bg-white border-l-transparent hover:bg-slate-50 border-b border-b-slate-50"
-                  )}
-                >
-                  <div className={cn(
-                    "h-12 w-12 shrink-0 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden",
-                    isActive ? "bg-[#E4F2E8] text-[#0B4928]" : "bg-slate-100 text-slate-600"
-                  )}>
-                    {thread.business.logoUrl ? (
-                      <Image src={thread.business.logoUrl} alt={businessName} width={48} height={48} className="object-cover h-full w-full" />
-                    ) : (
-                      initials
+          {filteredThreads.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 text-xs font-medium">
+              No conversations found.
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {filteredThreads.map((thread) => {
+                const lastMessage = thread.messages[thread.messages.length - 1];
+                const isActive = thread.id === activeThreadId;
+                const businessName = thread.business.name || "Business";
+                const initials = businessName.substring(0, 2).toUpperCase();
+                const unreadCount = getUnreadCount(thread);
+                
+                return (
+                  <button
+                    key={thread.id}
+                    onClick={() => setActiveThreadId(thread.id)}
+                    className={cn(
+                      "relative flex items-start gap-3 p-4 text-left transition-colors border-l-[3px]",
+                      isActive 
+                        ? "bg-[#F7FAF8] border-l-[#0B4928]" 
+                        : "bg-white border-l-transparent hover:bg-slate-50 border-b border-b-slate-50"
                     )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0 flex flex-col pt-0.5">
-                    <div className="flex items-center justify-between gap-1 mb-1">
-                      <p className={cn("font-bold truncate", isActive ? "text-slate-900" : "text-slate-900")}>
-                        {businessName}
-                      </p>
-                      <span className="text-[10px] font-semibold text-slate-400 shrink-0">
-                        {format(new Date(thread.updatedAt), "MMM d")}
-                      </span>
+                  >
+                    <div className={cn(
+                      "h-12 w-12 shrink-0 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden",
+                      isActive ? "bg-[#E4F2E8] text-[#0B4928]" : "bg-slate-100 text-slate-600"
+                    )}>
+                      {thread.business.logoUrl ? (
+                        <Image src={thread.business.logoUrl} alt={businessName} width={48} height={48} className="object-cover h-full w-full" />
+                      ) : (
+                        initials
+                      )}
                     </div>
                     
-                    <p className="text-xs truncate text-slate-500 font-semibold mb-1">
-                      {thread.booking?.listing.title || "Inquiry"}
-                    </p>
+                    <div className="flex-1 min-w-0 flex flex-col pt-0.5">
+                      <div className="flex items-center justify-between gap-1 mb-1">
+                        <p className={cn("font-bold truncate text-xs", isActive ? "text-slate-900" : "text-slate-900")}>
+                          {businessName}
+                        </p>
+                        <span className="text-[10px] font-semibold text-slate-400 shrink-0">
+                          {format(new Date(thread.updatedAt), "MMM d")}
+                        </span>
+                      </div>
+                      
+                      <p className="text-[11px] truncate text-slate-500 font-semibold mb-0.5">
+                        {thread.booking?.listing.title || "Direct Inquiry"}
+                      </p>
 
-                    <p className={cn("text-xs truncate max-w-[200px]", isActive ? "text-slate-600" : "text-slate-500")}>
-                      {lastMessage ? lastMessage.content : <span className="italic">No messages yet</span>}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                      <p className={cn("text-xs truncate max-w-[200px]", unreadCount > 0 ? "font-bold text-slate-900" : "text-slate-500")}>
+                        {lastMessage ? lastMessage.content : <span className="italic">No messages yet</span>}
+                      </p>
+                    </div>
+
+                    {unreadCount > 0 && (
+                      <div className="absolute right-4 bottom-4 h-5 w-5 bg-[#0B4928] rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-xs">
+                        {unreadCount}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
@@ -179,7 +268,7 @@ export function CustomerMessageInbox({ initialThreads, customerUserId }: { initi
                   className="md:hidden p-2 -ml-2 text-slate-500 hover:text-slate-900"
                   onClick={() => setActiveThreadId(null)}
                 >
-                  <ChevronLeftIcon className="h-5 w-5" />
+                  <ChevronLeft className="h-5 w-5" />
                 </button>
                 <div className="h-10 w-10 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center shrink-0 overflow-hidden">
                   {activeThread.business.logoUrl ? (
@@ -189,7 +278,7 @@ export function CustomerMessageInbox({ initialThreads, customerUserId }: { initi
                   )}
                 </div>
                 <div className="flex flex-col">
-                  <h2 className="font-bold text-slate-900 leading-tight">{activeThread.business.name}</h2>
+                  <h2 className="font-bold text-slate-900 leading-tight text-sm">{activeThread.business.name}</h2>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-slate-400 text-[11px] font-medium flex items-center gap-1">
                       <Store className="h-3 w-3" /> Business Account
@@ -199,11 +288,13 @@ export function CustomerMessageInbox({ initialThreads, customerUserId }: { initi
               </div>
               
               {activeThread.booking && (
-                <div className="hidden sm:flex items-center gap-3">
-                  <div className="flex flex-col items-end text-right">
-                    <p className="text-xs font-bold text-slate-700 truncate max-w-[200px]">{activeThread.booking.listing.title}</p>
-                    <p className="text-[10px] text-slate-500 font-semibold">{activeThread.booking.bookingRef}</p>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <Button asChild variant="outline" size="sm" className="h-8 text-xs font-bold border-slate-200 text-slate-700 rounded-xl">
+                    <Link href={`/bookings/${activeThread.booking.id}`}>
+                      <Calendar className="mr-1.5 h-3.5 w-3.5 text-slate-400" />
+                      View Booking ({activeThread.booking.bookingRef})
+                    </Link>
+                  </Button>
                 </div>
               )}
             </div>
@@ -216,26 +307,38 @@ export function CustomerMessageInbox({ initialThreads, customerUserId }: { initi
               <div className="flex flex-col min-h-full space-y-4">
                 {activeThread.messages.map((message, i) => {
                   const isCustomer = message.senderId === customerUserId;
-                  
+                  const msgDate = new Date(message.createdAt);
+                  const prevMsg = activeThread.messages[i - 1];
+                  const showDateHeader = !prevMsg || !isSameDay(new Date(prevMsg.createdAt), msgDate);
+
                   return (
-                    <div key={message.id} className={cn("flex flex-col max-w-[85%] md:max-w-[70%]", isCustomer ? "ml-auto items-end" : "items-start")}>
-                      <div 
-                        className={cn(
-                          "px-4 py-3 rounded-2xl text-sm leading-relaxed border shadow-sm",
-                          isCustomer 
-                            ? "bg-[#0B4928] text-white border-transparent rounded-tr-sm" 
-                            : "bg-white text-slate-800 border-slate-200 rounded-tl-sm"
-                        )}
-                      >
-                        {message.content}
-                      </div>
-                      <div className="flex items-center gap-1 mt-1 px-1">
-                        <span className="text-[10px] font-semibold text-slate-400">
-                          {format(new Date(message.createdAt), "h:mm a")}
-                        </span>
-                        {isCustomer && (
-                          <CheckCheck className="h-3 w-3 text-[#0B4928] opacity-70" />
-                        )}
+                    <div key={message.id} className="space-y-4">
+                      {showDateHeader && (
+                        <div className="flex justify-center my-3">
+                          <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full border border-slate-200/50">
+                            {format(msgDate, "dd MMM yyyy")}
+                          </span>
+                        </div>
+                      )}
+                      <div className={cn("flex flex-col max-w-[85%] md:max-w-[70%]", isCustomer ? "ml-auto items-end" : "items-start")}>
+                        <div 
+                          className={cn(
+                            "px-4 py-3 rounded-2xl text-xs leading-relaxed border shadow-xs font-medium",
+                            isCustomer 
+                              ? "bg-[#0B4928] text-white border-transparent rounded-tr-xs" 
+                              : "bg-white text-slate-800 border-slate-200 rounded-tl-xs"
+                          )}
+                        >
+                          {message.content}
+                        </div>
+                        <div className="flex items-center gap-1 mt-1 px-1">
+                          <span className="text-[10px] font-semibold text-slate-400">
+                            {format(msgDate, "h:mm a")}
+                          </span>
+                          {isCustomer && (
+                            <CheckCheck className={cn("h-3 w-3", message.readAt ? "text-[#0B4928]" : "text-slate-400")} />
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -246,11 +349,11 @@ export function CustomerMessageInbox({ initialThreads, customerUserId }: { initi
             {/* Composer */}
             <div className="p-4 bg-white border-t border-slate-100">
               <form onSubmit={handleSend} className="relative border border-slate-200 rounded-xl overflow-hidden focus-within:border-[#0B4928] focus-within:ring-1 focus-within:ring-[#0B4928]/20 transition-all">
-                <Textarea 
+                <textarea 
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   placeholder="Type your message..." 
-                  className="w-full min-h-[90px] p-4 pb-12 border-none focus-visible:ring-0 text-sm resize-none bg-white"
+                  className="w-full min-h-[85px] p-4 pb-12 border-none focus:outline-none text-xs resize-none bg-white font-medium"
                   disabled={isSending}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -267,9 +370,9 @@ export function CustomerMessageInbox({ initialThreads, customerUserId }: { initi
                   <Button 
                     type="submit" 
                     disabled={!draft.trim() || isSending} 
-                    className="h-8 px-4 bg-[#0B4928] hover:bg-[#0B4928]/90 text-white text-xs font-bold rounded-lg shadow-sm"
+                    className="h-8 px-4 bg-[#0B4928] hover:bg-[#0B4928]/90 text-white text-xs font-bold rounded-lg shadow-xs gap-1.5"
                   >
-                    <Send className="h-3 w-3 mr-1.5" /> Send
+                    <Send className="h-3 w-3" /> Send
                   </Button>
                 </div>
               </form>
@@ -277,42 +380,11 @@ export function CustomerMessageInbox({ initialThreads, customerUserId }: { initi
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center bg-slate-50">
-            <p className="text-slate-500 font-medium text-sm">Select a conversation to view messages</p>
+            <p className="text-slate-500 font-medium text-xs">Select a conversation to view messages</p>
           </div>
         )}
       </div>
 
     </div>
   );
-}
-
-function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
-      {...props}
-      className={cn(
-        "flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-        props.className
-      )}
-    />
-  )
-}
-
-function ChevronLeftIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m15 18-6-6 6-6" />
-    </svg>
-  )
 }

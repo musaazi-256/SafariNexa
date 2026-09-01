@@ -342,7 +342,11 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
                           <DropdownMenuItem asChild>
                             <Link href={`/business/bookings/${booking.id}`} className="w-full cursor-pointer">View details</Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-slate-600">Message customer</DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/business/messages?bookingId=${booking.id}`} className="w-full cursor-pointer text-slate-700">
+                              Message customer
+                            </Link>
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

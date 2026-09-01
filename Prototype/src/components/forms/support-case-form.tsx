@@ -14,11 +14,6 @@ export function SupportCaseForm({ action }: { action: (formData: FormData) => vo
   return (
     <form action={action} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="subject">Subject</Label>
-        <Input id="subject" name="subject" required placeholder="e.g. Payment failed but I was charged" />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
         <Label>Category</Label>
         <div className="flex flex-wrap gap-1.5">
           {SUPPORT_CATEGORIES.map((item) => (
@@ -39,6 +34,11 @@ export function SupportCaseForm({ action }: { action: (formData: FormData) => vo
             </label>
           ))}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="subject">Subject</Label>
+        <Input id="subject" name="subject" required placeholder="e.g. Payment failed but I was charged" />
       </div>
 
       <div className="flex flex-col gap-1.5">

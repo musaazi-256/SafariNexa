@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/profile", label: "Profile", icon: LayoutDashboard },
   { href: "/bookings", label: "Bookings", icon: CalendarDays },
   { href: "/profile/saved", label: "Saved", icon: Heart },
+  { href: "/profile/messages", label: "Messages", icon: MessageSquareText },
   { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/support", label: "Support", icon: LifeBuoy },
   { href: "/profile/payment-settings", label: "Payments", icon: CreditCard },

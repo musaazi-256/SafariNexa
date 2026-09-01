@@ -881,11 +881,12 @@ model MessageThread {
 }
 
 model Message {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   threadId  String
   senderId  String
   content   String
-  createdAt DateTime @default(now())
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
   
   thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   sender    User          @relation(fields: [senderId], references: [id])

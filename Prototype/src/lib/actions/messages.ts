@@ -122,3 +122,115 @@ export async function sendListingInquiryAction(listingId: string, content: strin
   const messageText = `[Inquiry regarding "${listing.title}"]\n${content}`;
   return await sendMessage(thread.id, messageText);
 }
+
+export async function markThreadAsRead(threadId: string) {
+  const session = await auth();
+  if (!session?.user) return;
+
+  await db.message.updateMany({
+    where: {
+      threadId,
+      senderId: { not: session.user.id },
+      readAt: null,
+    },
+    data: {
+      readAt: new Date(),
+    },
+  });
+}
+
+export async function getThreadMessages(threadId: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const thread = await db.messageThread.findUnique({
+    where: { id: threadId },
+    select: { id: true, businessId: true, customerId: true }
+  });
+
+  if (!thread) throw new Error("Thread not found");
+
+  const isCustomer = thread.customerId === session.user.id;
+  if (!isCustomer) {
+    const businessUser = await db.businessUser.findFirst({
+      where: { businessId: thread.businessId, userId: session.user.id }
+    });
+    if (!businessUser) throw new Error("Unauthorized");
+  }
+
+  const messages = await db.message.findMany({
+    where: { threadId },
+    orderBy: { createdAt: "asc" },
+    include: {
+      sender: {
+        select: { name: true, image: true }
+      }
+    }
+  });
+
+  return messages;
+}
+
+export async function getBusinessCustomers(businessId: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const businessUser = await db.businessUser.findFirst({
+    where: { businessId, userId: session.user.id }
+  });
+  if (!businessUser) throw new Error("Unauthorized");
+
+  const bookings = await db.booking.findMany({
+    where: { businessId },
+    include: {
+      customer: {
+        select: { id: true, name: true, email: true, image: true, phone: true }
+      },
+      listing: {
+        select: { title: true }
+      }
+    },
+    orderBy: { createdAt: "desc" }
+  });
+
+  // Deduplicate customers with their latest booking
+  const map = new Map<string, { customer: any; booking: any }>();
+  for (const b of bookings) {
+    if (!map.has(b.customerId)) {
+      map.set(b.customerId, { customer: b.customer, booking: b });
+    }
+  }
+
+  return Array.from(map.values());
+}
+
+export async function createThreadWithCustomer(businessId: string, customerId: string, bookingId?: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const businessUser = await db.businessUser.findFirst({
+    where: { businessId, userId: session.user.id }
+  });
+  if (!businessUser) throw new Error("Unauthorized");
+
+  let thread = await db.messageThread.findFirst({
+    where: {
+      businessId,
+      customerId,
+      ...(bookingId ? { bookingId } : {})
+    }
+  });
+
+  if (!thread) {
+    thread = await db.messageThread.create({
+      data: {
+        businessId,
+        customerId,
+        ...(bookingId ? { bookingId } : {})
+      }
+    });
+  }
+
+  return thread;
+}
+

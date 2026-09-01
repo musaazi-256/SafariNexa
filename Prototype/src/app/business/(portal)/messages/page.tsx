@@ -1,13 +1,40 @@
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
 import { MessageInbox } from "@/components/business/message-inbox";
-import { Button } from "@/components/ui/button";
-import { SquarePen } from "lucide-react";
+import { getBusinessCustomers } from "@/lib/actions/messages";
 
-export default async function BusinessMessagesPage() {
+export default async function BusinessMessagesPage({
+  searchParams,
+}: {
+  searchParams?: { bookingId?: string; threadId?: string };
+}) {
   const { session, businessId } = await requireBusinessSession();
 
   if (!businessId) return null;
+
+  let targetThreadId = searchParams?.threadId;
+
+  if (!targetThreadId && searchParams?.bookingId) {
+    const booking = await db.booking.findUnique({
+      where: { id: searchParams.bookingId },
+      select: { businessId: true, customerId: true }
+    });
+    if (booking && booking.businessId === businessId) {
+      let thread = await db.messageThread.findFirst({
+        where: { bookingId: searchParams.bookingId }
+      });
+      if (!thread) {
+        thread = await db.messageThread.create({
+          data: {
+            bookingId: searchParams.bookingId,
+            businessId,
+            customerId: booking.customerId
+          }
+        });
+      }
+      targetThreadId = thread.id;
+    }
+  }
 
   // Fetch all threads for this business
   const threads = await db.messageThread.findMany({
@@ -21,7 +48,7 @@ export default async function BusinessMessagesPage() {
           email: true,
           phone: true,
           bookings: {
-            where: { businessId }, // only count bookings at this business? The mockup implies total. Let's just do all for this business.
+            where: { businessId },
             select: { totalMinor: true, status: true }
           }
         }
@@ -46,24 +73,17 @@ export default async function BusinessMessagesPage() {
     orderBy: { updatedAt: "desc" }
   });
 
-  return (
-    <div className="max-w-[1400px] mx-auto space-y-6 pb-20">
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-[#0B4928] mb-1">BUSINESS PORTAL</p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Messages</h1>
-          <p className="text-sm text-slate-500">Communicate directly with your customers regarding their bookings.</p>
-        </div>
-        
-        <Button className="bg-[#1e613c] hover:bg-[#164a2e] text-white gap-2 font-bold h-10 px-5 rounded-lg">
-          <SquarePen className="h-4 w-4" />
-          New message
-        </Button>
-      </div>
+  const businessCustomers = await getBusinessCustomers(businessId);
 
-      <div className="mt-2">
-        <MessageInbox initialThreads={threads} businessUserId={session.user.id} />
-      </div>
+  return (
+    <div className="max-w-[1400px] mx-auto space-y-6 pb-20 font-sans">
+      <MessageInbox 
+        initialThreads={threads as any} 
+        businessUserId={session.user.id} 
+        businessId={businessId}
+        initialActiveThreadId={targetThreadId}
+        businessCustomers={businessCustomers as any}
+      />
     </div>
   );
 }
