@@ -4,7 +4,7 @@ import { Heart, Search, Scale, CalendarCheck } from "lucide-react";
 
 import { auth } from "@/auth";
 import { ListingCard } from "@/components/listing-card";
-import { AccountLayout } from "@/components/account-layout";
+import { AccountLayout } from "@/components/customer/account-layout";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { db } from "@/lib/db";

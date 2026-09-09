@@ -16,8 +16,8 @@ import {
   Settings as SettingsIcon
 } from "lucide-react";
 
-import { BusinessSwitcher } from "@/components/business-switcher";
-import { signOutAction } from "@/lib/actions";
+import { BusinessSwitcher } from "@/components/business/business-switcher";
+import { signOutAction } from "@/lib/actions/session";
 import {
   Sidebar,
   SidebarContent,

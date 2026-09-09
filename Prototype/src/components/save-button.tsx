@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 
-import { toggleSavedItem } from "@/lib/actions";
+import { toggleSavedItem } from "@/lib/actions/customer";
 import { cn } from "@/lib/utils";
 
 export function SaveButton({

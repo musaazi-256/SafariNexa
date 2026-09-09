@@ -8,7 +8,7 @@ import { db } from "@/lib/db";
 import { formatUGX } from "@/lib/booking";
 import { listingTypeLabel } from "@/lib/listings";
 import { toBookingStatus } from "@/lib/status";
-import { AccountLayout } from "@/components/account-layout";
+import { AccountLayout } from "@/components/customer/account-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";

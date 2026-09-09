@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { BusinessSidebar } from "@/components/business-sidebar";
+import { BusinessSidebar } from "@/components/business/business-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { requireBusinessSession } from "@/lib/business";
 import { auth } from "@/auth";

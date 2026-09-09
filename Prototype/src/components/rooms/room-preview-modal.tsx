@@ -13,7 +13,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { AccommodationReservationFields, RoomTypeOption, AddOnOption } from "@/components/rooms/reservation-fields";
-import { getAccommodationRoomsAction } from "@/lib/actions";
+import { getAccommodationRoomsAction } from "@/lib/actions/customer";
 
 export function RoomPreviewModal({ listingId, title }: { listingId: string; title: string }) {
   const [open, setOpen] = React.useState(false);

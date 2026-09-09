@@ -18,7 +18,7 @@ import {
   UserCircle
 } from "lucide-react";
 
-import { signOutAction } from "@/lib/actions";
+import { signOutAction } from "@/lib/actions/session";
 import { Logo } from "@/components/logo";
 import {
   Sidebar,

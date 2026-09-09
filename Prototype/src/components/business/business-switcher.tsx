@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
-import { setActiveBusiness } from "@/lib/actions";
+import { setActiveBusiness } from "@/lib/actions/business";
 
 export function BusinessSwitcher({
   businesses,

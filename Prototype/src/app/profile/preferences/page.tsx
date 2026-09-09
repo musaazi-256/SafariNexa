@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
-import { AccountLayout } from "@/components/account-layout";
+import { AccountLayout } from "@/components/customer/account-layout";
 import { PreferencesForm } from "@/components/forms/preferences-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { db } from "@/lib/db";

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { AccountSidebar } from "@/components/account-sidebar";
+import { AccountSidebar } from "@/components/customer/account-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Container } from "@/components/ui/container";

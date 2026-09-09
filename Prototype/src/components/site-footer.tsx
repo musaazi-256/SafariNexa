@@ -101,7 +101,12 @@ export function SiteFooter() {
       <div className="border-t border-border py-5">
         <Container className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} SafariNexa. Phase 1 MVP — East Africa marketplace.</p>
-          <p>Payments via mobile money & card. Verified businesses only.</p>
+          <div className="flex items-center gap-4">
+            <p>Payments via mobile money & card. Verified businesses only.</p>
+            <Link href="/docs" className="font-semibold text-foreground/70 hover:text-primary">
+              Engineering docs
+            </Link>
+          </div>
         </Container>
       </div>
     </footer>

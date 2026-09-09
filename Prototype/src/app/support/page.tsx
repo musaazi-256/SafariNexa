@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { LifeBuoy, Plus } from "lucide-react";
 
 import { auth } from "@/auth";
-import { AccountLayout } from "@/components/account-layout";
+import { AccountLayout } from "@/components/customer/account-layout";
 import { SupportCaseForm } from "@/components/forms/support-case-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

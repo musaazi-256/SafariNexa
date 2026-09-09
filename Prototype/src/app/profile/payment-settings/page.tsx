@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { AccountLayout } from "@/components/account-layout";
+import { AccountLayout } from "@/components/customer/account-layout";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export default async function PaymentSettingsPage() {

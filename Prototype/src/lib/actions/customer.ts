@@ -1,19 +1,10 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 import { auth } from "@/auth";
-import { ACTIVE_BUSINESS_COOKIE } from "@/lib/business";
 import { db } from "@/lib/db";
 import { getRoomTypeAvailability } from "@/lib/listings";
-
-export async function signOutAction() {
-  await auth(); // or do something else if needed
-  // We can't import signOut directly from @/auth if it's not exported properly, but wait, @/auth exports signOut
-  const { signOut } = await import("@/auth");
-  await signOut({ redirectTo: "/" });
-}
 
 export async function toggleSavedItem(listingId: string, path?: string) {
   const session = await auth();
@@ -31,23 +22,6 @@ export async function toggleSavedItem(listingId: string, path?: string) {
 
   if (path) revalidatePath(path);
   return { saved: !existing };
-}
-
-export async function setActiveBusiness(businessId: string) {
-  const session = await auth();
-  if (!session?.user) throw new Error("Sign in required.");
-
-  // Never trust the client-picked id blindly — only switch to a business this
-  // user actually belongs to. The session JWT might be stale, so query the DB.
-  const dbUser = await db.user.findUnique({
-    where: { id: session.user.id },
-    include: { businessUsers: true }
-  });
-  const memberBusinessIds = dbUser?.businessUsers.map((bu) => bu.businessId) || [];
-
-  if (!memberBusinessIds.includes(businessId)) throw new Error("Not a member of this business.");
-  cookies().set(ACTIVE_BUSINESS_COOKIE, businessId, { httpOnly: true, sameSite: "lax", path: "/" });
-  revalidatePath("/business", "layout");
 }
 
 export async function getAccommodationRoomsAction(listingId: string) {
@@ -79,7 +53,14 @@ export async function getAccommodationRoomsAction(listingId: string) {
       priceMinor: room.priceMinor,
       maxOccupancy: room.maxOccupancy,
       breakfastIncluded: room.breakfastIncluded,
-      bookedDates: availabilityByRoom[room.id] ?? []
+      bookedDates: availabilityByRoom[room.id] ?? [],
+      bedType: room.bedType,
+      bedrooms: room.bedrooms,
+      roomFeatures: room.roomFeatures,
+      isRefundable: room.isRefundable,
+      refundPolicyText: room.refundPolicyText,
+      discountNotice: room.discountNotice,
+      totalRooms: room.totalRooms
     })),
     addOns: listing.accommodation.addOns.map((addOn) => ({
       id: addOn.id,

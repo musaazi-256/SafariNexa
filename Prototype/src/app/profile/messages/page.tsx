@@ -3,7 +3,7 @@ import { Metadata } from "next";
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { AccountLayout } from "@/components/account-layout";
+import { AccountLayout } from "@/components/customer/account-layout";
 import { CustomerMessageInbox } from "@/components/customer/message-inbox";
 
 export const metadata: Metadata = {

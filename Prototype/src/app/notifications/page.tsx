@@ -4,7 +4,7 @@ import type { NotificationType } from "@prisma/client";
 import { Bell, BellOff, CalendarCheck, CreditCard, LifeBuoy, Settings, ShieldAlert, Star } from "lucide-react";
 
 import { auth } from "@/auth";
-import { AccountLayout } from "@/components/account-layout";
+import { AccountLayout } from "@/components/customer/account-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";

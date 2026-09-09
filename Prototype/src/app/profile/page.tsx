@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { CalendarClock, ChevronRight, Key, ShieldCheck } from "lucide-react";
 
 import { auth } from "@/auth";
-import { AccountLayout } from "@/components/account-layout";
+import { AccountLayout } from "@/components/customer/account-layout";
 import { ChangePasswordForm } from "@/components/forms/change-password-form";
 import { EditProfileForm } from "@/components/forms/edit-profile-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

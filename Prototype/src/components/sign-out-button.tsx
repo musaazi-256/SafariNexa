@@ -1,6 +1,6 @@
 import { LogOut } from "lucide-react";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { signOutAction } from "@/lib/actions";
+import { signOutAction } from "@/lib/actions/session";
 
 export function SignOutMenuItem() {
   return (

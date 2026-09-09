@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { AdminSidebar } from "@/components/admin-sidebar";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { requireAdminSession } from "@/lib/admin";
 
