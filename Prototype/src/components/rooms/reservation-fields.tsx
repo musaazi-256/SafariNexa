@@ -23,6 +23,13 @@ export type RoomTypeOption = {
   maxOccupancy: number;
   breakfastIncluded: boolean;
   bookedDates?: string[];
+  bedType?: string | null;
+  bedrooms?: number | null;
+  roomFeatures?: string[] | null;
+  isRefundable?: boolean | null;
+  refundPolicyText?: string | null;
+  discountNotice?: string | null;
+  totalRooms?: number | null;
 };
 
 export type AddOnOption = {
@@ -196,9 +203,14 @@ export function AccommodationReservationFields({
                         <p className="font-semibold text-base">{room.name}</p>
                         <p className={cn("text-xs mt-0.5", !fits ? "font-semibold text-destructive" : "text-muted-foreground")}>
                           {fits
-                            ? `Up to ${room.maxOccupancy} guests${room.breakfastIncluded ? " · Breakfast included" : ""}`
+                            ? `${room.bedType || "1 Double Bed"} · Up to ${room.maxOccupancy} guests${room.breakfastIncluded ? " · Breakfast included" : ""}`
                             : `Sleeps up to ${room.maxOccupancy} — reduce guests to select`}
                         </p>
+                        {fits ? (
+                          <p className={cn("text-xs mt-0.5 font-medium", room.isRefundable === false ? "text-amber-700" : "text-emerald-700")}>
+                            {room.isRefundable === false ? "Non-refundable" : "Fully refundable"}
+                          </p>
+                        ) : null}
                       </div>
                       <span className="shrink-0 whitespace-nowrap font-semibold">
                         {formatUGX(room.priceMinor)}
@@ -212,7 +224,10 @@ export function AccommodationReservationFields({
                         images={room.images}
                         maxOccupancy={room.maxOccupancy}
                         breakfastIncluded={room.breakfastIncluded}
-                        amenities={[]} 
+                        amenities={[]}
+                        roomFeatures={room.roomFeatures}
+                        isRefundable={room.isRefundable}
+                        refundPolicyText={room.refundPolicyText}
                       />
                     </div>
                   </div>

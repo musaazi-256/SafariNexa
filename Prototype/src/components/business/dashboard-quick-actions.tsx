@@ -36,19 +36,23 @@ export function DashboardQuickActions({ verificationStatus }: DashboardQuickActi
             <Plus className="mr-2 h-4 w-4 text-[#0B4928]" /> Add new listing
           </Link>
         </Button>
-        <Button variant="ghost" className="text-slate-700 font-medium shrink-0" onClick={(e) => handleAction(e, "create a promotion")}>
-          <Ticket className="mr-2 h-4 w-4 text-orange-500" /> Create promotion
+        <Button variant="ghost" disabled className="text-slate-400 font-medium shrink-0">
+          <Ticket className="mr-2 h-4 w-4" /> Create promotion
+          <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-400">Soon</span>
         </Button>
-        <Button variant="ghost" className="text-slate-700 font-medium shrink-0" onClick={(e) => handleAction(e, "view the calendar")}>
-          <CalendarIcon className="mr-2 h-4 w-4 text-green-600" /> View calendar
+        <Button variant="ghost" asChild className="text-slate-700 font-medium shrink-0">
+          <Link href="/business/bookings" onClick={(e) => handleAction(e, "view the calendar")}>
+            <CalendarIcon className="mr-2 h-4 w-4 text-green-600" /> View calendar
+          </Link>
         </Button>
         <Button variant="ghost" asChild className="text-slate-700 font-medium shrink-0">
           <Link href="/business/reviews" onClick={(e) => handleAction(e, "respond to reviews")}>
             <Star className="mr-2 h-4 w-4 text-amber-400" /> Respond to reviews
           </Link>
         </Button>
-        <Button variant="ghost" className="text-slate-700 font-medium shrink-0 ml-auto hidden md:flex" onClick={(e) => handleAction(e, "download reports")}>
-          <Download className="mr-2 h-4 w-4 text-[#0B4928]" /> Download report
+        <Button variant="ghost" disabled className="text-slate-400 font-medium shrink-0 ml-auto hidden md:flex">
+          <Download className="mr-2 h-4 w-4" /> Download report
+          <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-400">Soon</span>
         </Button>
       </div>
 

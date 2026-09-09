@@ -63,7 +63,9 @@ export default async function ProfilePage() {
 
     const currentPassword = String(formData.get("currentPassword") ?? "");
     const newPassword = String(formData.get("newPassword") ?? "");
+    const confirmPassword = String(formData.get("confirmPassword") ?? "");
     if (newPassword.length < 8) return { error: "New password must be at least 8 characters." };
+    if (newPassword !== confirmPassword) return { error: "New password and confirmation don't match." };
 
     const target = await db.user.findUnique({ where: { id: activeSession.user.id } });
     if (!target?.passwordHash) return { error: "This account doesn't use a password." };

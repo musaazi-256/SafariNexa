@@ -27,6 +27,13 @@ import {
 import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
+const PREVIEW_PATH: Record<string, string> = {
+  ACCOMMODATION: "accommodation",
+  TOUR: "tours",
+  RESTAURANT: "restaurants",
+  TRANSPORT: "transport"
+};
+
 export default async function EditListingPage({ params }: { params: { id: string } }) {
   const { business, businessId } = await requireBusinessSession();
   if (!business || !businessId) redirect("/business/auth/sign-in");
@@ -169,6 +176,7 @@ export default async function EditListingPage({ params }: { params: { id: string
       <form action={updateListing} className="flex flex-col gap-6">
         <ListingBaseFields
           destinations={destinations}
+          previewHref={`/${PREVIEW_PATH[listing.type]}/${listing.id}`}
           initial={{
             title: listing.title,
             description: listing.description,
@@ -204,7 +212,13 @@ export default async function EditListingPage({ params }: { params: { id: string
                 totalRooms: String(room.totalRooms),
                 breakfastIncluded: room.breakfastIncluded,
                 description: room.description ?? "",
-                images: room.images
+                images: room.images,
+                bedType: room.bedType ?? "1 Double Bed",
+                bedrooms: String(room.bedrooms),
+                roomFeatures: room.roomFeatures,
+                isRefundable: room.isRefundable,
+                refundPolicyText: room.refundPolicyText ?? "",
+                discountNotice: room.discountNotice ?? ""
               }))}
             />
             <AddOnEditor

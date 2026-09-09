@@ -52,11 +52,6 @@ export default function OnboardingIntroPage() {
               Begin onboarding
             </Link>
           </Button>
-          <Button asChild variant="ghost" size="lg" className="text-[#0f6b40] hover:text-[#0a5230] hover:bg-[#0f6b40]/10 px-8 rounded-lg h-12 font-medium">
-            <Link href="/business/requirements">
-              Learn requirements
-            </Link>
-          </Button>
         </div>
       </div>
 

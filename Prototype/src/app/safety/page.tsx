@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AlertTriangle, Phone, ShieldAlert, HeartPulse, Building, MapPin } from "lucide-react";
 
 import { PageHero } from "@/components/page-hero";
@@ -119,7 +120,9 @@ export default function SafetyPage() {
                 <CardDescription>We&apos;re here to help if you encounter issues with your booking.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button className="w-full sm:w-auto">Open Support Chat</Button>
+                <Button asChild className="w-full sm:w-auto">
+                  <Link href="/support">Open Support Chat</Link>
+                </Button>
                 <p className="text-sm text-muted-foreground mt-4">
                   Or email us at <span className="font-medium">urgent@safarinexa.com</span> for critical issues.
                 </p>

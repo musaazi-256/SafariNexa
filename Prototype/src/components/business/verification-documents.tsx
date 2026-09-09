@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useTransition } from "react";
 import { format } from "date-fns";
-import { UploadCloud, FileText, Check, MoreVertical, ShieldCheck, Loader2 } from "lucide-react";
+import { UploadCloud, FileText, Check, MoreVertical, ShieldCheck, Loader2, Trash2 } from "lucide-react";
 
-import { submitVerificationDocument } from "@/lib/actions/verification";
+import { submitVerificationDocument, deleteVerificationDocument } from "@/lib/actions/verification";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
@@ -31,7 +32,19 @@ interface VerificationDocumentsProps {
 export function VerificationDocuments({ documents }: VerificationDocumentsProps) {
   const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, startDeleteTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDelete = (documentId: string) => {
+    startDeleteTransition(async () => {
+      try {
+        await deleteVerificationDocument(documentId);
+      } catch (error) {
+        console.error(error);
+        alert("Failed to delete document");
+      }
+    });
+  };
 
   const activeDocuments = documents.filter(d => 
     (d.type === activeTab) || 
@@ -118,9 +131,18 @@ export function VerificationDocuments({ documents }: VerificationDocumentsProps)
               <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-semibold">
                 <ClockIcon className="h-3.5 w-3.5" /> Under review
               </span>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400" disabled={isDeleting}>
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => handleDelete(doc.id)}>
+                    <Trash2 className="h-4 w-4 mr-2" /> Delete document
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         ))}

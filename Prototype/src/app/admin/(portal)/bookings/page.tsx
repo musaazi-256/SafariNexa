@@ -55,7 +55,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   ] = await Promise.all([
     db.booking.findMany({
       where: where as never,
-      include: { listing: true, business: true, customer: { select: { name: true, email: true } } },
+      include: { listing: true, business: true, customer: { select: { name: true, email: true } }, roomType: true, addOns: true },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE
@@ -342,8 +342,15 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                   </div>
                   
                   {/* Listing */}
-                  <div className="col-span-3 font-semibold text-slate-800 truncate pr-3">
-                    {booking.listing.title}
+                  <div className="col-span-3 pr-3">
+                    <div className="font-semibold text-slate-800 truncate">{booking.listing.title}</div>
+                    {booking.roomTypeName || booking.roomType || booking.addOns.length > 0 ? (
+                      <div className="text-[11px] font-medium text-slate-400 truncate">
+                        {booking.roomTypeName || booking.roomType ? `Room: ${booking.roomTypeName ?? booking.roomType?.name}` : ""}
+                        {(booking.roomTypeName || booking.roomType) && booking.addOns.length > 0 ? " · " : ""}
+                        {booking.addOns.length > 0 ? `+${booking.addOns.length} add-on${booking.addOns.length > 1 ? "s" : ""}` : ""}
+                      </div>
+                    ) : null}
                   </div>
                   
                   {/* Business */}

@@ -144,7 +144,8 @@ export function parseRestaurantFields(formData: FormData) {
     menuUrl: String(formData.get("menuUrl") ?? "").trim() || undefined,
     seatingCapacity: formData.get("seatingCapacity") ? Number(formData.get("seatingCapacity")) : undefined,
     acceptsReservationRequests: formData.get("acceptsReservationRequests") === "on",
-    openingHours: openingHours ? openingHours : undefined
+    // Stored as { summary } to match how the reader (restaurants/[id]/page.tsx) and seed data shape it.
+    openingHours: openingHours ? { summary: openingHours } : undefined
   };
 }
 

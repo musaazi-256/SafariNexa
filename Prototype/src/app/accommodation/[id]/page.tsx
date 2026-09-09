@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { ScoreBadge } from "@/components/ui/rating";
 import { db } from "@/lib/db";
-import { findEligibleReviewBooking, findRelatedListings, getRoomTypeAvailability, ratingBreakdown, ratingSummary } from "@/lib/listings";
+import { findEligibleReviewBooking, findRelatedListings, getRoomTypeAvailability, getRoomTypeRemainingToday, ratingBreakdown, ratingSummary } from "@/lib/listings";
 
 export default async function AccommodationDetailPage({ params }: { params: { id: string } }) {
   const session = await auth();
@@ -50,6 +50,9 @@ export default async function AccommodationDetailPage({ params }: { params: { id
   const breakdown = ratingBreakdown(listing.reviews);
   const related = await findRelatedListings("ACCOMMODATION", listing.id);
   const eligibleBooking = session?.user ? await findEligibleReviewBooking(listing.id, session.user.id) : null;
+  const remainingByRoom = await getRoomTypeRemainingToday(
+    accommodation.roomTypes.map((room) => ({ id: room.id, totalRooms: room.totalRooms }))
+  );
   const availabilityByRoom = await getRoomTypeAvailability(
     accommodation.roomTypes.map((room) => ({ id: room.id, totalRooms: room.totalRooms }))
   );
@@ -181,6 +184,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
                       <RoomPreviewCard
                         key={room.id}
                         room={room}
+                        remaining={remainingByRoom[room.id]}
                         accommodationAmenities={accommodation.amenities}
                         cancellationPolicy={accommodation.cancellationPolicy}
                         isLowestPrice={room.priceMinor === minPrice}
@@ -299,7 +303,14 @@ export default async function AccommodationDetailPage({ params }: { params: { id
                       priceMinor: room.priceMinor,
                       maxOccupancy: room.maxOccupancy,
                       breakfastIncluded: room.breakfastIncluded,
-                      bookedDates: availabilityByRoom[room.id] ?? []
+                      bookedDates: availabilityByRoom[room.id] ?? [],
+                      bedType: room.bedType,
+                      bedrooms: room.bedrooms,
+                      roomFeatures: room.roomFeatures,
+                      isRefundable: room.isRefundable,
+                      refundPolicyText: room.refundPolicyText,
+                      discountNotice: room.discountNotice,
+                      totalRooms: room.totalRooms
                     }))}
                     addOns={accommodation.addOns}
                     isSignedIn={Boolean(session?.user)}

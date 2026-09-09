@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { format, isSameDay } from "date-fns";
-import { 
-  Search, Filter, Calendar, ExternalLink, User, Mail, Phone, 
-  Smile, Image as ImageIcon, Paperclip, Zap, Send, MoreVertical, 
-  Plus, CheckCircle2, CheckCheck, SquarePen, Clock, X, Loader2 
+import {
+  Search, Filter, Calendar, ExternalLink, User, Mail, Phone,
+  Zap, Send, MoreVertical,
+  Plus, CheckCircle2, CheckCheck, SquarePen, Clock, X, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -572,11 +572,6 @@ export function MessageInbox({
                         }
                       }}
                     />
-                    <div className="absolute bottom-3 left-3 flex items-center gap-3">
-                      <button type="button" className="text-slate-400 hover:text-slate-600 transition-colors"><Smile className="h-4 w-4" /></button>
-                      <button type="button" className="text-slate-400 hover:text-slate-600 transition-colors"><ImageIcon className="h-4 w-4" /></button>
-                      <button type="button" className="text-slate-400 hover:text-slate-600 transition-colors"><Paperclip className="h-4 w-4" /></button>
-                    </div>
                     <div className="absolute bottom-3 right-3">
                       <Button 
                         type="submit" 

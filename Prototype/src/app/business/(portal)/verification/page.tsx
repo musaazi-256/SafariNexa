@@ -29,6 +29,20 @@ export default async function BusinessVerificationPage() {
 
   const documents = latestVerification?.documents || [];
 
+  const statusCopy: Record<string, string> = {
+    NOT_STARTED: "You haven't submitted your business for verification yet.",
+    DRAFT: "Your verification submission is saved as a draft.",
+    SUBMITTED: "Your documents are under review. We'll notify you once there's an update.",
+    UNDER_REVIEW: "Your documents are under review. We'll notify you once there's an update.",
+    NEEDS_CHANGES: "We need more information before we can approve your business. See the notes below and resubmit.",
+    APPROVED: "Your business is verified and can publish listings.",
+    REJECTED: "Your verification was not approved. See the notes below.",
+    SUSPENDED: "Your business's verification has been flagged and is on hold. See the notes below."
+  };
+  const bannerMessage = statusCopy[business.verificationStatus] ?? statusCopy.SUBMITTED;
+  const reviewNotes = latestVerification?.reviewNotes?.trim();
+  const showNotes = Boolean(reviewNotes) && ["NEEDS_CHANGES", "REJECTED", "SUSPENDED"].includes(business.verificationStatus);
+
   return (
     <div className="max-w-4xl mx-auto space-y-10 pb-20 pt-8">
       <div className="mb-8">
@@ -47,8 +61,14 @@ export default async function BusinessVerificationPage() {
                 {business.verificationStatus.replace("_", " ")}
               </div>
               <p className="text-sm text-slate-500 mt-4 leading-relaxed">
-                Your documents are under review. We&apos;ll notify you once there&apos;s an update.
+                {bannerMessage}
               </p>
+              {showNotes ? (
+                <p className="text-sm text-slate-700 mt-3 leading-relaxed rounded-lg bg-slate-50 border border-slate-200 p-3">
+                  <span className="font-bold">Reviewer notes: </span>
+                  {reviewNotes}
+                </p>
+              ) : null}
             </div>
             
             <div className="lg:border-l lg:border-slate-100 lg:pl-10 w-full overflow-x-auto pb-4 lg:pb-0">

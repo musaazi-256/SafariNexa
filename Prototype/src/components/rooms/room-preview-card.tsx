@@ -43,6 +43,7 @@ function getFeatureIcon(featureName: string) {
 
 export function RoomPreviewCard({
   room,
+  remaining,
   accommodationAmenities,
   cancellationPolicy,
   isLowestPrice = false
@@ -63,6 +64,9 @@ export function RoomPreviewCard({
     refundPolicyText?: string | null;
     discountNotice?: string | null;
   };
+  /** Real remaining inventory for tonight, from getRoomTypeRemainingToday — falls
+   * back to the configured totalRooms if not supplied by the caller. */
+  remaining?: number;
   accommodationAmenities: string[];
   cancellationPolicy?: string | null;
   isLowestPrice?: boolean;
@@ -90,7 +94,7 @@ export function RoomPreviewCard({
   const roomFeaturesList = room.roomFeatures && room.roomFeatures.length > 0 ? room.roomFeatures : null;
   const bedroomsCount = room.bedrooms ?? 1;
   const bedTypeLabel = room.bedType || "1 Double Bed";
-  const totalRoomsLeft = room.totalRooms && room.totalRooms > 0 ? room.totalRooms : 1;
+  const totalRoomsLeft = remaining !== undefined ? remaining : room.totalRooms && room.totalRooms > 0 ? room.totalRooms : 1;
   const isRefundable = room.isRefundable !== false;
   const refundText = room.refundPolicyText || cancellationPolicy || "Before check-in";
 
@@ -197,6 +201,9 @@ export function RoomPreviewCard({
             maxOccupancy={room.maxOccupancy}
             breakfastIncluded={room.breakfastIncluded}
             amenities={accommodationAmenities}
+            roomFeatures={room.roomFeatures}
+            isRefundable={room.isRefundable}
+            refundPolicyText={room.refundPolicyText}
             trigger={
               <button className="text-sm font-bold text-foreground hover:underline focus-visible:outline-none">
                 More details &gt;

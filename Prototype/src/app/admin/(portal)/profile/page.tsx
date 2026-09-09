@@ -44,7 +44,7 @@ export default async function AdminProfilePage() {
               <User className="h-8 w-8" />
             </div>
             <div>
-              <CardTitle className="text-xl">{user.name || "Admin User"}</CardTitle>
+              <CardTitle className="text-xl">{user.adminUser.displayName || "Admin User"}</CardTitle>
               <CardDescription className="text-[13px] font-semibold text-slate-500 mt-1">
                 {user.adminUser.role.name}
               </CardDescription>
@@ -70,12 +70,12 @@ export default async function AdminProfilePage() {
               <Label htmlFor="name" className="font-semibold text-slate-700 flex items-center gap-2">
                 <User className="h-4 w-4 text-slate-400" /> Full name
               </Label>
-              <Input 
-                id="name" 
-                name="name" 
-                defaultValue={user.name ?? ""} 
-                placeholder="Enter your full name" 
-                required 
+              <Input
+                id="name"
+                name="name"
+                defaultValue={user.adminUser.displayName ?? ""}
+                placeholder="Enter your full name"
+                required
               />
             </div>
 
@@ -83,12 +83,12 @@ export default async function AdminProfilePage() {
               <Label htmlFor="phone" className="font-semibold text-slate-700 flex items-center gap-2">
                 <Phone className="h-4 w-4 text-slate-400" /> Phone number
               </Label>
-              <Input 
-                id="phone" 
-                name="phone" 
-                type="tel" 
-                defaultValue={user.phone ?? ""} 
-                placeholder="+256 7XX XXX XXX" 
+              <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                defaultValue={user.adminUser.phone ?? ""}
+                placeholder="+256 7XX XXX XXX"
               />
             </div>
 

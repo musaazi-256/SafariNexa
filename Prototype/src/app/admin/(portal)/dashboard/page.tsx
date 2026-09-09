@@ -264,7 +264,7 @@ export default async function AdminDashboardPage() {
                     <p className="font-bold text-[12px] text-slate-900 truncate">{item.name}</p>
                     <p className="text-[10px] text-slate-400 font-medium">Submitted {item.date}</p>
                   </div>
-                  <Button variant="outline" size="sm" className="h-6 px-2.5 text-[10px] font-bold border-slate-200 rounded-md">Review</Button>
+                  <span className="h-6 px-2.5 inline-flex items-center text-[10px] font-bold text-slate-400 border border-slate-200 rounded-md">Pending</span>
                 </div>
               ))
             )}
@@ -291,7 +291,7 @@ export default async function AdminDashboardPage() {
                   <p className="font-bold text-[12px] text-slate-900 truncate">{caseItem.title}</p>
                   <p className="text-[10px] text-slate-400 font-medium">{caseItem.user} • {caseItem.date}</p>
                 </div>
-                <Button variant="outline" size="sm" className="h-6 px-2.5 text-[10px] font-bold border-slate-200 rounded-md shrink-0">View</Button>
+                <span className="h-6 px-2.5 inline-flex items-center text-[10px] font-bold text-slate-400 border border-slate-200 rounded-md shrink-0">Open</span>
               </div>
             ))}
           </div>

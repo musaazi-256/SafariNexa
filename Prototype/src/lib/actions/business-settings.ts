@@ -14,22 +14,24 @@ export async function updateBusinessProfile(formData: FormData) {
   const contactEmail = String(formData.get("email") ?? "").trim();
   const contactPhone = String(formData.get("phone") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim();
+  const city = String(formData.get("city") ?? "").trim();
+  const country = String(formData.get("country") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
 
   // Basic validation
-  if (!name || !contactEmail || !contactPhone || !address || !description) {
+  if (!name || !contactEmail || !contactPhone || !address || !city || !description) {
     throw new Error("Missing required fields");
   }
 
-  // To support city/country from a single address field, we'll store it in city for now
-  // In a real app, this might be broken down.
   await db.businessProfile.update({
     where: { id: businessId },
     data: {
       name,
       contactEmail,
       contactPhone,
-      city: address,
+      address,
+      city,
+      country: country || "Uganda",
       description,
     },
   });

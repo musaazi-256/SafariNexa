@@ -15,6 +15,9 @@ export function RoomDetailsModal({
   maxOccupancy,
   breakfastIncluded,
   amenities,
+  roomFeatures,
+  isRefundable,
+  refundPolicyText,
   trigger
 }: {
   name: string;
@@ -23,6 +26,9 @@ export function RoomDetailsModal({
   maxOccupancy: number;
   breakfastIncluded: boolean;
   amenities: string[];
+  roomFeatures?: string[] | null;
+  isRefundable?: boolean | null;
+  refundPolicyText?: string | null;
   trigger?: React.ReactNode;
 }) {
   const [open, setOpen] = React.useState(false);
@@ -113,6 +119,25 @@ export function RoomDetailsModal({
 
           {description ? (
             <p className="mt-8 text-sm leading-relaxed text-muted-foreground">{description}</p>
+          ) : null}
+
+          {refundPolicyText || isRefundable !== undefined ? (
+            <p className={`mt-4 text-sm font-medium ${isRefundable === false ? "text-amber-700" : "text-emerald-700"}`}>
+              {isRefundable === false ? "Non-refundable" : "Fully refundable"}
+              {refundPolicyText ? ` — ${refundPolicyText}` : ""}
+            </p>
+          ) : null}
+
+          {roomFeatures && roomFeatures.length > 0 ? (
+            <>
+              <Separator className="my-8" />
+              <h3 className="mb-4 text-xl font-bold">Room highlights</h3>
+              <ul className="grid grid-cols-1 gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+                {roomFeatures.map((feature) => (
+                  <li key={feature} className="list-disc pl-5">{feature}</li>
+                ))}
+              </ul>
+            </>
           ) : null}
 
           <Separator className="my-8" />

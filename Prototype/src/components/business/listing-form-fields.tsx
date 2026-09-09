@@ -20,12 +20,16 @@ export type ListingBaseInitial = {
   destinationId?: string | null;
 };
 
-export function ListingBaseFields({ 
-  initial, 
-  destinations = [] 
-}: { 
+export function ListingBaseFields({
+  initial,
+  destinations = [],
+  previewHref
+}: {
   initial?: ListingBaseInitial;
   destinations?: { id: string; name: string }[];
+  /** Only known once a listing exists (edit mode) — omitted on create, so the
+   * button doesn't render for a listing that has no page to preview yet. */
+  previewHref?: string;
 }) {
   return (
     <Card className="rounded-2xl shadow-sm border-slate-200">
@@ -39,9 +43,13 @@ export function ListingBaseFields({
             <p className="text-sm text-slate-500 font-medium">Basic information about your listing.</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" type="button" className="hidden sm:flex text-slate-700 font-semibold border-slate-200">
-          <Eye className="h-4 w-4 mr-2" /> Preview listing
-        </Button>
+        {previewHref ? (
+          <Button variant="outline" size="sm" asChild className="hidden sm:flex text-slate-700 font-semibold border-slate-200">
+            <a href={previewHref} target="_blank" rel="noreferrer">
+              <Eye className="h-4 w-4 mr-2" /> Preview listing
+            </a>
+          </Button>
+        ) : null}
       </CardHeader>
       
       <CardContent className="grid gap-6 sm:grid-cols-2 pt-6">

@@ -4,37 +4,59 @@ import * as React from "react";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB, matching the uploader's own copy
+const DEFAULT_MAX_IMAGES = 10;
+
 interface ImageUploaderProps {
   name: string;
   multiple?: boolean;
   defaultValue?: string | string[];
+  maxImages?: number;
 }
 
-export function ImageUploader({ name, multiple = false, defaultValue }: ImageUploaderProps) {
+export function ImageUploader({ name, multiple = false, defaultValue, maxImages = DEFAULT_MAX_IMAGES }: ImageUploaderProps) {
   const [images, setImages] = React.useState<string[]>(() => {
     if (!defaultValue) return [];
     if (Array.isArray(defaultValue)) return defaultValue.filter(Boolean);
     return [defaultValue].filter(Boolean);
   });
-  
+  const [error, setError] = React.useState<string | null>(null);
+
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const atLimit = multiple && images.length >= maxImages;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    setError(null);
+
     Array.from(files).forEach((file) => {
+      if (multiple && images.length >= maxImages) {
+        setError(`You can upload up to ${maxImages} photos.`);
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        setError(`"${file.name}" isn't an image file.`);
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        setError(`"${file.name}" is over the 10MB limit.`);
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (event) => {
         const result = event.target?.result as string;
         if (result) {
           if (multiple) {
-            setImages((prev) => [...prev, result]);
+            setImages((prev) => (prev.length >= maxImages ? prev : [...prev, result]));
           } else {
             setImages([result]);
           }
         }
       };
+      reader.onerror = () => setError(`Couldn't read "${file.name}". Try another file.`);
       reader.readAsDataURL(file);
     });
 
@@ -56,25 +78,31 @@ export function ImageUploader({ name, multiple = false, defaultValue }: ImageUpl
       ))}
       
       {/* Drag & Drop Zone */}
-      <div 
-        onClick={() => fileInputRef.current?.click()}
+      <div
+        onClick={() => !atLimit && fileInputRef.current?.click()}
         className={cn(
-          "w-full shrink-0 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center bg-slate-50 text-center p-6 cursor-pointer hover:bg-slate-100 transition-colors",
+          "w-full shrink-0 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center bg-slate-50 text-center p-6 transition-colors",
+          atLimit ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-slate-100",
           !multiple && images.length > 0 ? "hidden" : "flex h-32"
         )}
       >
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          onChange={handleFileChange} 
-          accept="image/*" 
-          multiple={multiple} 
-          className="hidden" 
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept="image/*"
+          multiple={multiple}
+          disabled={atLimit}
+          className="hidden"
         />
         <Upload className="h-6 w-6 text-slate-400 mb-2" />
-        <p className="text-sm font-semibold text-slate-700">Upload {multiple ? "photos" : "a photo"}</p>
-        <p className="text-xs text-slate-500 mt-1">Click to select files<br/>JPG, PNG up to 10MB</p>
+        <p className="text-sm font-semibold text-slate-700">
+          {atLimit ? `Limit reached (${maxImages} photos)` : `Upload ${multiple ? "photos" : "a photo"}`}
+        </p>
+        <p className="text-xs text-slate-500 mt-1">Click to select files<br/>JPG, PNG up to 10MB{multiple ? `, up to ${maxImages} photos` : ""}</p>
       </div>
+
+      {error ? <p className="text-xs font-semibold text-destructive">{error}</p> : null}
 
       {/* Previews */}
       {images.length > 0 && (

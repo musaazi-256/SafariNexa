@@ -275,8 +275,12 @@ model BusinessProfile {
   coverImageUrl      String?
   contactEmail       String
   contactPhone       String?
+  address            String?
   city               String?
   country            String             @default("Uganda")
+  registrationNumber String?
+  contactName        String?
+  contactRole        String?
   verificationStatus VerificationStatus @default(NOT_STARTED)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
@@ -381,6 +385,8 @@ model AdminUser {
   userId      String          @unique
   roleId      String
   status      AdminUserStatus @default(INVITED)
+  displayName String?
+  phone       String?
   lastLoginAt DateTime?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
@@ -632,6 +638,7 @@ model Booking {
   listingId         String
   businessId        String
   roomTypeId        String?
+  roomTypeName      String?
   status            BookingStatus @default(DRAFT)
   startDate         DateTime?
   endDate           DateTime?

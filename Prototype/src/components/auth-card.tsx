@@ -91,7 +91,6 @@ export function AuthCard({
         </div>
 
         <form action={credentialsAction} className="flex flex-col gap-3">
-          <input type="hidden" name="returnTo" value={target} />
           <div className="flex flex-col gap-1.5">
             <Label htmlFor={`${surface}-email`}>Email</Label>
             <Input

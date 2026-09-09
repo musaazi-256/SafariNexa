@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, MapPin, ShieldCheck, Star } from "lucide-react";
+import { MapPin, ShieldCheck, Star } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -47,9 +47,6 @@ export function ListingRow({
       <div className={`relative h-[210px] shrink-0 sm:w-[300px] overflow-hidden rounded-[14px] ${imageUrl ? "" : "bg-gradient-to-br from-brand-green to-[#062617]"}`}>
         {imageUrl ? <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 300px" className="object-cover transition-transform duration-500 group-hover:scale-105" /> : null}
         <Badge className="absolute left-3 top-3 border-transparent bg-white/90 text-[#0B4928]">{type}</Badge>
-        <button className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-muted-foreground transition-colors hover:text-destructive hover:bg-white" aria-label="Save to wishlist">
-          <Heart className="h-4 w-4" />
-        </button>
       </div>
       <div className="flex flex-1 flex-col py-1">
         <div className="flex flex-col items-start gap-1">

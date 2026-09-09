@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { formatUGX } from "@/lib/booking";
+import { releaseAvailabilityForBooking } from "@/lib/booking-service";
 import { toBookingStatus } from "@/lib/status";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { SiteHeader } from "@/components/site-header";
@@ -72,6 +73,8 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
     const successfulPayment = target.payments.find((p) => p.status === "SUCCESSFUL");
 
     if (successfulPayment) {
+      // Still holds the room until the refund is finalized — matches
+      // NON_BLOCKING_BOOKING_STATUSES in lib/listings.ts, so no release here.
       await db.booking.update({
         where: { id: target.id },
         data: { status: "REFUND_REQUESTED", cancelledAt: new Date(), cancelReason: "Cancelled by customer" }
@@ -87,9 +90,12 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
         }
       });
     } else {
-      await db.booking.update({
-        where: { id: target.id },
-        data: { status: "CANCELLED_BY_CUSTOMER", cancelledAt: new Date(), cancelReason: "Cancelled by customer" }
+      await db.$transaction(async (tx) => {
+        await tx.booking.update({
+          where: { id: target.id },
+          data: { status: "CANCELLED_BY_CUSTOMER", cancelledAt: new Date(), cancelReason: "Cancelled by customer" }
+        });
+        await releaseAvailabilityForBooking(tx, target.id);
       });
     }
 
@@ -132,15 +138,17 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
                 </div>
               </div>
 
-              {booking.roomType || booking.addOns.length > 0 ? (
+              {booking.roomTypeName || booking.roomType || booking.addOns.length > 0 ? (
                 <>
                   <h2 className="mb-2 mt-8 text-lg font-bold">Room &amp; add-ons</h2>
                   <Card>
                     <CardContent className="grid gap-2 pt-6 text-sm">
-                      {booking.roomType ? (
+                      {booking.roomTypeName || booking.roomType ? (
                         <p>
                           <span className="text-muted-foreground">Room: </span>
-                          {booking.roomType.name}
+                          {booking.roomTypeName ?? booking.roomType?.name}
+                          {booking.roomType?.bedType ? ` · ${booking.roomType.bedType}` : ""}
+                          {booking.roomType?.breakfastIncluded ? " · Breakfast included" : ""}
                         </p>
                       ) : null}
                       {booking.addOns.map((addOn) => (

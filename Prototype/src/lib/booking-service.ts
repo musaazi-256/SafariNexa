@@ -1,6 +1,43 @@
+import type { Prisma } from "@prisma/client";
+
 import { db } from "@/lib/db";
 import { generateBookingRef, nightsBetween, parseFirstUgxAmount } from "@/lib/booking";
 import { CartItem } from "@/lib/cart";
+
+/** Undoes the per-night/per-date `tx.availability.upsert` decrement made when a booking
+ * was created. Nothing previously restored this on cancellation, so `remaining` only ever
+ * ratcheted downward — a room could read "fully booked" from stale cancelled bookings even
+ * though the customer-facing calendar (which counts live bookings directly) correctly showed
+ * it as free. Call this from every path that cancels a booking. Must run inside the same
+ * transaction as the status update so the release can't be lost or double-applied. */
+export async function releaseAvailabilityForBooking(tx: Prisma.TransactionClient, bookingId: string) {
+  const booking = await tx.booking.findUnique({
+    where: { id: bookingId },
+    include: { listing: { select: { type: true } } }
+  });
+  if (!booking || !booking.startDate) return;
+
+  if (booking.listing.type === "ACCOMMODATION" && booking.roomTypeId && booking.endDate) {
+    const start = new Date(Date.UTC(booking.startDate.getUTCFullYear(), booking.startDate.getUTCMonth(), booking.startDate.getUTCDate()));
+    const end = new Date(Date.UTC(booking.endDate.getUTCFullYear(), booking.endDate.getUTCMonth(), booking.endDate.getUTCDate()));
+    const nights = nightsBetween(start.toISOString(), end.toISOString());
+
+    for (let i = 0; i < nights; i++) {
+      const night = new Date(start);
+      night.setUTCDate(night.getUTCDate() + i);
+      await tx.availability.updateMany({
+        where: { listingId: booking.listingId, roomTypeId: booking.roomTypeId, date: night },
+        data: { remaining: { increment: 1 } }
+      });
+    }
+  } else if (booking.listing.type === "TOUR") {
+    const date = new Date(Date.UTC(booking.startDate.getUTCFullYear(), booking.startDate.getUTCMonth(), booking.startDate.getUTCDate()));
+    await tx.availability.updateMany({
+      where: { listingId: booking.listingId, roomTypeId: "", date },
+      data: { remaining: { increment: booking.participantsCount } }
+    });
+  }
+}
 
 export async function validateAndReserveBookings(
   customerId: string,
@@ -37,6 +74,7 @@ export async function validateAndReserveBookings(
       let startDate: Date | undefined;
       let endDate: Date | undefined;
       let roomTypeId: string | undefined;
+      let roomTypeName: string | undefined;
       let addOns: { id: string; name: string; priceMinor: number }[] = [];
       let totalMinor: number = 0;
 
@@ -94,6 +132,7 @@ export async function validateAndReserveBookings(
         }
 
         roomTypeId = room.id;
+        roomTypeName = room.name;
         const roomRate = room.priceMinor ?? listing.basePriceMinor;
 
         const requestedAddOnIds = item.addOnIds || [];
@@ -159,6 +198,7 @@ export async function validateAndReserveBookings(
         listingId: listing.id,
         businessId: listing.businessId,
         roomTypeId,
+        roomTypeName,
         startDate,
         endDate,
         participantsCount,
@@ -187,6 +227,7 @@ export async function validateAndReserveBookings(
           listingId: booking.listingId,
           businessId: booking.businessId,
           roomTypeId: booking.roomTypeId,
+          roomTypeName: booking.roomTypeName,
           status: "PENDING_PAYMENT",
           startDate: booking.startDate,
           endDate: booking.endDate,

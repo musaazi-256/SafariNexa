@@ -18,9 +18,14 @@ export async function submitBusinessOnboarding(formData: FormData) {
   // Parse fields
   const type = "GENERAL";
   const businessName = String(formData.get("businessName") || "Untitled Business");
+  const registrationNumber = String(formData.get("registrationNumber") || "").trim() || undefined;
+  const address = String(formData.get("address") || "").trim() || undefined;
+  const description = String(formData.get("description") || "").trim() || undefined;
+  const contactName = String(formData.get("contactName") || "").trim() || undefined;
+  const contactRole = String(formData.get("contactRole") || "").trim() || undefined;
   const contactEmail = String(formData.get("contactEmail") || session.user.email || "");
   const contactPhone = String(formData.get("contactPhone") || "");
-  const city = String(formData.get("city") || "Kampala");
+  const city = "Kampala"; // Default — refined later in Business Settings
   const country = "Uganda"; // Default
   
   // Handle file uploads
@@ -65,6 +70,11 @@ export async function submitBusinessOnboarding(formData: FormData) {
         name: businessName,
         slug,
         type,
+        registrationNumber,
+        address,
+        description,
+        contactName,
+        contactRole,
         contactEmail,
         contactPhone,
         city,

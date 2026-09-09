@@ -35,6 +35,7 @@ export default async function CheckoutPage({
     participants?: string;
     roomTypeId?: string;
     addOnIds?: string | string[];
+    error?: string;
   };
 }) {
   const session = await auth();
@@ -84,26 +85,43 @@ export default async function CheckoutPage({
     const email = String(formData.get("email") ?? "").trim();
     const phone = String(formData.get("phone") ?? "").trim();
 
-    const { bookings } = await validateAndReserveBookings(
-      activeSession.user.id,
-      [{
-        id: "single-item",
-        listingId: submittedListingId,
-        type: submittedType.toLowerCase(),
-        title: "", // Ignored on backend
-        startDate: formData.get("startDate") ? String(formData.get("startDate")) : formData.get("date") ? String(formData.get("date")) : undefined,
-        endDate: formData.get("endDate") ? String(formData.get("endDate")) : undefined,
-        time: formData.get("time") ? String(formData.get("time")) : undefined,
-        participants: participantsCount,
-        roomTypeId: formData.get("roomTypeId") ? String(formData.get("roomTypeId")) : undefined,
-        addOnIds: formData.getAll("addOnIds").map(String),
-        totalMinor: 0 // Ignored on backend
-      }],
-      { fullName, email, phone },
-      false // No order
-    );
+    const checkoutParams = new URLSearchParams({ listingId: submittedListingId, type: submittedType.toLowerCase() });
+    for (const key of ["startDate", "endDate", "date", "time", "participants", "roomTypeId"]) {
+      const value = formData.get(key);
+      if (value) checkoutParams.set(key, String(value));
+    }
+    for (const addOnId of formData.getAll("addOnIds")) {
+      checkoutParams.append("addOnIds", String(addOnId));
+    }
 
-    redirect(`/payments?bookingId=${bookings[0].id}`);
+    let bookingId: string;
+    try {
+      const { bookings } = await validateAndReserveBookings(
+        activeSession.user.id,
+        [{
+          id: "single-item",
+          listingId: submittedListingId,
+          type: submittedType.toLowerCase(),
+          title: "", // Ignored on backend
+          startDate: formData.get("startDate") ? String(formData.get("startDate")) : formData.get("date") ? String(formData.get("date")) : undefined,
+          endDate: formData.get("endDate") ? String(formData.get("endDate")) : undefined,
+          time: formData.get("time") ? String(formData.get("time")) : undefined,
+          participants: participantsCount,
+          roomTypeId: formData.get("roomTypeId") ? String(formData.get("roomTypeId")) : undefined,
+          addOnIds: formData.getAll("addOnIds").map(String),
+          totalMinor: 0 // Ignored on backend
+        }],
+        { fullName, email, phone },
+        false // No order
+      );
+      bookingId = bookings[0].id;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
+      checkoutParams.set("error", message);
+      redirect(`/checkout?${checkoutParams.toString()}`);
+    }
+
+    redirect(`/payments?bookingId=${bookingId}`);
   }
 
   return (
@@ -120,6 +138,12 @@ export default async function CheckoutPage({
           />
 
           <h1 className="mb-6 text-3xl font-extrabold">Checkout</h1>
+
+          {searchParams.error ? (
+            <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm font-medium text-destructive">
+              {searchParams.error}
+            </div>
+          ) : null}
 
           <form action={createBooking} className="grid gap-8 lg:grid-cols-[1fr_360px]">
             <input type="hidden" name="listingId" value={listing.id} />
@@ -147,7 +171,14 @@ export default async function CheckoutPage({
                         priceMinor: room.priceMinor,
                         maxOccupancy: room.maxOccupancy,
                         breakfastIncluded: room.breakfastIncluded,
-                        bookedDates: []
+                        bookedDates: [],
+                        bedType: room.bedType,
+                        bedrooms: room.bedrooms,
+                        roomFeatures: room.roomFeatures,
+                        isRefundable: room.isRefundable,
+                        refundPolicyText: room.refundPolicyText,
+                        discountNotice: room.discountNotice,
+                        totalRooms: room.totalRooms
                       }))}
                       addOns={listing.accommodation.addOns}
                       initial={{

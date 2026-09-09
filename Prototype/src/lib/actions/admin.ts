@@ -49,13 +49,16 @@ export async function updateVerificationStatus(verificationId: string, status: V
       where: { businessId: verification.businessId, role: "OWNER" }
     });
 
+    const trimmedNotes = notes.trim();
+    const notesLine = trimmedNotes && trimmedNotes !== "No notes provided by reviewer." ? ` Reviewer notes: ${trimmedNotes}` : "";
+
     for (const owner of owners) {
       await tx.notification.create({
         data: {
           userId: owner.userId,
           type: "SYSTEM",
           title: `Business Verification ${status}`,
-          body: `Your business verification for ${verification.business.name} has been marked as ${status}.`
+          body: `Your business verification for ${verification.business.name} has been marked as ${status}.${notesLine}`
         }
       });
     }
@@ -182,9 +185,14 @@ export async function updateAdminProfile(name: string, phone: string) {
     throw new Error("Unauthorized: Admin access required");
   }
 
-  await db.user.update({
-    where: { id: session.user.id },
-    data: { name, phone }
+  // Writes to AdminUser, not User — an admin's display name/phone must stay
+  // independent of any customer profile the same login might also have
+  // (inviteAdmin promotes an existing customer's User row in place rather
+  // than creating a separate identity, so User.name/phone can't be trusted
+  // as "the admin's own" details).
+  await db.adminUser.update({
+    where: { userId: session.user.id },
+    data: { displayName: name, phone }
   });
 
   await logAuditEvent({

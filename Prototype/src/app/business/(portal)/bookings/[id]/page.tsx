@@ -9,6 +9,7 @@ import { BookingStatusBadge } from "@/components/ui/status-badge";
 import { formatUGX } from "@/lib/booking";
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
+import { releaseAvailabilityForBooking } from "@/lib/booking-service";
 import { toBookingStatus } from "@/lib/status";
 import { BookingChat } from "@/components/booking-chat";
 
@@ -65,11 +66,16 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
     if (target.status !== "AWAITING_BUSINESS_CONFIRMATION") return;
 
     const isConfirm = decision === "confirm";
-    await db.booking.update({
-      where: { id: target.id },
-      data: isConfirm
-        ? { status: "CONFIRMED", confirmedAt: new Date() }
-        : { status: "CANCELLED_BY_BUSINESS", cancelledAt: new Date(), cancelReason: "Declined by business" }
+    await db.$transaction(async (tx) => {
+      await tx.booking.update({
+        where: { id: target.id },
+        data: isConfirm
+          ? { status: "CONFIRMED", confirmedAt: new Date() }
+          : { status: "CANCELLED_BY_BUSINESS", cancelledAt: new Date(), cancelReason: "Declined by business" }
+      });
+      if (!isConfirm) {
+        await releaseAvailabilityForBooking(tx, target.id);
+      }
     });
 
     await db.notification.create({
@@ -114,15 +120,17 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
                 </div>
               </div>
 
-              {booking.roomType || booking.addOns.length > 0 ? (
+              {booking.roomTypeName || booking.roomType || booking.addOns.length > 0 ? (
                 <>
                   <h2 className="mb-2 mt-8 text-lg font-bold">Room &amp; add-ons</h2>
                   <Card>
                     <CardContent className="grid gap-2 pt-6 text-sm">
-                      {booking.roomType ? (
+                      {booking.roomTypeName || booking.roomType ? (
                         <p>
                           <span className="text-muted-foreground">Room: </span>
-                          {booking.roomType.name}
+                          {booking.roomTypeName ?? booking.roomType?.name}
+                          {booking.roomType?.bedType ? ` · ${booking.roomType.bedType}` : ""}
+                          {booking.roomType?.breakfastIncluded ? " · Breakfast included" : ""}
                         </p>
                       ) : null}
                       {booking.addOns.map((addOn) => (

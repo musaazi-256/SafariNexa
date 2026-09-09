@@ -24,11 +24,12 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
           </div>
           <div className="flex items-center gap-4">
             {session?.user && (
-              <UserMenu 
-                name={session.user.name} 
-                email={session.user.email} 
-                image={session.user.image} 
+              <UserMenu
+                name={session.user.name}
+                email={session.user.email}
+                image={session.user.image}
                 unreadCount={unreadCount}
+                surface="business"
               >
                 <SignOutMenuItem />
               </UserMenu>

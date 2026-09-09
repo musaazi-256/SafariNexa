@@ -62,6 +62,42 @@ export async function getRoomTypeAvailability(
   return availability;
 }
 
+/** How many rooms of each type are free tonight — real remaining inventory
+ * (totalRooms minus bookings overlapping today), not the fabricated "N left"
+ * badge that used to just echo the static totalRooms configuration. */
+export async function getRoomTypeRemainingToday(
+  roomTypes: { id: string; totalRooms: number }[]
+): Promise<Record<string, number>> {
+  if (roomTypes.length === 0) return {};
+
+  const now = new Date();
+  const todayUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const tomorrowUtc = new Date(todayUtc);
+  tomorrowUtc.setUTCDate(tomorrowUtc.getUTCDate() + 1);
+
+  const bookings = await db.booking.findMany({
+    where: {
+      roomTypeId: { in: roomTypes.map((room) => room.id) },
+      status: { notIn: [...NON_BLOCKING_BOOKING_STATUSES] },
+      startDate: { not: null, lt: tomorrowUtc },
+      endDate: { not: null, gt: todayUtc }
+    },
+    select: { roomTypeId: true }
+  });
+
+  const bookedCounts = new Map<string, number>();
+  for (const booking of bookings) {
+    if (!booking.roomTypeId) continue;
+    bookedCounts.set(booking.roomTypeId, (bookedCounts.get(booking.roomTypeId) ?? 0) + 1);
+  }
+
+  const remaining: Record<string, number> = {};
+  for (const room of roomTypes) {
+    remaining[room.id] = Math.max(0, room.totalRooms - (bookedCounts.get(room.id) ?? 0));
+  }
+  return remaining;
+}
+
 export function ratingSummary(reviews: { rating: number }[]): { average?: number; count: number } {
   if (reviews.length === 0) return { average: undefined, count: 0 };
   const sum = reviews.reduce((total, review) => total + review.rating, 0);

@@ -15,6 +15,8 @@ export default async function NewGuidePage() {
   const { business, businessId } = await requireBusinessSession();
   if (!business || !businessId) redirect("/business/auth/sign-in");
 
+  const destinations = await db.destination.findMany({ orderBy: { name: "asc" } });
+
   async function createGuide(formData: FormData) {
     "use server";
     const { businessId: activeBusinessId } = await requireBusinessSession();
@@ -29,7 +31,9 @@ export default async function NewGuidePage() {
     const specialization = String(formData.get("specialization") ?? "GENERAL") as GuideSpecialization;
     const hasOwnVehicle = formData.get("hasOwnVehicle") === "on";
     const isTopGuide = formData.get("isTopGuide") === "on";
-    
+    const destinationId = String(formData.get("destinationId") ?? "").trim() || null;
+    const availabilityNote = String(formData.get("availabilityNote") ?? "").trim() || null;
+
     const languages = String(formData.get("languages") ?? "")
       .split(",")
       .map((l) => l.trim())
@@ -46,7 +50,9 @@ export default async function NewGuidePage() {
         specialization,
         hasOwnVehicle,
         isTopGuide,
-        languages
+        languages,
+        destinationId,
+        availabilityNote
       }
     });
 
@@ -107,6 +113,26 @@ export default async function NewGuidePage() {
                 <option value="GENERAL">General Guide</option>
                 <option value="DESTINATION_SPECIALIST">Destination Specialist</option>
               </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="destinationId">Destination (optional)</Label>
+              <select
+                id="destinationId"
+                name="destinationId"
+                defaultValue=""
+                className="flex h-11 w-full rounded-xl border border-input bg-card px-3.5 text-sm"
+              >
+                <option value="">No specific destination</option>
+                {destinations.map((destination) => (
+                  <option key={destination.id} value={destination.id}>{destination.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="availabilityNote">Availability note (optional)</Label>
+              <Input id="availabilityNote" name="availabilityNote" placeholder="e.g. Weekdays only, book 3 days ahead" />
             </div>
 
             <div className="flex flex-col gap-2 sm:col-span-2">

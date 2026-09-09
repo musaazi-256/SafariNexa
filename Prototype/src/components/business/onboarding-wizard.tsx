@@ -60,10 +60,14 @@ export function OnboardingWizard() {
     try {
       const form = new FormData();
       form.append("businessName", formData.businessName);
+      form.append("registrationNumber", formData.registrationNumber);
+      form.append("address", formData.address);
+      form.append("description", formData.description);
+      form.append("contactName", formData.contactName);
+      form.append("contactRole", formData.contactRole);
       form.append("contactEmail", formData.contactEmail);
       form.append("contactPhone", formData.contactPhone);
-      form.append("city", formData.address);
-      
+
       Object.entries(documents).forEach(([key, files]) => {
         files.forEach((file) => {
           form.append(`doc_${key}`, file);

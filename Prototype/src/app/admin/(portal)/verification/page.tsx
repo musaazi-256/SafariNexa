@@ -52,12 +52,13 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
 
     const verificationId = String(formData.get("verificationId"));
     const status = String(formData.get("status")) as PrismaVerificationStatus;
+    const notes = String(formData.get("notes") ?? "").trim();
 
     if (verificationId.startsWith("mock-")) {
       return; // Gracefully handle mock items in demo mode
     }
 
-    await updateVerificationStatus(verificationId, status, "Processed via admin portal");
+    await updateVerificationStatus(verificationId, status, notes || "No notes provided by reviewer.");
   }
 
   // Fallback mock items matching the screenshot when database records are few
@@ -152,38 +153,32 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
               <div key={v.id} className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 space-y-4">
                 
                 {/* Header Row */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div>
                     <h3 className="text-base font-bold text-slate-900">{v.business.name}</h3>
                     <p className="text-xs font-semibold text-slate-400 mt-0.5">{formattedCategory} · Submitted on {dateStr}</p>
                   </div>
 
-                  {/* Actions Top Right */}
-                  <div className="flex items-center gap-2">
-                    <form action={setVerificationStatus}>
-                      <input type="hidden" name="verificationId" value={v.id} />
-                      <input type="hidden" name="status" value="APPROVED" />
-                      <Button type="submit" className="bg-[#0d5932] hover:bg-[#0a4526] text-white font-bold text-xs rounded-lg px-4 h-8 transition-colors">
+                  <form action={setVerificationStatus} className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-end gap-2 sm:justify-end">
+                    <input type="hidden" name="verificationId" value={v.id} />
+                    <textarea
+                      name="notes"
+                      placeholder="Reviewer notes (shown to the business)"
+                      rows={1}
+                      className="w-full sm:w-64 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+                    />
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button type="submit" name="status" value="APPROVED" className="bg-[#0d5932] hover:bg-[#0a4526] text-white font-bold text-xs rounded-lg px-4 h-8 transition-colors">
                         Approve
                       </Button>
-                    </form>
-
-                    <form action={setVerificationStatus}>
-                      <input type="hidden" name="verificationId" value={v.id} />
-                      <input type="hidden" name="status" value="NEEDS_CHANGES" />
-                      <Button type="submit" variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-xs rounded-lg px-4 h-8 transition-colors">
+                      <Button type="submit" name="status" value="NEEDS_CHANGES" variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-xs rounded-lg px-4 h-8 transition-colors">
                         Request more
                       </Button>
-                    </form>
-
-                    <form action={setVerificationStatus}>
-                      <input type="hidden" name="verificationId" value={v.id} />
-                      <input type="hidden" name="status" value="SUSPENDED" />
-                      <Button type="submit" variant="secondary" className="bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs rounded-lg px-4 h-8 transition-colors">
+                      <Button type="submit" name="status" value="SUSPENDED" variant="secondary" className="bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs rounded-lg px-4 h-8 transition-colors">
                         Flag
                       </Button>
-                    </form>
-                  </div>
+                    </div>
+                  </form>
                 </div>
 
                 {/* Submitted Documents Section */}
@@ -247,18 +242,11 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
                   <p className="text-xs font-semibold text-slate-400 mt-0.5">{item.category} · Submitted on {item.date}</p>
                 </div>
 
-                {/* Actions Top Right */}
-                <div className="flex items-center gap-2">
-                  <Button className="bg-[#0d5932] hover:bg-[#0a4526] text-white font-bold text-xs rounded-lg px-4 h-8 transition-colors">
-                    Approve
-                  </Button>
-                  <Button variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-xs rounded-lg px-4 h-8 transition-colors">
-                    Request more
-                  </Button>
-                  <Button variant="secondary" className="bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs rounded-lg px-4 h-8 transition-colors">
-                    Flag
-                  </Button>
-                </div>
+                {/* No real verification record behind this demo card — actions render once a
+                    real submission exists, above. */}
+                <span className="shrink-0 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-400">
+                  Example only
+                </span>
               </div>
 
               {/* Submitted Documents Section */}

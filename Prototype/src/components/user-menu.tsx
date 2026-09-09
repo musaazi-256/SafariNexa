@@ -29,14 +29,23 @@ export function UserMenu({
   email,
   image,
   unreadCount = 0,
+  surface = "customer",
   children
 }: {
   name?: string | null;
   email?: string | null;
   image?: string | null;
   unreadCount?: number;
+  /** Which portal this menu is rendered inside — determines where "Profile"
+   * goes. Business owners are also customers on the same login, so the rest
+   * of the menu (bookings, saved, trip planner, preferences) stays personal
+   * and cross-surface on purpose; only "Profile" and the portal-switch link
+   * are surface-dependent. */
+  surface?: "customer" | "business";
   children?: React.ReactNode;
 }) {
+  const isBusiness = surface === "business";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="rounded-full ring-offset-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
@@ -49,9 +58,9 @@ export function UserMenu({
         <DropdownMenuLabel>{name ?? email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/profile">
+          <Link href={isBusiness ? "/business/settings" : "/profile"}>
             <User className="h-4 w-4" />
-            Profile
+            {isBusiness ? "Business profile" : "Profile"}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
@@ -80,9 +89,9 @@ export function UserMenu({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/business">
+          <Link href={isBusiness ? "/" : "/business"}>
             <Building2 className="h-4 w-4" />
-            Business Portal
+            {isBusiness ? "Switch to customer view" : "Business Portal"}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

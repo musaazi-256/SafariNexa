@@ -73,3 +73,32 @@ export async function submitVerificationDocument(formData: FormData) {
   revalidatePath("/business/verification");
   return { success: true };
 }
+
+export async function deleteVerificationDocument(documentId: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const { businessId } = await requireBusinessSession();
+  if (!businessId) throw new Error("No active business");
+
+  const document = await db.businessDocument.findUnique({
+    where: { id: documentId },
+    include: { verification: { select: { businessId: true } } }
+  });
+  if (!document || document.verification.businessId !== businessId) {
+    throw new Error("Document not found");
+  }
+
+  await db.businessDocument.delete({ where: { id: documentId } });
+
+  await logAuditEvent({
+    actorUserId: session.user.id,
+    actorEmail: session.user.email ?? undefined,
+    surface: "BUSINESS",
+    action: "business_verification_document_deleted",
+    outcome: "SUCCESS",
+    metadata: { businessId, documentId }
+  });
+
+  revalidatePath("/business/verification");
+}

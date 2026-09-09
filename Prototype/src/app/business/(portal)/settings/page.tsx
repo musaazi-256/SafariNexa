@@ -83,20 +83,30 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
 
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="address" className="text-[13px] font-bold text-slate-700">Physical Address <span className="text-red-500">*</span></Label>
-                <Input id="address" name="address" defaultValue={business.city ? `${business.city}, ${business.country}` : "Kampala, Uganda"} className="h-11 rounded-lg border-slate-200 font-medium focus-visible:ring-[#1e613c] shadow-sm" />
+                <Input id="address" name="address" defaultValue={business.address ?? ""} placeholder="Street address" className="h-11 rounded-lg border-slate-200 font-medium focus-visible:ring-[#1e613c] shadow-sm" />
                 <p className="text-[11px] font-semibold text-slate-400">Your business address will be visible to customers on your listings.</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="city" className="text-[13px] font-bold text-slate-700">City <span className="text-red-500">*</span></Label>
+                <Input id="city" name="city" defaultValue={business.city ?? "Kampala"} className="h-11 rounded-lg border-slate-200 font-medium focus-visible:ring-[#1e613c] shadow-sm" />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="country" className="text-[13px] font-bold text-slate-700">Country</Label>
+                <Input id="country" name="country" defaultValue={business.country} className="h-11 rounded-lg border-slate-200 font-medium focus-visible:ring-[#1e613c] shadow-sm" />
               </div>
 
               <div className="space-y-2 sm:col-span-2 relative">
                 <Label htmlFor="description" className="text-[13px] font-bold text-slate-700">About the Business <span className="text-red-500">*</span></Label>
-                <Textarea 
-                  id="description" 
+                <Textarea
+                  id="description"
                   name="description"
-                  rows={4} 
-                  defaultValue={business.description || "We provide the best safari experiences in East Africa."}
-                  className="rounded-lg border-slate-200 font-medium resize-none focus-visible:ring-[#1e613c] shadow-sm pb-8" 
+                  rows={4}
+                  defaultValue={business.description ?? ""}
+                  placeholder="We provide the best safari experiences in East Africa."
+                  className="rounded-lg border-slate-200 font-medium resize-none focus-visible:ring-[#1e613c] shadow-sm"
                 />
-                <div className="absolute bottom-2 right-3 text-[11px] font-bold text-slate-400">50 / 500</div>
                 <p className="text-[11px] font-semibold text-slate-400 mt-1">This description appears on your business profile.</p>
               </div>
             </div>
