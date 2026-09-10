@@ -22,8 +22,8 @@ const NAV_LINKS = [
 ];
 
 const AUTH_LINKS = [
-  { href: "/auth/sign-in", label: "Sign in" },
-  { href: "/auth/create-account", label: "Create account" }
+  { href: "/auth/sign-in", label: "Log in" },
+  { href: "/auth/create-account", label: "Sign up" }
 ];
 
 export async function SiteHeader() {
@@ -65,15 +65,15 @@ export async function SiteHeader() {
           ) : (
             <div className="hidden items-center gap-2 sm:flex">
               <Button asChild variant="ghost">
-                <Link href="/auth/sign-in">Sign in</Link>
+                <Link href="/auth/sign-in">Log in</Link>
               </Button>
               <Button asChild>
-                <Link href="/auth/create-account">Create account</Link>
+                <Link href="/auth/create-account">Sign up</Link>
               </Button>
             </div>
           )}
 
-          <div className="hidden md:flex">
+          <div className="flex md:hidden">
             <MobileNav links={NAV_LINKS} authed={Boolean(session?.user)} authLinks={AUTH_LINKS} />
           </div>
         </div>

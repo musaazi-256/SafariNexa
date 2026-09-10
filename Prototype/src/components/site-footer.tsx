@@ -27,8 +27,8 @@ const COLUMNS = [
     title: "Support",
     links: [
       { href: "/support", label: "Get help" },
-      { href: "/auth/sign-in", label: "Sign in" },
-      { href: "/auth/create-account", label: "Create account" },
+      { href: "/auth/sign-in", label: "Log in" },
+      { href: "/auth/create-account", label: "Sign up" },
       { href: "/bookings", label: "My bookings" }
     ]
   }

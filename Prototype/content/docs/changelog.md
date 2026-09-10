@@ -150,3 +150,11 @@ Built the mechanical/safe fixes from the structure audit above; deliberately lef
 **Deliberately not fixed** — the route-shape items from the audit (admin sign-in path, list/detail/edit shape differing between the business and admin portals, admin bookings having no detail route, `/reviews` having no index page): these change actual URLs and, in a couple of cases, imply real feature work (e.g. an admin booking detail page doesn't exist yet — building one is a feature, not a rename), not a mechanical structure fix. Flagged for a separate decision.
 
 Verification: `tsc`/`eslint`/`jest` clean; confirmed live — signed in as both the business and admin test accounts and loaded each portal's dashboard (which renders the moved sidebar/switcher components), plus a customer profile page (renders the moved `AccountLayout`), all 200s with no runtime import-resolution errors.
+
+---
+
+## 9 September 2026 (nav copy + a real mobile bug fix)
+
+Header/footer auth-link wording changed from "Sign in"/"Create account" to "Log in"/"Sign up" across `site-header.tsx`, `site-footer.tsx`, and `mobile-nav.tsx`'s button-variant check (which was matching on the literal old label — left unfixed, this rename would have silently broken which auth button rendered as the primary/filled button).
+
+**Real bug fixed in the same change**: `site-header.tsx`'s mobile-nav trigger wrapper was `hidden md:flex` — hidden by default, only shown at the `md` breakpoint and up. That's backwards for a *mobile* nav trigger: it meant the hamburger button was invisible exactly where it's needed (small viewports) and only appeared once the screen was already wide enough that the desktop nav links were showing anyway. Fixed to `flex md:hidden`. Confirmed live at both a 1280px desktop viewport (hamburger correctly absent, "Log in"/"Sign up" buttons shown) and a 390px mobile viewport (hamburger correctly present, auth buttons correctly hidden in favor of the mobile bottom nav) — screenshotted both.

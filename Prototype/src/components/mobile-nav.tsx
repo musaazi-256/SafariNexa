@@ -65,7 +65,7 @@ export function MobileNav({
             <Separator className="my-2" />
             <div className="flex flex-col gap-2">
               {authLinks.map((link) => (
-                <Button key={link.href} asChild variant={link.label === "Sign in" ? "default" : "secondary"} onClick={() => setOpen(false)}>
+                <Button key={link.href} asChild variant={link.label === "Sign up" ? "default" : "outline"} onClick={() => setOpen(false)}>
                   <Link href={link.href}>{link.label}</Link>
                 </Button>
               ))}
