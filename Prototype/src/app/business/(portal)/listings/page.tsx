@@ -11,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Pagination } from "@/components/ui/pagination";
+import { FilterTabs } from "@/components/ui/filter-tabs";
+import { PageHero } from "@/components/page-hero";
 import { formatUGX } from "@/lib/booking";
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
@@ -118,12 +121,13 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-[#0B4928] mb-1">BUSINESS PORTAL</p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Listings</h1>
-          <p className="text-sm text-slate-500">Create and manage your service offerings.</p>
-        </div>
-        <Button asChild className="bg-[#0B4928] hover:bg-[#0B4928]/90 text-white rounded-md h-10 px-5 font-semibold shrink-0">
+        <PageHero
+          variant="portal"
+          eyebrow="Business portal"
+          title="Listings"
+          description="Create and manage your service offerings."
+        />
+        <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md h-10 px-5 font-semibold shrink-0">
           <Link href="/business/listings/new"><Plus className="h-4 w-4 mr-2" /> Create listing</Link>
         </Button>
       </div>
@@ -142,7 +146,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
             <p className="text-3xl font-extrabold text-slate-900">{totalListingsCount}</p>
             <div className="mt-auto pt-4 flex items-center justify-between text-sm font-semibold">
               <span className="text-slate-500">Published</span>
-              <span className="text-[#0B4928]">{publishedCount}</span>
+              <span className="text-primary">{publishedCount}</span>
             </div>
           </CardContent>
         </Card>
@@ -175,7 +179,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
             </div>
             <p className="text-3xl font-extrabold text-slate-900">1,245</p>
             <div className="mt-auto pt-4 flex items-center gap-1.5">
-              <span className="text-xs font-bold text-[#0B4928]">↑ 18.6%</span>
+              <span className="text-xs font-bold text-primary">↑ 18.6%</span>
               <span className="text-xs text-slate-500 font-medium">vs last month</span>
             </div>
           </CardContent>
@@ -192,7 +196,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
             </div>
             <p className="text-3xl font-extrabold text-slate-900">124</p>
             <div className="mt-auto pt-4 flex items-center gap-1.5">
-              <span className="text-xs font-bold text-[#0B4928]">↑ 22.4%</span>
+              <span className="text-xs font-bold text-primary">↑ 22.4%</span>
               <span className="text-xs text-slate-500 font-medium">vs last month</span>
             </div>
           </CardContent>
@@ -201,33 +205,16 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
 
       {/* Tabs & Filters */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-4 mt-8">
-        <div className="flex flex-wrap items-center gap-2">
-          {TABS.map((tab) => {
-            const isActive = tab.value === "ALL" ? !activeType : activeType === tab.value;
-            const href = tab.value === "ALL" ? "/business/listings" : `/business/listings?type=${tab.value.toLowerCase()}`;
-            return (
-              <Link
-                key={tab.value}
-                href={href}
-                className={cn(
-                  "flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                  isActive 
-                    ? "bg-[#0B4928] text-white border-transparent" 
-                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                )}
-              >
-                {tab.label}
-                <span className={cn(
-                  "flex items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold",
-                  isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-                )}>
-                  {tab.count}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-        
+        <FilterTabs
+          activeValue={activeType ?? "ALL"}
+          tabs={TABS.map((tab) => ({
+            value: tab.value,
+            label: tab.label,
+            count: tab.count,
+            href: tab.value === "ALL" ? "/business/listings" : `/business/listings?type=${tab.value.toLowerCase()}`
+          }))}
+        />
+
         <Button variant="outline" className="border-slate-200 text-slate-700 font-semibold h-10 w-full sm:w-auto">
           <Filter className="h-4 w-4 mr-2" /> Filters
         </Button>
@@ -305,11 +292,11 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                     <div className="flex items-center gap-2 font-bold text-[11px] tracking-wider uppercase">
                       <div className={cn(
                         "h-2 w-2 rounded-full",
-                        listing.status === "PUBLISHED" ? "bg-[#0B4928]" : 
+                        listing.status === "PUBLISHED" ? "bg-primary" :
                         listing.status === "DRAFT" ? "bg-orange-500" : "bg-slate-400"
                       )} />
                       <span className={
-                        listing.status === "PUBLISHED" ? "text-[#0B4928]" : 
+                        listing.status === "PUBLISHED" ? "text-primary" :
                         listing.status === "DRAFT" ? "text-orange-600" : "text-slate-500"
                       }>
                         {listing.status}
@@ -349,7 +336,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                               <input type="hidden" name="listingId" value={listing.id} />
                               <input type="hidden" name="status" value="PUBLISHED" />
                               <DropdownMenuItem asChild>
-                                <button type="submit" className="w-full cursor-pointer text-[#0B4928]" disabled={business.verificationStatus !== "APPROVED"}>
+                                <button type="submit" className="w-full cursor-pointer text-primary" disabled={business.verificationStatus !== "APPROVED"}>
                                   Publish
                                 </button>
                               </DropdownMenuItem>
@@ -372,46 +359,16 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
           </Table>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="border-t border-slate-200 bg-white px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-sm font-medium text-slate-500">
-                Showing {((page - 1) * PAGE_SIZE) + 1} to {Math.min(page * PAGE_SIZE, totalFilteredCount)} of {totalFilteredCount} listings
-              </p>
-              
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-slate-500">10 per page</span>
-                  <div className="border border-slate-200 rounded-md px-2 py-1 text-xs font-bold text-slate-400">v</div>
-                </div>
-                
-                <div className="flex items-center gap-1">
-                  <Link 
-                    href={`/business/listings?${new URLSearchParams({ ...(activeType ? { type: activeType.toLowerCase() } : {}), page: String(Math.max(1, page - 1)) }).toString()}`}
-                    className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:bg-slate-50"
-                  >
-                    &lt;
-                  </Link>
-                  <span className="h-8 w-8 flex items-center justify-center rounded-full bg-[#0B4928] text-white font-bold text-sm shadow-sm">
-                    {page}
-                  </span>
-                  {page < totalPages && (
-                    <Link 
-                      href={`/business/listings?${new URLSearchParams({ ...(activeType ? { type: activeType.toLowerCase() } : {}), page: String(page + 1) }).toString()}`}
-                      className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50"
-                    >
-                      {page + 1}
-                    </Link>
-                  )}
-                  <Link 
-                    href={`/business/listings?${new URLSearchParams({ ...(activeType ? { type: activeType.toLowerCase() } : {}), page: String(Math.min(totalPages, page + 1)) }).toString()}`}
-                    className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:bg-slate-50"
-                  >
-                    &gt;
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="border-t border-slate-200 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
+            <span className="text-sm font-medium text-slate-500">
+              Showing {((page - 1) * PAGE_SIZE) + 1} to {Math.min(page * PAGE_SIZE, totalFilteredCount)} of {totalFilteredCount} listings
+            </span>
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              buildHref={(p) => `/business/listings?${new URLSearchParams({ ...(activeType ? { type: activeType.toLowerCase() } : {}), page: String(p) }).toString()}`}
+            />
+          </div>
         </div>
       )}
     </div>

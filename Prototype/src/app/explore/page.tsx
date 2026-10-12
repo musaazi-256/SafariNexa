@@ -11,6 +11,10 @@ import { db } from "@/lib/db";
 import { LISTING_TYPE_TO_SERVICE_TYPE, SERVICE_TYPE_TO_LISTING_TYPE, type ServiceType } from "@/lib/listing-types";
 import { formatListingPrice, ratingSummary } from "@/lib/listings";
 
+/** No searchParams/cookies/auth() call here, so without this Next.js would statically
+ * prerender this page once at build time and never reflect new/updated listings. */
+export const revalidate = 60;
+
 const CATEGORIES: Array<{ type: ServiceType; label: string; href: string; icon: React.ComponentType<{ className?: string }> }> = [
   { type: "Accommodation", label: "Accommodation", href: "/accommodation", icon: Building2 },
   { type: "Tour", label: "Tours & safaris", href: "/tours", icon: Compass },

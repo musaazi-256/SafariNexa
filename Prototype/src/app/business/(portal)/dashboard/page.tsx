@@ -100,7 +100,7 @@ export default async function BusinessDashboardPage() {
       {/* Stat Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Published Listings */}
-        <Card className="bg-[#0B4928] text-white border-none shadow-sm rounded-2xl relative overflow-hidden">
+        <Card className="bg-primary text-primary-foreground border-none shadow-sm rounded-2xl relative overflow-hidden">
           <CardContent className="pt-6 pb-6 relative z-10 h-full flex flex-col justify-between">
             <p className="text-xs font-bold uppercase tracking-wider text-white/80">Published listings</p>
             <div className="mt-2">
@@ -196,7 +196,7 @@ export default async function BusinessDashboardPage() {
                   </span>
                 )}
               </div>
-              <Link href="/business/bookings" className="text-sm font-semibold text-[#0B4928] hover:underline">
+              <Link href="/business/bookings" className="text-sm font-semibold text-primary hover:underline">
                 View all &rarr;
               </Link>
             </div>
@@ -244,7 +244,7 @@ export default async function BusinessDashboardPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold text-slate-900">Recent reviews</h2>
-              <Link href="/business/reviews" className="text-sm font-semibold text-[#0B4928] hover:underline">
+              <Link href="/business/reviews" className="text-sm font-semibold text-primary hover:underline">
                 View all &rarr;
               </Link>
             </div>
@@ -280,7 +280,7 @@ export default async function BusinessDashboardPage() {
               </div>
             )}
 
-            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-[#0B4928]">
+            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-primary">
               <MessageSquare className="h-4 w-4" /> Respond to reviews <span className="font-normal text-slate-500">to build trust with travelers.</span>
             </div>
           </CardContent>

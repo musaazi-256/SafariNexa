@@ -20,43 +20,65 @@ const NAV_ITEMS = [
 export function AccountSidebar() {
   const pathname = usePathname();
 
+  function isActive(href: string) {
+    // "/profile" is a path prefix of "/profile/saved" and "/profile/preferences",
+    // which have their own tabs — so it only lights up on an exact match.
+    return pathname === href || (href !== "/profile" && pathname?.startsWith(`${href}/`));
+  }
+
   return (
-    <div className="flex flex-col h-full min-h-[500px]">
-      <nav className="flex flex-col gap-2 flex-1">
-      {NAV_ITEMS.map((item) => {
-        // "/profile" is a path prefix of "/profile/saved" and "/profile/preferences",
-        // which have their own tabs — so it only lights up on an exact match.
-        const isActive =
-          pathname === item.href || (item.href !== "/profile" && pathname?.startsWith(`${item.href}/`));
-        
-        return (
+    <>
+      {/* Mobile: a compact horizontal scroll strip instead of dumping all 8 items
+       * as a full-width vertical block above the page content. */}
+      <nav className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6 md:hidden">
+        {NAV_ITEMS.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition-colors",
+              isActive(item.href)
+                ? "border-transparent bg-primary text-primary-foreground shadow-sm"
+                : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
+            )}
+          >
+            <item.icon className="h-4 w-4" />
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+
+      {/* Desktop: full sticky sidebar */}
+      <div className="hidden h-full min-h-[500px] flex-col md:flex">
+        <nav className="flex flex-col gap-2 flex-1">
+        {NAV_ITEMS.map((item) => (
           <Link
             key={item.href}
             href={item.href}
             className={cn(
               "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all",
-              isActive
-                ? "bg-[#1e613c] text-white shadow-sm"
+              isActive(item.href)
+                ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground"
             )}
           >
             <item.icon className="h-5 w-5" />
             {item.label}
           </Link>
-        );
-      })}
-      </nav>
+        ))}
+        </nav>
 
-      <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
-        <h4 className="font-bold text-slate-900 mb-1">Need help?</h4>
-        <p className="text-[13px] font-medium text-slate-500 mb-4 leading-relaxed">
-          Our support team is here to help you succeed.
-        </p>
-        <Link href="/support" className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[13px] font-bold text-slate-700 hover:bg-slate-50 transition-colors w-full justify-center shadow-sm">
-          <MessageSquareText className="h-4 w-4" />
-          Contact support
-        </Link>
+        <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
+          <h4 className="font-bold text-slate-900 mb-1">Need help?</h4>
+          <p className="text-[13px] font-medium text-slate-500 mb-4 leading-relaxed">
+            Our support team is here to help you succeed.
+          </p>
+          <Link href="/support" className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[13px] font-bold text-slate-700 hover:bg-slate-50 transition-colors w-full justify-center shadow-sm">
+            <MessageSquareText className="h-4 w-4" />
+            Contact support
+          </Link>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

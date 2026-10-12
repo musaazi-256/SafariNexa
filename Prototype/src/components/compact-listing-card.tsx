@@ -29,7 +29,7 @@ export function CompactListingCard({
   return (
     <Link
       href={href}
-      className={`flex w-64 shrink-0 snap-start items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-card transition-shadow hover:shadow-card-hover ${className ?? ""}`}
+      className={`flex w-72 shrink-0 snap-start items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-card transition-shadow hover:shadow-card-hover ${className ?? ""}`}
     >
       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
         {imageUrl ? (
@@ -40,7 +40,7 @@ export function CompactListingCard({
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate font-bold leading-tight">{title}</p>
-        <p className="text-sm text-muted-foreground">{price}</p>
+        <p className="truncate text-sm text-muted-foreground">{price}</p>
       </div>
       <ChevronRight className="h-5 w-5 shrink-0 text-primary" />
     </Link>

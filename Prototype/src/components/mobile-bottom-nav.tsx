@@ -22,7 +22,8 @@ export function MobileBottomNav() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex h-[68px] items-center justify-around border-t border-border bg-background/95 pb-safe backdrop-blur md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur md:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <div className="flex h-[68px] items-center justify-around">
       {NAV_ITEMS.map((item) => {
         const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
         return (
@@ -39,6 +40,7 @@ export function MobileBottomNav() {
           </Link>
         );
       })}
+      </div>
     </div>
   );
 }

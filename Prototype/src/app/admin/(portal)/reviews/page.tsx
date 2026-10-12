@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Star } from "lucide-react";
 import type { ReviewStatus as PrismaReviewStatus } from "@prisma/client";
@@ -7,9 +6,10 @@ import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
+import { FilterTabs } from "@/components/ui/filter-tabs";
+import { PageHero } from "@/components/page-hero";
 import { ReviewStatusBadge } from "@/components/ui/status-badge";
 import { db } from "@/lib/db";
-import { cn } from "@/lib/utils";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { toReviewStatus } from "@/lib/status";
 import { logAuditEvent } from "@/lib/audit";
@@ -99,34 +99,22 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 pb-20 font-sans">
       
-      {/* Header */}
-      <div>
-        <p className="text-[11px] font-bold uppercase tracking-wider text-[#1e613c] mb-1">ADMIN PORTAL</p>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Reviews moderation</h1>
-        <p className="text-[13px] text-slate-500 font-semibold max-w-2xl">Moderate flagged reviews and business replies.</p>
-      </div>
+      <PageHero
+        variant="portal"
+        eyebrow="Admin portal"
+        title="Reviews moderation"
+        description="Moderate flagged reviews and business replies."
+      />
 
       {/* Pill Filters */}
-      <div className="flex flex-wrap gap-2">
-        {TABS.map((tab) => {
-          const isActive = tab.value === "ALL" ? !activeStatus : activeStatus === tab.value;
-          const href = tab.value === "ALL" ? "/admin/reviews" : `/admin/reviews?status=${tab.value.toLowerCase()}`;
-          return (
-            <Link
-              key={tab.value}
-              href={href}
-              className={cn(
-                "rounded-full border px-4 py-1.5 text-[13px] font-bold transition-all",
-                isActive 
-                  ? "border-[#1e613c] bg-[#1e613c] text-white shadow-sm" 
-                  : "border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              )}
-            >
-              {tab.label}
-            </Link>
-          );
-        })}
-      </div>
+      <FilterTabs
+        activeValue={activeStatus ?? "ALL"}
+        tabs={TABS.map((tab) => ({
+          value: tab.value,
+          label: tab.label,
+          href: tab.value === "ALL" ? "/admin/reviews" : `/admin/reviews?status=${tab.value.toLowerCase()}`
+        }))}
+      />
 
       {/* Reviews List Container */}
       {reviews.length === 0 ? (
@@ -141,7 +129,7 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
                 <h3 className="font-bold text-[16px] text-slate-900">Latest reviews</h3>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-[#1e613c] text-[#1e613c]" />
+                    <Star className="h-4 w-4 fill-primary text-primary" />
                     <span className="font-bold text-[14px] text-slate-900">{review.rating}</span>
                   </div>
                   <ReviewStatusBadge status={toReviewStatus(review.status)} />
@@ -179,7 +167,7 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
                   .filter((status) => status !== review.status)
                   .map((status) => {
                     let label = "Publish review";
-                    let styleClass = "border-slate-200 text-[#1e613c] hover:bg-[#E4F2E8]";
+                    let styleClass = "border-slate-200 text-primary hover:bg-primary/10";
                     if (status === "FLAGGED") {
                       label = "Flag review";
                       styleClass = "border-slate-200 text-orange-600 hover:bg-orange-50";

@@ -18,7 +18,7 @@ export function AccountLayout({ children, eyebrow, title, description }: Account
       <SiteHeader />
       <main className="bg-muted/10 min-h-screen pb-24 pt-8">
         <Container>
-          <div className="flex flex-col gap-10 md:flex-row md:items-start">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-10">
             <aside className="w-full shrink-0 md:sticky md:top-24 md:w-64">
               <AccountSidebar />
             </aside>

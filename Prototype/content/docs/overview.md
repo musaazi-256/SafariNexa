@@ -36,6 +36,7 @@
 - `/search` (`src/app/search/page.tsx`) — the main search experience, backed by `SearchBar`/`SearchFilters`/`MobileFilters`. Guest/passenger-count filters and text/city search genuinely query the database (`Prisma.ListingWhereInput`). **However**, the property-type, tour-type, vehicle-type, cuisine, and amenities filters do a plain substring match against listing title/description rather than querying the real structured columns the business forms save (`AccommodationListing.propertyType`, `TourListing.tourType`, etc.) — the underlying data is correct, the filter reading it isn't always.
 - `/destinations`, `/destinations/[slug]` — real, but `Destination` rows are **seed-only**; there is no create/edit UI anywhere in the product for admin or businesses to add a new destination.
 - `/guides`, `/guides/[id]` — real, backed by the `Guide` model.
+- **Fixed 12 Oct 2026**: `/`, `/explore`, `/destinations`, `/destinations/[slug]`, and `/guides/[id]` had no `searchParams`/`auth()`/dynamic-rendering signal, so Next.js statically prerendered them once at build time and never re-queried the database again — new listings, verification approvals, and reviews silently never appeared on the deployed Vercel site (invisible locally, since `next dev` always renders fresh). All 5 now carry `export const revalidate = 60`, so they re-fetch at most once a minute.
 
 ### 2.2 Listing detail pages
 **Status: Working**, with one known display bug.
@@ -130,7 +131,7 @@ Entry: `/business` → `requireBusinessSession()`. A business owner first has a 
 
 ### 3.8 Revenue
 **Status: Partial — real totals, decorative everything else.**
-- `/business/revenue` — the headline stat totals (gross/commission/net/refunded) are real, computed from actual `Payment` rows. The comparison percentages, sparkline charts, date-range picker, "Export," the payout-breakdown line items, and the filter-tab pills are all hardcoded/non-functional. **Do not use anything on this page except the four headline totals for real financial decisions.**
+- `/business/revenue` — the headline stat totals (gross/commission/net/refunded) are real, computed from actual `Payment` rows. The comparison percentages, sparkline charts, date-range picker, "Export," and the payout-breakdown line items are all hardcoded/non-functional. The filter-tab row was simplified to a single real "All transactions" tab with a real count (11 Sept — previously four extra sub-tabs with hardcoded fake counts and no backing filter logic; removed rather than faked, since wiring real status filtering here would mean moving the table off DB-level pagination). **Do not use anything on this page except the four headline totals for real financial decisions.**
 
 ### 3.9 Verification
 **Status: Working**, business side.
@@ -160,7 +161,7 @@ Entry: `/admin` → `requireAdminSession()`, gated on `session.user.isAdmin` in 
 
 ### 4.3 Businesses
 **Status: Partial.**
-- `/admin/businesses`, `/admin/businesses/[id]` — search and status-tab filtering are real. "Filter," "Export," column-sort, and the row overflow menu are decorative (deliberately left as-is, per product direction — this is the known, intentional demo-toolbar pattern referenced throughout this document).
+- `/admin/businesses`, `/admin/businesses/[id]` — search and status-tab filtering are real. "Filter," "Export," and column-sort are decorative (deliberately left as-is, per product direction — this is the known, intentional demo-toolbar pattern referenced throughout this document). The row's dead "⋮" overflow menu was removed (11 Sept) — a working "View" link/button already sat next to it in the same row, so the menu offered no real destination of its own.
 
 ### 4.4 Users & access
 **Status: Working.**

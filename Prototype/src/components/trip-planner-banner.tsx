@@ -25,16 +25,16 @@ export function TripPlannerBanner() {
           </Button>
         </div>
 
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           {STEPS.map((step, index) => (
             <div key={step.label} className="flex items-center">
               <div className="flex flex-col items-center gap-2">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 backdrop-blur">
-                  <step.icon className="h-5 w-5" />
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 backdrop-blur sm:h-12 sm:w-12">
+                  <step.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </span>
                 <span className="text-xs font-semibold">{step.label}</span>
               </div>
-              {index < STEPS.length - 1 ? <span className="mx-2 mb-5 h-px w-8 border-t border-dashed border-white/40 sm:w-12" /> : null}
+              {index < STEPS.length - 1 ? <span className="mx-1.5 mb-5 h-px w-6 border-t border-dashed border-white/40 sm:mx-2 sm:w-12" /> : null}
             </div>
           ))}
         </div>

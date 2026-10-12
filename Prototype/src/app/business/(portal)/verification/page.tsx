@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import { submitVerificationDocument } from "@/lib/actions/verification";
 import { VerificationTimeline, VerificationStatus } from "@/components/business/verification-timeline";
 import { VerificationDocuments } from "@/components/business/verification-documents";
+import { PageHero } from "@/components/page-hero";
 
 export default async function BusinessVerificationPage() {
   const { business, businessId } = await requireBusinessSession();
@@ -45,10 +46,12 @@ export default async function BusinessVerificationPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10 pb-20 pt-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Business verification</h1>
-        <p className="text-slate-500 mt-2 text-lg">Submit documents and track approval before publishing or receiving bookings.</p>
-      </div>
+      <PageHero
+        variant="portal"
+        eyebrow="Business portal"
+        title="Business verification"
+        description="Submit documents and track approval before publishing or receiving bookings."
+      />
 
       {/* Verification Status Banner */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">

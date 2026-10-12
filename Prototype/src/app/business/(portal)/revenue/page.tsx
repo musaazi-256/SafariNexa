@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { FilterTabs } from "@/components/ui/filter-tabs";
 import { formatUGX } from "@/lib/booking";
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
@@ -74,12 +75,13 @@ export default async function BusinessRevenuePage({ searchParams }: { searchPara
       
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-[#0B4928] mb-1">BUSINESS PORTAL</p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Revenue & payouts</h1>
-          <p className="text-sm text-slate-500">Track paid bookings, commission, and net payout.</p>
-        </div>
-        
+        <PageHero
+          variant="portal"
+          eyebrow="Business portal"
+          title="Revenue & payouts"
+          description="Track paid bookings, commission, and net payout."
+        />
+
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="outline" className="h-10 border-slate-200 text-slate-700 font-bold">
             <Calendar className="mr-2 h-4 w-4 text-slate-400" />
@@ -257,23 +259,10 @@ export default async function BusinessRevenuePage({ searchParams }: { searchPara
 
       {/* Filter Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0B4928] text-white text-sm font-bold shadow-sm">
-            All transactions <span className="bg-white/20 px-1.5 py-0.5 rounded-sm text-[10px] font-bold">27</span>
-          </button>
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors">
-            Paid <span className="bg-slate-100 px-1.5 py-0.5 rounded-sm text-[10px] font-bold">18</span>
-          </button>
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors">
-            Refunded <span className="bg-slate-100 px-1.5 py-0.5 rounded-sm text-[10px] font-bold">2</span>
-          </button>
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors">
-            Pending payout <span className="bg-slate-100 px-1.5 py-0.5 rounded-sm text-[10px] font-bold">4</span>
-          </button>
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors">
-            Not started <span className="bg-slate-100 px-1.5 py-0.5 rounded-sm text-[10px] font-bold">3</span>
-          </button>
-        </div>
+        <FilterTabs
+          activeValue="ALL"
+          tabs={[{ value: "ALL", label: "All transactions", count: totalCount, href: "/business/revenue" }]}
+        />
 
         <div className="flex items-center gap-3">
           <Button variant="outline" className="h-9 px-3 border-slate-200 text-slate-700 font-bold rounded-lg shadow-sm">
@@ -282,10 +271,10 @@ export default async function BusinessRevenuePage({ searchParams }: { searchPara
           </Button>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Search transactions..." 
-              className="pl-9 pr-4 h-9 w-[220px] rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-1 focus:ring-[#0B4928] shadow-sm"
+            <input
+              type="text"
+              placeholder="Search transactions..."
+              className="pl-9 pr-4 h-9 w-[220px] rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-1 focus:ring-primary shadow-sm"
             />
           </div>
         </div>

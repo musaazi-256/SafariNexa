@@ -2,6 +2,7 @@ import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
 import { MessageInbox } from "@/components/business/message-inbox";
 import { getBusinessCustomers } from "@/lib/actions/messages";
+import { PageHero } from "@/components/page-hero";
 
 export default async function BusinessMessagesPage({
   searchParams,
@@ -77,7 +78,13 @@ export default async function BusinessMessagesPage({
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 pb-20 font-sans">
-      <MessageInbox 
+      <PageHero
+        variant="portal"
+        eyebrow="Business portal"
+        title="Messages"
+        description="Reply to customer questions and booking conversations."
+      />
+      <MessageInbox
         initialThreads={threads as any} 
         businessUserId={session.user.id} 
         businessId={businessId}

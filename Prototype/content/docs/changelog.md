@@ -158,3 +158,85 @@ Verification: `tsc`/`eslint`/`jest` clean; confirmed live — signed in as both 
 Header/footer auth-link wording changed from "Sign in"/"Create account" to "Log in"/"Sign up" across `site-header.tsx`, `site-footer.tsx`, and `mobile-nav.tsx`'s button-variant check (which was matching on the literal old label — left unfixed, this rename would have silently broken which auth button rendered as the primary/filled button).
 
 **Real bug fixed in the same change**: `site-header.tsx`'s mobile-nav trigger wrapper was `hidden md:flex` — hidden by default, only shown at the `md` breakpoint and up. That's backwards for a *mobile* nav trigger: it meant the hamburger button was invisible exactly where it's needed (small viewports) and only appeared once the screen was already wide enough that the desktop nav links were showing anyway. Fixed to `flex md:hidden`. Confirmed live at both a 1280px desktop viewport (hamburger correctly absent, "Log in"/"Sign up" buttons shown) and a 390px mobile viewport (hamburger correctly present, auth buttons correctly hidden in favor of the mobile bottom nav) — screenshotted both.
+
+---
+
+## 11 September 2026 — admin/business portal UI consistency pass
+
+Full review of every admin and business portal page against the app's real shadcn primitives, prompted by the observation that the two portals had independently reinvented the same table/header/filter/pagination shapes in different, inconsistent ways. Three parallel audits (admin pages, business pages, the actual shadcn baseline already in the codebase) found: zero admin pages used the real `Table` component (all hand-rolled `grid grid-cols-12` "fake tables"), almost no page in either portal used the real `PageHero`, the brand green was a three-way split (`#1e613c` and `#0d5932` on admin, `#0B4928` on business) that matched none of the real `--primary` token, admin's filter pills were three different shapes across its own pages, and business hand-rolled its own pagination on three pages instead of using the real `Pagination` component.
+
+**New shared component**: `src/components/ui/filter-tabs.tsx` — a `FilterTabs` component (`tabs: {value, label, href, count?}[]`, `activeValue`) rendering the status-filter pill bar as real `<Link>`s driving a URL query param (deliberately not shadcn `Tabs`, since these are real navigations, not client-side ARIA tabs). The optional `count` is only ever passed when backed by a real query — a fake number was judged worse than no number.
+
+**Converted to the real `Table`/`TableHeader`/`TableBody`/`TableRow`/`TableHead`/`TableCell`**: all six admin list pages that were hand-rolled div-grids (`businesses`, `users`, `bookings`, `payments` — both its payments and refunds tables, `support`), plus business `settings`' Staff Access tab (the one confirmed fake table on the business side).
+
+**Converted to the real `PageHero`**: every admin and business list/detail page that either hand-cloned its markup or had no header at all (admin `dashboard`, business `messages`) — 17 pages total across both portals. Business `dashboard` kept its existing custom image-banner hero (personalized greeting, business name, background photo, "View business profile" CTA) rather than being flattened to the generic header — that hero carries real, page-specific content `PageHero`'s generic eyebrow/title/description shape can't express, so only its color tokens were fixed, not its structure.
+
+**Converted to `FilterTabs`**: every hand-rolled filter-pill bar in both portals, including business `revenue`'s previously non-functional plain-`<button>` fake-count tabs — reduced to a single real "All transactions" tab with a real count, since the four sub-tabs (Paid/Refunded/Pending payout/Not started) had no backing query logic and no real destination; fabricating that filtering was judged out of scope for a UI-consistency pass (it would mean moving the page off DB-level pagination).
+
+**Wired up the real `Pagination`**: business `bookings`, `listings`, `reviews` (each previously hand-rolled prev/next, with `reviews` carrying a divergent extra ellipsis branch the other two lacked) and admin `verification` (imported but never rendered).
+
+**Color tokens unified**: every hardcoded `#1e613c` / `#0d5932` / `#0B4928` / `#E4F2E8` replaced with `bg-primary` / `text-primary` / `border-primary` / `text-primary-foreground` (the real `--primary: 148 88% 25%` token), across both portals — including inline SVG `stroke`/`stopColor` attributes on the admin dashboard's sparklines, via `hsl(var(--primary))`.
+
+**Real bug found and fixed along the way**: business `bookings/page.tsx`'s status-badge mapping (`getStatusDisplay`) checked for a `PAYMENT_REQUIRED` status that doesn't exist in the `BookingStatus` enum — the real value is `PENDING_PAYMENT` (confirmed against admin's own status grouping, which already handled both). Every business booking in that state was rendering the raw enum string `PENDING_PAYMENT` instead of a real label, while the identical admin page correctly showed "Payment required" — exactly the kind of admin/business inconsistency this pass was meant to catch. Fixed to match `PENDING_PAYMENT` too.
+
+**Row-action menus left conservative**: where a "⋮" trigger was a bare unhandled button with no real destination anywhere in the row (e.g. admin `bookings` — there's still no admin booking detail route), it was left as-is rather than wrapped in a fake `DropdownMenu`. Where a real destination already existed elsewhere in the row (admin `businesses`' row already had a working "View" link/button next to the dead "⋮"), the dead button was removed instead of duplicating the same action inside a dropdown.
+
+**Explicitly out of scope**: the decorative Filter/Export/date-picker toolbar buttons (already ruled on in an earlier session as intentional demo placeholders), the list-wrapper's literal component (`rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden` was already the shared look both portals had converged on — made byte-identical, not replaced with shadcn `Card`), and any new admin routes/feature work (e.g. a real admin booking detail page).
+
+Verification: `tsc`/`eslint`/`jest` clean across all 18 touched files (0 errors; only pre-existing `<img>`-vs-`next/image` warnings, not introduced by this pass). Confirmed live via a full Playwright pass signed in as the seeded admin and business test accounts — screenshotted admin `bookings`/`payments` and business `bookings`/`revenue` side by side to confirm the two portals now share the same table, header, pill, and color language.
+
+---
+
+## 15 September 2026 — mobile layout fixes on the public homepage
+
+Investigated a report that the homepage "isn't handled well on mobile." A Playwright pass at a 390×844 mobile viewport (with DOM-measurement overlays, not just eyeballing screenshots) turned up three real, confirmed layout bugs — all now fixed:
+
+| Bug | Root cause | Fix |
+|---|---|---|
+| "One Day Tours" row: card titles truncated hard (e.g. "Lake Bunyon…") and the price wrapped onto two lines, making cards uneven and the trailing chevron icon look squeezed | `CompactListingCard` (`src/components/compact-listing-card.tsx`) used a fixed `w-64` (256px) card with no responsive sizing, leaving only ~136px for the text column after the 64px thumbnail and chevron | Widened the card to `w-72`; added `truncate` to the price line so it can never wrap to a second line |
+| "Plan a full trip" banner: the last step's label ("Transport") was visibly cut off at the card's right edge | The Stay/Safari/Food/Transport icon row (`src/components/trip-planner-banner.tsx`) used fixed desktop-sized icons (48px) and connector lines (48px each) that add up to ~336px — wider than the ~294px available inside the card's padding on a 390px viewport. The row overflowed past the section's own `overflow-hidden` boundary and got clipped | Icons and connectors now scale down below the `sm:` breakpoint (40px icons, narrower connector gaps) and the row is centered, comfortably fitting the available width; unchanged at `sm:` and up |
+| **Most severe**: the site footer's last row — copyright line, "Payments via…" line, and the **"Engineering docs" link** — was completely and permanently hidden behind the fixed mobile bottom tab bar (`MobileBottomNav`, `h-[68px]`) on every customer-facing page. Confirmed via bounding-box measurement at max scroll: the link's rect sat entirely inside the bottom nav's rect, with no further scroll possible — the link was unreachable and unclickable on mobile, not just visually cramped | `SiteFooter`'s last block had no bottom padding reserved for the fixed-position bottom nav, so the page's natural scroll end landed exactly where the nav started covering content | Added `pb-[calc(68px+env(safe-area-inset-bottom))] md:pb-5` to the footer's last block (mobile only; reverts to normal `py-5` at `md:` and up, where the bottom nav is hidden). Also fixed `MobileBottomNav`'s own `pb-safe` class, which doesn't exist in this project's Tailwind config (no plugin defines it) and was silently a no-op — replaced with a real `paddingBottom: env(safe-area-inset-bottom)` on a wrapping element, so the fix's padding math is now correct on notched devices too, not just a flat 68px |
+
+Verified fixed via the same DOM-measurement technique used to find each bug (not just re-screenshotting): the trip-planner icon row's right edge now sits inside the card's boundary with margin to spare, and the footer's "Engineering docs" link's bounding box no longer overlaps the bottom nav's at max scroll — confirmed on both the homepage and `/accommodation` (same shared `SiteFooter`), with a desktop-viewport screenshot confirming no padding regression where the bottom nav is hidden. `tsc`/`eslint`/`jest` clean on all four touched files.
+
+---
+
+## 16 September 2026 — account section's two mobile nav menus restructured
+
+The customer account section (`/profile`, `/bookings`, `/profile/saved`, `/profile/messages`, `/notifications`, `/support`, `/profile/payment-settings`, `/profile/preferences` — all sharing `AccountLayout`) had two navigation surfaces that genuinely conflicted on mobile: the global fixed bottom tab bar (`MobileBottomNav` — Explore/Search/Saved/Messages/Profile) and the account section's own 8-item sidebar (`AccountSidebar` — Profile/Bookings/Saved/Messages/Notifications/Support/Payments/Preferences).
+
+The sidebar (`src/components/customer/account-sidebar.tsx`) had no mobile-specific treatment at all — below the `md:` breakpoint it lost its `sticky`/`w-64` desktop sizing but still rendered as a full `w-full` vertical stack of all 8 nav items plus a "Need help?" card, sitting directly above the actual page content (the parent layout, `AccountLayout`, stacks the aside above the content on mobile via `flex-col`). In practice this meant a mobile visitor to any account page had to scroll past roughly 500–600px of duplicate navigation — 3 of those 8 items (Saved, Messages, Profile) already sit in the always-visible bottom tab bar — before reaching the content they navigated there for.
+
+Fixed by giving `AccountSidebar` a real responsive split:
+- **Mobile (`md:hidden`)**: the same 8 destinations, now rendered as a single-row horizontally-scrollable pill strip (`overflow-x-auto`, `no-scrollbar` — the same pattern already used by the homepage `SearchBar`'s category tabs), taking up one compact row instead of a multi-hundred-pixel block. The "Need help?" card is desktop-only now — its one link (Support) is already one of the 8 pills.
+- **Desktop (`hidden md:flex`)**: unchanged — the original full sticky vertical sidebar with the "Need help?" card, exactly as before.
+
+Also tightened `AccountLayout`'s gap between the nav and the page content on mobile (`gap-4` instead of the desktop `gap-10`, which was sized for the old full-height sidebar block) and replaced the sidebar's hardcoded `#1e613c` active-state color with the real `bg-primary` token while touching the file (same off-brand-green pattern fixed across the admin/business portals on 11 Sept; this customer-facing component had been missed since it wasn't in scope then).
+
+Verified live at a 390×844 mobile viewport (signed in as the seeded customer test account): the pill strip renders correctly on `/profile` and scrolls to reveal all 8 items with correct active-state highlighting on `/notifications`; confirmed no horizontal page overflow; confirmed the desktop sidebar is pixel-identical to before at 1440×900. `tsc`/`eslint`/`jest` clean on both touched files.
+
+**Related, complementary change found already in progress in the working tree** (`src/components/site-header.tsx`, `src/components/user-menu.tsx`) — the mobile hamburger menu (`MobileNav`, in the header) is now only rendered for signed-out visitors; a signed-in mobile user sees just the cart icon and avatar, since the avatar's dropdown (`UserMenu`) plus the bottom tab bar already cover navigation for them. `UserMenu`'s dropdown also dropped its "Saved" and "Messages" items, which duplicated the bottom tab bar. Reviewed and verified rather than assumed correct, per this repo's working practice for unexpected working-tree changes: confirmed `tsc`/`eslint`/`jest` clean, cleaned up two now-dead icon imports (`Heart`, `MessageSquare`) left behind in `user-menu.tsx`, and live-tested both the signed-in mobile header (avatar-only, dropdown correctly trimmed) and the signed-out mobile header (hamburger still present, since anonymous visitors have no avatar/bottom-tab equivalent for category browsing). One consequence worth knowing: a signed-in mobile visitor no longer has a persistent header link to `/accommodation`, `/tours`, `/guides`, or `/trip-planner` — those remain reachable via the homepage's own sections and search, just not as a standing nav item once signed in.
+
+---
+
+## 12 October 2026 — fixed homepage (and 4 other public pages) silently frozen at build time on Vercel
+
+Reported: the homepage's "Stay at our top accommodations" section was rendering completely empty on the deployed Vercel site, despite working fine in local dev.
+
+**Root cause**: `src/app/page.tsx` had no `searchParams` prop, no `auth()`/`cookies()` call, and no `dynamic`/`revalidate` export — the three things that make Next.js's App Router treat a page as dynamic. With none of them present, Next.js statically prerenders the page **once, at build time**, and bakes whatever the Prisma queries returned at that moment into the deployed HTML — permanently, until the next deploy. `next dev` always renders fresh per request regardless of this distinction, which is why the bug was invisible locally and only showed up in production.
+
+Audited every public page in the app for the same gap (no `searchParams`, no `auth()` call, no dynamic export — any one of the three is normally enough to force live rendering). Four more pages had the identical exposure, all now fixed the same way:
+
+| Page | What was frozen at build time |
+|---|---|
+| `src/app/page.tsx` | Homepage — accommodation/tour/restaurant/transport listings, guides, destinations |
+| `src/app/destinations/page.tsx` | Destinations index and their listing counts |
+| `src/app/explore/page.tsx` | The category-browse listing grid |
+| `src/app/guides/[id]/page.tsx` | A guide's own profile — their tours, reviews, rating |
+| `src/app/destinations/[slug]/page.tsx` | A destination's own detail page — its listings |
+
+Every other public page was already safe: anything with URL filters reads `searchParams` (which forces dynamic rendering by itself), and anything behind sign-in calls `auth()` (which reads cookies, also forcing dynamic rendering) — `src/app/search/page.tsx` already had `export const dynamic = "force-dynamic"` explicitly set, which is the precedent this fix follows.
+
+**Fix**: added `export const revalidate = 60` to all 5 pages — chosen over `force-dynamic` (the user's call, offered as an explicit tradeoff: always-fresh-but-a-DB-round-trip-per-visitor vs. cached-and-revalidated-in-the-background-at-most-once-a-minute). New listings, verification approvals, and review changes now reach the deployed site within about a minute instead of never.
+
+Verified: `tsc`/`eslint`/`jest` clean on all 5 files; a full `next build` production build succeeds, and the homepage's route classification changed from what would have been a permanently-static prerender to `ƒ` (rendered per request, re-querying the database) — confirming this was a real, build-observable change in behavior, not just an unused export.

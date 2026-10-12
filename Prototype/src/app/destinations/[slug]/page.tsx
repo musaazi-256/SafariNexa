@@ -12,6 +12,10 @@ import { db } from "@/lib/db";
 import { LISTING_TYPE_TO_SERVICE_TYPE, type ServiceType } from "@/lib/listing-types";
 import { formatListingPrice, ratingSummary } from "@/lib/listings";
 
+/** No searchParams/cookies/auth() call here, so without this Next.js would statically
+ * prerender each destination page once at build time and never reflect new listings. */
+export const revalidate = 60;
+
 const SECTIONS: Array<{ type: ServiceType; heading: string }> = [
   { type: "Accommodation", heading: "Accommodation" },
   { type: "Tour", heading: "Tours & safaris" },

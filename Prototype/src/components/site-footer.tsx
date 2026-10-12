@@ -98,7 +98,7 @@ export function SiteFooter() {
           </ul>
         </div>
       </Container>
-      <div className="border-t border-border py-5">
+      <div className="border-t border-border py-5 pb-[calc(68px+env(safe-area-inset-bottom))] md:pb-5">
         <Container className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} SafariNexa. Phase 1 MVP — East Africa marketplace.</p>
           <div className="flex items-center gap-4">

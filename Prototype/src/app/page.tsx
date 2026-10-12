@@ -16,6 +16,12 @@ import { db } from "@/lib/db";
 import { formatListingPrice, guideRatingSummary, ratingSummary } from "@/lib/listings";
 import { protectedActions } from "@/lib/data";
 
+/** Without this, Next.js statically prerenders the homepage once at build time (no
+ * searchParams/cookies/auth() call to trigger dynamic rendering) — new listings,
+ * verification approvals, etc. would never show up on the deployed site until the
+ * next deploy. Revalidate at most once a minute instead of re-querying every request. */
+export const revalidate = 60;
+
 const TRUST_POINTS = [
   { icon: ShieldCheck, title: "Verified businesses only", description: "Every listing belongs to a business that passed SafariNexa's verification review." },
   { icon: Lock, title: "Browse before you sign in", description: "Explore accommodation, safaris, restaurants, and transport freely — accounts are only for booking and paying." },

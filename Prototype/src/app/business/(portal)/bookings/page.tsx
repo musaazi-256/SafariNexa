@@ -7,6 +7,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
+import { FilterTabs } from "@/components/ui/filter-tabs";
+import { PageHero } from "@/components/page-hero";
 import { formatUGX } from "@/lib/booking";
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
@@ -95,7 +98,7 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
     // Some extra statuses based on design (e.g. refunded, payment failed, payment required)
     if (status === "REFUNDED") return { text: "Refunded", dot: "bg-green-500", bg: "bg-green-50", textCol: "text-green-700" };
     if (status === "PAYMENT_FAILED") return { text: "Payment failed", dot: "bg-red-500", bg: "bg-red-50", textCol: "text-red-700" };
-    if (status === "PAYMENT_REQUIRED") return { text: "Payment required", dot: "bg-orange-500", bg: "bg-orange-50", textCol: "text-orange-600" };
+    if (status === "PAYMENT_REQUIRED" || status === "PENDING_PAYMENT") return { text: "Payment required", dot: "bg-orange-500", bg: "bg-orange-50", textCol: "text-orange-600" };
     
     return { text: status, dot: "bg-slate-500", bg: "bg-slate-100", textCol: "text-slate-700" };
   };
@@ -105,16 +108,17 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-[#0B4928] mb-1">BUSINESS PORTAL</p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Bookings</h1>
-          <p className="text-sm text-slate-500">Handle booking requests and confirmations.</p>
-        </div>
+        <PageHero
+          variant="portal"
+          eyebrow="Business portal"
+          title="Bookings"
+          description="Handle booking requests and confirmations."
+        />
         <div className="flex items-center gap-3 shrink-0">
           <Button variant="outline" className="font-semibold text-slate-700 border-slate-200">
             <Download className="h-4 w-4 mr-2" /> Export
           </Button>
-          <Button className="bg-[#0B4928] hover:bg-[#0B4928]/90 text-white font-semibold shadow-sm">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm">
             <Calendar className="h-4 w-4 mr-2" /> Calendar view
           </Button>
         </div>
@@ -217,33 +221,16 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
 
       {/* Tabs & Filters */}
       <div className="flex flex-col lg:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-4 mt-8">
-        <div className="flex flex-wrap items-center gap-2">
-          {TABS.map((tab) => {
-            const isActive = tab.value === "ALL" ? !activeTab : activeTab === tab.value;
-            const href = tab.value === "ALL" ? "/business/bookings" : `/business/bookings?status=${tab.value.toLowerCase()}`;
-            return (
-              <Link
-                key={tab.value}
-                href={href}
-                className={cn(
-                  "flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                  isActive 
-                    ? "bg-[#0B4928] text-white border-transparent" 
-                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                )}
-              >
-                {tab.label}
-                <span className={cn(
-                  "flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-bold",
-                  isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-                )}>
-                  {tab.count}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-        
+        <FilterTabs
+          activeValue={activeTab ?? "ALL"}
+          tabs={TABS.map((tab) => ({
+            value: tab.value,
+            label: tab.label,
+            count: tab.count,
+            href: tab.value === "ALL" ? "/business/bookings" : `/business/bookings?status=${tab.value.toLowerCase()}`
+          }))}
+        />
+
         <div className="flex items-center gap-3 w-full lg:w-auto">
           <Button variant="outline" className="border-slate-200 text-slate-700 font-semibold h-10">
             <Filter className="h-4 w-4 mr-2" /> Filters
@@ -357,46 +344,16 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
           </Table>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="border-t border-slate-200 bg-white px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-sm font-medium text-slate-500">
-                Showing {((page - 1) * PAGE_SIZE) + 1} to {Math.min(page * PAGE_SIZE, totalFilteredCount)} of {totalFilteredCount} bookings
-              </p>
-              
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-slate-500">10 per page</span>
-                  <div className="border border-slate-200 rounded-md px-2 py-1 text-xs font-bold text-slate-400">v</div>
-                </div>
-                
-                <div className="flex items-center gap-1">
-                  <Link 
-                    href={`/business/bookings?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), page: String(Math.max(1, page - 1)) }).toString()}`}
-                    className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:bg-slate-50"
-                  >
-                    &lt;
-                  </Link>
-                  <span className="h-8 w-8 flex items-center justify-center rounded-full bg-[#0B4928] text-white font-bold text-sm shadow-sm">
-                    {page}
-                  </span>
-                  {page < totalPages && (
-                    <Link 
-                      href={`/business/bookings?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), page: String(page + 1) }).toString()}`}
-                      className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50"
-                    >
-                      {page + 1}
-                    </Link>
-                  )}
-                  <Link 
-                    href={`/business/bookings?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), page: String(Math.min(totalPages, page + 1)) }).toString()}`}
-                    className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:bg-slate-50"
-                  >
-                    &gt;
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="border-t border-slate-200 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
+            <span className="text-sm font-medium text-slate-500">
+              Showing {((page - 1) * PAGE_SIZE) + 1} to {Math.min(page * PAGE_SIZE, totalFilteredCount)} of {totalFilteredCount} bookings
+            </span>
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              buildHref={(p) => `/business/bookings?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), page: String(p) }).toString()}`}
+            />
+          </div>
         </div>
       )}
     </div>

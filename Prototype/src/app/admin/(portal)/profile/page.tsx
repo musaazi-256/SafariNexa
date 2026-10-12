@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PageHero } from "@/components/page-hero";
 import { updateAdminProfile } from "@/lib/actions/admin";
 
 export default async function AdminProfilePage() {
@@ -31,16 +32,17 @@ export default async function AdminProfilePage() {
 
   return (
     <div className="max-w-[800px] mx-auto space-y-8 pb-20 font-sans">
-      <div>
-        <p className="text-[11px] font-bold uppercase tracking-wider text-[#1e613c] mb-1">ADMIN PORTAL</p>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">My Profile</h1>
-        <p className="text-[13px] text-slate-500 font-semibold max-w-2xl">Manage your personal admin account details and preferences.</p>
-      </div>
+      <PageHero
+        variant="portal"
+        eyebrow="Admin portal"
+        title="My profile"
+        description="Manage your personal admin account details and preferences."
+      />
 
       <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
         <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-6 pt-8 px-8">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-[#E4F2E8] text-[#1e613c] flex items-center justify-center border-2 border-white shadow-sm">
+            <div className="h-16 w-16 rounded-full bg-primary/10 text-primary flex items-center justify-center border-2 border-white shadow-sm">
               <User className="h-8 w-8" />
             </div>
             <div>
@@ -93,7 +95,7 @@ export default async function AdminProfilePage() {
             </div>
 
             <div className="pt-4">
-              <Button type="submit" className="h-11 px-8 rounded-full bg-[#1e613c] hover:bg-[#15462b] text-white font-bold shadow-sm transition-all">
+              <Button type="submit" className="h-11 px-8 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-sm transition-all">
                 Save changes
               </Button>
             </div>

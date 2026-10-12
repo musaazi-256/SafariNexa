@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { PageHero } from "@/components/page-hero";
 import { formatUGX } from "@/lib/booking";
 import { requireAdminSession } from "@/lib/admin";
 import { db } from "@/lib/db";
@@ -101,7 +102,7 @@ export default async function AdminDashboardPage() {
 
   const stats = [
     // Row 1
-    { label: "Total Revenue", value: "UGX 12,265,000", icon: Banknote, color: "text-[#1e613c]", bg: "bg-[#E4F2E8]", trend: "↑ 18% vs last week", trendColor: "text-[#1e613c]", path: PATH_UP, stroke: "#1e613c" },
+    { label: "Total Revenue", value: "UGX 12,265,000", icon: Banknote, color: "text-primary", bg: "bg-primary/10", trend: "↑ 18% vs last week", trendColor: "text-primary", path: PATH_UP, stroke: "hsl(var(--primary))" },
     { label: "Pending Payouts", value: "UGX 4,210,000", icon: Banknote, color: "text-amber-600", bg: "bg-amber-50", trend: "↑ 12% vs last week", trendColor: "text-amber-600", path: PATH_UP, stroke: "#d97706" },
     { label: "Total Bookings", value: "842", icon: ClipboardCheck, color: "text-purple-600", bg: "bg-purple-50", trend: "↑ 45% vs last week", trendColor: "text-purple-600", path: PATH_UP, stroke: "#9333ea" },
     { label: "Active Businesses", value: String(activeBusinessCount > 0 ? activeBusinessCount : 184), icon: Building2, color: "text-emerald-600", bg: "bg-emerald-50", trend: "↑ 18% vs last week", trendColor: "text-emerald-600", path: PATH_UP, stroke: "#059669" },
@@ -137,6 +138,13 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="max-w-[1550px] mx-auto space-y-6 pb-20 font-sans">
+      <PageHero
+        variant="portal"
+        eyebrow="Admin portal"
+        title="Dashboard"
+        description="Platform overview: bookings, revenue, verification, and support at a glance."
+      />
+
       {/* 12 KPI Metrics Grid (4 columns x 3 rows) */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
@@ -172,7 +180,7 @@ export default async function AdminDashboardPage() {
         <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 flex flex-col">
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-base font-bold text-slate-900">Featured Businesses</h3>
-            <Link href="/admin/businesses" className="text-xs font-bold text-[#0d5932] hover:underline flex items-center gap-1">
+            <Link href="/admin/businesses" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
               View all businesses <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -208,7 +216,7 @@ export default async function AdminDashboardPage() {
         <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-bold text-slate-900">Recent Platform Activity</h3>
-            <Link href="/admin/audit" className="text-xs font-bold text-[#0d5932] hover:underline">
+            <Link href="/admin/audit" className="text-xs font-bold text-primary hover:underline">
               View all activity
             </Link>
           </div>
@@ -235,7 +243,7 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 flex flex-col h-[340px]">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
             <h3 className="text-sm font-bold text-slate-900">Action Queues</h3>
-            <Link href="/admin/verification" className="text-[11px] font-bold text-[#0d5932] hover:underline">
+            <Link href="/admin/verification" className="text-[11px] font-bold text-primary hover:underline">
               View all queues
             </Link>
           </div>
@@ -275,7 +283,7 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 flex flex-col h-[340px]">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
             <h3 className="text-sm font-bold text-slate-900">Active Support Cases</h3>
-            <Link href="/admin/support" className="text-[11px] font-bold text-[#0d5932] hover:underline">
+            <Link href="/admin/support" className="text-[11px] font-bold text-primary hover:underline">
               View all cases
             </Link>
           </div>
@@ -301,7 +309,7 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 flex flex-col h-[340px]">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
             <h3 className="text-sm font-bold text-slate-900">Top Performers</h3>
-            <Link href="/admin/businesses" className="text-[11px] font-bold text-[#0d5932] hover:underline">
+            <Link href="/admin/businesses" className="text-[11px] font-bold text-primary hover:underline">
               View all businesses
             </Link>
           </div>
@@ -320,7 +328,7 @@ export default async function AdminDashboardPage() {
                     <p className="text-[10px] text-slate-400 font-medium">{perf.bookings}</p>
                   </div>
                 </div>
-                <span className="font-extrabold text-[12px] text-[#0d5932] shrink-0">{perf.revenue}</span>
+                <span className="font-extrabold text-[12px] text-primary shrink-0">{perf.revenue}</span>
               </div>
             ))}
           </div>
@@ -330,7 +338,7 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 flex flex-col h-[340px]">
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
             <h3 className="text-sm font-bold text-slate-900">Recent Actions</h3>
-            <Link href="/admin/audit" className="text-[11px] font-bold text-[#0d5932] hover:underline">
+            <Link href="/admin/audit" className="text-[11px] font-bold text-primary hover:underline">
               View audit log
             </Link>
           </div>
@@ -360,9 +368,9 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Revenue Overview Footer Banner */}
-      <div className="bg-[#f0f9f3] rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-6 border border-[#c4e3cf]/90 shadow-sm">
+      <div className="bg-primary/5 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-6 border border-primary/20 shadow-sm">
         <div className="flex items-center gap-3.5 shrink-0">
-          <div className="h-10 w-10 rounded-full bg-[#0d5932] flex items-center justify-center shrink-0">
+          <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center shrink-0">
             <TrendingUp className="h-5 w-5 text-white" />
           </div>
           <div>
@@ -383,17 +391,17 @@ export default async function AdminDashboardPage() {
           <svg width="100%" height="100%" viewBox="0 0 320 40" preserveAspectRatio="none" className="overflow-visible">
             <defs>
               <linearGradient id="revGradAdmin" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0d5932" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#0d5932" stopOpacity="0" />
+                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
               </linearGradient>
             </defs>
             <path d="M0,40 L0,32 C40,24 80,38 120,28 C160,18 200,34 240,16 C280,-4 320,8 320,8 L320,40 Z" fill="url(#revGradAdmin)" />
-            <path d="M0,32 C40,24 80,38 120,28 C160,18 200,34 240,16 C280,-4 320,8 320,8" stroke="#0d5932" strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path d="M0,32 C40,24 80,38 120,28 C160,18 200,34 240,16 C280,-4 320,8 320,8" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" fill="none" />
           </svg>
         </div>
 
         <Link href="/admin/payments" className="shrink-0">
-          <Button variant="ghost" className="text-[13px] font-bold text-[#0d5932] hover:bg-[#e4f2e8] hover:text-[#0a4526]">
+          <Button variant="ghost" className="text-[13px] font-bold text-primary hover:bg-primary/10 hover:text-primary">
             View payments <ArrowRight className="h-4 w-4 ml-1.5" />
           </Button>
         </Link>

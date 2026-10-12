@@ -9,6 +9,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { db } from "@/lib/db";
 
+/** No searchParams/cookies/auth() call here, so without this Next.js would statically
+ * prerender this page once at build time and never reflect new destinations/listings. */
+export const revalidate = 60;
+
 export default async function DestinationsPage() {
   const [destinations, listingCounts] = await Promise.all([
     db.destination.findMany({ orderBy: { name: "asc" } }),

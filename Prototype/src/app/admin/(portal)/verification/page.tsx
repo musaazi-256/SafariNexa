@@ -1,10 +1,10 @@
-import Link from "next/link";
-import { FileText, CheckSquare, Square, ShieldCheck, Flag, RotateCcw } from "lucide-react";
+import { Square } from "lucide-react";
 import type { VerificationStatus as PrismaVerificationStatus } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
+import { FilterTabs } from "@/components/ui/filter-tabs";
+import { PageHero } from "@/components/page-hero";
 import { requireAdminSession } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
@@ -108,38 +108,27 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
     <div className="max-w-[1450px] mx-auto space-y-6 pb-20 font-sans">
       
       {/* Header Row */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-1">Verification queue</h1>
-          <p className="text-sm font-medium text-slate-500">Review submitted profiles, certificate of operations, and business documents.</p>
-        </div>
-        <Button variant="outline" className="border-slate-200 text-slate-700 font-bold rounded-lg h-9 px-4 text-xs shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <PageHero
+          variant="portal"
+          eyebrow="Admin portal"
+          title="Verification queue"
+          description="Review submitted profiles, certificate of operations, and business documents."
+        />
+        <Button variant="outline" className="border-slate-200 text-slate-700 font-bold rounded-lg h-9 px-4 text-xs shadow-sm shrink-0">
           Bulk Action
         </Button>
       </div>
 
       {/* Filter Tabs (Pill Buttons) */}
-      <div className="flex flex-wrap gap-2">
-        {TABS.map((tab) => {
-          const tabValueLower = tab.value.toLowerCase();
-          const isActive = tabValueLower === activeStatusParam || (tab.value === "ALL" && activeStatusParam === "all");
-          const href = tab.value === "ALL" ? "/admin/verification?status=all" : `/admin/verification?status=${tabValueLower}`;
-          return (
-            <Link
-              key={tab.value}
-              href={href}
-              className={cn(
-                "rounded-lg border px-4 py-1.5 text-xs font-bold transition-all shadow-none",
-                isActive 
-                  ? "border-[#0d5932] bg-[#0d5932] text-white shadow-sm" 
-                  : "border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              )}
-            >
-              {tab.label}
-            </Link>
-          );
-        })}
-      </div>
+      <FilterTabs
+        activeValue={activeStatusParam === "all" ? "ALL" : activePrismaStatus ?? "ALL"}
+        tabs={TABS.map((tab) => ({
+          value: tab.value,
+          label: tab.label,
+          href: tab.value === "ALL" ? "/admin/verification?status=all" : `/admin/verification?status=${tab.value.toLowerCase()}`
+        }))}
+      />
 
       {/* Queue Items List */}
       <div className="space-y-4">
@@ -165,10 +154,10 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
                       name="notes"
                       placeholder="Reviewer notes (shown to the business)"
                       rows={1}
-                      className="w-full sm:w-64 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+                      className="w-full sm:w-64 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     />
                     <div className="flex items-center gap-2 shrink-0">
-                      <Button type="submit" name="status" value="APPROVED" className="bg-[#0d5932] hover:bg-[#0a4526] text-white font-bold text-xs rounded-lg px-4 h-8 transition-colors">
+                      <Button type="submit" name="status" value="APPROVED" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-lg px-4 h-8 transition-colors">
                         Approve
                       </Button>
                       <Button type="submit" name="status" value="NEEDS_CHANGES" variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-xs rounded-lg px-4 h-8 transition-colors">
@@ -275,6 +264,19 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
           ))
         )}
       </div>
+
+      {totalCount > 0 ? (
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs font-semibold text-slate-500">
+            Showing {(page - 1) * PAGE_SIZE + 1} to {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount} verifications
+          </span>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPagesFor(totalCount)}
+            buildHref={(p) => `/admin/verification?${new URLSearchParams({ status: activeStatusParam, page: String(p) }).toString()}`}
+          />
+        </div>
+      ) : null}
 
     </div>
   );

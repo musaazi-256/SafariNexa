@@ -13,6 +13,10 @@ import { formatUGX } from "@/lib/booking";
 import { db } from "@/lib/db";
 import { formatListingPrice, guideRatingSummary, ratingSummary } from "@/lib/listings";
 
+/** No searchParams/cookies/auth() call here, so without this Next.js would statically
+ * prerender each guide page once at build time and never reflect new reviews/tours. */
+export const revalidate = 60;
+
 export default async function GuideDetailPage({ params }: { params: { id: string } }) {
   const guide = await db.guide.findUnique({
     where: { id: params.id },

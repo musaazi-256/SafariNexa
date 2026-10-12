@@ -73,9 +73,11 @@ export async function SiteHeader() {
             </div>
           )}
 
-          <div className="flex md:hidden">
-            <MobileNav links={NAV_LINKS} authed={Boolean(session?.user)} authLinks={AUTH_LINKS} />
-          </div>
+          {!session?.user ? (
+            <div className="flex md:hidden">
+              <MobileNav links={NAV_LINKS} authed={false} authLinks={AUTH_LINKS} />
+            </div>
+          ) : null}
         </div>
       </Container>
       </header>

@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Pagination } from "@/components/ui/pagination";
+import { FilterTabs } from "@/components/ui/filter-tabs";
+import { PageHero } from "@/components/page-hero";
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
@@ -123,12 +126,13 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
       
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-[#0B4928] mb-1">BUSINESS PORTAL</p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Reviews</h1>
-          <p className="text-sm text-slate-500">View verified customer reviews and reply where allowed.</p>
-        </div>
-        
+        <PageHero
+          variant="portal"
+          eyebrow="Business portal"
+          title="Reviews"
+          description="View verified customer reviews and reply where allowed."
+        />
+
         <div className="flex items-center gap-3 w-full lg:w-auto shrink-0">
           <Button variant="outline" className="border-slate-200 text-slate-700 font-semibold h-10">
             <Filter className="h-4 w-4 mr-2" /> Filters
@@ -230,33 +234,16 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
 
       {/* Tabs & Sorting */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-4 mt-8">
-        <div className="flex flex-wrap items-center gap-2">
-          {TABS.map((tab) => {
-            const isActive = tab.value === activeTab;
-            const href = tab.value === "ALL" ? "/business/reviews" : `/business/reviews?status=${tab.value.toLowerCase()}`;
-            return (
-              <Link
-                key={tab.value}
-                href={href}
-                className={cn(
-                  "flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-                  isActive 
-                    ? "bg-[#0B4928] text-white border-transparent" 
-                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                )}
-              >
-                {tab.label}
-                <span className={cn(
-                  "flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-bold",
-                  isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-                )}>
-                  {tab.count}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-        
+        <FilterTabs
+          activeValue={activeTab}
+          tabs={TABS.map((tab) => ({
+            value: tab.value,
+            label: tab.label,
+            count: tab.count,
+            href: tab.value === "ALL" ? "/business/reviews" : `/business/reviews?status=${tab.value.toLowerCase()}`
+          }))}
+        />
+
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
           Sort by: 
           <select className="bg-transparent border-none outline-none font-bold text-slate-900 cursor-pointer pl-1">
@@ -278,7 +265,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
             
             // Status styling
             let statusStyle = "bg-slate-100 text-slate-700";
-            if (review.status === "PUBLISHED") statusStyle = "bg-green-50 text-[#0B4928] border-green-100";
+            if (review.status === "PUBLISHED") statusStyle = "bg-green-50 text-primary border-green-100";
             if (review.status === "PENDING") statusStyle = "bg-orange-50 text-orange-600 border-orange-100";
             if (review.status === "FLAGGED") statusStyle = "bg-red-50 text-red-600 border-red-100";
             if (review.status === "HIDDEN") statusStyle = "bg-slate-100 text-slate-600 border-slate-200";
@@ -288,13 +275,13 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                 
                 {/* Left Column: Customer */}
                 <div className="w-full md:w-48 shrink-0 flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#0B4928]/10 text-[#0B4928] font-bold flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center shrink-0">
                     {initials}
                   </div>
                   <div className="flex flex-col pt-0.5">
                     <span className="font-bold text-slate-900">{customerName}</span>
-                    <div className="flex items-center gap-1 text-[#0B4928] text-xs font-bold mt-0.5">
-                      Verified guest <CheckCircle2 className="h-3 w-3 fill-[#0B4928] text-white" />
+                    <div className="flex items-center gap-1 text-primary text-xs font-bold mt-0.5">
+                      Verified guest <CheckCircle2 className="h-3 w-3 fill-primary text-white" />
                     </div>
                   </div>
                 </div>
@@ -340,7 +327,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                         Only visible to the customer <Info className="h-3 w-3" />
                       </div>
                       <div className="absolute bottom-2 right-2 flex items-center gap-2 hidden group-focus-within:flex">
-                        <Button type="submit" size="sm" className="h-6 text-[10px] bg-[#0B4928] hover:bg-[#0B4928]/90">
+                        <Button type="submit" size="sm" className="h-6 text-[10px] bg-primary hover:bg-primary/90">
                           Post reply
                         </Button>
                       </div>
@@ -362,7 +349,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                   </div>
                   
                   <div className="flex items-center gap-2 md:mt-4">
-                    <Button variant="outline" size="sm" className="h-8 font-semibold text-[#0B4928] border-slate-200">
+                    <Button variant="outline" size="sm" className="h-8 font-semibold text-primary border-slate-200">
                       Reply
                     </Button>
                     <DropdownMenu>
@@ -387,54 +374,15 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm font-medium text-slate-500">
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-sm font-medium text-slate-500">
             Showing {((page - 1) * PAGE_SIZE) + 1} to {Math.min(page * PAGE_SIZE, totalFilteredCount)} of {totalCount} reviews
-          </p>
-          
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-slate-500">10 per page</span>
-              <div className="border border-slate-200 rounded-md px-2 py-1 text-xs font-bold text-slate-400">v</div>
-            </div>
-            
-            <div className="flex items-center gap-1">
-              <Link 
-                href={`/business/reviews?${new URLSearchParams({ ...(activeTab !== "ALL" ? { status: activeTab.toLowerCase() } : {}), page: String(Math.max(1, page - 1)) }).toString()}`}
-                className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:bg-slate-50"
-              >
-                &lt;
-              </Link>
-              <span className="h-8 w-8 flex items-center justify-center rounded-full bg-[#0B4928] text-white font-bold text-sm shadow-sm">
-                {page}
-              </span>
-              {page < totalPages && (
-                <Link 
-                  href={`/business/reviews?${new URLSearchParams({ ...(activeTab !== "ALL" ? { status: activeTab.toLowerCase() } : {}), page: String(page + 1) }).toString()}`}
-                  className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50"
-                >
-                  {page + 1}
-                </Link>
-              )}
-              {totalPages > 3 && (
-                <>
-                  <span className="text-slate-400 mx-1">...</span>
-                  <Link 
-                    href={`/business/reviews?${new URLSearchParams({ ...(activeTab !== "ALL" ? { status: activeTab.toLowerCase() } : {}), page: String(totalPages) }).toString()}`}
-                    className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50"
-                  >
-                    {totalPages}
-                  </Link>
-                </>
-              )}
-              <Link 
-                href={`/business/reviews?${new URLSearchParams({ ...(activeTab !== "ALL" ? { status: activeTab.toLowerCase() } : {}), page: String(Math.min(totalPages, page + 1)) }).toString()}`}
-                className="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:bg-slate-50"
-              >
-                &gt;
-              </Link>
-            </div>
-          </div>
+          </span>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            buildHref={(p) => `/business/reviews?${new URLSearchParams({ ...(activeTab !== "ALL" ? { status: activeTab.toLowerCase() } : {}), page: String(p) }).toString()}`}
+          />
         </div>
       )}
     </div>

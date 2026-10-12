@@ -1,15 +1,16 @@
-import Link from "next/link";
-import { 
-  Search, Filter, Download, Calendar, ArrowUpDown, MoreVertical, 
+import {
+  Search, Filter, Download, Calendar, ArrowUpDown, MoreVertical,
   CheckCircle2, Clock, Hourglass, RefreshCw, XCircle, ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { FilterTabs } from "@/components/ui/filter-tabs";
+import { PageHero } from "@/components/page-hero";
 import { formatUGX } from "@/lib/booking";
 import { requireAdminSession } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
-import { cn } from "@/lib/utils";
 
 import type { BookingStatus } from "@prisma/client";
 
@@ -45,12 +46,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   }
 
   const [
-    bookings, 
-    totalCount, 
-    allCount, 
-    awaitingCount, 
-    confirmedCount, 
-    completedCount, 
+    bookings,
+    totalCount,
+    allCount,
+    awaitingCount,
+    confirmedCount,
+    completedCount,
     cancelledCount
   ] = await Promise.all([
     db.booking.findMany({
@@ -231,13 +232,13 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
 
   return (
     <div className="max-w-[1550px] mx-auto space-y-6 pb-20 font-sans">
-      
-      {/* Header Row with Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-1">Bookings oversight</h1>
-          <p className="text-sm font-medium text-slate-500">Monitor bookings across every business on the platform.</p>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <PageHero
+          variant="portal"
+          eyebrow="Admin portal"
+          title="Bookings oversight"
+          description="Monitor bookings across every business on the platform."
+        />
 
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 h-10 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors">
@@ -245,39 +246,22 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
             <span>10 – 16 May 2026</span>
             <ChevronDown className="h-3.5 w-3.5 text-slate-400 ml-1" />
           </button>
-          <Button className="h-10 px-5 bg-[#0d5932] hover:bg-[#0a4526] text-white text-xs font-bold rounded-xl shadow-sm gap-2 transition-colors">
+          <Button className="h-10 px-5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-xl shadow-sm gap-2 transition-colors">
             <Download className="h-4 w-4" /> Export report
           </Button>
         </div>
       </div>
 
       {/* Filter Tabs with Count Pills */}
-      <div className="flex flex-wrap gap-2.5">
-        {tabs.map((tab) => {
-          const isActive = tab.key === activeTabParam;
-          const href = tab.key === "all" ? (q ? `/admin/bookings?q=${q}` : "/admin/bookings") : `/admin/bookings?status=${tab.key}${q ? `&q=${q}` : ''}`;
-          return (
-            <Link
-              key={tab.key}
-              href={href}
-              className={cn(
-                "inline-flex items-center rounded-full border px-4 py-2 text-xs font-bold transition-all shadow-none",
-                isActive 
-                  ? "border-[#0d5932] bg-[#0d5932] text-white shadow-sm" 
-                  : "border-slate-200 bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50"
-              )}
-            >
-              <span>{tab.label}</span>
-              <span className={cn(
-                "ml-2.5 px-2 py-0.5 rounded-full text-[11px] font-extrabold",
-                isActive ? "bg-emerald-950/40 text-emerald-100" : "bg-slate-100 text-slate-600"
-              )}>
-                {tab.count}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      <FilterTabs
+        activeValue={activeTabParam}
+        tabs={tabs.map((tab) => ({
+          value: tab.key,
+          label: tab.label,
+          count: tab.count,
+          href: tab.key === "all" ? (q ? `/admin/bookings?q=${q}` : "/admin/bookings") : `/admin/bookings?status=${tab.key}${q ? `&q=${q}` : ""}`
+        }))}
+      />
 
       {/* Toolbar (Search & Filter Action Row) */}
       <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
@@ -285,12 +269,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
           <form className="relative w-full sm:w-80">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             {activeTabParam && activeTabParam !== "all" && <input type="hidden" name="status" value={activeTabParam} />}
-            <input 
-              type="search" 
-              name="q" 
-              defaultValue={q} 
-              placeholder="Search bookings, businesses, or customers..." 
-              className="w-full h-10 pl-10 pr-4 rounded-xl border border-slate-200/90 text-xs font-medium outline-none focus:border-[#0d5932] focus:ring-1 focus:ring-[#0d5932] transition-all bg-white shadow-sm placeholder:text-slate-400"
+            <input
+              type="search"
+              name="q"
+              defaultValue={q}
+              placeholder="Search bookings, businesses, or customers..."
+              className="w-full h-10 pl-10 pr-4 rounded-xl border border-slate-200/90 text-xs font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-white shadow-sm placeholder:text-slate-400"
             />
           </form>
 
@@ -307,132 +291,79 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
       </div>
 
       {/* Data Table */}
-      <div className="rounded-2xl border border-slate-200/90 bg-white shadow-sm overflow-hidden">
-        
-        {/* Table Header */}
-        <div className="grid grid-cols-12 bg-white border-b border-slate-200/80 px-6 py-3.5 items-center text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-          <div className="col-span-2 flex items-center gap-1.5">
-            <span>DATE</span>
-            <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
-          </div>
-          <div className="col-span-2">REFERENCE</div>
-          <div className="col-span-3">LISTING</div>
-          <div className="col-span-2">BUSINESS</div>
-          <div className="col-span-2">CUSTOMER</div>
-          <div className="col-span-2">STATUS</div>
-          <div className="col-span-1 text-right">TOTAL</div>
-        </div>
-
-        {/* Table Body */}
-        <div className="divide-y divide-slate-100">
-          {bookings.length > 0 ? (
-            bookings.map((booking) => {
-              const dateStr = booking.createdAt.toLocaleDateString("en-UG", { day: 'numeric', month: 'short', year: 'numeric' }) + ", " + booking.createdAt.toLocaleTimeString("en-UG", { hour: '2-digit', minute: '2-digit' });
-              return (
-                <div key={booking.id} className="grid grid-cols-12 items-center px-6 py-4 hover:bg-slate-50/50 transition-colors text-xs">
-                  
-                  {/* Date */}
-                  <div className="col-span-2 font-medium text-slate-500 truncate pr-3">
-                    {dateStr}
-                  </div>
-
-                  {/* Reference */}
-                  <div className="col-span-2 font-bold text-slate-900 truncate pr-3">
-                    {booking.bookingRef}
-                  </div>
-                  
-                  {/* Listing */}
-                  <div className="col-span-3 pr-3">
-                    <div className="font-semibold text-slate-800 truncate">{booking.listing.title}</div>
-                    {booking.roomTypeName || booking.roomType || booking.addOns.length > 0 ? (
-                      <div className="text-[11px] font-medium text-slate-400 truncate">
-                        {booking.roomTypeName || booking.roomType ? `Room: ${booking.roomTypeName ?? booking.roomType?.name}` : ""}
-                        {(booking.roomTypeName || booking.roomType) && booking.addOns.length > 0 ? " · " : ""}
-                        {booking.addOns.length > 0 ? `+${booking.addOns.length} add-on${booking.addOns.length > 1 ? "s" : ""}` : ""}
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1.5">Date <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" /></span>
+              </TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Reference</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Listing</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Business</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Customer</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status</TableHead>
+              <TableHead className="text-right text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {bookings.length > 0 ? (
+              bookings.map((booking) => {
+                const dateStr = booking.createdAt.toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" }) + ", " + booking.createdAt.toLocaleTimeString("en-UG", { hour: "2-digit", minute: "2-digit" });
+                return (
+                  <TableRow key={booking.id} className="hover:bg-slate-50/50">
+                    <TableCell className="pl-6 font-medium text-slate-500 text-xs whitespace-nowrap">{dateStr}</TableCell>
+                    <TableCell className="font-bold text-slate-900 text-xs">{booking.bookingRef}</TableCell>
+                    <TableCell>
+                      <div className="font-semibold text-slate-800 text-xs">{booking.listing.title}</div>
+                      {booking.roomTypeName || booking.roomType || booking.addOns.length > 0 ? (
+                        <div className="text-[11px] font-medium text-slate-400">
+                          {booking.roomTypeName || booking.roomType ? `Room: ${booking.roomTypeName ?? booking.roomType?.name}` : ""}
+                          {(booking.roomTypeName || booking.roomType) && booking.addOns.length > 0 ? " · " : ""}
+                          {booking.addOns.length > 0 ? `+${booking.addOns.length} add-on${booking.addOns.length > 1 ? "s" : ""}` : ""}
+                        </div>
+                      ) : null}
+                    </TableCell>
+                    <TableCell className="font-semibold text-slate-700 text-xs">{booking.business.name}</TableCell>
+                    <TableCell className="font-medium text-slate-600 text-xs">{booking.customer.name ?? booking.customer.email}</TableCell>
+                    <TableCell>{renderStatusBadge(booking.status)}</TableCell>
+                    <TableCell className="pr-6 text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        <span className="font-extrabold text-slate-900 text-xs whitespace-nowrap">{formatUGX(booking.totalMinor)}</span>
+                        <button className="text-slate-400 hover:text-slate-700 p-1">
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
                       </div>
-                    ) : null}
-                  </div>
-                  
-                  {/* Business */}
-                  <div className="col-span-2 font-semibold text-slate-700 truncate pr-3">
-                    {booking.business.name}
-                  </div>
-
-                  {/* Customer */}
-                  <div className="col-span-2 font-medium text-slate-600 truncate pr-3">
-                    {booking.customer.name ?? booking.customer.email}
-                  </div>
-                  
-                  {/* Status */}
-                  <div className="col-span-2">
-                    {renderStatusBadge(booking.status)}
-                  </div>
-                  
-                  {/* Total & Action */}
-                  <div className="col-span-1 flex items-center justify-end gap-3 text-right">
-                    <span className="font-extrabold text-slate-900 text-xs whitespace-nowrap">
-                      {formatUGX(booking.totalMinor)}
-                    </span>
-                    <button className="text-slate-400 hover:text-slate-700 p-1">
-                      <MoreVertical className="h-4 w-4" />
-                    </button>
-                  </div>
-
-                </div>
-              );
-            })
-          ) : (
-            // Mock rows matching screenshot
-            mockBookings.map((mb) => (
-              <div key={mb.id} className="grid grid-cols-12 items-center px-6 py-4 hover:bg-slate-50/50 transition-colors text-xs">
-                
-                {/* Date */}
-                <div className="col-span-2 font-medium text-slate-500 truncate pr-3">
-                  {mb.date}
-                </div>
-
-                {/* Reference */}
-                <div className="col-span-2 font-bold text-slate-900 truncate pr-3">
-                  {mb.ref}
-                </div>
-                
-                {/* Listing */}
-                <div className="col-span-3 font-semibold text-slate-800 truncate pr-3">
-                  {mb.listing}
-                </div>
-                
-                {/* Business */}
-                <div className="col-span-2 font-semibold text-slate-700 truncate pr-3">
-                  {mb.business}
-                </div>
-
-                {/* Customer */}
-                <div className="col-span-2 font-medium text-slate-600 truncate pr-3">
-                  {mb.customer}
-                </div>
-                
-                {/* Status */}
-                <div className="col-span-2">
-                  {renderStatusBadge(mb.status)}
-                </div>
-                
-                {/* Total & Action */}
-                <div className="col-span-1 flex items-center justify-end gap-3 text-right">
-                  <span className="font-extrabold text-slate-900 text-xs whitespace-nowrap">
-                    {mb.total}
-                  </span>
-                  <button className="text-slate-400 hover:text-slate-700 p-1">
-                    <MoreVertical className="h-4 w-4" />
-                  </button>
-                </div>
-
-              </div>
-            ))
-          )}
-        </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              // Mock rows matching screenshot
+              mockBookings.map((mb) => (
+                <TableRow key={mb.id} className="hover:bg-slate-50/50">
+                  <TableCell className="pl-6 font-medium text-slate-500 text-xs whitespace-nowrap">{mb.date}</TableCell>
+                  <TableCell className="font-bold text-slate-900 text-xs">{mb.ref}</TableCell>
+                  <TableCell className="font-semibold text-slate-800 text-xs">{mb.listing}</TableCell>
+                  <TableCell className="font-semibold text-slate-700 text-xs">{mb.business}</TableCell>
+                  <TableCell className="font-medium text-slate-600 text-xs">{mb.customer}</TableCell>
+                  <TableCell>{renderStatusBadge(mb.status)}</TableCell>
+                  <TableCell className="pr-6 text-right">
+                    <div className="flex items-center justify-end gap-3">
+                      <span className="font-extrabold text-slate-900 text-xs whitespace-nowrap">{mb.total}</span>
+                      <button className="text-slate-400 hover:text-slate-700 p-1">
+                        <MoreVertical className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
 
         {/* Pagination Footer */}
-        <div className="border-t border-slate-200/80 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
+        <div className="border-t border-slate-200 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
           <span className="text-xs font-semibold text-slate-500">
             Showing {bookings.length > 0 ? (page - 1) * PAGE_SIZE + 1 : 1} to {bookings.length > 0 ? Math.min(page * PAGE_SIZE, totalCount) : mockBookings.length} of {totalCount > 0 ? totalCount : 122} bookings
           </span>
@@ -440,11 +371,10 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
             currentPage={page}
             totalPages={totalCount > 0 ? totalPagesFor(totalCount) : 1}
             buildHref={(p) =>
-              `/admin/bookings?${new URLSearchParams({ ...(activeTabParam ? { status: activeTabParam } : {}), ...(q ? { q } : {}), page: String(p) }).toString()}`
+              `/admin/bookings?${new URLSearchParams({ ...(activeTabParam && activeTabParam !== "all" ? { status: activeTabParam } : {}), ...(q ? { q } : {}), page: String(p) }).toString()}`
             }
           />
         </div>
-
       </div>
     </div>
   );
