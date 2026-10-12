@@ -871,9 +871,14 @@ async function main() {
       create: { email: ownerEmail, name: ownerName, role: "BUSINESS_OWNER", passwordHash }
     });
 
+    // update forces these core demo businesses back to APPROVED on every seed run
+    // (the build script runs `prisma db seed` on every deploy) — otherwise testing
+    // the admin suspend/reject action against one of them on a live deployment
+    // would silently stay broken forever, since an empty `update: {}` only ever
+    // takes effect on first creation.
     const business = await db.businessProfile.upsert({
       where: { slug },
-      update: {},
+      update: { verificationStatus: "APPROVED" },
       create: { slug, name, type, description, contactEmail: ownerEmail, city: "Kampala", verificationStatus: "APPROVED" }
     });
 
@@ -885,7 +890,7 @@ async function main() {
 
     await db.businessVerification.upsert({
       where: { id: `${business.id}-verification` },
-      update: {},
+      update: { status: "APPROVED" },
       create: {
         id: `${business.id}-verification`,
         businessId: business.id,
@@ -982,7 +987,7 @@ async function main() {
   for (const item of accommodationListings) {
     await db.listing.upsert({
       where: { id: item.id },
-      update: { images: galleryFor(item.coverImageUrl) },
+      update: { images: galleryFor(item.coverImageUrl), status: "PUBLISHED" },
       create: {
         id: item.id,
         slug: item.id,
@@ -1032,7 +1037,7 @@ async function main() {
     const { min, max } = parseGroupSize(item.groupSize);
     await db.listing.upsert({
       where: { id: item.id },
-      update: {},
+      update: { status: "PUBLISHED" },
       create: {
         id: item.id,
         slug: item.id,
@@ -1066,7 +1071,7 @@ async function main() {
   for (const item of restaurantListings) {
     await db.listing.upsert({
       where: { id: item.id },
-      update: {},
+      update: { status: "PUBLISHED" },
       create: {
         id: item.id,
         slug: item.id,
@@ -1097,7 +1102,7 @@ async function main() {
   for (const item of transportListings) {
     await db.listing.upsert({
       where: { id: item.id },
-      update: {},
+      update: { status: "PUBLISHED" },
       create: {
         id: item.id,
         slug: item.id,
