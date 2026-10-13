@@ -5,7 +5,7 @@
 @layer base {
   :root {
     /* SafariNexa brand tokens — warm, trustworthy, travel-oriented */
-    --background: 90 14% 97%; /* #F8F9F7 */
+    --background: 0 0% 100%; /* #FFFFFF */
     --foreground: 144 11% 9%; /* #151A17 */
 
     --card: 0 0% 100%;
