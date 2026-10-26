@@ -23,11 +23,14 @@ export function ListingCard({
   price,
   description,
   rating,
+  reviewCount,
   featureBadge,
   isVerified = true,
   availability,
   imageUrl,
-  showWishlist,
+  showWishlist = true,
+  /** Optional quick-view room modal button (defaults false to match clean Figma marketplace card) */
+  showQuickView = false,
   /** Signed-in save state — when set, the wishlist heart becomes a real save/unsave toggle
    * instead of the guest sign-in link. */
   isSaved,
@@ -41,6 +44,7 @@ export function ListingCard({
   price: string;
   description: string;
   rating?: number;
+  reviewCount?: number;
   /** Solid-gold highlight tag at the bottom-left of the photo — falls back to the listing type. */
   featureBadge?: string;
   /** Every business on this platform is verification-gated before publishing, so this defaults true. */
@@ -48,6 +52,7 @@ export function ListingCard({
   availability?: string;
   imageUrl?: string | null;
   showWishlist?: boolean;
+  showQuickView?: boolean;
   isSaved?: boolean;
   savedPath?: string;
   className?: string;
@@ -55,17 +60,37 @@ export function ListingCard({
   const href = (TYPE_HREF[type] ?? (() => "/explore"))(id);
   const returnTo = href;
 
+  // Format price cleanly so "From" and "/ night" don't get awkwardly doubled
+  const displayPrice = (() => {
+    let clean = price.trim();
+    if (!clean.toLowerCase().startsWith("from") && type !== "Restaurant") {
+      clean = `From ${clean}`;
+    }
+    if (type === "Accommodation" && !clean.includes("/")) {
+      clean = `${clean} / night`;
+    }
+    return clean;
+  })();
+
   return (
-    <Card className={`relative flex h-full flex-col overflow-hidden transition-shadow hover:shadow-card-hover ${className ?? ""}`}>
+    <Card className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-card transition-all duration-300 hover:shadow-card-hover ${className ?? ""}`}>
       <Link href={href} className="absolute inset-0 z-10" aria-label={title} />
-      <div className={`relative h-40 ${imageUrl ? "" : "bg-gradient-to-br from-brand-green to-[#062617]"}`}>
-        {imageUrl ? <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" /> : null}
+      <div className={`relative h-[150px] w-full shrink-0 overflow-hidden bg-muted ${imageUrl ? "" : "bg-gradient-to-br from-brand-green to-[#062617]"}`}>
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : null}
         {isVerified ? (
-          <Badge variant="success-soft" className="absolute left-3 top-3 border-transparent">
+          <Badge variant="success-soft" className="absolute left-3 top-3 z-10 border-transparent text-xs font-medium">
             Verified
           </Badge>
         ) : null}
-        <Badge variant="accent" className="absolute bottom-3 left-3 border-transparent">
+        <Badge variant="accent" className="absolute bottom-3 left-3 z-10 border-transparent text-xs font-medium">
           {featureBadge ?? type}
         </Badge>
         {showWishlist && isSaved !== undefined ? (
@@ -74,32 +99,36 @@ export function ListingCard({
           <Link
             href={`/auth/sign-in?reason=${encodeURIComponent("Save")}&returnTo=${encodeURIComponent(returnTo)}`}
             aria-label="Save to wishlist"
-            className="absolute right-3 top-3 z-20 flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-white/90 text-foreground transition-colors hover:text-destructive"
+            className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm transition-colors hover:bg-white hover:text-destructive"
           >
             <Heart className="h-4 w-4" />
           </Link>
-        ) : rating ? (
-          <span className="absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1">
-            <Rating value={rating} />
-          </span>
         ) : null}
       </div>
-      <CardContent className="flex flex-1 flex-col gap-2 pt-5">
-        <h3 className="text-lg font-bold leading-tight">{title}</h3>
-        <p className="flex items-center gap-1 text-sm text-muted-foreground">
-          <MapPin className="h-3.5 w-3.5" />
-          {location}
+      <CardContent className="flex flex-1 flex-col gap-3 p-4">
+        <h3 className="truncate text-base font-semibold leading-tight text-foreground">{title}</h3>
+        <p className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{location}</span>
         </p>
-        {showWishlist && rating ? <Rating value={rating} /> : null}
-        {availability ? <p className="text-xs font-semibold text-primary">{availability}</p> : null}
-        <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground">{description}</p>
-        <div>
-          <p className="text-xs text-muted-foreground">From</p>
-          <strong className="text-lg font-extrabold">{price}</strong>
-          {type === "Accommodation" ? <p className="text-xs text-muted-foreground mt-0.5">per night</p> : null}
+        {(rating || availability) ? (
+          <div className="flex items-center gap-3 text-[13px]">
+            {rating ? (
+              <Rating value={rating} count={reviewCount} className="text-[13px] font-medium" />
+            ) : null}
+            {availability ? (
+              <span className="truncate font-medium text-success">{availability}</span>
+            ) : null}
+          </div>
+        ) : null}
+        <p className="line-clamp-2 flex-1 text-xs leading-relaxed text-muted-foreground">{description}</p>
+        <div className="pt-0.5">
+          <p className="text-base font-semibold text-foreground">{displayPrice}</p>
         </div>
-        {type === "Accommodation" ? (
-          <RoomPreviewModal listingId={id} title={title} />
+        {showQuickView && type === "Accommodation" ? (
+          <div className="relative z-20 pt-1">
+            <RoomPreviewModal listingId={id} title={title} />
+          </div>
         ) : null}
       </CardContent>
     </Card>

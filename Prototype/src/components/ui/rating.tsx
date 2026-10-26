@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 
 export function Rating({ value, count, className }: { value: number; count?: number; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 text-sm font-semibold text-foreground", className)}>
-      <Star className="h-4 w-4 fill-accent text-accent" />
-      {value.toFixed(1)}
-      {typeof count === "number" ? <span className="font-normal text-muted-foreground">({count})</span> : null}
+    <span className={cn("inline-flex items-center gap-1 text-[13px] font-medium text-foreground", className)}>
+      <Star className="h-3.5 w-3.5 fill-accent text-accent" />
+      <span>{value.toFixed(1)}</span>
+      {typeof count === "number" ? <span className="font-medium text-foreground">({count})</span> : null}
     </span>
   );
 }

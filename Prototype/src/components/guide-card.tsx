@@ -64,7 +64,7 @@ export function GuideCard({
         </div>
 
         <div className="flex flex-col gap-2.5 p-4">
-          <p className="text-[13px] leading-relaxed text-muted-foreground">{bio}</p>
+          <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">{bio}</p>
 
           {rating || availabilityNote ? (
             <div className="flex items-center gap-3">

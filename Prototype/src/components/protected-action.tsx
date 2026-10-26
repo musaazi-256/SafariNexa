@@ -16,8 +16,8 @@ export function ProtectedAction({
   const href = `/auth/sign-in?reason=${encodeURIComponent(action)}&returnTo=${encodeURIComponent(returnTo)}`;
 
   return (
-    <Card className="border-primary/20 bg-primary/5">
-      <CardContent className="pt-6">
+    <Card className="rounded-2xl border border-primary/20 bg-primary/5 shadow-card">
+      <CardContent className="p-6">
         <div className="flex items-center gap-2 text-primary">
           <Lock className="h-4 w-4" />
           <span className="text-xs font-extrabold uppercase tracking-wide">Account required</span>

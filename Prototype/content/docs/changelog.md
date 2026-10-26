@@ -256,3 +256,20 @@ After the `revalidate = 60` fix deployed, the homepage's "Stay at our top accomm
 This applies to the 4 "core" demo businesses (one per category) and their seed-defined listings specifically — anything created later through the real product UI (a business owner's own new listing, say) is untouched, since the seed only upserts by the specific IDs it already knows about.
 
 **Verified by directly simulating the production failure mode locally** (not just re-reading the code): connected to the local Postgres DB, manually set `nile-crater-lodges` to `SUSPENDED` and all 26 of its accommodation listings to `ARCHIVED` — reproducing exactly what the live symptom implied. Re-ran `npm run db:seed`. Confirmed via direct SQL: the business was back to `APPROVED`, 24 of the 26 listings (the ones the seed script actually owns) were back to `PUBLISHED`, and the exact query the homepage runs (`type = ACCOMMODATION AND status = PUBLISHED AND business.verificationStatus = APPROVED`) returned 24 rows again, up from 0. `tsc`/`eslint`/`jest` clean.
+
+---
+
+## 13 October 2026 — Card UI system alignment with Figma design specifications
+
+Aligned card primitives and marketplace card layouts with the Figma design specification following the transition to a pure white (`#FFFFFF`) application background:
+
+- **`Card` foundation (`src/components/ui/card.tsx`)**: Changed base border from `border-transparent bg-white` to `border border-border bg-card shadow-card`, ensuring all cards maintain crisp outline definition and elevation against the pure white page background.
+- **`ListingCard` (`src/components/listing-card.tsx`)**:
+  - Image media header: Standardized to exact 150px height with rounded top, Verified badge (`variant="success-soft"`) top-left, category/feature highlight badge (`variant="accent"`) bottom-left, and circular wishlist action top-right.
+  - Body layout: Refined typography to 16px font-semibold title, 13px muted location with map pin, and paired rating (`★ 4.8 (126)`) alongside availability cue (`Available 15–20 Jun` in `text-success`) in a single horizontal row as designed in Figma.
+  - Pricing & Actions: Cleaned up vertical duplication into a unified single-line `From [price] / night` format with 16px font-semibold styling. Removed the extra modal button on marketplace cards so accommodation cards match the clean Figma layout and align evenly across discovery rails.
+- **`CompactListingCard` (`src/components/compact-listing-card.tsx`)**: Refined thumbnail image rounding, bold title, compact price typography, and hover chevron interaction.
+- **`GuideCard` (`src/components/guide-card.tsx`)**: Enforced line-clamping on bio and aligned border/shadows with the updated card system.
+- **`ProtectedAction` (`src/components/protected-action.tsx`)**: Updated card container to use clean `rounded-2xl border border-primary/20 bg-primary/5 shadow-card` styling with standardized padding.
+- **Homepage (`src/app/page.tsx`) & Accommodation Page (`src/app/accommodation/page.tsx`)**: Wired review counts and availability cues to `ListingCard` instances across Accommodation, Restaurants, and Transport sections.
+

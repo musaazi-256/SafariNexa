@@ -29,20 +29,20 @@ export function CompactListingCard({
   return (
     <Link
       href={href}
-      className={`flex w-72 shrink-0 snap-start items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-card transition-shadow hover:shadow-card-hover ${className ?? ""}`}
+      className={`group flex w-72 shrink-0 snap-start items-center gap-3 rounded-2xl border border-border bg-card p-2.5 shadow-card transition-all duration-300 hover:shadow-card-hover ${className ?? ""}`}
     >
-      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
+      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-muted">
         {imageUrl ? (
-          <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover" />
+          <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-brand-green to-[#062617]" />
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate font-bold leading-tight">{title}</p>
-        <p className="truncate text-sm text-muted-foreground">{price}</p>
+        <p className="truncate text-sm font-semibold leading-tight text-foreground">{title}</p>
+        <p className="truncate text-xs font-medium text-muted-foreground mt-1">{price}</p>
       </div>
-      <ChevronRight className="h-5 w-5 shrink-0 text-primary" />
+      <ChevronRight className="h-4 w-4 shrink-0 text-primary transition-transform duration-300 group-hover:translate-x-0.5" />
     </Link>
   );
 }

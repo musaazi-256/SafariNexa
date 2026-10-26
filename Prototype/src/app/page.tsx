@@ -99,22 +99,27 @@ export default async function HomePage() {
         <Container className="pt-14">
           <HomeSection title="Stay at our top accommodations" description="Well curated stays for you — all costs included." moreHref="/accommodation">
             <ScrollRow>
-              {accommodationListings.map((listing) => (
-                <ListingCard
-                  key={listing.id}
-                  id={listing.id}
-                  type="Accommodation"
-                  title={listing.title}
-                  location={listing.city ?? ""}
-                  price={`${formatListingPrice(listing)} / night`}
-                  description={listing.description}
-                  rating={ratingSummary(listing.reviews).average}
-                  imageUrl={listing.coverImageUrl}
-                  featureBadge={listing.accommodation?.roomTypes.some((room) => room.breakfastIncluded) ? "Breakfast included" : undefined}
-                  showWishlist
-                  className={CARD_WIDTH}
-                />
-              ))}
+              {accommodationListings.map((listing) => {
+                const { average, count } = ratingSummary(listing.reviews);
+                return (
+                  <ListingCard
+                    key={listing.id}
+                    id={listing.id}
+                    type="Accommodation"
+                    title={listing.title}
+                    location={listing.city ?? ""}
+                    price={`${formatListingPrice(listing)} / night`}
+                    description={listing.description}
+                    rating={average}
+                    reviewCount={count}
+                    availability="Available this week"
+                    imageUrl={listing.coverImageUrl}
+                    featureBadge={listing.accommodation?.roomTypes.some((room) => room.breakfastIncluded) ? "Breakfast included" : undefined}
+                    showWishlist
+                    className={CARD_WIDTH}
+                  />
+                );
+              })}
             </ScrollRow>
           </HomeSection>
         </Container>
@@ -225,39 +230,49 @@ export default async function HomePage() {
 
           <HomeSection title="Where to eat" description="Reserve a table at a verified restaurant near you." moreHref="/restaurants">
             <ScrollRow>
-              {restaurantListings.map((restaurant) => (
-                <ListingCard
-                  key={restaurant.id}
-                  id={restaurant.id}
-                  type="Restaurant"
-                  title={restaurant.title}
-                  location={restaurant.city ?? ""}
-                  price={formatListingPrice(restaurant)}
-                  description={restaurant.description}
-                  rating={ratingSummary(restaurant.reviews).average}
-                  imageUrl={restaurant.coverImageUrl}
-                  className={CARD_WIDTH}
-                />
-              ))}
+              {restaurantListings.map((restaurant) => {
+                const { average, count } = ratingSummary(restaurant.reviews);
+                return (
+                  <ListingCard
+                    key={restaurant.id}
+                    id={restaurant.id}
+                    type="Restaurant"
+                    title={restaurant.title}
+                    location={restaurant.city ?? ""}
+                    price={formatListingPrice(restaurant)}
+                    description={restaurant.description}
+                    rating={average}
+                    reviewCount={count}
+                    availability="Open for reservations"
+                    imageUrl={restaurant.coverImageUrl}
+                    className={CARD_WIDTH}
+                  />
+                );
+              })}
             </ScrollRow>
           </HomeSection>
 
           <HomeSection title="Get around" description="Airport transfers and special hire, ready when you land." moreHref="/transport">
             <ScrollRow>
-              {transportListings.map((option) => (
-                <ListingCard
-                  key={option.id}
-                  id={option.id}
-                  type="Transport"
-                  title={option.title}
-                  location={option.city ?? ""}
-                  price={formatListingPrice(option)}
-                  description={option.description}
-                  rating={ratingSummary(option.reviews).average}
-                  imageUrl={option.coverImageUrl}
-                  className={CARD_WIDTH}
-                />
-              ))}
+              {transportListings.map((option) => {
+                const { average, count } = ratingSummary(option.reviews);
+                return (
+                  <ListingCard
+                    key={option.id}
+                    id={option.id}
+                    type="Transport"
+                    title={option.title}
+                    location={option.city ?? ""}
+                    price={formatListingPrice(option)}
+                    description={option.description}
+                    rating={average}
+                    reviewCount={count}
+                    availability="3 spots left"
+                    imageUrl={option.coverImageUrl}
+                    className={CARD_WIDTH}
+                  />
+                );
+              })}
             </ScrollRow>
           </HomeSection>
 

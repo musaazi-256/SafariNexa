@@ -38,20 +38,25 @@ export default async function AccommodationPage({ searchParams }: { searchParams
           />
           <p className="mb-4 text-sm text-muted-foreground">{totalCount} verified stays</p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {listings.map((listing) => (
-              <ListingCard
-                key={listing.id}
-                id={listing.id}
-                type="Accommodation"
-                title={listing.title}
-                location={listing.city ?? ""}
-                price={formatListingPrice(listing)}
-                description={listing.description}
-                rating={ratingSummary(listing.reviews).average}
-                imageUrl={listing.coverImageUrl}
-                featureBadge={listing.accommodation?.roomTypes.some((room) => room.breakfastIncluded) ? "Breakfast included" : undefined}
-              />
-            ))}
+            {listings.map((listing) => {
+              const { average, count } = ratingSummary(listing.reviews);
+              return (
+                <ListingCard
+                  key={listing.id}
+                  id={listing.id}
+                  type="Accommodation"
+                  title={listing.title}
+                  location={listing.city ?? ""}
+                  price={formatListingPrice(listing)}
+                  description={listing.description}
+                  rating={average}
+                  reviewCount={count}
+                  availability="Available this week"
+                  imageUrl={listing.coverImageUrl}
+                  featureBadge={listing.accommodation?.roomTypes.some((room) => room.breakfastIncluded) ? "Breakfast included" : undefined}
+                />
+              );
+            })}
           </div>
           <Pagination currentPage={page} totalPages={totalPagesFor(totalCount)} buildHref={(p) => `/accommodation?page=${p}`} />
         </Container>
