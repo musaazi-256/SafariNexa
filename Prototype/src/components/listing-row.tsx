@@ -48,7 +48,7 @@ export function ListingRow({
         {imageUrl ? <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 300px" className="object-cover transition-transform duration-500 group-hover:scale-105" /> : null}
         <Badge className="absolute left-3 top-3 border-transparent bg-white/90 text-[#0B4928]">{type}</Badge>
       </div>
-      <div className="flex flex-1 flex-col py-1">
+      <div className="flex min-w-0 flex-1 flex-col py-1">
         <div className="flex flex-col items-start gap-1">
           <h3 className="text-[20px] font-bold leading-tight text-foreground">{title}</h3>
           <p className="flex items-center gap-1 text-[13px] font-medium text-muted-foreground">
@@ -80,14 +80,13 @@ export function ListingRow({
           </div>
         ) : null}
          </div>
-        <div className="mt-auto pt-4 flex items-end justify-between">
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-4">
           <div>
-            <p className="text-[13px] text-muted-foreground mb-0.5">From</p>
-            <div className="flex items-baseline gap-1">
+            <div className="flex flex-wrap items-baseline gap-1">
               <strong className="text-[20px] font-extrabold text-foreground">{price}</strong>
               {!price.includes("/") ? (
                 <span className="text-[13px] text-muted-foreground">
-                  {type === "Guide" ? "/ hr" : type === "Transport" ? "/ trip" : "/ night"}
+                  {type === "Guide" ? "/ hr" : type === "Transport" ? "/ trip" : type === "Accommodation" ? "/ night" : "/ person"}
                 </span>
               ) : null}
             </div>

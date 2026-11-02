@@ -36,13 +36,13 @@ export default async function BusinessVerificationPage() {
     SUBMITTED: "Your documents are under review. We'll notify you once there's an update.",
     UNDER_REVIEW: "Your documents are under review. We'll notify you once there's an update.",
     NEEDS_CHANGES: "We need more information before we can approve your business. See the notes below and resubmit.",
-    APPROVED: "Your business is verified and can publish listings.",
+    APPROVED: "Your business is verified. You can submit individual listings and photos for admin approval before publication.",
     REJECTED: "Your verification was not approved. See the notes below.",
     SUSPENDED: "Your business's verification has been flagged and is on hold. See the notes below."
   };
   const bannerMessage = statusCopy[business.verificationStatus] ?? statusCopy.SUBMITTED;
   const reviewNotes = latestVerification?.reviewNotes?.trim();
-  const showNotes = Boolean(reviewNotes) && ["NEEDS_CHANGES", "REJECTED", "SUSPENDED"].includes(business.verificationStatus);
+  const showNotes = Boolean(reviewNotes);
 
   return (
     <div className="max-w-4xl mx-auto space-y-10 pb-20 pt-8">
@@ -129,10 +129,9 @@ export default async function BusinessVerificationPage() {
               <p className="text-sm text-slate-500 mt-0.5">If you&apos;re not sure what to upload, contact our support team.</p>
             </div>
          </div>
-         <Button variant="outline" className="bg-white font-bold h-10 px-6 shrink-0">
-           <MessageCircle className="mr-2 h-4 w-4" /> Contact support
-         </Button>
+<Button asChild variant="outline"><Link href="/support">Contact support</Link></Button>
       </div>
     </div>
   );
 }
+import Link from "next/link";

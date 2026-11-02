@@ -39,7 +39,7 @@ export function CartView() {
         <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 font-medium mb-6 flex-wrap">
           <Link href="/" className="hover:text-slate-900 transition-colors">Home</Link>
           <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
-          <Link href="/accommodation" className="hover:text-slate-900 transition-colors">Accommodation</Link>
+          <Link href="/explore" className="hover:text-slate-900 transition-colors">Explore</Link>
           {firstItem && (
             <>
               <ChevronRight className="h-3.5 w-3.5 text-slate-400" />

@@ -3,6 +3,7 @@ import { Star } from "lucide-react";
 import type { ReviewStatus as PrismaReviewStatus } from "@prisma/client";
 
 import { auth } from "@/auth";
+import { requireAdminSession } from "@/lib/admin";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
@@ -26,7 +27,8 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
   const session = await auth();
   if (!session?.user?.isAdmin) redirect("/admin/login");
 
-  const activeStatus = (searchParams.status?.toUpperCase() as PrismaReviewStatus | undefined) ?? undefined;
+  const requestedStatus = searchParams.status?.toUpperCase();
+  const activeStatus = requestedStatus && ["PUBLISHED","FLAGGED","HIDDEN","PENDING"].includes(requestedStatus) ? requestedStatus as PrismaReviewStatus : undefined;
   const page = parsePage(searchParams.page);
   const where = activeStatus ? { status: activeStatus } : undefined;
 
@@ -43,9 +45,10 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
 
   async function setReviewStatus(formData: FormData) {
     "use server";
-    const activeSession = await auth();
+    const activeSession = await requireAdminSession("reviews.moderate");
     if (!activeSession?.user?.isAdmin) redirect("/admin/login");
 
+    if (!["PENDING","PUBLISHED","HIDDEN","FLAGGED"].includes(String(formData.get("status")))) throw new Error("Invalid review state");
     const reviewId = String(formData.get("reviewId"));
     const status = String(formData.get("status")) as PrismaReviewStatus;
 

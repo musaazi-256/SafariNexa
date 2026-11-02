@@ -2,12 +2,12 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import fs from "fs/promises";
-import path from "path";
+import { saveVerificationFile } from "@/lib/private-documents";
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { logAuditEvent } from "@/lib/audit";
+import { businessReviewSnapshot } from "@/lib/business-review";
 
 export async function submitBusinessOnboarding(formData: FormData) {
   const session = await auth();
@@ -35,28 +35,11 @@ export async function submitBusinessOnboarding(formData: FormData) {
     if (key.startsWith("doc_") && value instanceof File && value.size > 0) {
       const docType = key.replace("doc_", "").toUpperCase();
       
-      const buffer = Buffer.from(await value.arrayBuffer());
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      await fs.mkdir(uploadDir, { recursive: true });
-      
-      const ext = path.extname(value.name) || ".pdf";
-      const filename = `doc_${docType.toLowerCase()}_${Date.now()}${ext}`;
-      await fs.writeFile(path.join(uploadDir, filename), buffer);
-      
-      documentsToCreate.push({
-        type: docType,
-        fileUrl: `/uploads/${filename}`
-      });
+      documentsToCreate.push({ type: docType, fileUrl: await saveVerificationFile(value) });
     }
   }
 
-  // Fallback for dev mode / no upload
-  if (documentsToCreate.length === 0) {
-    documentsToCreate.push({
-      type: "REGISTRATION_CERTIFICATE",
-      fileUrl: "https://example.com/doc.pdf"
-    });
-  }
+  if (documentsToCreate.length === 0) throw new Error("Please upload a registration document.");
 
   // Slug generation (rudimentary for demo)
   const slugBase = businessName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -97,6 +80,7 @@ export async function submitBusinessOnboarding(formData: FormData) {
       data: {
         businessId: profile.id,
         status: "SUBMITTED",
+        submittedProfile: businessReviewSnapshot(profile),
         documents: {
           create: documentsToCreate
         }

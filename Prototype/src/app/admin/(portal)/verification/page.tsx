@@ -1,4 +1,5 @@
 import { Square } from "lucide-react";
+import Link from "next/link";
 import type { VerificationStatus as PrismaVerificationStatus } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
@@ -62,47 +63,7 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
   }
 
   // Fallback mock items matching the screenshot when database records are few
-  const mockQueueItems = [
-    {
-      id: "mock-1",
-      name: "Nile Safari Lodge",
-      category: "Accommodation",
-      date: "26 Jun 2026",
-      documents: [
-        { name: "Trading License", status: "Verified", statusType: "verified" },
-        { name: "COI (Certificate)", status: "Pending", statusType: "pending" }
-      ]
-    },
-    {
-      id: "mock-2",
-      name: "Murchison Falls Safari",
-      category: "Tour Operator",
-      date: "26 Jun 2026",
-      documents: [
-        { name: "Trading License", status: "Rejected", statusType: "rejected" },
-        { name: "Insurance Certificate", status: "Missing", statusType: "missing" }
-      ]
-    },
-    {
-      id: "mock-3",
-      name: "Jinja River Guide",
-      category: "Guide Services",
-      date: "25 Jun 2026",
-      documents: [
-        { name: "Specialist License", status: "Verified", statusType: "verified" }
-      ]
-    },
-    {
-      id: "mock-4",
-      name: "Kampala Transit Co.",
-      category: "Transport Provider",
-      date: "24 Jun 2026",
-      documents: [
-        { name: "PSV License", status: "Verified", statusType: "verified" },
-        { name: "Vehicle Logbook", status: "Pending", statusType: "pending" }
-      ]
-    }
-  ];
+
 
   return (
     <div className="max-w-[1450px] mx-auto space-y-6 pb-20 font-sans">
@@ -115,9 +76,7 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
           title="Verification queue"
           description="Review submitted profiles, certificate of operations, and business documents."
         />
-        <Button variant="outline" className="border-slate-200 text-slate-700 font-bold rounded-lg h-9 px-4 text-xs shadow-sm shrink-0">
-          Bulk Action
-        </Button>
+<Link href="/admin/listings" className="text-sm underline">Review listing submissions and photos →</Link>
       </div>
 
       {/* Filter Tabs (Pill Buttons) */}
@@ -221,47 +180,7 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
           })
         ) : (
           // Mock Cards matching screenshot
-          mockQueueItems.map((item) => (
-            <div key={item.id} className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 space-y-4">
-              
-              {/* Header Row */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-base font-bold text-slate-900">{item.name}</h3>
-                  <p className="text-xs font-semibold text-slate-400 mt-0.5">{item.category} · Submitted on {item.date}</p>
-                </div>
-
-                {/* No real verification record behind this demo card — actions render once a
-                    real submission exists, above. */}
-                <span className="shrink-0 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-400">
-                  Example only
-                </span>
-              </div>
-
-              {/* Submitted Documents Section */}
-              <div>
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">SUBMITTED DOCUMENTS</p>
-                <div className="flex flex-wrap gap-3">
-                  {item.documents.map((doc, idx) => (
-                    <div key={idx} className="inline-flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50/80 px-3.5 py-2 text-xs text-slate-700 font-bold">
-                      <Square className="h-3.5 w-3.5 text-slate-400" />
-                      <span>{doc.name}</span>
-                      <span className={cn(
-                        "text-[10px] font-extrabold px-2.5 py-0.5 rounded-md ml-1",
-                        doc.statusType === 'verified' && "bg-emerald-100 text-emerald-800",
-                        doc.statusType === 'pending' && "bg-amber-100 text-amber-800",
-                        doc.statusType === 'rejected' && "bg-rose-100 text-rose-800",
-                        doc.statusType === 'missing' && "bg-blue-100 text-blue-800"
-                      )}>
-                        {doc.status}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-          ))
+<p className="rounded-xl border bg-white p-6 text-muted-foreground">No matching verification submissions.</p>
         )}
       </div>
 

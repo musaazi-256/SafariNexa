@@ -1,0 +1,5 @@
+import {serializeListingForm,restoreListingForm} from "./listing-revisions";
+import {listingSnapshot,snapshotDigest} from "./listing-review";
+test("revisions preserve multiple gallery and room photos without client-controlled action metadata",()=>{const form=new FormData();form.append("images","one.jpg");form.append("images","two.jpg");form.append("roomTypeImages_0","room.jpg");form.append("$ACTION_ID","ignored");const serialized=serializeListingForm(form);expect(serialized).not.toHaveProperty("$ACTION_ID");const restored=restoreListingForm(serialized);expect(restored.getAll("images")).toEqual(["one.jpg","two.jpg"]);expect(restored.get("roomTypeImages_0")).toBe("room.jpg");});
+test("saving an unpublished revision does not invalidate the approved live-content fingerprint",()=>{const live={title:"Approved",images:["approved.jpg"]};expect(snapshotDigest(listingSnapshot({...live,draftForm:{title:["Draft"]},draftSnapshot:{title:"Draft",images:["new.jpg"]}}))).toEqual(snapshotDigest(listingSnapshot(live)));});
+test("malformed persisted form data is rejected",()=>{expect(()=>restoreListingForm({title:42})).toThrow("Invalid");});

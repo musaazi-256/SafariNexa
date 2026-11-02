@@ -148,7 +148,7 @@ export function AccommodationReservationFields({
   const addItem = useCartStore((state) => state.addItem);
   const router = useRouter();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (checkout = false) => {
     if (!canReserve) return;
     
     addItem({
@@ -159,6 +159,8 @@ export function AccommodationReservationFields({
       startDate,
       endDate,
       participants: participantsNum,
+      participantMin: 1,
+      participantMax: selectedRoom?.maxOccupancy,
       roomTypeId,
       roomTypeName: selectedRoom?.name,
       addOnIds: Array.from(addOnIds),
@@ -166,7 +168,8 @@ export function AccommodationReservationFields({
       unitPriceMinor
     });
     
-    router.push("/cart");
+    const added = useCartStore.getState().items.at(-1);
+    router.push(checkout && added ? `/checkout/multi?itemId=${encodeURIComponent(added.id)}` : "/cart");
   };
 
   return (
@@ -365,7 +368,7 @@ export function AccommodationReservationFields({
           
           <div className="flex items-center gap-2">
             {canReserve ? (
-              <Button size="lg" variant="secondary" className="flex-1 font-bold bg-secondary hover:bg-secondary/80" onClick={handleAddToCart}>
+              <Button size="lg" variant="secondary" className="flex-1 font-bold bg-secondary hover:bg-secondary/80" onClick={() => handleAddToCart()}>
                 Add to cart
               </Button>
             ) : (
@@ -386,8 +389,8 @@ export function AccommodationReservationFields({
           </div>
 
           {canReserve ? (
-            <Button size="lg" className="w-full bg-brand-green hover:bg-brand-green/90 text-white font-bold" onClick={handleAddToCart}>
-              Reserve
+            <Button size="lg" className="w-full bg-brand-green hover:bg-brand-green/90 text-white font-bold" onClick={() => handleAddToCart(true)}>
+              Continue to checkout
             </Button>
           ) : (
             <div className="rounded-xl bg-secondary p-3 text-center text-sm text-muted-foreground font-medium">

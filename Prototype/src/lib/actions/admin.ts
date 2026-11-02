@@ -1,14 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { randomBytes, createHash } from "crypto";
+import { applicationOrigin, emailConfigured, sendAccountEmail } from "@/lib/email";
 
 import { auth } from "@/auth";
+import { requireAdminSession } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { logAuditEvent } from "@/lib/audit";
 import { VerificationStatus, UserRole, AdminUserStatus } from "@prisma/client";
+import { businessReviewSnapshot } from "@/lib/business-review";
+import { snapshotDigest } from "@/lib/listing-review";
 
 export async function updateVerificationStatus(verificationId: string, status: VerificationStatus, notes: string = "") {
-  const session = await auth();
+  const session = await requireAdminSession("businesses.manage");
+  if (!["UNDER_REVIEW", "APPROVED", "REJECTED", "NEEDS_CHANGES", "SUSPENDED"].includes(status)) throw new Error("Invalid verification decision.");
+  if (!notes.trim() || notes.length > 5000) throw new Error("Enter reviewer notes (1–5000 characters).");
   if (!session?.user?.isAdmin) {
     throw new Error("Unauthorized: Admin access required");
   }
@@ -24,6 +31,12 @@ export async function updateVerificationStatus(verificationId: string, status: V
 
   // Run in a transaction
   await db.$transaction(async (tx) => {
+    const latest = await tx.businessVerification.findFirst({where: {businessId: verification.businessId}, orderBy: {submittedAt: "desc"}});
+    if (latest?.id !== verificationId) throw new Error("Review the latest business submission instead of an older one.");
+    if (status === "APPROVED" && latest.submittedProfile) {
+      const current = await tx.businessProfile.findUniqueOrThrow({where: {id: verification.businessId}});
+      if (snapshotDigest(businessReviewSnapshot(current)) !== snapshotDigest(latest.submittedProfile)) throw new Error("The business profile changed after submission. Ask the business to resubmit its verification documents with the updated profile.");
+    }
     // 1. Update verification record
     await tx.businessVerification.update({
       where: { id: verificationId },
@@ -43,7 +56,7 @@ export async function updateVerificationStatus(verificationId: string, status: V
       }
     });
 
-    // 3. Send email notification to business owners
+    // 3. Send in-app notification to business owners
     // In a production app, we would integrate Resend/SendGrid here.
     const owners = await tx.businessUser.findMany({
       where: { businessId: verification.businessId, role: "OWNER" }
@@ -75,20 +88,25 @@ export async function updateVerificationStatus(verificationId: string, status: V
 
   revalidatePath("/admin/(portal)/verification", "page");
   revalidatePath("/admin/(portal)/businesses", "page");
+  revalidatePath("/business/verification");
+  revalidatePath(`/admin/verification/${verificationId}`);
 }
 
 export async function inviteAdmin(email: string) {
+  await requireAdminSession("users.manage");
+  if (!emailConfigured()) throw new Error("Email invitations are not configured. No access has been granted.");
   const session = await auth();
   if (!session?.user?.isAdmin) {
     throw new Error("Unauthorized: Admin access required");
   }
 
   const normalizedEmail = email.toLowerCase().trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) throw new Error("Enter a valid email.");
   
   // Find "Super Admin" role
-  let superAdminRole = await db.role.findUnique({ where: { name: "Super Admin" } });
+  let superAdminRole = await db.role.findUnique({ where: { name: "Support Agent" } });
   if (!superAdminRole) {
-    superAdminRole = await db.role.create({ data: { name: "Super Admin" } });
+    superAdminRole = await db.role.create({ data: { name: "Support Agent" } });
   }
 
   await db.$transaction(async (tx) => {
@@ -122,12 +140,17 @@ export async function inviteAdmin(email: string) {
         }
       });
     } else if (existingAdminUser.status === "SUSPENDED") {
-       await tx.adminUser.update({
-         where: { id: existingAdminUser.id },
-         data: { status: "ACTIVE" }
-       });
+       throw new Error("Suspended accounts must be restored through the access management action.");
     }
   });
+
+  const invited = await db.adminUser.findFirst({ where: { user: { email: normalizedEmail }, status: "INVITED" } });
+  if (!invited) throw new Error("This account already has admin access or cannot be invited.");
+  const token = randomBytes(32).toString("hex");
+  const digest = createHash("sha256").update(token).digest("hex");
+  const identifier = `admin-invite:${invited.id}`;
+  await db.$transaction([db.verificationToken.deleteMany({where:{identifier}}),db.verificationToken.create({data:{identifier,token:digest,expires:new Date(Date.now()+7*24*60*60*1000)}})]);
+  await sendAccountEmail(normalizedEmail,"SafariNexa admin invitation",`You have been invited to a limited administrative role. Sign in with this email and accept here: ${applicationOrigin()}/admin/auth/accept?token=${token}`,`admin-invite:${digest}`);
 
   await logAuditEvent({
     actorUserId: session.user.id,
@@ -142,6 +165,7 @@ export async function inviteAdmin(email: string) {
 }
 
 export async function toggleAdminUserStatus(adminUserId: string) {
+  await requireAdminSession("users.manage");
   const session = await auth();
   if (!session?.user?.isAdmin) {
     throw new Error("Unauthorized: Admin access required");

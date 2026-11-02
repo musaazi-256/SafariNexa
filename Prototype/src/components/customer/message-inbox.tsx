@@ -40,6 +40,10 @@ export type ThreadType = {
 
 export function CustomerMessageInbox({ initialThreads, customerUserId }: { initialThreads: ThreadType[], customerUserId: string }) {
   const [threads, setThreads] = useState<ThreadType[]>(initialThreads);
+  useEffect(() => {
+    setThreads(initialThreads);
+    setActiveThreadId(current => current ?? initialThreads[0]?.id ?? null);
+  }, [initialThreads]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(initialThreads[0]?.id || null);
   const [searchQuery, setSearchQuery] = useState("");
   const [draft, setDraft] = useState("");

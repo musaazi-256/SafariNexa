@@ -7,7 +7,7 @@ import { LISTING_TYPE_TO_SERVICE_TYPE } from "@/lib/listing-types";
 /** Bookings in these statuses no longer hold a room — every other status (including
  * mid-payment ones) still occupies the room, so we don't show a room as free while
  * someone else's payment is processing. */
-const NON_BLOCKING_BOOKING_STATUSES = ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN", "PAYMENT_FAILED"] as const;
+const NON_BLOCKING_BOOKING_STATUSES = ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN", "PAYMENT_FAILED", "REFUNDED"] as const;
 
 /** Which nights, over the next `monthsAhead` months, are fully booked for each room type —
  * real availability derived from actual Booking rows, not fabricated. A night only counts as
@@ -59,6 +59,8 @@ export async function getRoomTypeAvailability(
       .filter(([, count]) => count >= Math.max(1, room.totalRooms))
       .map(([date]) => date);
   }
+  const ledger = await db.availability.findMany({ where: { roomTypeId: { in: roomTypes.map(r => r.id) }, date: { gte: todayUtc, lt: windowEnd }, remaining: { lte: 0 } }, select: { roomTypeId: true, date: true } });
+  for (const row of ledger) if (row.roomTypeId) availability[row.roomTypeId] = [...new Set([...(availability[row.roomTypeId] ?? []), dateKeyUTC(row.date)])];
   return availability;
 }
 

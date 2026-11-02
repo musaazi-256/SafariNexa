@@ -28,7 +28,7 @@ export function SortSelect() {
 
   return (
     <Select value={current} onValueChange={handleChange}>
-      <SelectTrigger className="w-48">
+      <SelectTrigger className="w-40 max-w-full sm:w-48" aria-label="Sort search results">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

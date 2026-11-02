@@ -29,7 +29,8 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  useSidebar
 } from "@/components/ui/sidebar";
 
 const GROUPS = [
@@ -40,7 +41,8 @@ const GROUPS = [
     label: "Platform",
     items: [
       { href: "/admin/businesses", label: "Businesses", icon: Building2 },
-      { href: "/admin/verification", label: "Verification", icon: ShieldCheck }
+      { href: "/admin/verification", label: "Business verification", icon: ShieldCheck },
+      { href: "/admin/listings", label: "Listing reviews", icon: ClipboardCheck }
     ]
   },
   {
@@ -54,7 +56,9 @@ const GROUPS = [
     label: "Community",
     items: [
       { href: "/admin/users", label: "Users", icon: Users },
-      { href: "/admin/reviews", label: "Reviews", icon: Star }
+      { href: "/admin/reviews", label: "Reviews", icon: Star },
+      { href: "/admin/support", label: "Support", icon: LifeBuoy },
+      { href: "/admin/audit", label: "Audit trail", icon: Gauge }
     ]
   },
   {
@@ -66,6 +70,7 @@ const GROUPS = [
 ];
 
 export function AdminSidebar() {
+  const { setOpenMobile } = useSidebar();
   const pathname = usePathname();
 
   return (
@@ -91,7 +96,7 @@ export function AdminSidebar() {
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href}>
+                      <Link href={item.href} onClick={() => setOpenMobile(false)}>
                         <item.icon />
                         <span>{item.label}</span>
                       </Link>
@@ -107,25 +112,25 @@ export function AdminSidebar() {
         {/* System Status Widget */}
         <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100">
           <div className="flex flex-col mb-4">
-            <span className="text-[13px] font-bold text-slate-900 mb-2">System status</span>
+            <span className="text-[13px] font-bold text-slate-900 mb-2">Monitoring not configured</span>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-[#1e613c]"></div>
-              <span className="text-[12px] font-bold text-[#1e613c]">All systems operational</span>
+              <span className="text-[12px] font-bold text-[#1e613c]">Not connected to monitoring</span>
             </div>
-            <span className="text-[11px] font-semibold text-slate-400 mt-0.5">Updated 2 mins ago</span>
+            <span className="text-[11px] font-semibold text-slate-400 mt-0.5">Connect monitoring before launch</span>
           </div>
           <div className="space-y-2 mb-4">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-semibold text-slate-500">Uptime</span>
-              <span className="text-[12px] font-bold text-[#1e613c]">99.98%</span>
+              <span className="text-[12px] font-bold text-[#1e613c]">—</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-semibold text-slate-500">Response time</span>
-              <span className="text-[12px] font-bold text-[#1e613c]">145ms</span>
+              <span className="text-[12px] font-bold text-[#1e613c]">—</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-semibold text-slate-500">Active users</span>
-              <span className="text-[12px] font-bold text-[#1e613c]">128</span>
+              <span className="text-[12px] font-bold text-[#1e613c]">—</span>
             </div>
           </div>
         </div>

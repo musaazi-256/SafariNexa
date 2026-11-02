@@ -127,8 +127,8 @@ export function AvailabilityCalendarEditor({
               <Input id="capacity" name="capacity" type="number" min={0} defaultValue={selected?.capacity ?? 1} required />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="remaining">Remaining</Label>
-              <Input id="remaining" name="remaining" type="number" min={0} defaultValue={selected?.remaining ?? 1} required />
+              <p className="text-sm font-medium">Remaining</p>
+              <p id="remaining" className="text-sm text-muted-foreground">Calculated automatically from capacity minus existing reservations.</p>
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="priceOverrideMinor">Price override (UGX, optional)</Label>

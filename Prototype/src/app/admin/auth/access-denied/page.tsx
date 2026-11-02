@@ -19,9 +19,7 @@ export default function AdminAccessDeniedPage() {
               </span>
               <h1 className="text-xl font-bold">Access denied</h1>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                This Google account isn&apos;t recognized as an active SafariNexa admin. Admin access is never created
-                automatically — if you believe this is a mistake, ask a super admin to check your role. This attempt
-                has been recorded in the audit log.
+                Your account is not authorised for this administrative action. It may be inactive or missing the required role permission. Ask a super admin to check your access. No additional administrative access has been granted.
               </p>
               <Button asChild variant="secondary" className="mt-2">
                 <Link href="/admin/login">Back to admin sign in</Link>

@@ -31,7 +31,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
   const q = searchParams.q?.trim();
 
   const where: any = {};
-  if (activeStatus && activeStatus !== "ALL") {
+  if (activeStatus && ["NOT_STARTED","DRAFT","SUBMITTED","UNDER_REVIEW","NEEDS_CHANGES","APPROVED","REJECTED","SUSPENDED"].includes(activeStatus)) {
     where.verificationStatus = activeStatus;
   }
   if (q) {
@@ -86,14 +86,8 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
               className="w-full h-9 pl-9 pr-4 rounded-full border border-slate-200 text-[13px] outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-white"
             />
           </form>
-          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0">
-            <Filter className="h-4 w-4 mr-2 text-slate-400" />
-            Filter
-          </Button>
-          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0 hidden lg:inline-flex">
-            <Download className="h-4 w-4 mr-2 text-slate-400" />
-            Export
-          </Button>
+<PortalFilter />
+<ExportVisibleRows />
         </div>
       </div>
 
@@ -169,3 +163,4 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
     </div>
   );
 }
+import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

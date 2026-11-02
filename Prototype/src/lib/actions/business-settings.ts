@@ -7,8 +7,11 @@ import { requireBusinessSession } from "@/lib/business";
 import { logAuditEvent } from "@/lib/audit";
 
 export async function updateBusinessProfile(formData: FormData) {
-  const { business, businessId } = await requireBusinessSession();
+  const { business, businessId, session } = await requireBusinessSession();
   if (!business || !businessId) throw new Error("Unauthorized");
+
+  const member = await db.businessUser.findFirst({ where: { businessId, userId: session.user.id, role: { in: ["OWNER", "MANAGER"] } } });
+  if (!member) throw new Error("Only owners and managers can edit settings.");
 
   const name = String(formData.get("name") ?? "").trim();
   const contactEmail = String(formData.get("email") ?? "").trim();
@@ -36,7 +39,6 @@ export async function updateBusinessProfile(formData: FormData) {
     },
   });
 
-  const session = await auth();
   if (session?.user) {
     await logAuditEvent({
       actorUserId: session.user.id,

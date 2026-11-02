@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { CartItem } from "@/lib/cart";
 import { validateAndReserveBookings } from "@/lib/booking-service";
 
-export async function createBulkOrderAction(items: CartItem[], userDetails: { fullName: string; email: string; phone: string }) {
+export async function createBulkOrderAction(items: CartItem[], userDetails: { fullName: string; email: string; phone: string; nationality?: string; emergencyContact?: string }) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 

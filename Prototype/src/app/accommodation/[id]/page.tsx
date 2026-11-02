@@ -21,6 +21,8 @@ import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { ScoreBadge } from "@/components/ui/rating";
 import { db } from "@/lib/db";
+import { BookingModeNotice } from "@/components/booking-mode-notice";
+import { ListingTrustSummary } from "@/components/listing-trust-summary";
 import { findEligibleReviewBooking, findRelatedListings, getRoomTypeAvailability, getRoomTypeRemainingToday, ratingBreakdown, ratingSummary } from "@/lib/listings";
 
 export default async function AccommodationDetailPage({ params }: { params: { id: string } }) {
@@ -111,6 +113,8 @@ export default async function AccommodationDetailPage({ params }: { params: { id
             ]}
           />
 
+          <BookingModeNotice listing={listing}/>
+          <ListingTrustSummary listingId={listing.id}/>
           <PhotoGallery
             images={listing.images.length > 0 ? listing.images : listing.coverImageUrl ? [listing.coverImageUrl] : []}
             title={listing.title}

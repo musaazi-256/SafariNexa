@@ -12,6 +12,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { db } from "@/lib/db";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
+import { NOTIFICATION_TYPES, parsePreferences } from "@/lib/preferences";
 
 const TYPE_ICON: Record<NotificationType, typeof Bell> = {
   BOOKING_UPDATE: CalendarCheck,
@@ -35,14 +36,17 @@ export default async function NotificationsPage({ searchParams }: { searchParams
   const session = await auth();
   if (!session?.user) redirect("/auth/sign-in?returnTo=%2Fnotifications");
 
-  const filter = searchParams.filter ?? "all";
+  const filter = TABS.some(tab => tab.value === searchParams.filter) ? searchParams.filter! : "all";
+  const profile = await db.customerProfile.findUnique({where: {userId: session.user.id}});
+  const prefs = parsePreferences(profile?.preferences);
+  const enabled = NOTIFICATION_TYPES.filter(type => prefs.notify[type]);
   const page = parsePage(searchParams.page);
   const where =
     filter === "unread"
-      ? { userId: session.user.id, isRead: false }
+      ? { userId: session.user.id, isRead: false, type: {in: enabled} }
       : filter !== "all"
         ? { userId: session.user.id, type: filter as NotificationType }
-        : { userId: session.user.id };
+        : { userId: session.user.id, type: {in: enabled} };
 
   const [notifications, totalCount] = await Promise.all([
     db.notification.findMany({

@@ -34,7 +34,7 @@ export async function getAccommodationRoomsAction(listingId: string) {
     }
   });
 
-  if (!listing || !listing.accommodation) {
+  if (!listing || listing.status !== "PUBLISHED" || !listing.accommodation) {
     throw new Error("Accommodation not found");
   }
 

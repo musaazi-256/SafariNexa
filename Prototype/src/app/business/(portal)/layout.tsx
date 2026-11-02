@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { LiveRefresh } from "@/components/live-refresh";
 
 import { BusinessSidebar } from "@/components/business/business-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -15,12 +16,13 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
 
   return (
     <SidebarProvider>
+      <LiveRefresh />
       <BusinessSidebar businesses={businesses} activeBusinessId={businessId} />
-      <SidebarInset className="bg-[#f8f9fa]">
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border bg-white px-6">
+      <SidebarInset className="bg-muted/40">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border bg-background px-4 sm:px-6">
           <div className="flex items-center gap-4">
             <SidebarTrigger />
-            <span className="text-sm font-semibold text-slate-900">Business portal</span>
+            <span className="text-sm font-semibold text-muted-foreground">Business portal</span>
           </div>
           <div className="flex items-center gap-4">
             {session?.user && (
@@ -36,7 +38,7 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
             )}
           </div>
         </header>
-        <div className="flex-1 space-y-6 p-6">{children}</div>
+        <div className="mx-auto w-full min-w-0 max-w-[1440px] flex-1 space-y-6 p-4 sm:p-6 lg:p-8">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

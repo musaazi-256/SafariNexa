@@ -27,7 +27,8 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  useSidebar
 } from "@/components/ui/sidebar";
 
 const GROUPS = [
@@ -35,6 +36,8 @@ const GROUPS = [
     items: [
       { href: "/business/dashboard", label: "Overview", icon: LayoutDashboard },
       { href: "/business/listings", label: "Listings", icon: ClipboardList },
+      { href: "/business/guides", label: "Guides", icon: Users },
+      { href: "/business/verification", label: "Verification", icon: ShieldCheck },
       { href: "/business/bookings", label: "Bookings", icon: CalendarClock },
       { href: "/business/messages", label: "Messages", icon: MessageCircle },
       { href: "/business/reviews", label: "Reviews", icon: Star },
@@ -56,6 +59,7 @@ export function BusinessSidebar({
   businesses: Array<{ id: string; name: string; type: string }>;
   activeBusinessId?: string;
 }) {
+  const { setOpenMobile } = useSidebar();
   const pathname = usePathname();
 
   return (
@@ -80,7 +84,7 @@ export function BusinessSidebar({
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href}>
+                      <Link href={item.href} onClick={() => setOpenMobile(false)}>
                         <item.icon />
                         <span>{item.label}</span>
                       </Link>

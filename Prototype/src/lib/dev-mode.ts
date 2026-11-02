@@ -1,11 +1,7 @@
 /**
- * When AUTH_DEV_MODE=true, the Credentials providers in src/auth.ts accept
- * any email/password (creating a User on the fly if needed) instead of
- * checking a real password hash. Lets you click through every surface
- * without configuring Google OAuth or hand-seeding accounts. Never enable
- * this in production — it is intentionally opt-in via an explicit env var
- * rather than NODE_ENV, so a forgotten `.env` doesn't silently disable auth
- * checks on a real deployment.
+ * Legacy development flag validator. Authentication always checks existing
+ * credentials and roles, even locally. A stale development flag must never
+ * be accepted by a production deployment.
  */
 export function isAuthDevMode() {
   if (process.env.NODE_ENV === "production" && process.env.AUTH_DEV_MODE === "true") {

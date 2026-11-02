@@ -17,15 +17,15 @@
     --primary: 148 88% 25%; /* #087A3E */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 45 30% 94%;
+    --secondary: 150 8% 96%;
     --secondary-foreground: 148 74% 16%; /* #0B4928 — rich brand green used for section headings */
 
-    --muted: 42 24% 94%;
+    --muted: 150 8% 96%;
     --muted-foreground: 103 3% 42%; /* #6B6F68 */
 
     /* Gold is an accent for ratings/highlights only — never a default CTA background,
        and never paired with white text (see design system rules). */
-    --accent: 48 100% 51%; /* #FFCE06 accent gold */
+    --accent: 150 12% 94%; /* Neutral interaction surface; gold stays a brand highlight. */
     --accent-foreground: 150 10% 10%;
 
     --destructive: 0 75% 42%;
@@ -39,11 +39,11 @@
     --warning: 38 92% 50%;
     --warning-foreground: 150 10% 10%;
 
-    --border: 39 26% 87%; /* #E6E1D8 */
-    --input: 39 26% 87%;
+    --border: 150 8% 88%;
+    --input: 150 8% 86%;
     --ring: 146 82% 25%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
     --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -73,6 +73,28 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    overflow-wrap: break-word;
+  }
+
+  main, .container, .grid > * {
+    min-width: 0;
+  }
+
+  input, select, textarea {
+    max-width: 100%;
+  }
+
+  :where(a, button, input, select, textarea, summary):focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   ::selection {
@@ -115,11 +137,11 @@
   }
 
   .card {
-    @apply rounded-2xl border border-border bg-card text-card-foreground shadow-card;
+    @apply rounded-xl border border-border bg-card text-card-foreground shadow-sm;
   }
 
   .button {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-transparent bg-gradient-to-r from-primary to-brand-green-dark px-[18px] font-semibold text-primary-foreground shadow-sm transition-all duration-300 hover:shadow-md hover:opacity-90 active:scale-95;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-transparent bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
   }
 
   .button.secondary {

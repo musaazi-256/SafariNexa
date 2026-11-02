@@ -1,5 +1,6 @@
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
+import { projectMessageReadState } from "@/lib/message-read-state";
 import { MessageInbox } from "@/components/business/message-inbox";
 import { getBusinessCustomers } from "@/lib/actions/messages";
 import { PageHero } from "@/components/page-hero";
@@ -67,6 +68,7 @@ export default async function BusinessMessagesPage({
       messages: {
         orderBy: { createdAt: "asc" },
         include: {
+          readReceipts: true,
           sender: { select: { name: true, image: true } }
         }
       }
@@ -85,7 +87,7 @@ export default async function BusinessMessagesPage({
         description="Reply to customer questions and booking conversations."
       />
       <MessageInbox
-        initialThreads={threads as any} 
+        initialThreads={threads.map(thread => ({...thread, messages: projectMessageReadState(thread.messages, session.user.id, thread.customerId)})) as any}
         businessUserId={session.user.id} 
         businessId={businessId}
         initialActiveThreadId={targetThreadId}

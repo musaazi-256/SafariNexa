@@ -1,0 +1,3 @@
+export function BookingTravellerSummary({participants}: {participants: {id: string; fullName: string; email: string | null; phone: string | null; nationality: string | null; emergencyContact: string | null}[]}) {
+ return <section className="my-4 space-y-3 rounded border p-4"><h2 className="text-lg font-bold">Submitted traveller details</h2>{participants.map(person => <div key={person.id} className="break-words text-sm"><p>{person.fullName} · {person.email} · {person.phone}</p>{person.nationality && <p>Nationality: {person.nationality}</p>}{person.emergencyContact && <p>Emergency contact: {person.emergencyContact}</p>}</div>)}</section>;
+}

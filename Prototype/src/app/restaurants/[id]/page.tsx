@@ -22,6 +22,8 @@ import { Container } from "@/components/ui/container";
 import { ScoreBadge } from "@/components/ui/rating";
 import { parseFirstUgxAmount } from "@/lib/booking";
 import { db } from "@/lib/db";
+import { BookingModeNotice } from "@/components/booking-mode-notice";
+import { ListingTrustSummary } from "@/components/listing-trust-summary";
 import { findEligibleReviewBooking, findRelatedListings, ratingBreakdown, ratingSummary } from "@/lib/listings";
 
 export default async function RestaurantDetailPage({ params }: { params: { id: string } }) {
@@ -104,6 +106,8 @@ export default async function RestaurantDetailPage({ params }: { params: { id: s
             ]}
           />
 
+          <BookingModeNotice listing={listing}/>
+          <ListingTrustSummary listingId={listing.id}/>
           <PhotoGallery
             images={listing.images.length > 0 ? listing.images : listing.coverImageUrl ? [listing.coverImageUrl] : []}
             title={listing.title}

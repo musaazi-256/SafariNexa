@@ -1,3 +1,4 @@
+import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
 import { Download, Calendar, Hourglass, Check, CalendarCheck, X, Banknote, Filter, Search, MoreVertical, ArrowUpDown } from "lucide-react";
 
@@ -17,13 +18,14 @@ import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 
 const STATUS_GROUPS: Record<string, string[]> = {
+  PENDING_PAYMENT: ["PENDING_PAYMENT","PAYMENT_FAILED","PAYMENT_PROCESSING"],
   AWAITING_BUSINESS_CONFIRMATION: ["AWAITING_BUSINESS_CONFIRMATION"],
   CONFIRMED: ["CONFIRMED"],
   COMPLETED: ["COMPLETED", "REVIEW_PENDING", "REVIEWED"],
   CANCELLED: ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN"]
 };
 
-export default async function BusinessBookingsPage({ searchParams }: { searchParams: { status?: string; page?: string } }) {
+export default async function BusinessBookingsPage({ searchParams }: { searchParams: { status?: string; page?: string; q?: string } }) {
   const { business, businessId } = await requireBusinessSession();
 
   if (!business || !businessId) {
@@ -36,7 +38,7 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
 
   const activeTab = searchParams.status?.toUpperCase();
   const page = parsePage(searchParams.page);
-  const where = { businessId, ...(activeTab && STATUS_GROUPS[activeTab] ? { status: { in: STATUS_GROUPS[activeTab] } } : {}) };
+  const where = { ...(searchParams.q ? { OR: [{ bookingRef: { contains: searchParams.q.trim(), mode: "insensitive" as const } }, { listing: { title: { contains: searchParams.q.trim(), mode: "insensitive" as const } } }] } : {}), businessId, ...(activeTab && STATUS_GROUPS[activeTab] ? { status: { in: STATUS_GROUPS[activeTab] } } : {}) };
 
   // Fetch data
   const [
@@ -74,13 +76,14 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
   const confirmedCount = statusCounts["CONFIRMED"] || 0;
   const completedCount = (statusCounts["COMPLETED"] || 0) + (statusCounts["REVIEW_PENDING"] || 0) + (statusCounts["REVIEWED"] || 0);
   const cancelledCount = (statusCounts["CANCELLED_BY_CUSTOMER"] || 0) + (statusCounts["CANCELLED_BY_BUSINESS"] || 0) + (statusCounts["CANCELLED_BY_ADMIN"] || 0);
-  const allCount = awaitingCount + confirmedCount + completedCount + cancelledCount;
+  const allCount = Object.values(statusCounts).reduce((sum,count)=>sum+count,0);
   
   const totalRevenue = revenueResult._sum.totalMinor || 0;
 
   const TABS = [
     { value: "ALL", label: "All", count: allCount },
     { value: "AWAITING_BUSINESS_CONFIRMATION", label: "Awaiting confirmation", count: awaitingCount },
+    { value: "PENDING_PAYMENT", label: "Awaiting customer payment", count: STATUS_GROUPS.PENDING_PAYMENT.reduce((sum,status)=>sum+(statusCounts[status]||0),0) },
     { value: "CONFIRMED", label: "Confirmed", count: confirmedCount },
     { value: "COMPLETED", label: "Completed", count: completedCount },
     { value: "CANCELLED", label: "Cancelled", count: cancelledCount }
@@ -90,6 +93,7 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
 
   // Status mapping for dot badges
   const getStatusDisplay = (status: string) => {
+    if (STATUS_GROUPS.PENDING_PAYMENT.includes(status)) return {text:"Awaiting customer payment",dot:"bg-amber-500",bg:"bg-amber-50",textCol:"text-amber-700"};
     if (STATUS_GROUPS.AWAITING_BUSINESS_CONFIRMATION.includes(status)) return { text: "Awaiting confirmation", dot: "bg-orange-500", bg: "bg-orange-50", textCol: "text-orange-600" };
     if (STATUS_GROUPS.CONFIRMED.includes(status)) return { text: "Confirmed", dot: "bg-green-500", bg: "bg-green-50", textCol: "text-green-700" };
     if (STATUS_GROUPS.COMPLETED.includes(status)) return { text: "Completed", dot: "bg-purple-500", bg: "bg-purple-50", textCol: "text-purple-700" };
@@ -115,12 +119,8 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
           description="Handle booking requests and confirmations."
         />
         <div className="flex items-center gap-3 shrink-0">
-          <Button variant="outline" className="font-semibold text-slate-700 border-slate-200">
-            <Download className="h-4 w-4 mr-2" /> Export
-          </Button>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm">
-            <Calendar className="h-4 w-4 mr-2" /> Calendar view
-          </Button>
+<ExportVisibleRows />
+<Button asChild variant="outline"><Link href="/business/bookings/calendar">Calendar view</Link></Button>
         </div>
       </div>
 
@@ -232,9 +232,7 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
         />
 
         <div className="flex items-center gap-3 w-full lg:w-auto">
-          <Button variant="outline" className="border-slate-200 text-slate-700 font-semibold h-10">
-            <Filter className="h-4 w-4 mr-2" /> Filters
-          </Button>
+<PortalFilter />
           <div className="relative flex-1 lg:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input placeholder="Search bookings..." className="pl-9 h-10 bg-slate-50/50 border-slate-200" />
@@ -277,7 +275,7 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-100 overflow-hidden shadow-sm border border-slate-200/60">
                           {booking.listing.coverImageUrl ? (
-                            <img src={booking.listing.coverImageUrl} alt="" className="h-full w-full object-cover" />
+                            <RemoteImage src={booking.listing.coverImageUrl} alt="" className="h-full w-full object-cover" />
                           ) : (
                             <div className="h-full w-full bg-slate-100" />
                           )}
@@ -359,3 +357,4 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
     </div>
   );
 }
+import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

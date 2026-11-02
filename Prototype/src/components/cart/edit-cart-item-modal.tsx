@@ -53,7 +53,7 @@ export function EditCartItemModal({
   // Calculate unit price per night (or per participant)
   const initialNights = isMultiNight && item.startDate && item.endDate ? Math.max(1, nightsBetween(item.startDate, item.endDate)) : 1;
   const unitPricePerNight = item.unitPriceMinor ?? Math.round(item.totalMinor / initialNights);
-  const calculatedTotal = isMultiNight ? unitPricePerNight * nights : unitPricePerNight * (participants || 1);
+  const calculatedTotal = isMultiNight ? unitPricePerNight * nights : unitPricePerNight * (item.pricingBasis === "fixed" || item.type.toLowerCase() === "transport" && item.pricingBasis !== "per_person" ? 1 : participants || 1);
 
   const handleAddNight = () => {
     if (!endDate) return;
@@ -85,13 +85,14 @@ export function EditCartItemModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-card border border-border shadow-2xl transition-all">
+      <div role="dialog" aria-modal="true" aria-label="Edit booking details" className="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-card border border-border shadow-2xl transition-all">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-muted/40">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-bold text-foreground">Edit Booking Details</h2>
           </div>
           <button
+            aria-label="Close booking editor"
             onClick={onClose}
             className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
           >
@@ -159,7 +160,7 @@ export function EditCartItemModal({
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
-                <CalendarIcon className="h-3.5 w-3.5 text-primary" /> Check-in Date
+                <CalendarIcon className="h-3.5 w-3.5 text-primary" /> {isAccommodation ? "Check-in date" : "Service date"}
               </label>
               <input
                 type="date"
@@ -212,7 +213,7 @@ export function EditCartItemModal({
                 onChange={(e) => setParticipants(Number(e.target.value) || 1)}
                 className="w-full appearance-none bg-transparent text-sm font-medium outline-none"
               >
-                {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                {Array.from({ length: (item.participantMax ?? 10) - (item.participantMin ?? 1) + 1 }, (_, i) => i + (item.participantMin ?? 1)).map((num) => (
                   <option key={num} value={num}>
                     {num} {num === 1 ? "Guest" : "Guests"}
                   </option>

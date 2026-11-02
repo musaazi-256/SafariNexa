@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
+import { createHash } from "crypto";
 import { z } from "zod";
 
 import authConfig from "@/auth.config";
@@ -37,16 +38,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const { email, password } = parsed.data;
         const normalizedEmail = email.toLowerCase();
 
-        if (isAuthDevMode()) {
-          // Dev mode: any email/password works. Find-or-create so you can
-          // test guest→customer flows without hand-seeding an account.
-          const user = await db.user.upsert({
-            where: { email: normalizedEmail },
-            update: {},
-            create: { email: normalizedEmail, name: normalizedEmail.split("@")[0], role: "CUSTOMER", customerProfile: { create: {} } }
-          });
-          return { id: user.id, email: user.email, name: user.name, image: user.image };
-        }
+        isAuthDevMode(); // Validate configuration; never bypass credentials.
 
         const user = await db.user.findUnique({ where: { email: normalizedEmail } });
         if (!user?.passwordHash) return null;
@@ -74,35 +66,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const { email, password } = parsed.data;
         const normalizedEmail = email.toLowerCase();
 
-        if (isAuthDevMode()) {
-          // Dev mode: any email/password becomes an ACTIVE admin, so the
-          // admin portal is reachable without hand-seeding a role/allowlist
-          // entry. Still logged to the audit trail like a real admin sign-in.
-          const devRole = await db.role.upsert({
-            where: { name: "Dev Admin" },
-            update: {},
-            create: { name: "Dev Admin", description: "Auto-provisioned by AUTH_DEV_MODE for local testing." }
-          });
-          const devUser = await db.user.upsert({
-            where: { email: normalizedEmail },
-            update: { role: "ADMIN" },
-            create: { email: normalizedEmail, name: normalizedEmail.split("@")[0], role: "ADMIN" }
-          });
-          await db.adminUser.upsert({
-            where: { userId: devUser.id },
-            update: { status: "ACTIVE", roleId: devRole.id, lastLoginAt: new Date() },
-            create: { userId: devUser.id, roleId: devRole.id, status: "ACTIVE", lastLoginAt: new Date() }
-          });
-          await logAuditEvent({
-            actorUserId: devUser.id,
-            actorEmail: devUser.email,
-            surface: "ADMIN",
-            action: "admin_credentials_sign_in",
-            outcome: "SUCCESS",
-            metadata: { devMode: true }
-          });
-          return { id: devUser.id, email: devUser.email, name: devUser.name, image: devUser.image };
-        }
+        isAuthDevMode(); // Validate configuration; never bypass credentials.
 
         const user = await db.user.findUnique({
           where: { email: normalizedEmail },
@@ -233,7 +197,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.userId = user.id;
       }
 
-      if (user?.id || trigger === "update") {
+      if (user?.id || token.userId || trigger === "update") {
         const dbUser = await db.user.findUnique({
           where: { id: (user?.id ?? token.userId) as string },
           include: {
@@ -243,12 +207,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (dbUser) {
+          const authVersion = createHash("sha256").update(dbUser.passwordHash ?? "oauth").digest("hex");
+          if (!user?.id && token.authVersion && token.authVersion !== authVersion) return null;
+          token.authVersion = authVersion;
           token.userId = dbUser.id;
           token.role = dbUser.role;
           token.isAdmin = Boolean(dbUser.adminUser && dbUser.adminUser.status === "ACTIVE");
           token.adminRoleName = dbUser.adminUser?.role.name ?? null;
           token.businessIds = dbUser.businessUsers.map((membership) => membership.businessId);
-        }
+        } else return null;
       }
 
       return token;
@@ -258,7 +225,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.id = token.userId as string;
         session.user.role = token.role as string;
-        session.user.isAdmin = Boolean(token.isAdmin) || process.env.AUTH_DEV_MODE === "true";
+        session.user.isAdmin = Boolean(token.isAdmin);
         session.user.adminRoleName = (token.adminRoleName as string | null) ?? null;
         session.user.businessIds = (token.businessIds as string[]) ?? [];
       }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getSavedCardState } from "@/lib/saved-card-state";
 import Image from "next/image";
 import { Heart, MapPin } from "lucide-react";
 
@@ -15,7 +16,7 @@ const TYPE_HREF: Record<string, (id: string) => string> = {
   Transport: (id) => `/transport/${id}`
 };
 
-export function ListingCard({
+export async function ListingCard({
   id,
   type,
   title,
@@ -57,6 +58,8 @@ export function ListingCard({
   savedPath?: string;
   className?: string;
 }) {
+  const state = await getSavedCardState();
+  isSaved = isSaved ?? (state.signedIn ? state.ids.includes(id) : undefined);
   const href = (TYPE_HREF[type] ?? (() => "/explore"))(id);
   const returnTo = href;
 

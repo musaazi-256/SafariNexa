@@ -1,3 +1,4 @@
+import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
 import { Plus, User } from "lucide-react";
 
@@ -51,7 +52,7 @@ export default async function GuidesPage() {
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
                     {guide.photoUrl ? (
-                      <img src={guide.photoUrl} alt={guide.name} className="h-12 w-12 rounded-full object-cover" />
+                      <RemoteImage src={guide.photoUrl} alt={guide.name} className="h-12 w-12 rounded-full object-cover" />
                     ) : (
                       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
                         <User className="h-6 w-6 text-muted-foreground" />

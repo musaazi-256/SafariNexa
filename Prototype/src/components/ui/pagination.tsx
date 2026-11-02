@@ -17,9 +17,10 @@ export function Pagination({
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
 
   return (
-    <nav className="mt-8 flex items-center justify-center gap-1.5" aria-label="Pagination">
+    <nav className="mt-8 flex flex-wrap items-center justify-center gap-1.5" aria-label="Pagination">
       <Link
         href={buildHref(Math.max(1, currentPage - 1))}
+        aria-label="Previous page"
         aria-disabled={currentPage === 1}
         tabIndex={currentPage === 1 ? -1 : undefined}
         className={cn(
@@ -46,6 +47,7 @@ export function Pagination({
 
       <Link
         href={buildHref(Math.min(totalPages, currentPage + 1))}
+        aria-label="Next page"
         aria-disabled={currentPage === totalPages}
         tabIndex={currentPage === totalPages ? -1 : undefined}
         className={cn(

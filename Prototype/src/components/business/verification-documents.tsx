@@ -103,7 +103,7 @@ export function VerificationDocuments({ documents }: VerificationDocumentsProps)
           <h4 className="text-sm font-bold text-green-900">Why we need these documents</h4>
           <p className="text-sm text-green-700 mt-1 flex items-center justify-between">
             <span>These help us verify your business is legitimate and compliant with local regulations.</span>
-            <a href="#" className="font-semibold text-green-800 hover:underline shrink-0 ml-4 hidden sm:inline">Learn more ↗</a>
+            <a href="/docs/overview" className="font-semibold text-green-800 hover:underline shrink-0 ml-4 hidden sm:inline">Learn more ↗</a>
           </p>
         </div>
       </div>
@@ -172,7 +172,7 @@ export function VerificationDocuments({ documents }: VerificationDocumentsProps)
               <p className="text-sm font-semibold text-slate-900">
                 Drag and drop files here, or <span className="text-green-600 cursor-pointer">browse</span>
               </p>
-              <p className="text-xs text-slate-500 mt-1">PDF, JPG, PNG up to 10MB</p>
+              <p className="text-xs text-slate-500 mt-1">PDF, JPG, PNG up to 5MB</p>
             </>
           )}
         </div>

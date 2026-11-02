@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/ui/image-uploader";
+function ExistingOption({value,known}: {value?:string|null;known:string[]}) {return value && !known.includes(value) ? <option value={value}>{value} (current)</option> : null;}
 
 export type ListingBaseInitial = {
   title?: string;
+  bookingMode?: string;
   description?: string;
   city?: string;
   address?: string;
@@ -83,6 +85,7 @@ export function ListingBaseFields({
             defaultValue={initial?.city ?? "Kampala"}
             className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <ExistingOption value={initial?.city} known={["Kampala","Entebbe","Jinja","Mbarara","Gulu","Fort Portal"]}/>
             <option value="Kampala">Kampala</option>
             <option value="Entebbe">Entebbe</option>
             <option value="Jinja">Jinja</option>
@@ -128,6 +131,7 @@ export function ListingBaseFields({
           <Input id="basePriceMinor" name="basePriceMinor" type="number" min={0} defaultValue={initial?.basePriceMinor} required />
         </div>
 
+        <div className="flex flex-col gap-1.5"><Label htmlFor="bookingMode">Booking mode (reviewed by admin)</Label><select id="bookingMode" name="bookingMode" defaultValue={initial?.bookingMode || "REQUEST"} className="rounded border p-3"><option value="REQUEST">Request to book — accept before payment</option><option value="INSTANT">Instant — payment confirms availability</option></select><p className="text-xs text-muted-foreground">Use Instant only with reliably maintained inventory. Restaurants always use table-reservation requests with no online meal charge.</p></div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="coverImageUrl" className="font-semibold text-slate-700">Cover photo</Label>
           <ImageUploader name="coverImageUrl" multiple={false} defaultValue={initial?.coverImageUrl ?? ""} />
@@ -177,6 +181,7 @@ export function AccommodationTypeFields({
             defaultValue={initial?.propertyType ?? "Lodge"}
             className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <ExistingOption value={initial?.propertyType} known={["hotel","guesthouse","lodge","apartment"]}/>
             <option value="hotel">Hotel</option>
             <option value="guesthouse">Guesthouse</option>
             <option value="lodge">Lodge</option>
@@ -203,7 +208,8 @@ export function AccommodationTypeFields({
               { value: "parking", label: "Parking" },
               { value: "breakfast", label: "Breakfast" },
               { value: "pool", label: "Swimming pool" },
-              { value: "airport-transfer", label: "Airport transfer" }
+              { value: "airport-transfer", label: "Airport transfer" },
+              ...(initial?.amenities ?? []).filter(value=>!["wifi","parking","breakfast","pool","airport-transfer"].includes(value)).map(value=>({value,label:value}))
             ].map((amenity) => (
               <label key={amenity.value} className="flex items-center gap-2 text-sm text-slate-600">
                 <input
@@ -266,6 +272,7 @@ export function TourTypeFields({
             defaultValue={initial?.tourType ?? "wildlife"}
             className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <ExistingOption value={initial?.tourType} known={["wildlife","primate","cultural","adventure"]}/>
             <option value="wildlife">Wildlife Safari</option>
             <option value="primate">Gorilla & Chimp Trekking</option>
             <option value="cultural">Cultural Tour</option>
@@ -284,6 +291,7 @@ export function TourTypeFields({
             defaultValue={initial?.difficulty ?? "Moderate"}
             className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <ExistingOption value={initial?.difficulty} known={["Easy","Moderate","Strenuous","Extreme"]}/>
             <option value="Easy">Easy</option>
             <option value="Moderate">Moderate</option>
             <option value="Strenuous">Strenuous</option>
@@ -341,6 +349,7 @@ export function RestaurantTypeFields({
     seatingCapacity?: number | null;
     acceptsReservationRequests?: boolean;
     openingHours?: string | null;
+    reservationDurationMinutes?: number;
   };
 }) {
   return (
@@ -365,6 +374,7 @@ export function RestaurantTypeFields({
             defaultValue={initial?.cuisineType ?? "Ugandan home cooking"}
             className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <ExistingOption value={initial?.cuisineType} known={["local","continental","indian","cafe"]}/>
             <option value="local">Local Ugandan</option>
             <option value="continental">Continental</option>
             <option value="indian">Indian</option>
@@ -379,6 +389,7 @@ export function RestaurantTypeFields({
             defaultValue={initial?.priceRange ?? "UGX 45,000 - 85,000 per person"}
             className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <ExistingOption value={initial?.priceRange} known={["Under UGX 20,000 per person","UGX 20,000 - 45,000 per person","UGX 45,000 - 85,000 per person","Over UGX 85,000 per person"]}/>
             <option value="Under UGX 20,000 per person">Under UGX 20,000 per person</option>
             <option value="UGX 20,000 - 45,000 per person">UGX 20,000 - 45,000 per person</option>
             <option value="UGX 45,000 - 85,000 per person">UGX 45,000 - 85,000 per person</option>
@@ -387,12 +398,14 @@ export function RestaurantTypeFields({
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="openingHours" className="font-semibold text-slate-700">Opening hours <span className="text-red-500">*</span></Label>
+          <p className="text-xs text-muted-foreground">Online reservations currently support daily hours, for example Daily · 08:00 - 22:00. Times are East Africa Time.</p>
           <select
             id="openingHours"
             name="openingHours"
             defaultValue={initial?.openingHours ?? "Daily · 08:00 - 22:00"}
             className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <ExistingOption value={initial?.openingHours} known={["Daily · 08:00 - 22:00","Daily · 10:00 - 23:00","Weekdays only","Weekends only"]}/>
             <option value="Daily · 08:00 - 22:00">Daily · 08:00 - 22:00</option>
             <option value="Daily · 10:00 - 23:00">Daily · 10:00 - 23:00</option>
             <option value="Weekdays only">Weekdays only</option>
@@ -400,6 +413,8 @@ export function RestaurantTypeFields({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
+          <Label htmlFor="reservationDurationMinutes">Reservation duration (minutes)</Label>
+          <Input id="reservationDurationMinutes" name="reservationDurationMinutes" type="number" min={30} max={240} defaultValue={initial?.reservationDurationMinutes ?? 90} required />
           <Label htmlFor="seatingCapacity" className="font-semibold text-slate-700">Seating capacity <span className="text-red-500">*</span></Label>
           <Input id="seatingCapacity" name="seatingCapacity" type="number" min={1} defaultValue={initial?.seatingCapacity ?? ""} />
         </div>
@@ -476,6 +491,7 @@ export function TransportTypeFields({
             defaultValue={initial?.vehicleType ?? "suv"}
             className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <ExistingOption value={initial?.vehicleType} known={["suv","van","sedan"]}/>
             <option value="suv">SUV / 4x4</option>
             <option value="van">Safari Minivan</option>
             <option value="sedan">Sedan</option>

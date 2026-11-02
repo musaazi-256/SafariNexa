@@ -20,6 +20,6 @@ export async function setActiveBusiness(businessId: string) {
   const memberBusinessIds = dbUser?.businessUsers.map((bu) => bu.businessId) || [];
 
   if (!memberBusinessIds.includes(businessId)) throw new Error("Not a member of this business.");
-  cookies().set(ACTIVE_BUSINESS_COOKIE, businessId, { httpOnly: true, sameSite: "lax", path: "/" });
+  cookies().set(ACTIVE_BUSINESS_COOKIE, businessId, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
   revalidatePath("/business", "layout");
 }

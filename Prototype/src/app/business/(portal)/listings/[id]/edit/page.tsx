@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
@@ -26,6 +27,8 @@ import {
 } from "@/lib/business-listing-form";
 import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
+import { reviewInclude } from "@/lib/listing-review";
+import { revisionPreview,serializeListingForm } from "@/lib/listing-revisions";
 
 const PREVIEW_PATH: Record<string, string> = {
   ACCOMMODATION: "accommodation",
@@ -38,7 +41,7 @@ export default async function EditListingPage({ params }: { params: { id: string
   const { business, businessId } = await requireBusinessSession();
   if (!business || !businessId) redirect("/business/auth/sign-in");
 
-  const listing = await db.listing.findUnique({
+  const liveListing = await db.listing.findUnique({
     where: { id: params.id },
     include: {
       accommodation: { include: { roomTypes: true, addOns: true } },
@@ -47,7 +50,10 @@ export default async function EditListingPage({ params }: { params: { id: string
       transport: true
     }
   });
-  if (!listing || listing.businessId !== businessId) notFound();
+  if (!liveListing || liveListing.businessId !== businessId) notFound();
+  const listing = liveListing.draftSnapshot && liveListing.status === "PUBLISHED" ? {...liveListing,...liveListing.draftSnapshot as object} as typeof liveListing : liveListing;
+  const pendingReview = await db.listingSubmission.findFirst({where: {listingId: listing.id, status: {in: ["SUBMITTED", "UNDER_REVIEW"]}}});
+  if (pendingReview) return <div className="mx-auto max-w-2xl space-y-4 p-4"><h1 className="text-2xl font-bold">Submission is locked during review</h1><p>Withdraw the pending submission before editing. The approved live version remains unchanged.</p><Link className="block underline" href={`/business/listings/${listing.id}/review`}>Submission & feedback</Link><Link className="block underline" href="/business/listings">Back to listings</Link></div>;
 
   let guides: Array<{ id: string; name: string }> = [];
   if (listing.type === "TOUR") {
@@ -71,12 +77,28 @@ export default async function EditListingPage({ params }: { params: { id: string
     const target = await db.listing.findUnique({ where: { id: params.id } });
     if (!target || !activeSession.user.businessIds.includes(target.businessId)) throw new Error("Listing not found.");
 
+    const membership = await db.businessUser.findFirst({ where: { businessId: target.businessId, userId: activeSession.user.id, role: { in: ["OWNER", "MANAGER"] } } });
+    if (!membership) throw new Error("Only owners and managers can edit listings.");
+    if(target.status === "PUBLISHED") {
+      await db.$transaction(async tx=>{
+        const current=await tx.listing.findUniqueOrThrow({where:{id:target.id},include:reviewInclude});
+        if(current.status!=="PUBLISHED"||await tx.listingSubmission.findFirst({where:{listingId:target.id,status:{in:["SUBMITTED","UNDER_REVIEW"]}}}))throw new Error("Listing changed or is already awaiting review.");
+        const draftSnapshot=await revisionPreview(tx,current,formData);
+        await tx.listing.update({where:{id:target.id},data:{draftForm:serializeListingForm(formData),draftSnapshot}});
+      },{isolationLevel:Prisma.TransactionIsolationLevel.Serializable});
+      redirect(`/business/listings/${target.id}/review`);
+    }
+    if (target.status !== "DRAFT" || await db.listingSubmission.findFirst({where: {listingId: target.id, status: {in: ["SUBMITTED", "UNDER_REVIEW"]}}})) throw new Error("Unpublish or withdraw the pending submission before editing.");
     const base = parseBaseFields(formData);
-    await db.listing.update({ where: { id: target.id }, data: base });
+    async function saveBase(tx: Prisma.TransactionClient) {
+      const changed = await tx.listing.updateMany({where: {id: target!.id, status: "DRAFT", updatedAt: target!.updatedAt, submissions: {none: {status: {in: ["SUBMITTED", "UNDER_REVIEW"]}}}}, data: base});
+      if (changed.count !== 1) throw new Error("The listing changed or is awaiting review. Refresh before editing.");
+    }
+
 
     if (target.type === "ACCOMMODATION") {
       const fields = parseAccommodationFields(formData);
-      await db.accommodationListing.update({ where: { listingId: target.id }, data: fields });
+
 
       const roomTypeRows = parseRoomTypeRows(formData);
       const addOnRows = parseAddOnRows(formData);
@@ -95,6 +117,9 @@ export default async function EditListingPage({ params }: { params: { id: string
           include: { _count: { select: { bookingAddOns: true } } }
         });
 
+        if (incomingRoomIds.some(id => !existingRooms.some(r => r.id === id)) || incomingAddOnIds.some(id => !existingAddOns.some(a => a.id === id))) throw new Error("Invalid room or add-on selection.");
+        await saveBase(tx);
+        await tx.accommodationListing.update({ where: { listingId: target.id }, data: fields });
         const roomsToDelete = existingRooms.filter((r) => !incomingRoomIds.includes(r.id) && r._count.bookings === 0);
         const addOnsToDelete = existingAddOns.filter((a) => !incomingAddOnIds.includes(a.id) && a._count.bookingAddOns === 0);
 
@@ -122,7 +147,7 @@ export default async function EditListingPage({ params }: { params: { id: string
             await tx.addOn.create({ data: { ...row, accommodationId: target.id } });
           }
         }
-      });
+      }, {isolationLevel: Prisma.TransactionIsolationLevel.Serializable});
     } else if (target.type === "TOUR") {
       const parsedTourData = parseTourFields(formData);
       if (parsedTourData.guideId) {
@@ -131,18 +156,19 @@ export default async function EditListingPage({ params }: { params: { id: string
           throw new Error("Invalid guide selected.");
         }
       }
-      await db.tourListing.update({ where: { listingId: target.id }, data: parsedTourData as any });
+      await db.$transaction(async tx => { await saveBase(tx); await tx.tourListing.update({ where: {listingId: target.id}, data: parsedTourData }); }, {isolationLevel: Prisma.TransactionIsolationLevel.Serializable});
     } else if (target.type === "RESTAURANT") {
-      await db.restaurantProfile.update({ where: { listingId: target.id }, data: parseRestaurantFields(formData) });
+      await db.$transaction(async tx => { await saveBase(tx); await tx.restaurantProfile.update({where: {listingId: target.id}, data: parseRestaurantFields(formData)}); }, {isolationLevel: Prisma.TransactionIsolationLevel.Serializable});
     } else if (target.type === "TRANSPORT") {
-      await db.transportOption.update({ where: { listingId: target.id }, data: parseTransportFields(formData) });
+      await db.$transaction(async tx => { await saveBase(tx); await tx.transportOption.update({where: {listingId: target.id}, data: parseTransportFields(formData)}); }, {isolationLevel: Prisma.TransactionIsolationLevel.Serializable});
     }
 
-    redirect("/business/listings");
+    redirect(`/business/listings/${target.id}/review`);
   }
 
   return (
     <div className="max-w-4xl mx-auto pb-32">
+      <p className="mb-4 rounded border p-4">Save your changes, then <Link className="underline" href={`/business/listings/${listing.id}/review`}>preview and submit the listing and all photos for approval</Link>. Uploading photos does not publish or approve them.</p>
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2 text-sm text-slate-500 font-medium mb-8">
         <Link href="/business/dashboard" className="hover:text-slate-900 transition-colors">Home</Link>
@@ -167,18 +193,18 @@ export default async function EditListingPage({ params }: { params: { id: string
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-100 font-bold text-[11px] tracking-wider uppercase text-[#0B4928]">
             {listing.status}
           </div>
-          <Button variant="outline" size="sm" className="h-8 font-semibold text-slate-700 bg-white border-slate-200 shadow-sm">
-            Actions <span className="ml-2 text-[10px] text-slate-400">v</span>
-          </Button>
+          <Button asChild variant="outline" size="sm"><Link href={`/${PREVIEW_PATH[listing.type]}/${listing.id}`}>View public listing</Link></Button>
         </div>
       </div>
 
+      {["ACCOMMODATION", "TOUR"].includes(listing.type) && <Button asChild variant="outline" className="mb-5"><Link href={`/business/listings/${listing.id}/availability`}>Manage availability and date pricing</Link></Button>}
       <form action={updateListing} className="flex flex-col gap-6">
         <ListingBaseFields
           destinations={destinations}
           previewHref={`/${PREVIEW_PATH[listing.type]}/${listing.id}`}
           initial={{
             title: listing.title,
+            bookingMode: listing.bookingMode,
             description: listing.description,
             city: listing.city ?? undefined,
             address: listing.address ?? undefined,
@@ -236,6 +262,7 @@ export default async function EditListingPage({ params }: { params: { id: string
           <TourTypeFields
             guides={guides}
             initial={{
+              tourType: listing.tour.tourType,
               durationDays: listing.tour.durationDays,
               groupSizeMin: listing.tour.groupSizeMin,
               groupSizeMax: listing.tour.groupSizeMax,
@@ -256,7 +283,8 @@ export default async function EditListingPage({ params }: { params: { id: string
               menuUrl: listing.restaurant.menuUrl,
               seatingCapacity: listing.restaurant.seatingCapacity,
               acceptsReservationRequests: listing.restaurant.acceptsReservationRequests,
-              openingHours: typeof listing.restaurant.openingHours === "string" ? listing.restaurant.openingHours : undefined
+              openingHours: typeof listing.restaurant.openingHours === "object" && listing.restaurant.openingHours && "summary" in listing.restaurant.openingHours ? String(listing.restaurant.openingHours.summary) : typeof listing.restaurant.openingHours === "string" ? listing.restaurant.openingHours : undefined,
+              reservationDurationMinutes: typeof listing.restaurant.openingHours === "object" && listing.restaurant.openingHours && "reservationDurationMinutes" in listing.restaurant.openingHours ? Number(listing.restaurant.openingHours.reservationDurationMinutes) : 90
             }}
           />
         ) : null}

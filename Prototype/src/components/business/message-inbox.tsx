@@ -1,5 +1,6 @@
 "use client";
 
+import { RemoteImage } from "@/components/remote-image";
 import { useState, useRef, useEffect } from "react";
 import { format, isSameDay } from "date-fns";
 import {
@@ -83,6 +84,10 @@ export function MessageInbox({
   businessCustomers?: BusinessCustomerType[];
 }) {
   const [threads, setThreads] = useState<ThreadType[]>(initialThreads);
+  useEffect(() => {
+    setThreads(initialThreads);
+    setActiveThreadId(current => current ?? initialThreads[0]?.id ?? null);
+  }, [initialThreads]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(
     initialActiveThreadId || initialThreads[0]?.id || null
   );
@@ -645,7 +650,7 @@ export function MessageInbox({
                     <div className="flex gap-3 mb-4">
                       <div className="h-12 w-12 rounded-lg bg-slate-100 shrink-0 overflow-hidden shadow-xs border border-slate-200">
                         {activeThread.booking.listing.coverImageUrl ? (
-                          <img src={activeThread.booking.listing.coverImageUrl} alt={activeThread.booking.listing.title} className="h-full w-full object-cover" />
+                          <RemoteImage src={activeThread.booking.listing.coverImageUrl} alt={activeThread.booking.listing.title} className="h-full w-full object-cover" />
                         ) : null}
                       </div>
                       <div className="flex flex-col justify-center">

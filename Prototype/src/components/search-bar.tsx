@@ -51,8 +51,8 @@ function Field({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-1 flex-col justify-center px-6 py-3 hover:bg-muted/50 transition-colors", className)}>
-      <label className="text-xs font-bold tracking-wide text-foreground">{label}</label>
+    <div className={cn("flex min-w-0 flex-1 flex-col justify-center px-4 py-3 hover:bg-muted/50 transition-colors", className)}>
+      <span className="text-xs font-bold tracking-wide text-foreground">{label}</span>
       <div className="flex items-center mt-0.5">
         {children}
       </div>
@@ -64,7 +64,7 @@ function TextField(props: React.InputHTMLAttributes<HTMLInputElement> & { label:
   const { label, className, ...inputProps } = props;
   return (
     <Field label={label} className={className}>
-      <input {...inputProps} className="w-full bg-transparent text-sm font-medium text-muted-foreground outline-none placeholder:text-muted-foreground/70" />
+      <input {...inputProps} aria-label={label} className="w-full min-w-0 bg-transparent text-sm font-medium text-muted-foreground outline-none placeholder:text-muted-foreground/70" />
     </Field>
   );
 }
@@ -86,6 +86,7 @@ function SelectField({
     <Field label={label} className={className}>
       <div className="relative w-full">
         <select
+          aria-label={label}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           className="w-full appearance-none bg-transparent pr-5 text-sm font-medium text-muted-foreground outline-none"

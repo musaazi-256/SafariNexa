@@ -1,3 +1,4 @@
+import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Building2, ChevronLeft, MapPin, Mail, Phone, Users, FileText, CheckCircle2 } from "lucide-react";
@@ -47,7 +48,7 @@ export default async function AdminBusinessProfilePage({ params }: { params: { i
         
         <div className="h-24 w-24 rounded-2xl bg-[#E4F2E8] border border-[#1e613c]/20 flex items-center justify-center shrink-0">
           {business.logoUrl ? (
-             <img src={business.logoUrl} alt={business.name} className="h-full w-full object-cover rounded-2xl" />
+             <RemoteImage src={business.logoUrl} alt={business.name} className="h-full w-full object-cover rounded-2xl" />
           ) : (
             <Building2 className="h-10 w-10 text-[#1e613c]" />
           )}

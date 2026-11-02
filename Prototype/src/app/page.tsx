@@ -25,7 +25,7 @@ export const revalidate = 60;
 const TRUST_POINTS = [
   { icon: ShieldCheck, title: "Verified businesses only", description: "Every listing belongs to a business that passed SafariNexa's verification review." },
   { icon: Lock, title: "Browse before you sign in", description: "Explore accommodation, safaris, restaurants, and transport freely — accounts are only for booking and paying." },
-  { icon: Wallet, title: "Mobile money & card", description: "Pay with MTN Mobile Money, Airtel Money, or card through secure, trusted rails." }
+  { icon: Wallet, title: "Clear booking and payment status", description: "See whether your request needs acceptance or payment. Only configured payment methods are available at checkout." }
 ];
 
 const CARD_WIDTH = "w-72 shrink-0 snap-start sm:w-80";
@@ -83,7 +83,7 @@ export default async function HomePage() {
               See it all first
             </Badge>
             <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl">
-              See it all first. Book only when <span className="text-accent">you&apos;re ready</span>.
+              Explore Uganda. Book with <span className="text-accent">confidence</span>.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/90 sm:text-xl">
               Browse verified stays, restaurants, and rides across Uganda. Compare freely — you only need an account
@@ -97,7 +97,7 @@ export default async function HomePage() {
         </Container>
 
         <Container className="pt-14">
-          <HomeSection title="Stay at our top accommodations" description="Well curated stays for you — all costs included." moreHref="/accommodation">
+          <HomeSection title="Find your next stay" description="Compare room prices and check each listing’s inclusions and cancellation terms." moreHref="/accommodation">
             <ScrollRow>
               {accommodationListings.map((listing) => {
                 const { average, count } = ratingSummary(listing.reviews);
@@ -189,7 +189,7 @@ export default async function HomePage() {
             </div>
           </section>
 
-          <HomeSection title="One Day Tours" description="Well curated trips for you — all costs included." moreHref="/tours">
+          <HomeSection title="One Day Tours" description="Explore experiences and review what is included before requesting a booking." moreHref="/tours">
             <ScrollRow>
               {oneDayTours.map((tour) => (
                 <CompactListingCard
@@ -204,7 +204,7 @@ export default async function HomePage() {
             </ScrollRow>
           </HomeSection>
 
-          <HomeSection title="Meet your tour guides" description="Licensed, verified guides ready to lead your next trip." moreHref="/guides">
+          <HomeSection title="Meet your tour guides" description="Compare guide profiles, experience and languages, then confirm availability." moreHref="/guides">
             <ScrollRow>
               {guides.map((guide) => {
                 const { average, count } = guideRatingSummary(guide.tours);

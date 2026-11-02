@@ -24,6 +24,10 @@ const ADMIN_PUBLIC_PREFIXES = ["/admin/login", "/admin/auth"];
 export default auth((req) => {
   const { pathname, search } = req.nextUrl;
   const session = req.auth;
+  // Older verification URLs must never bypass document authorization via public/.
+  if (pathname.startsWith("/uploads/")) {
+    return NextResponse.rewrite(new URL("/api/documents/" + pathname.slice("/uploads/".length), req.nextUrl.origin));
+  }
 
   const isCustomerProtected = CUSTOMER_PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)

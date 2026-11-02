@@ -1,14 +1,16 @@
+import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
-import { Star, Clock, Database, Plus, Ticket, Calendar as CalendarIcon, MessageSquare, Download, AlertCircle, ArrowRight, ExternalLink, Info, User } from "lucide-react";
+import { Star, Clock, Database, Plus, MessageSquare, Download, ArrowRight, User } from "lucide-react";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatUGX } from "@/lib/booking";
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
+import { OperationsTasks } from "@/components/operations-tasks";
 import { ratingSummary } from "@/lib/listings";
 import { summarizePayments } from "@/lib/revenue";
-import { DashboardCharts } from "@/components/business/dashboard-charts";
+import { RevenueOverviewChart } from "@/components/business/revenue-charts";
 import { DashboardQuickActions } from "@/components/business/dashboard-quick-actions";
 import { VerificationWelcomeModal } from "@/components/business/verification-modals";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -27,262 +29,105 @@ export default async function BusinessDashboardPage() {
   const now = new Date();
   const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
 
-  const [publishedCount, draftCount, awaitingCount, monthPayments, monthPayouts, publishedReviews, recentBookings, recentReviews] = await Promise.all([
+  const [publishedCount, draftCount, awaitingCount, monthPayments, monthPayouts, publishedReviews, recentReviews] = await Promise.all([
     db.listing.count({ where: { businessId, status: "PUBLISHED" } }),
     db.listing.count({ where: { businessId, status: "DRAFT" } }),
     db.booking.count({ where: { businessId, status: "AWAITING_BUSINESS_CONFIRMATION" } }),
-    db.payment.findMany({
-      where: { booking: { businessId }, completedAt: { gte: startOfMonth } },
-      select: { status: true, amountMinor: true, payoutId: true }
+    db.booking.findMany({
+      where: { businessId },
+      select: { id:true,totalMinor:true,
+        payments: { where:{completedAt:{gte:startOfMonth}}, include:{refunds:true}, orderBy:{createdAt:"desc"} },
+        order: { include:{payments:{where:{completedAt:{gte:startOfMonth}},include:{refunds:true},orderBy:{createdAt:"desc"}}} }
+      }
     }),
     db.payout.findMany({
       where: { businessId, createdAt: { gte: startOfMonth }, status: "COMPLETED" },
       select: { amountMinor: true }
     }),
     db.review.findMany({ where: { businessId, status: "PUBLISHED" }, select: { rating: true } }),
-    db.booking.findMany({
-      where: { businessId, status: "AWAITING_BUSINESS_CONFIRMATION" },
-      include: { listing: true },
-      orderBy: { createdAt: "desc" },
-      take: 5
-    }),
     db.review.findMany({
-      where: { businessId },
+      where: { businessId, status: "PUBLISHED" },
       include: { listing: true, author: { select: { name: true, image: true } } },
       orderBy: { createdAt: "desc" },
       take: 3
     })
   ]);
 
-  const { grossMinor, unsettledNetMinor } = summarizePayments(monthPayments);
+  const allocationRows = monthPayments.map(booking => {
+    const candidates = booking.payments.length ? booking.payments : booking.order?.payments ?? [];
+    const payment = candidates.find(p => ["SUCCESSFUL","PARTIALLY_REFUNDED","REFUNDED"].includes(p.status)) ?? candidates[0];
+    const refunds = payment?.refunds.filter(r=>r.bookingId===booking.id&&r.status==="COMPLETED") ?? [];
+    const refunded = refunds.reduce((sum,r)=>sum+r.amountMinor,0);
+    const status = payment && ["REFUNDED","PARTIALLY_REFUNDED"].includes(payment.status) ? refunded>=booking.totalMinor?"REFUNDED":refunded?"PARTIALLY_REFUNDED":"SUCCESSFUL" : payment?.status ?? "NOT_STARTED";
+    return { status,amountMinor:booking.totalMinor,refunds,payoutId:payment?.payoutId,payment };
+  });
+  const { grossMinor, unsettledNetMinor } = summarizePayments(allocationRows);
+  const daily = new Map<string,{date:string;gross:number;net:number}>();
+  for(const row of allocationRows.filter(r=>["SUCCESSFUL","REFUNDED","PARTIALLY_REFUNDED"].includes(r.status)&&r.payment)){
+    const date=(row.payment!.completedAt??row.payment!.createdAt).toISOString().slice(0,10);
+    const item=daily.get(date)??{date,gross:0,net:0};
+    item.gross+=row.amountMinor;item.net+=Math.round((row.amountMinor-row.refunds.reduce((s,r)=>s+r.amountMinor,0))*0.88);daily.set(date,item);
+  }
   const settledMinor = monthPayouts.reduce((sum, p) => sum + p.amountMinor, 0);
   const { average, count } = ratingSummary(publishedReviews);
 
+  const metrics = [
+    { label: "Published listings", value: String(publishedCount), detail: `${draftCount} drafts in your workspace`, icon: Database, href: "/business/listings", action: "Manage listings" },
+    { label: "Booking requests", value: String(awaitingCount), detail: "Waiting for your response", icon: Clock, href: "/business/bookings", action: "Review requests" },
+    { label: "Recorded payouts", value: formatUGX(settledMinor), detail: "Completed records this month", icon: Download, href: "/business/revenue", action: "View earnings" },
+    { label: "Guest rating", value: average ? average.toFixed(1) : "—", detail: `${count} published reviews`, icon: Star, href: "/business/reviews", action: "Read reviews" }
+  ];
   return (
-    <div className="max-w-[1400px] mx-auto space-y-6">
+    <div className="mx-auto max-w-[1400px] space-y-6 lg:space-y-8">
       <VerificationWelcomeModal verificationStatus={business.verificationStatus} />
-      
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-slate-900 text-white min-h-[180px] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1551122003-889f078d4dd4?auto=format&fit=crop&q=80&w=2000" 
-            alt="Elephants" 
-            className="w-full h-full object-cover opacity-60"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="min-w-0">
+          <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Your workspace</p>
+          <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">{business.name}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">A clear view of your business. A simpler way to manage your day.</p>
         </div>
-        
-        <div className="relative z-10 w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-8">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-[#FFCE06] mb-2">Welcome back, Grace</p>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">{business.name}</h1>
-            <p className="text-slate-200">Here&apos;s what&apos;s happening with your business today.</p>
-          </div>
-          <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-black mt-2 sm:mt-0 shrink-0">
-            View business profile <ExternalLink className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
+        <Button asChild className="self-start sm:shrink-0"><Link href="/business/listings/new"><Plus />Create listing</Link></Button>
       </div>
-
       {business.verificationStatus !== "APPROVED" && (
-        <div className="rounded-lg border border-warning/50 bg-warning/10 p-4 text-warning-foreground flex items-center justify-between">
-          <div className="flex items-center gap-2 font-semibold">
-            <AlertCircle className="h-4 w-4" />
-            <h5 className="leading-none tracking-tight">Application Status: {business.verificationStatus.replace("_", " ")} - You cannot publish listings yet.</h5>
-          </div>
-          <Link href="/business/verification" className="flex items-center gap-1 font-semibold text-primary hover:underline text-sm">
-            Check Status <ArrowRight className="h-4 w-4" />
-          </Link>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warning/30 bg-warning/10 p-4">
+          <div><p className="text-sm font-medium">Verification: {business.verificationStatus.replaceAll("_", " ").toLowerCase()}</p><p className="mt-1 text-sm text-muted-foreground">Complete verification before publishing listings.</p></div>
+          <Button asChild size="sm" variant="outline"><Link href="/business/verification">View application<ArrowRight /></Link></Button>
         </div>
       )}
-
-      {/* Stat Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Published Listings */}
-        <Card className="bg-primary text-primary-foreground border-none shadow-sm rounded-2xl relative overflow-hidden">
-          <CardContent className="pt-6 pb-6 relative z-10 h-full flex flex-col justify-between">
-            <p className="text-xs font-bold uppercase tracking-wider text-white/80">Published listings</p>
-            <div className="mt-2">
-              <p className="text-4xl font-extrabold">{publishedCount}</p>
-              <p className="text-sm text-white/80 mt-1">{draftCount} draft</p>
-            </div>
+      <section aria-label="Business performance" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {metrics.map(metric => <Card key={metric.label}>
+          <CardContent className="flex h-full flex-col p-5">
+            <div className="flex items-center justify-between gap-3"><p className="text-sm font-medium text-muted-foreground">{metric.label}</p><metric.icon aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" /></div>
+            <p className="mt-4 break-words text-3xl font-semibold tracking-tight tabular-nums">{metric.value}</p>
+            <p className="mb-5 mt-1 text-xs leading-relaxed text-muted-foreground">{metric.detail}</p>
+            <Link href={metric.href} className="mt-auto flex items-center justify-between gap-2 border-t pt-3 text-xs font-medium text-primary hover:underline">{metric.action}<ArrowRight className="size-3.5" /></Link>
           </CardContent>
-          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full flex items-center justify-center">
-            <ArrowRight className="h-6 w-6 text-white" />
-          </div>
-        </Card>
-
-        {/* Awaiting Confirmation */}
-        <Card className="rounded-2xl shadow-sm border-slate-100 flex flex-col justify-between">
-          <CardContent className="pt-6 pb-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Awaiting confirmation</p>
-              <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center">
-                <Clock className="h-4 w-4 text-orange-500" />
-              </div>
-            </div>
-            <p className="text-3xl font-extrabold text-slate-900">{awaitingCount}</p>
-            <p className="text-sm text-slate-500 mt-1">Bookings needing a reply</p>
-            <div className="mt-auto pt-4">
-              <Link href="/business/bookings" className="text-sm font-semibold text-primary flex items-center hover:underline">
-                View bookings <ArrowRight className="ml-1 h-3.5 w-3.5" />
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Revenue */}
-        <Card className="rounded-2xl shadow-sm border-slate-100 flex flex-col justify-between">
-          <CardContent className="pt-6 pb-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">This month&apos;s revenue</p>
-              <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
-                <Database className="h-4 w-4 text-green-600" />
-              </div>
-            </div>
-            <p className="text-2xl font-extrabold text-slate-900">{formatUGX(settledMinor)}</p>
-            <p className="text-sm text-slate-500 mt-1">Settled payouts to you</p>
-            <div className="mt-auto pt-4 flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-600">
-                {formatUGX(unsettledNetMinor)} pending
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Average Rating */}
-        <Card className="rounded-2xl shadow-sm border-slate-100 flex flex-col justify-between">
-          <CardContent className="pt-6 pb-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Average rating</p>
-              <Star className="h-8 w-8 fill-amber-100 text-amber-100 opacity-50" />
-            </div>
-            <div className="flex items-center gap-2">
-              <Star className="h-6 w-6 fill-amber-400 text-amber-400" />
-              <p className="text-3xl font-extrabold text-slate-900">{average ? average.toFixed(1) : "—"}</p>
-            </div>
-            <p className="text-sm text-slate-500 mt-1">{count} published review{count === 1 ? "" : "s"}</p>
-            <div className="mt-auto pt-4">
-              <Link href="/business/reviews" className="text-sm font-semibold text-primary flex items-center hover:underline">
-                View reviews <ArrowRight className="ml-1 h-3.5 w-3.5" />
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        </Card>)}
+      </section>
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
+        <OperationsTasks businessId={businessId} />
+        <Card><CardHeader className="pb-3"><CardTitle className="text-base">Quick actions</CardTitle><CardDescription>Keep your business moving.</CardDescription></CardHeader><CardContent><DashboardQuickActions verificationStatus={business.verificationStatus} /></CardContent></Card>
       </div>
-
-      {/* Quick Actions */}
-      <Card className="rounded-2xl shadow-sm border-slate-100">
-        <CardContent className="p-2 sm:p-4">
-          <DashboardQuickActions verificationStatus={business.verificationStatus} />
-        </CardContent>
-      </Card>
-
-      {/* Charts (Client Component) */}
-      <DashboardCharts />
-
-      {/* Bottom Lists */}
-      <div className="grid gap-6 lg:grid-cols-2 mt-6">
-        {/* Needs Attention */}
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-slate-900">Needs your attention</h2>
-                {awaitingCount > 0 && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                    {awaitingCount}
-                  </span>
-                )}
-              </div>
-              <Link href="/business/bookings" className="text-sm font-semibold text-primary hover:underline">
-                View all &rarr;
-              </Link>
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <Card>
+          <CardHeader><div className="flex flex-wrap items-center justify-between gap-3"><CardTitle>Collections overview</CardTitle><span className="rounded-md border px-2 py-1 text-xs text-muted-foreground">{now.toLocaleDateString("en-GB", {month:"long",year:"numeric",timeZone:"UTC"})}</span></div><CardDescription>Recorded collections and estimated net earnings.</CardDescription></CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-x-10 gap-y-4 border-b pb-5">
+              <div><p className="text-xs text-muted-foreground">Gross collections</p><p className="mt-1 text-2xl font-semibold tabular-nums">{formatUGX(grossMinor)}</p></div>
+              <div><p className="text-xs text-muted-foreground">Estimated unsettled net</p><p className="mt-1 text-2xl font-semibold tabular-nums">{formatUGX(unsettledNetMinor)}</p></div>
             </div>
-            
-            {recentBookings.length === 0 ? (
-              <EmptyState title="Nothing awaiting confirmation" description="New booking requests will show up here." />
-            ) : (
-              <div className="flex flex-col gap-4">
-                {recentBookings.map((booking) => (
-                  <Link key={booking.id} href={`/business/bookings/${booking.id}`}>
-                    <div className="flex items-center justify-between gap-3 group">
-                      <div className="flex items-center gap-3">
-                        <div className="h-12 w-12 rounded-lg bg-slate-100 shrink-0 overflow-hidden">
-                          {booking.listing.coverImageUrl ? (
-                            <img src={booking.listing.coverImageUrl} alt="" className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="h-full w-full bg-slate-200" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-slate-900 group-hover:text-primary transition-colors">{booking.listing.title}</p>
-                          <p className="text-xs text-slate-500">{booking.bookingRef} • Today, 10:30 AM</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-semibold bg-orange-50 text-orange-600 px-2 py-1 rounded-md">
-                          Awaiting confirmation
-                        </span>
-                        <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-primary" />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-            
-            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-500">
-              <Info className="h-4 w-4" /> Reply to these bookings to avoid auto-cancellation.
-            </div>
+            {daily.size ? <RevenueOverviewChart data={[...daily.values()].sort((a,b)=>a.date.localeCompare(b.date))} /> : <div className="my-5 flex min-h-44 flex-col items-center justify-center rounded-lg border border-dashed bg-muted/30 px-4 text-center"><Database className="mb-3 size-6 text-muted-foreground" /><p className="text-sm font-medium">Your collections will appear here</p><p className="mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground">Completed booking payments will build your monthly overview. No confirmed payment history yet.</p></div>}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4"><p className="max-w-xs text-xs leading-relaxed text-muted-foreground">Demo records are not proof of provider settlement.</p><Button asChild size="sm" variant="ghost"><Link href="/business/revenue">View earnings<ArrowRight /></Link></Button></div>
           </CardContent>
         </Card>
-
-        {/* Recent Reviews */}
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-slate-900">Recent reviews</h2>
-              <Link href="/business/reviews" className="text-sm font-semibold text-primary hover:underline">
-                View all &rarr;
-              </Link>
-            </div>
-
-            {recentReviews.length === 0 ? (
-              <EmptyState title="No reviews yet" description="Reviews from completed bookings will show up here." />
-            ) : (
-              <div className="flex flex-col gap-6">
-                {recentReviews.map((review) => (
-                  <div key={review.id} className="flex gap-3">
-                    <div className="h-10 w-10 rounded-full bg-slate-100 shrink-0 overflow-hidden">
-                      {review.author.image ? (
-                        <img src={review.author.image} alt="" className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="h-full w-full bg-slate-200 flex items-center justify-center">
-                          <User className="h-5 w-5 text-slate-400" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold text-slate-900">{review.listing.title}</p>
-                        <span className="flex items-center gap-1 text-sm font-bold text-slate-900">
-                          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                          {review.rating}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500">{review.author.name ?? "Verified guest"} • 2 days ago</p>
-                      <p className="text-sm text-slate-700 mt-2 line-clamp-1 italic">&quot;{review.body}&quot;</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-primary">
-              <MessageSquare className="h-4 w-4" /> Respond to reviews <span className="font-normal text-slate-500">to build trust with travelers.</span>
-            </div>
+        <Card>
+          <CardHeader><div className="flex items-center justify-between gap-2"><CardTitle>Guest feedback</CardTitle><Button asChild size="sm" variant="ghost"><Link href="/business/reviews">View all<ArrowRight /></Link></Button></div><CardDescription>Latest published experiences from your guests.</CardDescription></CardHeader>
+          <CardContent>
+            {recentReviews.length ? <div className="divide-y">{recentReviews.map(review => <div key={review.id} className="py-4 first:pt-0 last:pb-0">
+              <div className="flex items-start gap-3"><div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">{review.author.image ? <RemoteImage src={review.author.image} alt="" className="size-full object-cover" /> : <User className="size-4 text-muted-foreground" />}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-medium">{review.author.name ?? "Guest"}</p><span className="flex items-center gap-1 text-xs font-medium"><Star aria-hidden="true" className="size-3.5 fill-brand-gold text-brand-gold" />{review.rating}<span className="sr-only">out of 5</span></span></div><p className="mt-1 text-xs text-muted-foreground">{review.createdAt.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"Africa/Kampala"})}</p></div></div>
+              <p className="mt-3 line-clamp-3 text-sm leading-relaxed">{review.body}</p><p className="mt-2 truncate text-xs text-muted-foreground">{review.listing.title}</p>
+            </div>)}</div> : <EmptyState title="Your first review is ahead" description="Published guest feedback will appear after completed bookings." />}
+            <Link href="/business/reviews" className="mt-5 flex items-center gap-2 border-t pt-4 text-xs font-medium text-primary hover:underline"><MessageSquare className="size-4" />Manage guest feedback<ArrowRight className="ml-auto size-3.5" /></Link>
           </CardContent>
         </Card>
       </div>

@@ -14,6 +14,9 @@ import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { TravellerDefaultFields } from "@/components/checkout/traveller-default-fields";
+import { ServiceDetailsFields } from "@/components/checkout/service-details-fields";
+import { fulfilmentFromForm } from "@/lib/booking-operations";
 
 const TYPE_LABELS: Record<string, { detailPath: string; noun: string; participantLabel: string }> = {
   accommodation: { detailPath: "accommodation", noun: "stay", participantLabel: "Guests" },
@@ -39,6 +42,7 @@ export default async function CheckoutPage({
   };
 }) {
   const session = await auth();
+  const traveller = session?.user ? await db.user.findUnique({where: {id: session.user.id}, include: {customerProfile: true}}) : null;
   const listingId = searchParams.listingId;
   const type = searchParams.type ?? "";
   const meta = TYPE_LABELS[type];
@@ -60,10 +64,9 @@ export default async function CheckoutPage({
       business: true
     }
   });
-  if (!listing) notFound();
+  if (!listing || listing.status !== "PUBLISHED" || listing.business.verificationStatus !== "APPROVED" || listing.type !== type.toUpperCase()) notFound();
 
-  const unitPriceMinor =
-    listing.basePriceMinor > 0 ? listing.basePriceMinor : parseFirstUgxAmount(listing.restaurant?.priceRange ?? "0");
+  const unitPriceMinor = listing.type === "RESTAURANT" ? 0 : listing.basePriceMinor > 0 ? listing.basePriceMinor : parseFirstUgxAmount(listing.restaurant?.priceRange ?? "0");
 
   const initialAddOnIds = Array.isArray(searchParams.addOnIds)
     ? searchParams.addOnIds
@@ -109,9 +112,10 @@ export default async function CheckoutPage({
           participants: participantsCount,
           roomTypeId: formData.get("roomTypeId") ? String(formData.get("roomTypeId")) : undefined,
           addOnIds: formData.getAll("addOnIds").map(String),
-          totalMinor: 0 // Ignored on backend
+          totalMinor: 0, // Ignored on backend
+          fulfilment: fulfilmentFromForm(formData,"single-item")
         }],
-        { fullName, email, phone },
+        { fullName, email, phone, nationality: String(formData.get("nationality") || ""), emergencyContact: String(formData.get("emergencyContact") || "") },
         false // No order
       );
       bookingId = bookings[0].id;
@@ -245,8 +249,10 @@ export default async function CheckoutPage({
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" name="phone" type="tel" placeholder="+256 7XX XXX XXX" required />
+                    <Input id="phone" name="phone" type="tel" defaultValue={traveller?.phone || ""} placeholder="+256 7XX XXX XXX" required />
                   </div>
+                  <TravellerDefaultFields nationality={traveller?.customerProfile?.nationality} emergencyContact={traveller?.customerProfile?.emergencyContact}/>
+                  <div className="sm:col-span-2"><ServiceDetailsFields prefix="single-item" type={type}/></div>
                 </CardContent>
               </Card>
             </div>
@@ -270,7 +276,7 @@ export default async function CheckoutPage({
                     </span>
                     <span className="font-semibold">UGX {(unitPriceMinor * tourParticipants).toLocaleString("en-UG")}</span>
                   </div>
-                ) : (
+                ) : type === "restaurant" ? <p className="text-sm">Table reservation request — no online meal charge. The restaurant must confirm availability. Meals are paid separately.</p> : (
                   <>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Price</span>
@@ -283,7 +289,7 @@ export default async function CheckoutPage({
                 )}
                 <Separator />
                 <Button type="submit" size="lg" className="w-full">
-                  Continue to payment
+                  Submit and check booking status
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
                   Booked by {session.user.name ?? session.user.email}

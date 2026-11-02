@@ -1,0 +1,29 @@
+name: Prototype checks
+on:
+  push:
+    paths: ["Prototype/**", ".github/workflows/prototype-checks.yml"]
+  pull_request:
+    paths: ["Prototype/**", ".github/workflows/prototype-checks.yml"]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Prototype
+    env:
+      AUTH_SECRET: ci-only-build-secret-not-a-deployment-secret
+      AUTH_DEV_MODE: "false"
+      SAFARINEXA_PRISMA_DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Prototype/package-lock.json
+      - run: npm ci
+      - run: npm run db:generate
+      - run: npm run lint
+      - run: npm test -- --runInBand
+      - run: npm run build
+      - run: npm run typecheck

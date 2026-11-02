@@ -29,6 +29,7 @@ export function InquiryDialog({
   const [content, setContent] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sentSuccess, setSentSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +41,7 @@ export function InquiryDialog({
     }
 
     setIsSending(true);
+    setErrorMessage("");
     try {
       await sendListingInquiryAction(listingId, content.trim());
       setSentSuccess(true);
@@ -50,6 +52,7 @@ export function InquiryDialog({
       }, 2000);
     } catch (error) {
       console.error(error);
+      setErrorMessage("Your inquiry was not sent. Please try again. You can find successful inquiries in your Messages inbox.");
     } finally {
       setIsSending(false);
     }
@@ -81,10 +84,11 @@ export function InquiryDialog({
           <div className="py-8 flex flex-col items-center justify-center text-center space-y-2">
             <CheckCircle2 className="h-10 w-10 text-emerald-600 animate-bounce" />
             <h4 className="font-bold text-base text-slate-900">Inquiry Sent Successfully!</h4>
-            <p className="text-xs text-slate-500">Your message has been sent to {businessName}. Redirecting...</p>
+            <p className="text-xs text-slate-500">Your message has been sent to {businessName}. Replies appear in your Messages inbox.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+            {errorMessage && <p role="alert" className="text-sm text-red-700">{errorMessage}</p>}
             <div>
               <label className="text-xs font-bold text-slate-700 mb-1.5 block">Your Question or Special Request</label>
               <Textarea

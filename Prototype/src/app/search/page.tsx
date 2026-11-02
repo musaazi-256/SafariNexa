@@ -155,13 +155,13 @@ export default async function SearchPage({
 
     results = guides.map((guide) => {
       const { average, count } = guideRatingSummary(guide.tours);
-      const numericPrice = (guide.hourlyRateMinor ?? 50000) * 3700;
+      const numericPrice = guide.hourlyRateMinor ?? 0;
       return {
         id: guide.id,
         type: "Guide",
         title: guide.name,
         location: guide.destination?.name ?? "Uganda",
-        price: guide.hourlyRateMinor ? formatUGX(guide.hourlyRateMinor * 3700) : "UGX 185,000",
+        price: guide.hourlyRateMinor ? formatUGX(guide.hourlyRateMinor) : "Contact for pricing",
         priceValue: numericPrice,
         description: guide.bio,
         rating: average,
@@ -361,7 +361,7 @@ export default async function SearchPage({
               </Card>
             </aside>
 
-            <div>
+            <div className="min-w-0">
               <div className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
                 <div>
                   <h1 className="text-2xl font-bold text-foreground">
@@ -372,7 +372,7 @@ export default async function SearchPage({
                   ) : null}
                   <p className="text-sm text-muted-foreground mt-2">Browse freely. Sign in when you&apos;re ready to book.</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex max-w-full flex-wrap items-center gap-2">
                   <Suspense fallback={null}>
                     <MobileFilters />
                   </Suspense>
@@ -399,4 +399,3 @@ export default async function SearchPage({
     </>
   );
 }
-

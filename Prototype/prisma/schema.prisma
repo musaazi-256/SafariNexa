@@ -191,6 +191,7 @@ model User {
   reviews            Review[]
   messageThreads     MessageThread[]
   messages           Message[]
+  messageReadReceipts MessageReadReceipt[]
   notifications      Notification[]
   supportCasesOpened SupportCase[]    @relation("SupportCaseOpener")
   supportMessages    SupportMessage[]
@@ -333,6 +334,7 @@ model BusinessVerification {
   reviewedAt        DateTime?
   reviewedByAdminId String?
   reviewNotes       String?
+  submittedProfile  Json?
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 
@@ -453,6 +455,9 @@ model Listing {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   publishedAt    DateTime?
+  bookingMode    String @default("REQUEST")
+  draftForm      Json?
+  draftSnapshot  Json?
 
   business    BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
   destination Destination?    @relation(fields: [destinationId], references: [id])
@@ -467,8 +472,33 @@ model Listing {
   savedBy       SavedItem[]
   reviews       Review[]
   tripPlanItems TripPlanItem[]
+  submissions ListingSubmission[]
 
   @@index([type, status])
+}
+
+model ListingSubmission {
+  id String @id @default(cuid())
+  listingId String
+  submittedBy String
+  status String @default("SUBMITTED")
+  snapshot Json
+  submittedAt DateTime @default(now())
+  reviewedAt DateTime?
+  reviewedBy String?
+  notes String?
+  draftForm Json?
+  baselineDigest String?
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, submittedAt])
+  @@index([status, submittedAt])
+}
+
+model ListingImageUpload {
+  filename String @id
+  uploadedBy String
+  createdAt DateTime @default(now())
 }
 
 model AccommodationListing {
@@ -646,6 +676,11 @@ model Booking {
   totalMinor        Int
   currency          String        @default("UGX")
   notes             String?
+  bookingMode       String @default("LEGACY")
+  responseDueAt     DateTime?
+  paymentDueAt      DateTime?
+  fulfilment        Json?
+  policySnapshot    Json?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   confirmedAt       DateTime?
@@ -671,6 +706,7 @@ model Booking {
   @@index([orderId])
   @@index([customerId, status])
   @@index([businessId, status])
+  @@index([status, responseDueAt])
 }
 
 model BookingParticipant {
@@ -679,6 +715,8 @@ model BookingParticipant {
   fullName       String
   email          String?
   phone          String?
+  nationality    String?
+  emergencyContact String?
   documentType   String?
   documentNumber String?
   isPrimary      Boolean @default(false)
@@ -897,4 +935,15 @@ model Message {
   
   thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   sender    User          @relation(fields: [senderId], references: [id])
+  readReceipts MessageReadReceipt[]
+}
+
+model MessageReadReceipt {
+  messageId String
+  userId String
+  readAt DateTime @default(now())
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([messageId, userId])
+  @@index([userId])
 }

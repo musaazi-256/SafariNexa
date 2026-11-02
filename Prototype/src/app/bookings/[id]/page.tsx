@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { BookingTravellerSummary } from "@/components/booking-traveller-summary";
+import { BookingOperationsSummary } from "@/components/booking-operations-summary";
 import { notFound, redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { formatUGX } from "@/lib/booking";
-import { releaseAvailabilityForBooking } from "@/lib/booking-service";
+import { formatUGX, formatBookingDate } from "@/lib/booking";
+import { cancelReservedBooking, CANCELLABLE } from "@/lib/booking-lifecycle";
+import { Prisma } from "@prisma/client";
 import { toBookingStatus } from "@/lib/status";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { SiteHeader } from "@/components/site-header";
@@ -16,7 +19,6 @@ import { Separator } from "@/components/ui/separator";
 import { BookingStatusBadge } from "@/components/ui/status-badge";
 import { BookingChat } from "@/components/booking-chat";
 
-const CANCELLABLE = ["AUTH_REQUIRED", "PENDING_TRAVELLER_DETAILS", "PENDING_PAYMENT", "AWAITING_BUSINESS_CONFIRMATION", "CONFIRMED"];
 
 export default async function BookingDetailPage({ params }: { params: { id: string } }) {
   const session = await auth();
@@ -28,6 +30,7 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
       listing: true,
       business: true,
       participants: true,
+      order: { include: { payments: { orderBy: { createdAt: "desc" } } } },
       payments: { orderBy: { createdAt: "desc" } },
       review: true,
       roomType: true,
@@ -35,6 +38,8 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
     }
   });
   if (!booking || booking.customerId !== session.user.id) notFound();
+
+  const paymentHistory = booking.payments.length ? booking.payments : (booking.order?.payments ?? []).map(payment => ({...payment, amountMinor: booking.totalMinor}));
 
   const thread = await db.messageThread.findFirst({
     where: { bookingId: params.id },
@@ -63,43 +68,9 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
     const activeSession = await auth();
     if (!activeSession?.user) redirect("/auth/sign-in");
 
-    const target = await db.booking.findUnique({ 
-      where: { id: params.id },
-      include: { payments: true }
-    });
-    if (!target || target.customerId !== activeSession.user.id) throw new Error("Booking not found.");
-    if (!CANCELLABLE.includes(target.status)) return;
+    await db.$transaction(tx => cancelReservedBooking(tx, params.id, activeSession.user.id, "customer"), { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 
-    const successfulPayment = target.payments.find((p) => p.status === "SUCCESSFUL");
-
-    if (successfulPayment) {
-      // Still holds the room until the refund is finalized — matches
-      // NON_BLOCKING_BOOKING_STATUSES in lib/listings.ts, so no release here.
-      await db.booking.update({
-        where: { id: target.id },
-        data: { status: "REFUND_REQUESTED", cancelledAt: new Date(), cancelReason: "Cancelled by customer" }
-      });
-      await db.refund.create({
-        data: {
-          paymentId: successfulPayment.id,
-          bookingId: target.id,
-          amountMinor: successfulPayment.amountMinor,
-          reason: "Customer cancellation",
-          status: "REQUESTED",
-          requestedByUserId: activeSession.user.id
-        }
-      });
-    } else {
-      await db.$transaction(async (tx) => {
-        await tx.booking.update({
-          where: { id: target.id },
-          data: { status: "CANCELLED_BY_CUSTOMER", cancelledAt: new Date(), cancelReason: "Cancelled by customer" }
-        });
-        await releaseAvailabilityForBooking(tx, target.id);
-      });
-    }
-
-    redirect(`/bookings/${target.id}`);
+    redirect(`/bookings/${params.id}`);
   }
 
   return (
@@ -127,13 +98,13 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Start</p>
                   <p className="font-semibold">
-                    {booking.startDate ? new Date(booking.startDate).toLocaleString("en-UG", { dateStyle: "medium", timeStyle: "short" }) : "—"}
+                    {booking.startDate ? formatBookingDate(booking.startDate, booking.listing.type) : "—"}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">End</p>
                   <p className="font-semibold">
-                    {booking.endDate ? new Date(booking.endDate).toLocaleDateString("en-UG", { dateStyle: "medium" }) : "—"}
+                    {booking.endDate ? formatBookingDate(booking.endDate, booking.listing.type) : "—"}
                   </p>
                 </div>
               </div>
@@ -184,11 +155,11 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
                 </>
               ) : null}
 
-              {booking.payments.length > 0 ? (
+              {paymentHistory.length > 0 ? (
                 <>
                   <h2 className="mb-2 mt-8 text-lg font-bold">Payment history</h2>
                   <div className="flex flex-col gap-2">
-                    {booking.payments.map((payment) => (
+                    {paymentHistory.map((payment) => (
                       <Card key={payment.id}>
                         <CardContent className="flex items-center justify-between pt-6 text-sm">
                           <span>
@@ -202,6 +173,8 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
                 </>
               ) : null}
 
+              <BookingTravellerSummary participants={booking.participants}/>
+              <BookingOperationsSummary booking={booking}/>
               {/* Messages & Inquiries Attached to Booking */}
               <BookingChat
                 bookingId={booking.id}

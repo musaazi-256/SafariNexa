@@ -58,10 +58,12 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
 
   async function createListing(formData: FormData) {
     "use server";
-    const { businessId: activeBusinessId } = await requireBusinessSession();
+    const { businessId: activeBusinessId, session: actor } = await requireBusinessSession();
     if (!activeBusinessId) redirect("/business/auth/sign-in");
 
+    if (!await db.businessUser.findFirst({where:{businessId:activeBusinessId,userId:actor.user.id,role:{in:["OWNER","MANAGER"]}}})) throw new Error("Only owners and managers can create listings.");
     const submittedType = String(formData.get("listingType")) as ListingType;
+    if (!TYPE_OPTIONS.some(option => option.value === submittedType)) throw new Error("Invalid listing category.");
     const base = parseBaseFields(formData);
     
     let parsedTourData;
@@ -103,9 +105,10 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
       }
     });
 
-    redirect(`/business/listings/${listing.id}/edit`);
+    redirect(`/business/listings/${listing.id}/review`);
   }
 
+  if (type && !TYPE_OPTIONS.some(option => option.value === type)) redirect("/business/listings/new");
   if (!type) {
     if (business.verificationStatus !== "APPROVED") {
       return (

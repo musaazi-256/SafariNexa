@@ -1,10 +1,10 @@
-/** Whole nights between two ISO date strings, clamped to a minimum of 1. */
+/** Whole nights; invalid/non-increasing ranges return zero and must not be booked. */
 export function nightsBetween(startDate: string, endDate: string) {
   const start = new Date(startDate);
   const end = new Date(endDate);
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 1;
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
   const nights = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  return Math.max(1, nights);
+  return Math.max(0, nights);
 }
 
 /** "YYYY-MM-DD" from a Date's UTC calendar fields — date-only values (from `<input type="date">`
@@ -24,6 +24,13 @@ export function generateBookingRef() {
 
 export function formatUGX(amountMinor: number) {
   return `UGX ${amountMinor.toLocaleString("en-UG")}`;
+}
+
+/** Date-only stays/tours must not display a fictitious 03:00 departure time. */
+export function formatBookingDate(date: Date, type: string) {
+  return type === "ACCOMMODATION" || type === "TOUR"
+    ? date.toLocaleDateString("en-UG", { dateStyle: "medium", timeZone: "UTC" })
+    : date.toLocaleString("en-UG", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Kampala" });
 }
 
 /** Restaurants only store a price range (e.g. "UGX 40,000 – 90,000 per

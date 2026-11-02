@@ -12,6 +12,8 @@ jest.mock("next/cache", () => ({
 
 jest.mock("@/lib/db", () => ({
   db: {
+    $transaction: jest.fn(fn => fn(require("@/lib/db").db)),
+    notification: { createMany: jest.fn().mockResolvedValue({count:1}) },
     messageThread: {
       findUnique: jest.fn().mockResolvedValue({
         id: "thread-1",
@@ -58,6 +60,7 @@ jest.mock("@/lib/db", () => ({
       })
     },
     businessUser: {
+      findMany: jest.fn().mockResolvedValue([{userId:"business-user"}]),
       findFirst: jest.fn().mockResolvedValue({
         id: "bu-1",
         businessId: "biz-1",

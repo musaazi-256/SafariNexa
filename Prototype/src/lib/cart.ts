@@ -16,6 +16,10 @@ export type CartItem = {
   addOnIds: string[];
   totalMinor: number;
   unitPriceMinor?: number;
+  participantMin?: number;
+  participantMax?: number;
+  pricingBasis?: "per_person" | "fixed";
+  fulfilment?: import("./booking-operations").FulfilmentDetails;
 };
 
 interface CartState {
@@ -41,7 +45,7 @@ export const useCartStore = create<CartState>()(
         items: state.items.filter((item) => item.id !== id) 
       })),
       clearCart: () => set({ items: [] }),
-      getTotalMinor: () => get().items.reduce((sum, item) => sum + item.totalMinor, 0),
+      getTotalMinor: () => get().items.reduce((sum, item) => sum + (item.type.toUpperCase()==="RESTAURANT" ? 0 : item.totalMinor), 0),
     }),
     {
       name: 'safarinexa-cart',

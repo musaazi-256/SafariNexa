@@ -23,3 +23,6 @@ next-env.d.ts
 
 # prisma
 prisma/dev.db
+
+# Private local verification storage (never publish or commit documents)
+.private/

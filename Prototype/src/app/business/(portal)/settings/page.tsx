@@ -65,8 +65,8 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
                 </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-[13px] font-bold text-slate-700">Support Email <span className="text-red-500">*</span></Label>
-                <Input id="email" name="email" type="email" defaultValue={business.contactEmail || "support@example.com"} className="h-11 rounded-lg border-slate-200 font-medium focus-visible:ring-primary shadow-sm" />
-                <p className="text-[11px] font-semibold text-slate-400">This email will receive important updates and notifications.</p>
+                <Input id="email" name="email" type="email" defaultValue={business.contactEmail || ""} className="h-11 rounded-lg border-slate-200 font-medium focus-visible:ring-primary shadow-sm" />
+                <p className="text-[11px] font-semibold text-slate-400">Business contact email. Operational updates currently appear in the app; email delivery is not connected.</p>
               </div>
               
               <div className="space-y-2">
@@ -76,7 +76,7 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
                     <span className="text-base mr-1">🇺🇬</span>
                     <span className="text-[13px] font-bold text-slate-600">+256</span>
                   </div>
-                  <Input id="phone" name="phone" type="tel" defaultValue={business.contactPhone || "700 000000"} className="h-11 rounded-lg border-slate-200 font-medium pl-[88px] focus-visible:ring-primary shadow-sm" />
+                  <Input id="phone" name="phone" type="tel" defaultValue={business.contactPhone || ""} className="h-11 rounded-lg border-slate-200 font-medium pl-[88px] focus-visible:ring-primary shadow-sm" />
                 </div>
                 <p className="text-[11px] font-semibold text-slate-400">Include country code</p>
               </div>
@@ -85,7 +85,7 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="address" className="text-[13px] font-bold text-slate-700">Physical Address <span className="text-red-500">*</span></Label>
                 <Input id="address" name="address" defaultValue={business.address ?? ""} placeholder="Street address" className="h-11 rounded-lg border-slate-200 font-medium focus-visible:ring-primary shadow-sm" />
-                <p className="text-[11px] font-semibold text-slate-400">Your business address will be visible to customers on your listings.</p>
+                <p className="text-[11px] font-semibold text-slate-400">Registered business address for administration. Set each listing’s customer-facing address in its listing form.</p>
               </div>
 
               <div className="space-y-2">
@@ -146,118 +146,9 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
           </div>
         </TabsContent>
 
-        <TabsContent value="notifications" className="space-y-6">
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-            
-            <div className="p-8 pb-4">
-              <div className="flex items-start gap-4 mb-8">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                  <Bell className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex flex-col">
-                  <h3 className="text-lg font-bold text-slate-900">Notification Preferences</h3>
-                  <p className="text-sm font-medium text-slate-500">Choose how you want to be notified about bookings and messages.</p>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                
-                {/* New Bookings */}
-                <div className="flex items-center justify-between rounded-xl border border-slate-200 p-5">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                      <CalendarDays className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <Label className="text-[15px] font-bold text-slate-900">New Bookings</Label>
-                      <p className="text-[13px] font-semibold text-slate-500">Receive an email when a new booking is made.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <div className="flex flex-col text-left">
-                      <span className="text-[12px] font-bold text-slate-900">Email</span>
-                      <span className="text-[12px] font-semibold text-slate-500">{business.contactEmail || "info@example.com"}</span>
-                    </div>
-                    <div className="h-8 w-px bg-slate-200" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-6 w-11 rounded-full bg-primary relative cursor-pointer shadow-sm">
-                        <div className="absolute right-1 top-1 h-4 w-4 rounded-full bg-white transition-transform" />
-                      </div>
-                      <span className="text-[13px] font-bold text-primary w-6">On</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Cancellations */}
-                <div className="flex items-center justify-between rounded-xl border border-slate-200 p-5">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                      <XCircle className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <Label className="text-[15px] font-bold text-slate-900">Cancellations</Label>
-                      <p className="text-[13px] font-semibold text-slate-500">Receive an SMS when a booking is cancelled.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <div className="flex flex-col text-left">
-                      <span className="text-[12px] font-bold text-slate-900">SMS</span>
-                      <span className="text-[12px] font-semibold text-slate-500">+256 700 000000</span>
-                    </div>
-                    <div className="h-8 w-px bg-slate-200" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-6 w-11 rounded-full bg-primary relative cursor-pointer shadow-sm">
-                        <div className="absolute right-1 top-1 h-4 w-4 rounded-full bg-white transition-transform" />
-                      </div>
-                      <span className="text-[13px] font-bold text-primary w-6">On</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Payout Reports */}
-                <div className="flex items-center justify-between rounded-xl border border-slate-200 p-5">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                      <BarChart2 className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <Label className="text-[15px] font-bold text-slate-900">Payout Reports</Label>
-                      <p className="text-[13px] font-semibold text-slate-500">Receive a weekly summary of your payouts.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <div className="flex flex-col text-left">
-                      <span className="text-[12px] font-bold text-slate-900">Email</span>
-                      <span className="text-[12px] font-semibold text-slate-500">{business.contactEmail || "info@example.com"}</span>
-                    </div>
-                    <div className="h-8 w-px bg-slate-200" />
-                    <div className="flex items-center gap-3">
-                      <div className="h-6 w-11 rounded-full bg-slate-200 relative cursor-pointer border border-slate-300">
-                        <div className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform" />
-                      </div>
-                      <span className="text-[13px] font-bold text-slate-500 w-6">Off</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50/50 p-4 mt-2">
-                  <Info className="h-5 w-5 text-primary shrink-0" />
-                  <p className="text-[13px] font-semibold text-slate-700">
-                    You can update your email and phone number in <span className="font-bold text-primary">Business Profile</span> settings.
-                  </p>
-                </div>
-                
-              </div>
-            </div>
-
-            <div className="px-8 py-6 border-t border-slate-200 bg-white">
-              <Button disabled className="bg-slate-200 text-slate-400 font-bold h-11 px-6 rounded-lg shadow-sm gap-2">
-                <Save className="h-4 w-4" />
-                Save preferences (Coming Soon)
-              </Button>
-            </div>
-            
-          </div>
+        <TabsContent value="notifications" className="space-y-5">
+          <div className="rounded-2xl border bg-white p-5"><h2 className="text-xl font-bold">Notification delivery</h2><p className="mt-3 text-sm text-muted-foreground">Booking updates, support replies and messages are recorded in account notifications. Operational email delivery needs a connected delivery queue; an in-app notification does not imply an email was sent.</p>
+          <div className="mt-5 flex flex-wrap gap-3"><Button asChild variant="outline"><Link href="/notifications">Open notifications</Link></Button><Button asChild variant="outline"><Link href="/business/messages">Open messages</Link></Button></div></div>
         </TabsContent>
 
         <TabsContent value="team" className="space-y-6">

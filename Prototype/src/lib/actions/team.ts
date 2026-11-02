@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { randomBytes } from "crypto";
+import { randomBytes, createHash } from "crypto";
+import { applicationOrigin, emailConfigured, sendAccountEmail } from "@/lib/email";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { requireBusinessSession } from "@/lib/business";
@@ -16,7 +17,8 @@ export async function inviteTeamMember(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const role = String(formData.get("role") ?? "STAFF") as BusinessUserRole;
 
-  if (!email) throw new Error("Email is required");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Valid email is required");
+  if (!["MANAGER", "STAFF"].includes(role)) throw new Error("Invitations can only grant manager or staff access.");
 
   // Verify sender is OWNER or MANAGER
   const senderMembership = await db.businessUser.findUnique({
@@ -45,7 +47,10 @@ export async function inviteTeamMember(formData: FormData) {
     throw new Error("An invitation is already pending for this email");
   }
 
+  if (role === "MANAGER" && senderMembership.role !== "OWNER") throw new Error("Only an owner can invite managers.");
+  if (!emailConfigured()) throw new Error("Email invitations are not configured. No invitation has been sent.");
   const token = randomBytes(32).toString("hex");
+  const digest = createHash("sha256").update(token).digest("hex");
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
 
@@ -54,11 +59,13 @@ export async function inviteTeamMember(formData: FormData) {
       businessId,
       email,
       role,
-      token,
+      token: digest,
       invitedByUserId: session.user.id,
       expiresAt
     }
   });
+
+  await sendAccountEmail(email,"SafariNexa business invitation",`You have been invited to ${business.name}. Sign in with this email and accept here: ${applicationOrigin()}/business/auth/accept?token=${token}`,`business-invite:${digest}`);
 
   await logAuditEvent({
     actorUserId: session.user.id,

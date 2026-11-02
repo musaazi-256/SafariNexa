@@ -26,7 +26,8 @@ const TABS: Array<{ value: UserRole | "ALL"; label: string }> = [
 export default async function AdminUsersPage({ searchParams }: { searchParams: { role?: string; page?: string; q?: string } }) {
   await requireAdminSession();
 
-  const activeRole = (searchParams.role?.toUpperCase() as UserRole | undefined) ?? undefined;
+  const roleParam = searchParams.role?.toUpperCase();
+  const activeRole = roleParam && ["CUSTOMER", "BUSINESS_OWNER", "BUSINESS_STAFF", "ADMIN", "SUPER_ADMIN"].includes(roleParam) ? roleParam as UserRole : undefined;
   const page = parsePage(searchParams.page);
   const q = searchParams.q?.trim();
 
@@ -84,10 +85,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
               className="w-full h-9 pl-9 pr-4 rounded-full border border-slate-200 text-[13px] outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-white"
             />
           </form>
-          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0">
-            <Filter className="h-4 w-4 mr-2 text-slate-400" />
-            Filter
-          </Button>
+<PortalFilter />
           <Link href="/admin/users/new">
             <Button className="h-9 px-4 text-[13px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm rounded-full shrink-0">
               Add user
@@ -159,3 +157,4 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
     </div>
   );
 }
+import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

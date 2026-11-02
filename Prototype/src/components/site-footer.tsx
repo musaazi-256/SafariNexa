@@ -35,10 +35,10 @@ const COLUMNS = [
 ];
 
 const SOCIALS = [
-  { href: "#", label: "Facebook", icon: Facebook },
-  { href: "#", label: "Twitter", icon: Twitter },
-  { href: "#", label: "Instagram", icon: Instagram },
-  { href: "#", label: "LinkedIn", icon: Linkedin }
+  { href: process.env.NEXT_PUBLIC_FACEBOOK_URL ?? "", label: "Facebook", icon: Facebook },
+  { href: process.env.NEXT_PUBLIC_TWITTER_URL ?? "", label: "Twitter", icon: Twitter },
+  { href: process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "", label: "Instagram", icon: Instagram },
+  { href: process.env.NEXT_PUBLIC_LINKEDIN_URL ?? "", label: "LinkedIn", icon: Linkedin }
 ];
 
 export function SiteFooter() {
@@ -52,7 +52,7 @@ export function SiteFooter() {
             in one marketplace.
           </p>
           <div className="mt-4 flex gap-2">
-            {SOCIALS.map((social) => (
+            {SOCIALS.filter(social => social.href.startsWith("https://")).map((social) => (
               <a
                 key={social.label}
                 href={social.href}
@@ -102,7 +102,7 @@ export function SiteFooter() {
         <Container className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} SafariNexa. Phase 1 MVP — East Africa marketplace.</p>
           <div className="flex items-center gap-4">
-            <p>Payments via mobile money & card. Verified businesses only.</p>
+            <p>Payment availability depends on connected providers. Verified businesses only.</p>
             <Link href="/docs" className="font-semibold text-foreground/70 hover:text-primary">
               Engineering docs
             </Link>

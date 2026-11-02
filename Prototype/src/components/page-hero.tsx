@@ -1,3 +1,4 @@
+import { RemoteImage } from "@/components/remote-image";
 import { cn } from "@/lib/utils";
 
 export function PageHero({
@@ -20,7 +21,7 @@ export function PageHero({
       return (
         <div className={cn("relative mb-6 overflow-hidden rounded-[20px] bg-muted pb-8 pt-12 px-6 sm:px-8", className)}>
           <div className="absolute inset-0 z-0">
-            <img src={heroImageUrl} alt={title} className="h-full w-full object-cover" />
+            <RemoteImage src={heroImageUrl} alt={title} className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-black/40" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>

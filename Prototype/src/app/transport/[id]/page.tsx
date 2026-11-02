@@ -22,6 +22,8 @@ import { Container } from "@/components/ui/container";
 import { ScoreBadge } from "@/components/ui/rating";
 import { formatUGX } from "@/lib/booking";
 import { db } from "@/lib/db";
+import { BookingModeNotice } from "@/components/booking-mode-notice";
+import { ListingTrustSummary } from "@/components/listing-trust-summary";
 import { findEligibleReviewBooking, ratingBreakdown, ratingSummary } from "@/lib/listings";
 
 export default async function TransportDetailPage({ params }: { params: { id: string } }) {
@@ -100,6 +102,8 @@ export default async function TransportDetailPage({ params }: { params: { id: st
             ]}
           />
 
+          <BookingModeNotice listing={listing}/>
+          <ListingTrustSummary listingId={listing.id}/>
           <PhotoGallery
             images={listing.images.length > 0 ? listing.images : listing.coverImageUrl ? [listing.coverImageUrl] : []}
             title={listing.title}
@@ -249,6 +253,7 @@ export default async function TransportDetailPage({ params }: { params: { id: st
                       participantLabel="Passengers"
                       participantMin={1}
                       participantMax={transport.capacity}
+                      priceUnitLabel={/person|passenger/i.test(transport.pricingModel ?? "") ? "per person" : "per trip"}
                       showTime
                       priceMinor={listing.basePriceMinor}
                       note="A driver is assigned after you confirm pickup details at checkout."

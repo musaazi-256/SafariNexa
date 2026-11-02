@@ -54,8 +54,9 @@ export function SimpleReservationFields({
   const [time, setTime] = React.useState(initial?.time ?? "");
   const [participants, setParticipants] = React.useState(initial?.participants ?? String(participantMin));
 
-  const canReserve = Boolean(date && (!showTime || time));
-  const total = priceMinor ? priceMinor * Number(participants) : undefined;
+  const canReserve = Boolean(date && date >= todayIsoDate() && (!showTime || time));
+  const isFixedFare = listingType === "transport" && !priceUnitLabel.includes("person") && !priceUnitLabel.includes("passenger");
+  const total = listingType === "restaurant" ? 0 : priceMinor !== undefined ? priceMinor * (isFixedFare ? 1 : Number(participants)) : undefined;
   const addItem = useCartStore((state) => state.addItem);
   const router = useRouter();
 
@@ -71,6 +72,9 @@ export function SimpleReservationFields({
       endDate: date, // For simple reservations, start and end date are the same
       time: showTime ? time : undefined,
       participants: Number(participants),
+      participantMin,
+      participantMax,
+      pricingBasis: isFixedFare ? "fixed" : "per_person",
       addOnIds: [],
       totalMinor: total ?? 0,
       unitPriceMinor: priceMinor
@@ -90,6 +94,7 @@ export function SimpleReservationFields({
             <input
               type="date"
               name="date"
+              aria-label="Reservation date"
               min={todayIsoDate()}
               value={date}
               onChange={(event) => setDate(event.target.value)}
@@ -105,6 +110,7 @@ export function SimpleReservationFields({
               <input
                 type="time"
                 name="time"
+                aria-label="Reservation time"
                 value={time}
                 onChange={(event) => setTime(event.target.value)}
                 className="w-full bg-transparent text-sm font-medium outline-none"
@@ -120,6 +126,7 @@ export function SimpleReservationFields({
         <div className="flex h-11 items-center rounded-xl border border-input bg-card px-3">
           <select
             name="participants"
+            aria-label={participantLabel}
             value={participants}
             onChange={(event) => setParticipants(event.target.value)}
             className="w-full appearance-none bg-transparent text-sm font-medium outline-none"
@@ -139,12 +146,12 @@ export function SimpleReservationFields({
           <div className="flex flex-col gap-1.5 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">
-                {formatUGX(priceMinor ?? 0)} ({priceUnitLabel}) × {participants}
+                {formatUGX(priceMinor ?? 0)} ({priceUnitLabel}) × {isFixedFare ? 1 : participants}
               </span>
               <span>{formatUGX(total)}</span>
             </div>
             <div className="flex items-center justify-between text-base font-bold">
-              <span>Total</span>
+              <span>{listingType === "restaurant" ? "Table reservation · meals paid separately" : "Total"}</span>
               <span>{formatUGX(total)}</span>
             </div>
           </div>

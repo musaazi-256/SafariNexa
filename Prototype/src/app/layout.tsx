@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+export const dynamic = "force-dynamic";
 
 // Fallback to system fonts to prevent build failures when fonts.googleapis.com is unreachable
 const systemFontVariable = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";

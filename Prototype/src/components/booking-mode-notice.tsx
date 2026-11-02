@@ -1,0 +1,3 @@
+export function BookingModeNotice({listing}: {listing:{type:string;bookingMode:string}}) {
+ return <p className="my-4 rounded border bg-muted/30 p-4 text-sm">{listing.type === "RESTAURANT" ? "Request a table: the restaurant confirms availability. No meal charge is collected online; menu prices are indicative and meals are paid separately." : listing.bookingMode === "INSTANT" ? "Instant booking: confirmation follows verified payment. Your dates and final price are checked again at checkout." : "Request to book: the business accepts availability first. No payment is collected until acceptance. You will then have a limited payment window to confirm."} Special requests require agreement with the business.</p>;
+}

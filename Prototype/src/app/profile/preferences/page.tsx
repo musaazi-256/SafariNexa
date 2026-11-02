@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 import { auth } from "@/auth";
 import { AccountLayout } from "@/components/customer/account-layout";
@@ -7,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { db } from "@/lib/db";
 import { NOTIFICATION_TYPES, defaultPreferences, parsePreferences, type CustomerPreferences } from "@/lib/preferences";
 
-export default async function PreferencesPage() {
+export default async function PreferencesPage({searchParams}: {searchParams: {saved?: string}}) {
   const session = await auth();
   if (!session?.user) redirect("/auth/sign-in?returnTo=%2Fprofile%2Fpreferences");
 
@@ -27,6 +28,7 @@ export default async function PreferencesPage() {
 
     const nationality = String(formData.get("nationality") ?? "").trim();
     const emergencyContact = String(formData.get("emergencyContact") ?? "").trim();
+    if (nationality.length > 100 || emergencyContact.length > 250) throw new Error("Traveller details are too long.");
 
     await db.customerProfile.upsert({
       where: { userId: activeSession.user.id },
@@ -38,6 +40,9 @@ export default async function PreferencesPage() {
         emergencyContact: emergencyContact || null
       }
     });
+    revalidatePath("/profile/preferences");
+    revalidatePath("/notifications");
+    redirect("/profile/preferences?saved=1");
   }
 
   return (
@@ -48,6 +53,7 @@ export default async function PreferencesPage() {
     >
       <Card className="border-none shadow-sm rounded-2xl">
         <CardContent className="pt-6 pb-6">
+          {searchParams.saved && <p role="status" className="mb-4 text-primary">Preferences saved.</p>}
           <PreferencesForm
             notify={preferences.notify}
             nationality={profile?.nationality ?? ""}

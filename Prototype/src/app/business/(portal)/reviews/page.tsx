@@ -17,7 +17,7 @@ import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-export default async function BusinessReviewsPage({ searchParams }: { searchParams: { status?: string; page?: string } }) {
+export default async function BusinessReviewsPage({ searchParams }: { searchParams: { status?: string; page?: string; q?: string } }) {
   const { business, businessId } = await requireBusinessSession();
 
   if (!business || !businessId) {
@@ -28,11 +28,13 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
     );
   }
 
-  const activeTab = searchParams.status?.toUpperCase() || "ALL";
+  const requestedStatus = searchParams.status?.toUpperCase();
+  const activeTab = requestedStatus && ["PENDING","PUBLISHED","HIDDEN","FLAGGED"].includes(requestedStatus) ? requestedStatus : "ALL";
   const page = parsePage(searchParams.page);
   
   const where = { 
-    businessId, 
+    businessId,
+    ...(searchParams.q ? { OR: [{ body: { contains: searchParams.q.trim(), mode: "insensitive" as const } }, { listing: { title: { contains: searchParams.q.trim(), mode: "insensitive" as const } } }] } : {}),
     ...(activeTab !== "ALL" ? { status: activeTab as any } : {}) 
   };
 
@@ -134,9 +136,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
         />
 
         <div className="flex items-center gap-3 w-full lg:w-auto shrink-0">
-          <Button variant="outline" className="border-slate-200 text-slate-700 font-semibold h-10">
-            <Filter className="h-4 w-4 mr-2" /> Filters
-          </Button>
+<PortalFilter />
           <div className="relative flex-1 lg:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input placeholder="Search reviews..." className="pl-9 h-10 bg-white border-slate-200" />
@@ -315,16 +315,16 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                       <p className="text-sm text-slate-700">{review.businessReplyBody}</p>
                     </div>
                   ) : (
-                    <form action={replyToReview} className="flex flex-col gap-2 relative">
+                    <form id={`reply-${review.id}`} action={replyToReview} className="flex flex-col gap-2 relative">
                       <input type="hidden" name="reviewId" value={review.id} />
                       <Textarea 
                         name="businessReplyBody" 
                         required 
-                        placeholder={`Write a public reply to ${customerName.split(' ')[0]} (optional)...`}
+                        placeholder={`Write a public reply to ${customerName.split(' ')[0]}...`}
                         className="resize-none min-h-[60px] pb-8 bg-white border-slate-200 text-sm"
                       />
                       <div className="absolute bottom-2 left-3 flex items-center gap-1 text-xs text-slate-400 font-medium">
-                        Only visible to the customer <Info className="h-3 w-3" />
+                        Public reply visible with this review <Info className="h-3 w-3" />
                       </div>
                       <div className="absolute bottom-2 right-2 flex items-center gap-2 hidden group-focus-within:flex">
                         <Button type="submit" size="sm" className="h-6 text-[10px] bg-primary hover:bg-primary/90">
@@ -349,9 +349,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                   </div>
                   
                   <div className="flex items-center gap-2 md:mt-4">
-                    <Button variant="outline" size="sm" className="h-8 font-semibold text-primary border-slate-200">
-                      Reply
-                    </Button>
+<Button asChild variant="outline" size="sm"><a href={`#reply-${review.id}`}>Reply</a></Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="icon" className="h-8 w-8 text-slate-400 border-slate-200">
@@ -359,8 +357,8 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40 font-medium text-sm">
-                        <DropdownMenuItem className="text-slate-600 cursor-pointer">Flag as inappropriate</DropdownMenuItem>
-                        <DropdownMenuItem className="text-slate-600 cursor-pointer">Contact customer</DropdownMenuItem>
+                        <DropdownMenuItem asChild><Link href="/support">Report to support</Link></DropdownMenuItem>
+                        <DropdownMenuItem asChild><Link href="/business/messages">Open customer messages</Link></DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -388,3 +386,4 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
     </div>
   );
 }
+import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

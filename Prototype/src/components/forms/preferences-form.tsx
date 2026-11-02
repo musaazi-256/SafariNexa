@@ -23,7 +23,7 @@ export function PreferencesForm({
     <form action={action} className="flex flex-col gap-6">
       <div>
         <h2 className="text-lg font-bold">Notifications</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Choose what SafariNexa keeps you posted on.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Choose the categories shown by default in your notification centre. This does not configure email or SMS delivery; individual category tabs still show their full history.</p>
         <div className="mt-4 grid sm:grid-cols-2 gap-4">
           {NOTIFICATION_TYPES.map((type: NotificationType) => (
             <label

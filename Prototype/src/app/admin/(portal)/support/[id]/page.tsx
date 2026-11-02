@@ -35,7 +35,7 @@ export default async function AdminSupportCaseDetailPage({ params }: { params: {
 
   async function postAdminReply(formData: FormData) {
     "use server";
-    const activeSession = await requireAdminSession();
+    const activeSession = await requireAdminSession("support.manage");
 
     const caseId = String(formData.get("caseId"));
     const body = String(formData.get("body") ?? "").trim();
@@ -61,7 +61,7 @@ export default async function AdminSupportCaseDetailPage({ params }: { params: {
 
   async function setCaseStatus(formData: FormData) {
     "use server";
-    await requireAdminSession();
+    await requireAdminSession("support.manage");
 
     const caseId = String(formData.get("caseId"));
     const nextStatus = String(formData.get("status")) as PrismaSupportCaseStatus;

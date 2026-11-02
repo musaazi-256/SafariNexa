@@ -1,6 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
-import { isAuthDevMode } from "@/lib/dev-mode";
 
 /**
  * Edge-safe auth config used by middleware. Deliberately excludes the
@@ -12,7 +11,7 @@ import { isAuthDevMode } from "@/lib/dev-mode";
  * components, server actions).
  */
 export default {
-  secret: process.env.AUTH_SECRET || "dummy-secret-for-prototype-safari-nexa",
+  secret: process.env.AUTH_SECRET,
   session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 30 },
   pages: {
     signIn: "/auth/sign-in",
@@ -29,7 +28,7 @@ export default {
       if (session.user) {
         session.user.id = token.userId as string;
         session.user.role = token.role as string;
-        session.user.isAdmin = Boolean(token.isAdmin) || isAuthDevMode();
+        session.user.isAdmin = Boolean(token.isAdmin);
         session.user.adminRoleName = (token.adminRoleName as string | null) ?? null;
         session.user.businessIds = (token.businessIds as string[]) ?? [];
       }

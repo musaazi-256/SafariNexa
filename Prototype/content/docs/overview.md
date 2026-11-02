@@ -16,13 +16,13 @@
 
 **Identity model:** one `User` table underlies all three surfaces, joined by email. A person can simultaneously be a customer (has a `CustomerProfile`, bookings, saved items), a business owner/staff (via `BusinessUser`, pointing at a `BusinessProfile`), and an admin (via `AdminUser`, pointing at a `Role`). **This is intentional** — see the identity-model note in §5. Route protection is enforced centrally in `src/middleware.ts`, which checks `session.user.isAdmin` for admin routes and session presence for customer/business-protected routes.
 
-**Auth:** NextAuth v5 with Google OAuth and a credentials provider, per surface (`src/auth.ts`, edge-safe config in `src/auth.config.ts`). `AUTH_DEV_MODE=true` (dev-only) makes email/password sign-in on any surface accept any credentials and auto-provision the account — this is how the seeded demo accounts (`customer@safarinexa.test`, `business@dev.test`, `admin@safarinexa.test`, all password `Passw0rd!`) work locally. **Never enable this in production.**
+**Auth:** NextAuth v5 with Google OAuth and a credentials provider, per surface (`src/auth.ts`, edge-safe config in `src/auth.config.ts`). **As of 1 Nov 2026**, `AUTH_DEV_MODE` is a validated-but-inert legacy flag (`src/lib/dev-mode.ts`) — it no longer bypasses credential checks or elevates any session to admin on any surface; the real blank-login-as-demo-admin shortcut and the blanket `AUTH_DEV_MODE`-based admin elevation were removed as release hazards. The seeded demo accounts (`customer@safarinexa.test`, `business@dev.test`, `admin@safarinexa.test`, all password `Passw0rd!`) still sign in, but only through the normal, now-hardened credentials path (real bcrypt-matched password, and for admin, a real `ACTIVE` `AdminUser` record). A separate, explicit dev-only convenience (one-click quick-sign-in buttons in `src/components/auth-card.tsx`, gated to `process.env.NODE_ENV !== "production"`) submits through that same real path — it never renders on any deployed build, including Vercel previews.
 
 **The seed script runs on every deploy, not just the first one.** `package.json`'s `build` script is `prisma generate && prisma db push --accept-data-loss && prisma db seed && next build` — every Vercel deploy re-runs `prisma/seed.ts` against whatever database is configured. This is deliberate self-healing for the four core demo businesses (one per category — accommodation/tours/restaurants/transport) and their seed-defined listings: their `upsert` calls' `update` clauses force `verificationStatus`/`status` back to `APPROVED`/`PUBLISHED` on every run (fixed 12 Oct 2026 — previously `update: {}` was a no-op on existing rows, so testing an admin Suspend/Reject action against one of these businesses on the live site silently broke it forever, since no later deploy ever repaired it). This only touches the seed's own known IDs — anything created later through the real product UI is untouched.
 
 **Money:** all prices are stored as `*Minor` integer fields (minor currency units, e.g. UGX has no subunit so these are whole-shilling integers) — never floats.
 
-**Payments — read this before assuming anything works:** `stripe` and `@stripe/stripe-js` are installed, a webhook handler and admin refund flow are real (`src/app/api/webhooks/stripe/route.ts`, `src/app/admin/(portal)/payments/page.tsx`), but **nothing in the app ever creates a Stripe Checkout Session or PaymentIntent.** `processPaymentAction` (`src/app/payments/actions.ts`) unconditionally marks every payment method — including `"stripe"` — as `SUCCESSFUL` without any gateway confirming funds. Treat all payment flows in this codebase as **simulated** until that's built.
+**Payments — read this before assuming anything works:** **As of 1 Nov 2026**, the old `processPaymentAction` self-attested-success path (which unconditionally marked every method, including `"stripe"`, as `SUCCESSFUL` with no gateway ever contacted) was removed. Checkout now creates a real **Stripe-hosted Checkout Session**, and the webhook (`src/app/api/webhooks/stripe/route.ts`) validates payment identity, amount/currency, and payable state with idempotency guards before confirming a booking. **However, no Stripe keys are configured in this environment** — with `STRIPE_SECRET_KEY` blank, checkout honestly disables itself with an unpaid message rather than faking success. Mobile money is modeled in the schema/UI but has no gateway call-sites. Admin refunds (`src/app/admin/(portal)/payments/page.tsx`) call the real Stripe refund API for Stripe-labeled payments. **Net effect: the payment flow is real but inert** (no provider configured) rather than simulated-successful — don't treat a "payment successful" screen as proof of settlement until Stripe keys are added and reconciled. See `SAFARINEXA_FIXES_AND_VERIFICATION_2026-11-01.md` for full detail.
 
 **Images:** the shared `ImageUploader` (`src/components/ui/image-uploader.tsx`) base64-encodes photos client-side and stores them as text directly in Postgres — there is no object storage integration. It does enforce a 10MB/file, image-type-only, and a photo-count cap as of 9 September 2026, but the storage mechanism itself is still base64-in-DB.
 
@@ -54,8 +54,8 @@
 - Cart: `/cart`, Zustand-backed (`src/lib/cart.ts`), with edit-in-place support (`src/components/cart/edit-cart-item-modal.tsx`).
 
 ### 2.4 Payments
-**Status: Simulated — see §1.**
-- `/payments`, `/payments/success`, `/payments/cancelled`, `/payments/receipt`. Real UI, real data collection per method (masked card/mobile-money reference stored in `Payment.providerReference`), real `Payment` rows created — but the "success" outcome is never actually confirmed by a payment provider.
+**Status: Working but unconfigured — see §1.**
+- `/payments`, `/payments/success`, `/payments/cancelled`, `/payments/receipt`. Checkout now hands off to real Stripe-hosted Checkout rather than collecting a raw card form; the webhook confirms payment before any booking is marked paid (fixed 1 Nov 2026 — previously `processPaymentAction` self-attested every method as `SUCCESSFUL`). With no Stripe keys configured in this environment, checkout is disabled with an explicit unpaid message instead of faking success. Receipt/success pages now derive their state from real owned payment records — an unpaid booking can no longer show a "Payment successful" receipt.
 
 ### 2.5 Bookings management
 **Status: Working.**
@@ -80,8 +80,8 @@
 - `/support`, `/support/[id]` — real case creation and threaded replies (`SupportCase`/`SupportMessage`), visible to both the customer and admin sides.
 
 ### 2.10 Trip planner
-**Status: Placeholder — explicitly unfinished, not a bug.**
-- `/trip-planner`'s own list page literally displays "Coming soon — currently in development." `/trip-planner/[id]` is a client-side mock builder with fabricated demo data and no persistence — none of its buttons (Save, Share, Add Item, etc.) do anything. The schema already has `TripPlan`/`TripPlanItem` models ready and unused if this becomes a real feature.
+**Status: Working, as of 1 Nov 2026 — was Placeholder.**
+- `/trip-planner/[id]` now persists an owned itinerary to the `TripPlan`/`TripPlanItem` models that previously sat unused; add/edit/remove/save/copy-to-share controls work against a real detail URL reachable from `/trip-planner/new`. It still does not create or hold a reservation — it's a planning tool, not a booking path.
 
 ### 2.11 Safety
 **Status: Working.**
@@ -132,8 +132,8 @@ Entry: `/business` → `requireBusinessSession()`. A business owner first has a 
 **Status: Working** — see §2.7; the business side of the same system, plus the ability to start a new thread with any past customer (added 1 Sept).
 
 ### 3.8 Revenue
-**Status: Partial — real totals, decorative everything else.**
-- `/business/revenue` — the headline stat totals (gross/commission/net/refunded) are real, computed from actual `Payment` rows. The comparison percentages, sparkline charts, date-range picker, "Export," and the payout-breakdown line items are all hardcoded/non-functional. The filter-tab row was simplified to a single real "All transactions" tab with a real count (11 Sept — previously four extra sub-tabs with hardcoded fake counts and no backing filter logic; removed rather than faked, since wiring real status filtering here would mean moving the table off DB-level pagination). **Do not use anything on this page except the four headline totals for real financial decisions.**
+**Status: Partial — real totals and allocations, some decorative chrome remains.**
+- `/business/revenue` — the headline stat totals (gross/commission/net/refunded) are real, computed from actual `Payment` rows. **As of 1 Nov 2026**, these now derive from real booking-level payment allocations including multi-business orders, replacing some of the previously simulated revenue-chart data. The comparison percentages, date-range picker, and some line items may still be hardcoded/non-functional — not fully re-audited item-by-item since the 1 Nov remediation; verify against `SAFARINEXA_FIXES_AND_VERIFICATION_2026-11-01.md` before trusting anything beyond the headline totals.
 
 ### 3.9 Verification
 **Status: Working**, business side.
@@ -154,25 +154,25 @@ Entry: `/business` → `requireBusinessSession()`. A business owner first has a 
 Entry: `/admin` → `requireAdminSession()`, gated on `session.user.isAdmin` in middleware.
 
 ### 4.1 Dashboard
-**Status: Partial — largely cosmetic beyond a handful of stats.**
-- `/admin/dashboard` — a substantial rewrite (25 Aug) added many real database queries, but most of what they compute is never rendered. Only a handful of secondary stats (active business count, cancelled bookings, support case counts, rating average, recent verifications) reach the UI via a real-value-or-fallback pattern; the headline KPI cards (Total Revenue, Pending Payouts, Total Bookings, etc.) and several whole panels (Featured Businesses, Recent Platform Activity, Top Performers, Recent Actions) are hardcoded literals. Empty-state mock rows in the verification/support panels no longer look clickable (fixed 9 Sept).
+**Status: Working, as of 1 Nov 2026 — was Partial.**
+- `/admin/dashboard` — a substantial rewrite (25 Aug) added many real database queries; as of 1 Nov 2026, admin dashboard activity/health metrics that were previously hardcoded/simulated were replaced with real queries as part of the same remediation that fixed business revenue (§3.8). Not every literal panel has been individually re-verified since — if a specific number looks suspiciously round, check it against the database before relying on it. Empty-state mock rows in the verification/support panels no longer look clickable (fixed 9 Sept). The dashboard also now links to a real `/admin/audit` route (added 1 Nov 2026 — previously linked twice but 404'd).
 
 ### 4.2 Verification queue
 **Status: Working.**
-- `/admin/verification` — approve/request-changes/flag actions correctly sync `BusinessProfile.verificationStatus` in one transaction, and now carry a real reviewer-notes textarea that reaches the business owner's notification (fixed 9 Sept — previously hardcoded to a generic string).
+- `/admin/verification` — approve/request-changes/flag actions correctly sync `BusinessProfile.verificationStatus` in one transaction, and now carry a real reviewer-notes textarea that reaches the business owner's notification (fixed 9 Sept — previously hardcoded to a generic string). **Added 1 Nov 2026**: `/admin/verification/[id]` detail route (the dashboard linked to it before this date, but only the collection route existed — a reproduced 404). Verification documents now live in private storage with content/type/size validation; old public `/uploads` URLs are intercepted and require admin authorization (`src/lib/private-documents.ts`).
 
 ### 4.3 Businesses
-**Status: Partial.**
-- `/admin/businesses`, `/admin/businesses/[id]` — search and status-tab filtering are real. "Filter," "Export," and column-sort are decorative (deliberately left as-is, per product direction — this is the known, intentional demo-toolbar pattern referenced throughout this document). The row's dead "⋮" overflow menu was removed (11 Sept) — a working "View" link/button already sat next to it in the same row, so the menu offered no real destination of its own.
+**Status: Working.**
+- `/admin/businesses`, `/admin/businesses/[id]` — search and status-tab filtering are real. **As of 1 Nov 2026**, "Filter" submits a real URL-backed search and "Export" downloads the visible rows as CSV, replacing the previously decorative toolbar pattern described here before that date. The row's dead "⋮" overflow menu was removed (11 Sept) — a working "View" link/button already sat next to it in the same row, so the menu offered no real destination of its own.
 
 ### 4.4 Users & access
 **Status: Working.**
-- `/admin/users`, `/admin/users/new` — invite/promote and suspend/reactivate are both real, with audit logging (the suspend/reactivate action was hardened 31 Aug — it used to trust an unvalidated client field and log nothing). Every invited admin is currently hardcoded to the "Super Admin" role; this is confirmed harmless today since no code anywhere branches on `Role`/`Permission` yet, but is worth knowing before that changes.
+- `/admin/users`, `/admin/users/new` — invite/promote and suspend/reactivate are both real, with audit logging (the suspend/reactivate action was hardened 31 Aug — it used to trust an unvalidated client field and log nothing). **Fixed 1 Nov 2026**: invitations no longer default every invite to Super Admin, and a manager can no longer invite an owner or promote another manager — sensitive finance/user-management/verification/support/moderation actions now enforce role-appropriate permissions server-side rather than a single blanket `isAdmin` gate.
 - **Admin identity is now separate from customer identity** (fixed 9 Sept): `/admin/profile` reads/writes `AdminUser.displayName`/`phone`, not the shared `User` fields — previously an admin who started as a customer would see (and could overwrite) their customer-entered name here.
 
 ### 4.5 Bookings
-**Status: Partial.**
-- `/admin/bookings` — real status tabs, search, and pagination; now also shows which room/add-ons a booking was for (fixed 9 Sept). "Filter," "Export," the date-range picker, and the row overflow menu remain decorative.
+**Status: Working.**
+- `/admin/bookings` — real status tabs, search, and pagination; now also shows which room/add-ons a booking was for (fixed 9 Sept). **As of 1 Nov 2026**: added `/admin/bookings/[id]` (previously this surface had no detail route, unlike customer/business); "Filter" and "Export" now submit real URL-backed search/CSV download; the decorative date-range picker and row overflow menu were removed rather than left as inert controls.
 
 ### 4.6 Reviews
 **Status: Working.**
@@ -217,19 +217,19 @@ This means, correctly, the same login can move between all three portals. What w
 
 ## 6. Consolidated known limitations
 
-One list, so nothing here is repeated-but-inconsistent across the sections above:
+One list, so nothing here is repeated-but-inconsistent across the sections above. **Updated 1 Nov 2026** — several long-standing items on this list were resolved that day; they're kept below, struck through in spirit (marked **Resolved**) rather than deleted, so the history of what used to be wrong here isn't lost.
 
-1. **No live payment gateway** — everything is self-attested success (§1, §2.4).
-2. **Images are base64-in-Postgres**, not object storage (§1) — guardrails exist, storage mechanism doesn't scale.
-3. **Verification/onboarding documents are written to local disk** — will not survive a typical serverless deploy (§3.1, §3.9).
-4. **Trip planner is unreachable prototype scaffolding**, not a real feature yet (§2.10).
-5. **No admin reporting page** — deleted, not rebuilt (§4.10).
-6. **Business revenue page, admin dashboard, and several list-page toolbars** show real headline numbers surrounded by decorative/hardcoded UI — see each module's Partial notes for exactly which parts to trust.
-7. **Checkout collects one participant per booking**, regardless of party size — schema supports more, UI doesn't ask (§2.3).
-8. **`Destination` is a closed, seed-only catalog** — no admin or business UI to add one (§2.1).
-9. **Password reset has no working email delivery** (§2.12).
-10. **Admin roles are currently cosmetic** — every invited admin is Super Admin and nothing branches on role yet (§4.4).
+1. **No live payment gateway configured** — real Stripe-hosted checkout exists as of 1 Nov 2026 (§1, §2.4), but no Stripe keys are set in this environment, so checkout is honestly disabled rather than faking success. Mobile money remains unimplemented as a live integration.
+2. **Images are base64-in-Postgres**, not object storage (§1) — guardrails exist, storage mechanism doesn't scale. Listing photos now upload separately to a validated image endpoint (`src/lib/listing-images.ts`, 1 Nov 2026) rather than embedding multi-megabyte data URLs in server-action bodies, but the underlying storage is still local/DB-backed, not durable object storage.
+3. **Verification/onboarding documents**: verification documents moved to private, access-controlled storage with validation (**Resolved**, 1 Nov 2026 — `src/lib/private-documents.ts`). Onboarding document upload still writes to the local filesystem and remains a pre-deployment blocker (§3.1) — not covered by the 1 Nov private-storage fix.
+4. **Trip planner is unreachable prototype scaffolding** — **Resolved**, 1 Nov 2026 (§2.10): now a real, persisted itinerary feature.
+5. **No admin reporting page** — still true. `/admin/audit` (added 1 Nov 2026) is an audit log, not an analytics/reporting page — don't conflate the two (§4.10 unchanged).
+6. **Business revenue page and admin dashboard**: real allocations/queries replaced several previously hardcoded figures as of 1 Nov 2026 (§3.8, §4.1), but neither has been re-audited line-by-line since — treat any suspiciously-round or unlabeled number with the same caution as before until it has.
+7. **Checkout collects one participant per booking**, regardless of party size — schema supports more, UI doesn't ask (§2.3). Unchanged.
+8. **`Destination` is a closed, seed-only catalog** — no admin or business UI to add one (§2.1). Unchanged.
+9. **Password reset has no working email delivery** — expiring single-use tokens were added 1 Nov 2026 for reset/invitation-acceptance, but delivery depends on a configured email provider (`RESEND_API_KEY`) that is not set in this environment, so this has not been exercised against a real inbox end to end. Treat as partially resolved: the workflow is real, the delivery leg is unverified.
+10. **Admin roles**: **Resolved**, 1 Nov 2026 (§4.4) — invitations no longer default to Super Admin, and role-appropriate permission checks now gate sensitive actions server-side instead of a single `isAdmin` gate.
 
-Everything else described in this document as "Working" was verified — by direct code trace, by a passing `tsc`/`eslint`/`jest` run, and in the highest-risk cases by an actual browser session — during the sessions covered in the companion changelog document.
+Everything else described in this document as "Working" was verified — by direct code trace, by a passing `tsc`/`eslint`/`jest` run, and in the highest-risk cases by an actual browser session — during the sessions covered in the companion changelog document. For the 1 Nov 2026 batch specifically, see `SAFARINEXA_FULL_PRODUCT_ENGINEERING_AUDIT_2026-11-01.md` and `SAFARINEXA_FIXES_AND_VERIFICATION_2026-11-01.md` (repo root) for full line-level detail — this document summarizes, it doesn't replace them.
 
 11. **Structural/naming debt** (found 9 Sept 2026) — the mechanical issues were fixed same day: `src/lib/actions.ts` split into `src/lib/actions/{session,customer,business}.ts`, the dead duplicate `use-mobile` hook removed, root-level scripts consolidated into `scripts/`, and portal-shell components (sidebars, switchers, `AccountLayout`) reorganized into `src/components/{business,admin,customer}/` consistently. **Still open, deliberately deferred**: a few route shapes diverge between portals — admin's sign-in path breaks the pattern customer/business use, the business portal's "list→edit" and admin's "list→view" shapes differ for the same underlying concept, admin bookings has no detail route (customer and business both do), and `/reviews` has no index page. These change real URLs/behavior rather than just renaming files, so they weren't fixed silently — see `SAFARINEXA_STRUCTURE_NAMING_AUDIT_2026-09-09.md` (repo root) for the full original findings.

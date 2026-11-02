@@ -1,4 +1,6 @@
+import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
+import { submitListing } from "@/lib/actions/listing-review";
 import { redirect } from "next/navigation";
 import type { ListingType } from "@prisma/client";
 import { 
@@ -21,7 +23,7 @@ import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 
-export default async function BusinessListingsPage({ searchParams }: { searchParams: { type?: string; page?: string } }) {
+export default async function BusinessListingsPage({ searchParams }: { searchParams: { type?: string; page?: string; q?: string } }) {
   const { business, businessId } = await requireBusinessSession();
 
   if (!business || !businessId) {
@@ -32,9 +34,10 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
     );
   }
 
-  const activeType = (searchParams.type?.toUpperCase() as ListingType | undefined) ?? undefined;
+  const requestedType = searchParams.type?.toUpperCase();
+  const activeType = requestedType && ["ACCOMMODATION", "TOUR", "RESTAURANT", "TRANSPORT"].includes(requestedType) ? requestedType as ListingType : undefined;
   const page = parsePage(searchParams.page);
-  const where = { businessId, ...(activeType ? { type: activeType } : {}) };
+  const where = { ...(searchParams.q ? { title: { contains: searchParams.q.trim(), mode: "insensitive" as const } } : {}), businessId, ...(activeType ? { type: activeType } : {}) };
 
   // Fetch data
   const [
@@ -44,7 +47,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
     publishedCount,
     draftCount
   ] = await Promise.all([
-    db.listing.findMany({ where, orderBy: { createdAt: "desc" }, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE }),
+    db.listing.findMany({ where, include: {submissions: {orderBy: {submittedAt: "desc"}, take: 1}}, orderBy: { createdAt: "desc" }, skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE }),
     db.listing.count({ where }),
     db.listing.groupBy({ by: ["type"], _count: { type: true }, where: { businessId } }),
     db.listing.count({ where: { businessId, status: "PUBLISHED" } }),
@@ -57,7 +60,10 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
     return acc;
   }, {} as Record<string, number>);
 
-  const totalListingsCount = publishedCount + draftCount;
+  const totalListingsCount = typeCountsResult.reduce((sum,row)=>sum+row._count.type,0);
+  const archivedCount = totalListingsCount - publishedCount - draftCount;
+  const monthStart = new Date();monthStart.setUTCDate(1);monthStart.setUTCHours(0,0,0,0);
+  const monthBookings = await db.booking.count({where:{businessId,createdAt:{gte:monthStart}}});
 
   // Tabs structure
   const TABS = [
@@ -76,11 +82,11 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
     const listingId = String(formData.get("listingId"));
     const status = String(formData.get("status")) as "PUBLISHED" | "DRAFT" | "DELETED";
 
+    if (!["PUBLISHED","DRAFT","DELETED"].includes(status)) throw new Error("Invalid listing status.");
+    if (status === "PUBLISHED") throw new Error("Submit the listing for admin review instead. Only an admin can approve publication.");
     const listing = await db.listing.findUnique({ where: { id: listingId }, include: { business: true } });
     if (!listing || !activeSession.user.businessIds.includes(listing.businessId)) throw new Error("Listing not found.");
-    if (status === "PUBLISHED" && listing.business.verificationStatus !== "APPROVED") {
-      throw new Error("This business isn't verified yet — publishing is blocked until approval.");
-    }
+    if (!await db.businessUser.findFirst({where:{businessId:listing.businessId,userId:activeSession.user.id,role:{in:["OWNER","MANAGER"]}}})) throw new Error("Only owners and managers can change publication status.");
 
     if (status === "DELETED") {
       // In reality we might just archive or soft delete
@@ -88,7 +94,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
     } else {
       await db.listing.update({
         where: { id: listing.id },
-        data: { status, publishedAt: status === "PUBLISHED" ? new Date() : listing.publishedAt }
+        data: { status }
       });
     }
 
@@ -160,7 +166,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                 <Hourglass className="h-4 w-4 text-orange-500" />
               </div>
             </div>
-            <p className="text-3xl font-extrabold text-slate-900">{draftCount}</p>
+            <p className="text-3xl font-extrabold text-slate-900">{totalListingsCount - publishedCount}</p>
             <div className="mt-auto pt-4 flex items-center justify-between text-sm font-semibold">
               <span className="text-slate-500">Draft</span>
               <span className="text-orange-500">{draftCount}</span>
@@ -172,15 +178,15 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
         <Card className="rounded-2xl shadow-sm border-slate-100 flex flex-col justify-between">
           <CardContent className="pt-6 pb-6 flex flex-col h-full">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-slate-500">Views this month</p>
+              <p className="text-xs font-semibold text-slate-500">Archived listings</p>
               <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
                 <Eye className="h-4 w-4 text-blue-500" />
               </div>
             </div>
-            <p className="text-3xl font-extrabold text-slate-900">1,245</p>
+            <p className="text-3xl font-extrabold text-slate-900">{archivedCount}</p>
             <div className="mt-auto pt-4 flex items-center gap-1.5">
-              <span className="text-xs font-bold text-primary">↑ 18.6%</span>
-              <span className="text-xs text-slate-500 font-medium">vs last month</span>
+              <span className="text-xs font-bold text-primary">Not published</span>
+              <span className="text-xs text-slate-500 font-medium">Live database count</span>
             </div>
           </CardContent>
         </Card>
@@ -194,9 +200,9 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                 <Calendar className="h-4 w-4 text-purple-500" />
               </div>
             </div>
-            <p className="text-3xl font-extrabold text-slate-900">124</p>
+            <p className="text-3xl font-extrabold text-slate-900">{monthBookings}</p>
             <div className="mt-auto pt-4 flex items-center gap-1.5">
-              <span className="text-xs font-bold text-primary">↑ 22.4%</span>
+              <span className="text-xs font-bold text-primary">Created this month</span>
               <span className="text-xs text-slate-500 font-medium">vs last month</span>
             </div>
           </CardContent>
@@ -215,9 +221,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
           }))}
         />
 
-        <Button variant="outline" className="border-slate-200 text-slate-700 font-semibold h-10 w-full sm:w-auto">
-          <Filter className="h-4 w-4 mr-2" /> Filters
-        </Button>
+<PortalFilter />
       </div>
 
       {/* Main Table */}
@@ -256,7 +260,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-12 shrink-0 rounded-lg bg-slate-100 overflow-hidden shadow-sm border border-slate-200/60">
                         {listing.coverImageUrl ? (
-                          <img src={listing.coverImageUrl} alt="" className="h-full w-full object-cover" />
+                          <RemoteImage src={listing.coverImageUrl} alt="" className="h-full w-full object-cover" />
                         ) : (
                           <div className="h-full w-full bg-slate-100" />
                         )}
@@ -302,6 +306,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                         {listing.status}
                       </span>
                     </div>
+                    <Link href={`/business/listings/${listing.id}/review`} className="mt-2 block text-xs underline">{listing.submissions[0]?.status.replaceAll("_", " ") || "Not submitted"} · Submission & feedback</Link>
                   </TableCell>
 
                   <TableCell className="text-sm font-medium text-slate-600">
@@ -318,7 +323,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                       
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                          <Button aria-label="Listing actions" variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -332,16 +337,16 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                               </DropdownMenuItem>
                             </form>
                           ) : (
-                            <form action={setListingStatus}>
+                            <form action={submitListing}>
                               <input type="hidden" name="listingId" value={listing.id} />
-                              <input type="hidden" name="status" value="PUBLISHED" />
                               <DropdownMenuItem asChild>
-                                <button type="submit" className="w-full cursor-pointer text-primary" disabled={business.verificationStatus !== "APPROVED"}>
-                                  Publish
+                                <button type="submit" className="w-full cursor-pointer text-primary" disabled={business.verificationStatus !== "APPROVED" || listing.status !== "DRAFT" || ["SUBMITTED", "UNDER_REVIEW"].includes(listing.submissions[0]?.status || "")}>
+                                  Submit for review
                                 </button>
                               </DropdownMenuItem>
                             </form>
                           )}
+                          <DropdownMenuItem asChild><Link href={`/business/listings/${listing.id}/review`}>Submission & feedback</Link></DropdownMenuItem>
                           <form action={setListingStatus}>
                             <input type="hidden" name="listingId" value={listing.id} />
                             <input type="hidden" name="status" value="DELETED" />
@@ -374,3 +379,4 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
     </div>
   );
 }
+import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

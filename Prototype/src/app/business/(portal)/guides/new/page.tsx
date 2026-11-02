@@ -19,9 +19,10 @@ export default async function NewGuidePage() {
 
   async function createGuide(formData: FormData) {
     "use server";
-    const { businessId: activeBusinessId } = await requireBusinessSession();
+    const { businessId: activeBusinessId, session: actor } = await requireBusinessSession();
     if (!activeBusinessId) redirect("/business/auth/sign-in");
 
+    if (!await db.businessUser.findFirst({where:{businessId:activeBusinessId,userId:actor.user.id,role:{in:["OWNER","MANAGER"]}}})) throw new Error("Only owners and managers can create guide profiles.");
     const name = String(formData.get("name") ?? "").trim();
     const bio = String(formData.get("bio") ?? "").trim();
     const experienceYears = Math.max(0, Number(formData.get("experienceYears")) || 0);
@@ -30,7 +31,7 @@ export default async function NewGuidePage() {
     
     const specialization = String(formData.get("specialization") ?? "GENERAL") as GuideSpecialization;
     const hasOwnVehicle = formData.get("hasOwnVehicle") === "on";
-    const isTopGuide = formData.get("isTopGuide") === "on";
+    const isTopGuide = false; // Curated status is assigned by platform administrators only.
     const destinationId = String(formData.get("destinationId") ?? "").trim() || null;
     const availabilityNote = String(formData.get("availabilityNote") ?? "").trim() || null;
 
@@ -141,7 +142,7 @@ export default async function NewGuidePage() {
                 Has own vehicle
               </label>
               <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="isTopGuide" className="h-4 w-4 rounded border-input" />
+                <input type="checkbox" name="isTopGuide" disabled aria-label="Top guide status is assigned by SafariNexa" className="h-4 w-4 rounded border-input" />
                 Mark as Top Guide
               </label>
             </div>

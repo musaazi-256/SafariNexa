@@ -1,0 +1,21 @@
+import type { Prisma } from "@prisma/client";
+import { releaseAvailabilityForBooking } from "@/lib/booking-service";
+import { syncOrderStatus } from "@/lib/booking-lifecycle";
+export async function completeRefund(tx: Prisma.TransactionClient, refundId:string) {
+ const refund=await tx.refund.findUnique({where:{id:refundId},include:{payment:true}});
+ if(!refund||!["REQUESTED","PROCESSING"].includes(refund.status))return;
+ const claimed=await tx.refund.updateMany({where:{id:refundId,status:{in:["REQUESTED","PROCESSING"]}},data:{status:"COMPLETED"}});
+ if(!claimed.count)return;
+ const total=await tx.refund.aggregate({where:{paymentId:refund.paymentId,status:"COMPLETED"},_sum:{amountMinor:true}});
+ const refunded=total._sum.amountMinor??0;
+ if(refunded>refund.payment.amountMinor)throw new Error("Refund allocation exceeds payment.");
+ await tx.payment.update({where:{id:refund.paymentId},data:{status:refunded>=refund.payment.amountMinor?"REFUNDED":"PARTIALLY_REFUNDED"}});
+ const booking=await tx.booking.findUniqueOrThrow({where:{id:refund.bookingId}});
+ const allocated=await tx.refund.aggregate({where:{bookingId:refund.bookingId,status:"COMPLETED"},_sum:{amountMinor:true}});
+ if((allocated._sum.amountMinor??0)>=booking.totalMinor&&booking.status!=="REFUNDED"){
+   await tx.booking.update({where:{id:booking.id},data:{status:"REFUNDED"}});
+   await releaseAvailabilityForBooking(tx,booking.id);
+   await syncOrderStatus(tx,booking.orderId);
+ }
+ await tx.notification.create({data:{userId:booking.customerId,type:"PAYMENT_UPDATE",title:"Refund confirmed by provider",body:`A refund of UGX ${refund.amountMinor.toLocaleString("en-UG")} for ${booking.bookingRef} has been confirmed by the payment provider.`,relatedBookingId:booking.id}});
+}

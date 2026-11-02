@@ -18,6 +18,17 @@ const SURFACE_META: Record<Surface, { label: string; googleHref: string; provide
   admin: { label: "admin account", googleHref: "/admin/auth/google", provider: "admin-credentials", defaultReturn: "/admin/dashboard", signInPath: "/admin/login" }
 };
 
+// Local-only testing convenience. Never shown on a production build (`next build`
+// always sets NODE_ENV=production, including Vercel preview/production deploys) —
+// only ever renders under `next dev`. Submits through the exact same credentials
+// form/server action as a real sign-in; nothing in auth.ts changes for this.
+const DEMO_ACCOUNT: Record<Surface, { email: string; label: string }> = {
+  customer: { email: "customer@safarinexa.test", label: "Quick sign in as customer" },
+  business: { email: "business@dev.test", label: "Quick sign in as business (all 4 listings)" },
+  admin: { email: "admin@safarinexa.test", label: "Quick sign in as admin" }
+};
+const DEMO_PASSWORD = "Passw0rd!";
+
 const ERROR_COPY: Record<string, string> = {
   invalid_credentials: "Incorrect email or password.",
   admin_denied: "This account is not an active admin. Access has been logged."
@@ -41,15 +52,8 @@ export function AuthCard({
       let email = formData.get("email")?.toString();
       let password = formData.get("password")?.toString();
 
-      // Automatically fallback to our seeded demo accounts if fields are left empty
-      if (!email) {
-        if (surface === "admin") email = "admin@safarinexa.test";
-        else if (surface === "business") email = "business@dev.test";
-        else email = "customer@safarinexa.test";
-      }
-      
-      if (!password) {
-        password = "Passw0rd!";
+      if (!email?.trim() || !password) {
+        redirect(`${meta.signInPath}?error=invalid_credentials`);
       }
 
       await signIn(meta.provider, {
@@ -97,7 +101,9 @@ export function AuthCard({
               id={`${surface}-email`}
               name="email"
               type="email"
-              placeholder="Leave empty to use a demo account"
+              placeholder="you@example.com"
+              autoComplete="username"
+              required
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -106,7 +112,9 @@ export function AuthCard({
               id={`${surface}-password`}
               name="password"
               type="password"
-              placeholder="Leave empty to use a demo account"
+              placeholder="Your password"
+              autoComplete="current-password"
+              required
             />
           </div>
           <Button type="submit" className="mt-1">
@@ -134,6 +142,20 @@ export function AuthCard({
           <p className="text-center text-xs text-muted-foreground">
             Admin accounts are provisioned by SafariNexa super admins only — there is no self-service sign-up.
           </p>
+        ) : null}
+
+        {process.env.NODE_ENV !== "production" ? (
+          <div className="rounded-xl border border-dashed border-amber-400/60 bg-amber-50 p-3">
+            <p className="text-[10px] font-extrabold uppercase tracking-wide text-amber-700">Dev only · never shown in production</p>
+            <form action={credentialsAction} className="mt-2">
+              <input type="hidden" name="email" value={DEMO_ACCOUNT[surface].email} />
+              <input type="hidden" name="password" value={DEMO_PASSWORD} />
+              <Button type="submit" variant="outline" className="w-full border-amber-400/60 text-amber-800 hover:bg-amber-100">
+                {DEMO_ACCOUNT[surface].label}
+              </Button>
+            </form>
+            <p className="mt-1.5 text-[11px] text-amber-700">{DEMO_ACCOUNT[surface].email} / {DEMO_PASSWORD}</p>
+          </div>
         ) : null}
       </CardContent>
     </Card>

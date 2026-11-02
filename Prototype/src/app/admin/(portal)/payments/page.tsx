@@ -16,6 +16,9 @@ import { PLATFORM_COMMISSION_RATE, summarizePayments } from "@/lib/revenue";
 import { toPaymentStatus, toRefundStatus } from "@/lib/status";
 import { logAuditEvent } from "@/lib/audit";
 import { Button } from "@/components/ui/button";
+import { paymentStatusFilter, stripeAmount } from "@/lib/payment-state";
+import { completeRefund } from "@/lib/refund-service";
+import { Prisma } from "@prisma/client";
 
 const TABS = [
   { value: "ALL", label: "All" },
@@ -33,7 +36,8 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
   const activeTab = searchParams.status?.toUpperCase();
   const q = searchParams.q?.trim();
 
-  const where: any = activeTab && activeTab !== "ALL" ? { status: activeTab } : {};
+  const statuses = paymentStatusFilter(activeTab);
+  const where: any = statuses ? { status: { in: statuses } } : {};
   if (q) {
     where.OR = [
       { booking: { listing: { title: { contains: q, mode: "insensitive" } } } },
@@ -42,7 +46,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
   }
 
   const [allPayments, pagePayments, totalCount, refunds] = await Promise.all([
-    db.payment.findMany({ select: { status: true, amountMinor: true, payoutId: true } }),
+    db.payment.findMany({ select: { status: true, amountMinor: true, payoutId: true, refunds: { where: { status: "COMPLETED" }, select: { amountMinor: true } } } }),
     db.payment.findMany({
       where,
       include: { booking: { include: { listing: true, business: true } }, order: true },
@@ -62,7 +66,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
 
   async function approveRefund(formData: FormData) {
     "use server";
-    const adminSession = await requireAdminSession();
+    const adminSession = await requireAdminSession("payments.manage");
     const refundId = String(formData.get("refundId"));
 
     const targetRefund = await db.refund.findUnique({
@@ -74,31 +78,25 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
       throw new Error("Invalid refund request.");
     }
 
-    if (targetRefund.payment.provider === "STRIPE" && targetRefund.payment.providerReference) {
-      try {
-        await stripe.refunds.create({
-          payment_intent: targetRefund.payment.providerReference,
-          amount: targetRefund.amountMinor,
-        });
-      } catch (err: any) {
-        throw new Error(`Stripe Refund Failed: ${err.message}`);
-      }
+    if (targetRefund.payment.provider !== "STRIPE" || !targetRefund.payment.providerReference?.startsWith("cs_") || !process.env.STRIPE_SECRET_KEY) {
+      throw new Error("This payment requires manual provider reconciliation. No refund has been recorded as completed.");
     }
-
-    await db.$transaction([
-      db.refund.update({
-        where: { id: refundId },
-        data: { status: "COMPLETED", reviewedByAdminId: adminSession.user.id }
-      }),
-      db.payment.update({
-        where: { id: targetRefund.paymentId },
-        data: { status: "REFUNDED" }
-      }),
-      db.booking.update({
-        where: { id: targetRefund.bookingId },
-        data: { status: "REFUNDED" }
-      })
-    ]);
+    const checkout = await stripe.checkout.sessions.retrieve(targetRefund.payment.providerReference);
+    const intent = typeof checkout.payment_intent === "string" ? checkout.payment_intent : checkout.payment_intent?.id;
+    if (!intent) throw new Error("The provider payment is not settled.");
+    const providerRefund = await stripe.refunds.create({
+      payment_intent: intent,
+      amount: stripeAmount(targetRefund.amountMinor, targetRefund.payment.currency),
+      metadata: { refundId: targetRefund.id }
+    }, { idempotencyKey: `refund:${targetRefund.id}` });
+    if (providerRefund.status !== "succeeded") {
+      await db.refund.update({ where: { id: refundId }, data: { status: "PROCESSING", reviewedByAdminId: adminSession.user.id } });
+      redirect("/admin/payments");
+    }
+    await db.$transaction(async tx => {
+      await tx.refund.update({where:{id:refundId},data:{reviewedByAdminId:adminSession.user.id}});
+      await completeRefund(tx, refundId);
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 
     await logAuditEvent({
       actorUserId: adminSession.user.id,
@@ -112,56 +110,6 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
     redirect("/admin/payments");
   }
 
-  async function processAllPayouts() {
-    "use server";
-    const adminSession = await requireAdminSession();
-
-    const unsettled = await db.payment.findMany({
-      where: { status: "SUCCESSFUL", payoutId: null, bookingId: { not: null } },
-      include: { booking: true }
-    });
-
-    if (unsettled.length === 0) return;
-
-    const byBusiness = unsettled.reduce((acc, p) => {
-      const bId = p.booking!.businessId;
-      if (!acc[bId]) acc[bId] = [];
-      acc[bId].push(p);
-      return acc;
-    }, {} as Record<string, typeof unsettled>);
-
-    await db.$transaction(async (tx) => {
-      for (const [businessId, payments] of Object.entries(byBusiness)) {
-        const gross = payments.reduce((sum, p) => sum + p.amountMinor, 0);
-        const net = gross - Math.round(gross * PLATFORM_COMMISSION_RATE);
-
-        const payout = await tx.payout.create({
-          data: {
-            businessId,
-            amountMinor: net,
-            status: "COMPLETED",
-            notes: "Batch platform settlement",
-          }
-        });
-
-        await tx.payment.updateMany({
-          where: { id: { in: payments.map(p => p.id) } },
-          data: { payoutId: payout.id }
-        });
-      }
-    });
-
-    await logAuditEvent({
-      actorUserId: adminSession.user.id,
-      actorEmail: adminSession.user.email ?? undefined,
-      surface: "ADMIN",
-      action: "admin_processed_payouts",
-      outcome: "SUCCESS",
-      metadata: { batchCount: Object.keys(byBusiness).length }
-    });
-
-    redirect("/admin/payments");
-  }
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20 font-sans">
@@ -264,20 +212,14 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
               className="w-full h-9 pl-9 pr-4 rounded-full border border-slate-200 text-[13px] outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-white"
             />
           </form>
-          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0">
-            <Filter className="h-4 w-4 mr-2 text-slate-400" />
-            Filter
-          </Button>
-          <Button variant="outline" className="h-9 px-4 text-[13px] font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-full shrink-0 hidden lg:inline-flex">
-            <Download className="h-4 w-4 mr-2 text-slate-400" />
-            Export
-          </Button>
+<PortalFilter />
+<ExportVisibleRows />
           {unsettledNetMinor > 0 && (
-            <form action={processAllPayouts}>
-              <Button type="submit" className="h-9 px-4 text-[13px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shrink-0 shadow-sm transition-all">
-                Settle Payouts ({formatUGX(unsettledNetMinor)})
+            <div title="Payout provider and business settlement accounts must be configured before funds can be transferred.">
+              <Button disabled title="Payout integration is not configured" className="h-9 px-4 text-[13px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shrink-0 shadow-sm transition-all">
+                Payouts unavailable ({formatUGX(unsettledNetMinor)})
               </Button>
-            </form>
+            </div>
           )}
         </div>
       </div>
@@ -377,3 +319,4 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
     </div>
   );
 }
+import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

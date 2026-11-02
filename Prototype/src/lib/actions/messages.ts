@@ -3,10 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { projectMessageReadState } from "@/lib/message-read-state";
 
 export async function sendMessage(threadId: string, content: string) {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
+  content = content.trim();
+  if (!content || content.length > 5000) throw new Error("Messages must contain 1–5,000 characters.");
 
   const thread = await db.messageThread.findUnique({
     where: { id: threadId },
@@ -24,17 +27,15 @@ export async function sendMessage(threadId: string, content: string) {
     if (!businessUser) throw new Error("Unauthorized");
   }
 
-  const message = await db.message.create({
-    data: {
-      threadId,
-      senderId: session.user.id,
-      content,
-    }
-  });
-
-  await db.messageThread.update({
-    where: { id: threadId },
-    data: { updatedAt: new Date() }
+  const message = await db.$transaction(async tx => {
+    const created = await tx.message.create({ data: { threadId, senderId: session.user.id, content } });
+    await tx.messageThread.update({ where: { id: threadId }, data: { updatedAt: new Date() } });
+    const members = isCustomer ? await tx.businessUser.findMany({ where: { businessId: thread.businessId }, select: { userId: true } }) : [];
+    const recipients = isCustomer ? members.map(m => m.userId) : [thread.customerId];
+    await tx.notification.createMany({ data: [...new Set(recipients)].filter(id => id !== session.user.id).map(userId => ({
+      userId, type: "SYSTEM" as const, title: "New message", body: "You have a new message. Open your account messages to reply.", relatedBookingId: thread.bookingId
+    })) });
+    return created;
   });
 
   revalidatePath("/business/messages");
@@ -126,17 +127,18 @@ export async function sendListingInquiryAction(listingId: string, content: strin
 export async function markThreadAsRead(threadId: string) {
   const session = await auth();
   if (!session?.user) return;
+  const thread = await db.messageThread.findUnique({ where: { id: threadId } });
+  if (!thread) throw new Error("Thread not found");
+  if (thread.customerId !== session.user.id) {
+    const membership = await db.businessUser.findFirst({
+      where: { businessId: thread.businessId, userId: session.user.id }
+    });
+    if (!membership) throw new Error("Unauthorized");
+  }
 
-  await db.message.updateMany({
-    where: {
-      threadId,
-      senderId: { not: session.user.id },
-      readAt: null,
-    },
-    data: {
-      readAt: new Date(),
-    },
-  });
+  const messages = await db.message.findMany({ where: { threadId, senderId: { not: session.user.id } }, select: { id: true } });
+  await db.messageReadReceipt.createMany({ data: messages.map(message => ({ messageId: message.id, userId: session.user.id })), skipDuplicates: true });
+
 }
 
 export async function getThreadMessages(threadId: string) {
@@ -162,13 +164,14 @@ export async function getThreadMessages(threadId: string) {
     where: { threadId },
     orderBy: { createdAt: "asc" },
     include: {
+      readReceipts: true,
       sender: {
         select: { name: true, image: true }
       }
     }
   });
 
-  return messages;
+  return projectMessageReadState(messages, session.user.id, thread.customerId);
 }
 
 export async function getBusinessCustomers(businessId: string) {
@@ -212,6 +215,8 @@ export async function createThreadWithCustomer(businessId: string, customerId: s
     where: { businessId, userId: session.user.id }
   });
   if (!businessUser) throw new Error("Unauthorized");
+  const booking = await db.booking.findFirst({where:{businessId,customerId,...(bookingId?{id:bookingId}:{})},select:{id:true}});
+  if (!booking) throw new Error("A booking with this customer is required.");
 
   let thread = await db.messageThread.findFirst({
     where: {
@@ -233,4 +238,3 @@ export async function createThreadWithCustomer(businessId: string, customerId: s
 
   return thread;
 }
-

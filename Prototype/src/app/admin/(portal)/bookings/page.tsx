@@ -70,115 +70,15 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   ]);
 
   const tabs = [
-    { key: "all", label: "All", count: allCount > 0 ? allCount : 122 },
-    { key: "awaiting_confirmation", label: "Awaiting confirmation", count: awaitingCount > 0 ? awaitingCount : 56 },
-    { key: "confirmed", label: "Confirmed", count: confirmedCount > 0 ? confirmedCount : 32 },
-    { key: "completed", label: "Completed", count: completedCount > 0 ? completedCount : 20 },
-    { key: "cancelled", label: "Cancelled", count: cancelledCount > 0 ? cancelledCount : 14 }
+    { key: "all", label: "All", count: allCount },
+    { key: "awaiting_confirmation", label: "Awaiting confirmation", count: awaitingCount },
+    { key: "confirmed", label: "Confirmed", count: confirmedCount },
+    { key: "completed", label: "Completed", count: completedCount },
+    { key: "cancelled", label: "Cancelled", count: cancelledCount }
   ];
 
   // Fallback mock items matching screenshot
-  const mockBookings = [
-    {
-      id: "mb-1",
-      date: "16 May 2026, 09:15",
-      ref: "BK-BEDD2A6E",
-      listing: "Murchison River Lodge",
-      business: "Nile & Crater Lodges",
-      customer: "Multi-Business Tester",
-      status: "CONFIRMED",
-      statusLabel: "Confirmed",
-      total: "UGX 2,100,000"
-    },
-    {
-      id: "mb-2",
-      date: "16 May 2026, 08:40",
-      ref: "BK-E0F3C658",
-      listing: "Murchison Falls Golden Lodge",
-      business: "Nile & Crater Lodges",
-      customer: "Multi-Business Tester",
-      status: "PAYMENT_REQUIRED",
-      statusLabel: "Payment required",
-      total: "UGX 1,500,000"
-    },
-    {
-      id: "mb-3",
-      date: "15 May 2026, 14:22",
-      ref: "BK-DD24097D",
-      listing: "Murchison Falls Golden Lodge",
-      business: "Nile & Crater Lodges",
-      customer: "Grace Nakato",
-      status: "PAYMENT_REQUIRED",
-      statusLabel: "Payment required",
-      total: "UGX 1,800,000"
-    },
-    {
-      id: "mb-4",
-      date: "15 May 2026, 11:05",
-      ref: "BK-0034B677",
-      listing: "Queen Elizabeth National Park Ridge Day Trip",
-      business: "Uganda Trails Safaris",
-      customer: "Grace Nakato",
-      status: "AWAITING_BUSINESS_CONFIRMATION",
-      statusLabel: "Awaiting confirmation",
-      total: "UGX 540,000"
-    },
-    {
-      id: "mb-5",
-      date: "14 May 2026, 16:30",
-      ref: "order-trip-2-B2",
-      listing: "Kampala–Murchison Falls Transfer",
-      business: "Kampala Transit Co",
-      customer: "Grace Nakato",
-      status: "AWAITING_BUSINESS_CONFIRMATION",
-      statusLabel: "Awaiting confirmation",
-      total: "UGX 480,000"
-    },
-    {
-      id: "mb-6",
-      date: "14 May 2026, 10:18",
-      ref: "order-trip-2-B1",
-      listing: "3-Day Wildlife Safari",
-      business: "Uganda Trails Safaris",
-      customer: "Grace Nakato",
-      status: "AWAITING_BUSINESS_CONFIRMATION",
-      statusLabel: "Awaiting confirmation",
-      total: "UGX 1,250,000"
-    },
-    {
-      id: "mb-7",
-      date: "13 May 2026, 18:45",
-      ref: "order-trip-1-B2",
-      listing: "Kampala Garden Dining",
-      business: "Kampala Table Group",
-      customer: "Grace Nakato",
-      status: "AWAITING_BUSINESS_CONFIRMATION",
-      statusLabel: "Awaiting confirmation",
-      total: "UGX 160,000"
-    },
-    {
-      id: "mb-8",
-      date: "13 May 2026, 09:12",
-      ref: "order-trip-1-B1",
-      listing: "Murchison River Lodge",
-      business: "Nile & Crater Lodges",
-      customer: "Grace Nakato",
-      status: "AWAITING_BUSINESS_CONFIRMATION",
-      statusLabel: "Awaiting confirmation",
-      total: "UGX 420,000"
-    },
-    {
-      id: "mb-9",
-      date: "12 May 2026, 12:33",
-      ref: "BK-3228",
-      listing: "Kampala ⇄ Queen Elizabeth National Park Transfer",
-      business: "Kampala Transit Co",
-      customer: "Grace Nakato",
-      status: "REFUNDED",
-      statusLabel: "Refunded",
-      total: "UGX 300,000"
-    }
-  ];
+
 
   function renderStatusBadge(status: string) {
     const s = status.toUpperCase();
@@ -241,14 +141,8 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
         />
 
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 h-10 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors">
-            <Calendar className="h-4 w-4 text-slate-400" />
-            <span>10 – 16 May 2026</span>
-            <ChevronDown className="h-3.5 w-3.5 text-slate-400 ml-1" />
-          </button>
-          <Button className="h-10 px-5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-xl shadow-sm gap-2 transition-colors">
-            <Download className="h-4 w-4" /> Export report
-          </Button>
+          <span className="text-sm text-muted-foreground">All dates</span>
+<ExportVisibleRows />
         </div>
       </div>
 
@@ -265,8 +159,8 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
 
       {/* Toolbar (Search & Filter Action Row) */}
       <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <form className="relative w-full sm:w-80">
+        <div className="flex min-w-0 flex-wrap items-center gap-3 w-full lg:w-auto">
+          <form className="relative w-full lg:w-80">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             {activeTabParam && activeTabParam !== "all" && <input type="hidden" name="status" value={activeTabParam} />}
             <input
@@ -278,15 +172,9 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
             />
           </form>
 
-          <Button variant="outline" className="h-10 px-4 text-xs font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-xl gap-2">
-            <Filter className="h-4 w-4 text-slate-400" />
-            Filter
-          </Button>
+<PortalFilter />
 
-          <Button variant="outline" className="h-10 px-4 text-xs font-bold border-slate-200 text-slate-700 bg-white shadow-sm rounded-xl gap-2">
-            <Download className="h-4 w-4 text-slate-400" />
-            Export
-          </Button>
+<ExportVisibleRows />
         </div>
       </div>
 
@@ -330,9 +218,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                     <TableCell className="pr-6 text-right">
                       <div className="flex items-center justify-end gap-3">
                         <span className="font-extrabold text-slate-900 text-xs whitespace-nowrap">{formatUGX(booking.totalMinor)}</span>
-                        <button className="text-slate-400 hover:text-slate-700 p-1">
-                          <MoreVertical className="h-4 w-4" />
-                        </button>
+                        <Link className="text-primary underline" href={`/admin/bookings/${booking.id}`}>Details</Link>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -340,24 +226,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               })
             ) : (
               // Mock rows matching screenshot
-              mockBookings.map((mb) => (
-                <TableRow key={mb.id} className="hover:bg-slate-50/50">
-                  <TableCell className="pl-6 font-medium text-slate-500 text-xs whitespace-nowrap">{mb.date}</TableCell>
-                  <TableCell className="font-bold text-slate-900 text-xs">{mb.ref}</TableCell>
-                  <TableCell className="font-semibold text-slate-800 text-xs">{mb.listing}</TableCell>
-                  <TableCell className="font-semibold text-slate-700 text-xs">{mb.business}</TableCell>
-                  <TableCell className="font-medium text-slate-600 text-xs">{mb.customer}</TableCell>
-                  <TableCell>{renderStatusBadge(mb.status)}</TableCell>
-                  <TableCell className="pr-6 text-right">
-                    <div className="flex items-center justify-end gap-3">
-                      <span className="font-extrabold text-slate-900 text-xs whitespace-nowrap">{mb.total}</span>
-                      <button className="text-slate-400 hover:text-slate-700 p-1">
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+<TableRow><TableCell colSpan={7} className="py-10 text-center">No matching bookings.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
@@ -365,7 +234,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
         {/* Pagination Footer */}
         <div className="border-t border-slate-200 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
           <span className="text-xs font-semibold text-slate-500">
-            Showing {bookings.length > 0 ? (page - 1) * PAGE_SIZE + 1 : 1} to {bookings.length > 0 ? Math.min(page * PAGE_SIZE, totalCount) : mockBookings.length} of {totalCount > 0 ? totalCount : 122} bookings
+            Showing {totalCount ? (page - 1) * PAGE_SIZE + 1 : 0} to {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount} bookings
           </span>
           <Pagination
             currentPage={page}
@@ -379,3 +248,5 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
     </div>
   );
 }
+import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";
+import Link from "next/link";

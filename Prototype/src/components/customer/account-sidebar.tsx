@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { CalendarDays, Heart, LayoutDashboard, Bell, LifeBuoy, Settings, CreditCard, MessageSquareText } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 const NAV_ITEMS = [
   { href: "/profile", label: "Profile", icon: LayoutDashboard },
@@ -35,10 +36,11 @@ export function AccountSidebar() {
           <Link
             key={item.href}
             href={item.href}
+            aria-current={isActive(item.href) ? "page" : undefined}
             className={cn(
-              "flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition-colors",
+              "flex min-h-11 shrink-0 items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring",
               isActive(item.href)
-                ? "border-transparent bg-primary text-primary-foreground shadow-sm"
+                ? "border-primary/20 bg-primary/10 text-primary"
                 : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
             )}
           >
@@ -55,10 +57,11 @@ export function AccountSidebar() {
           <Link
             key={item.href}
             href={item.href}
+            aria-current={isActive(item.href) ? "page" : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all",
+              "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring",
               isActive(item.href)
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground"
             )}
           >
@@ -68,12 +71,12 @@ export function AccountSidebar() {
         ))}
         </nav>
 
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
-          <h4 className="font-bold text-slate-900 mb-1">Need help?</h4>
-          <p className="text-[13px] font-medium text-slate-500 mb-4 leading-relaxed">
-            Our support team is here to help you succeed.
+        <div className="mt-8 rounded-xl border bg-card p-4">
+          <h4 className="mb-1 text-sm font-semibold">Need help?</h4>
+          <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+            Get help with your account or bookings.
           </p>
-          <Link href="/support" className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[13px] font-bold text-slate-700 hover:bg-slate-50 transition-colors w-full justify-center shadow-sm">
+          <Link href="/support" className={cn(buttonVariants({ variant: "outline" }), "w-full")}>
             <MessageSquareText className="h-4 w-4" />
             Contact support
           </Link>

@@ -36,7 +36,7 @@ export function OnboardingWizard() {
   const [documents, setDocuments] = useState<Record<string, File[]>>({});
 
   const requiredDocs = useMemo(() => {
-    return [{ id: "incorporation", label: "Certificate of Incorporation", desc: "PDF, JPG, or PNG up to 10MB." }];
+    return [{ id: "incorporation", label: "Certificate of Incorporation", desc: "PDF, JPG, or PNG up to 5MB." }];
   }, []);
 
   const updateForm = (key: keyof typeof formData, value: any) => {

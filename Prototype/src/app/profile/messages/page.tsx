@@ -3,6 +3,7 @@ import { Metadata } from "next";
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { projectMessageReadState } from "@/lib/message-read-state";
 import { AccountLayout } from "@/components/customer/account-layout";
 import { CustomerMessageInbox } from "@/components/customer/message-inbox";
 
@@ -49,6 +50,7 @@ export default async function MessagesPage() {
           createdAt: "asc"
         },
         include: {
+          readReceipts: true,
           sender: {
             select: {
               name: true,
@@ -70,7 +72,7 @@ export default async function MessagesPage() {
       description="Communicate directly with businesses about your bookings and inquiries."
     >
       <CustomerMessageInbox
-        initialThreads={threads as any}
+        initialThreads={threads.map(thread => ({...thread,messages:projectMessageReadState(thread.messages,session.user.id,session.user.id)})) as any}
         customerUserId={session.user.id}
       />
     </AccountLayout>

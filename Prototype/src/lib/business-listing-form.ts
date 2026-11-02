@@ -1,4 +1,6 @@
 import type { TransportCategory } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { dailyOpeningWindow } from "@/lib/category-booking-rules";
 
 function linesToArray(value: FormDataEntryValue | null) {
   return String(value ?? "")
@@ -16,15 +18,26 @@ export function slugify(title: string) {
 }
 
 export function parseBaseFields(formData: FormData) {
+  const title = String(formData.get("title") ?? "").trim();
+  const price = Number(formData.get("basePriceMinor") || 0);
+  if (!title || title.length > 200) throw new Error("Enter a listing title of 1–200 characters.");
+  if (!Number.isSafeInteger(price) || price < 0 || price > 2000000000) throw new Error("Enter a valid whole UGX price.");
+  const bookingMode = String(formData.get("bookingMode") || "REQUEST");
+  if (!["REQUEST", "INSTANT"].includes(bookingMode)) throw new Error("Select a valid booking mode.");
+  for (const [field, limit] of [["latitude", 90], ["longitude", 180]] as const) {
+    const raw = String(formData.get(field) ?? "").trim();
+    if (raw && (!Number.isFinite(Number(raw)) || Math.abs(Number(raw)) > limit)) throw new Error(`Enter a valid ${field}.`);
+  }
   return {
-    title: String(formData.get("title") ?? "").trim(),
+    title,
+    bookingMode,
     description: String(formData.get("description") ?? "").trim(),
-    city: String(formData.get("city") ?? "").trim() || undefined,
-    address: String(formData.get("address") ?? "").trim() || undefined,
-    latitude: formData.get("latitude") ? Number(formData.get("latitude")) : undefined,
-    longitude: formData.get("longitude") ? Number(formData.get("longitude")) : undefined,
-    basePriceMinor: Math.max(0, Number(formData.get("basePriceMinor")) || 0),
-    coverImageUrl: String(formData.get("coverImageUrl") ?? "").trim() || undefined,
+    city: String(formData.get("city") ?? "").trim() || null,
+    address: String(formData.get("address") ?? "").trim() || null,
+    latitude: formData.get("latitude") ? Number(formData.get("latitude")) : null,
+    longitude: formData.get("longitude") ? Number(formData.get("longitude")) : null,
+    basePriceMinor: price,
+    coverImageUrl: String(formData.get("coverImageUrl") ?? "").trim() || null,
     images: Array.from(formData.getAll("images")).map(String).filter(Boolean),
     destinationId: String(formData.get("destinationId") ?? "").trim() || null
   };
@@ -39,14 +52,14 @@ export function parseRoomTypeRows(formData: FormData) {
     maxOccupancy: number;
     totalRooms: number;
     breakfastIncluded: boolean;
-    description?: string;
+    description?: string | null;
     images: string[];
     bedType?: string;
     bedrooms: number;
     roomFeatures: string[];
     isRefundable: boolean;
-    refundPolicyText?: string;
-    discountNotice?: string;
+    refundPolicyText?: string | null;
+    discountNotice?: string | null;
   }> = [];
 
   for (let i = 0; i < count; i++) {
@@ -64,7 +77,7 @@ export function parseRoomTypeRows(formData: FormData) {
       .filter(Boolean);
     
     const isRefundableInput = formData.get(`roomTypeIsRefundable_${i}`);
-    const isRefundable = isRefundableInput ? isRefundableInput === "on" : true;
+    const isRefundable = isRefundableInput === "on" || isRefundableInput === "true";
 
     rows.push({
       id: String(formData.get(`roomTypeId_${i}`) ?? "").trim() || undefined,
@@ -73,14 +86,14 @@ export function parseRoomTypeRows(formData: FormData) {
       maxOccupancy,
       totalRooms,
       breakfastIncluded: formData.get(`roomTypeBreakfast_${i}`) === "on",
-      description: String(formData.get(`roomTypeDescription_${i}`) ?? "").trim() || undefined,
+      description: String(formData.get(`roomTypeDescription_${i}`) ?? "").trim() || null,
       images: Array.from(formData.getAll(`roomTypeImages_${i}`)).map(String).filter(Boolean),
       bedType: String(formData.get(`roomTypeBedType_${i}`) ?? "").trim() || "1 Double Bed",
       bedrooms,
       roomFeatures,
       isRefundable,
-      refundPolicyText: String(formData.get(`roomTypeRefundPolicyText_${i}`) ?? "").trim() || undefined,
-      discountNotice: String(formData.get(`roomTypeDiscountNotice_${i}`) ?? "").trim() || undefined
+      refundPolicyText: String(formData.get(`roomTypeRefundPolicyText_${i}`) ?? "").trim() || null,
+      discountNotice: String(formData.get(`roomTypeDiscountNotice_${i}`) ?? "").trim() || null
     });
   }
   return rows;
@@ -88,7 +101,7 @@ export function parseRoomTypeRows(formData: FormData) {
 
 export function parseAddOnRows(formData: FormData) {
   const count = Number(formData.get("addOnCount") ?? 0);
-  const rows: Array<{ id?: string; name: string; priceMinor: number; description?: string }> = [];
+  const rows: Array<{ id?: string; name: string; priceMinor: number; description?: string | null }> = [];
 
   for (let i = 0; i < count; i++) {
     const name = String(formData.get(`addOnName_${i}`) ?? "").trim();
@@ -97,7 +110,7 @@ export function parseAddOnRows(formData: FormData) {
       id: String(formData.get(`addOnId_${i}`) ?? "").trim() || undefined,
       name,
       priceMinor: Math.max(0, Number(formData.get(`addOnPrice_${i}`)) || 0),
-      description: String(formData.get(`addOnDescription_${i}`) ?? "").trim() || undefined
+      description: String(formData.get(`addOnDescription_${i}`) ?? "").trim() || null
     });
   }
   return rows;
@@ -107,10 +120,10 @@ export function parseAccommodationFields(formData: FormData) {
   return {
     propertyType: String(formData.get("propertyType") ?? "").trim(),
     amenities: formData.getAll("amenities").map(String),
-    checkInTime: String(formData.get("checkInTime") ?? "").trim() || undefined,
-    checkOutTime: String(formData.get("checkOutTime") ?? "").trim() || undefined,
+    checkInTime: String(formData.get("checkInTime") ?? "").trim() || null,
+    checkOutTime: String(formData.get("checkOutTime") ?? "").trim() || null,
     maxGuests: Math.max(1, Number(formData.get("maxGuests")) || 2),
-    cancellationPolicy: String(formData.get("cancellationPolicy") ?? "").trim() || undefined
+    cancellationPolicy: String(formData.get("cancellationPolicy") ?? "").trim() || null
   };
 }
 
@@ -124,28 +137,31 @@ export function parseTourFields(formData: FormData) {
   }
 
   return {
-    tourType: String(formData.get("tourType") ?? "").trim() || undefined,
+    tourType: String(formData.get("tourType") ?? "").trim() || null,
     durationDays: Math.max(1, Number(formData.get("durationDays")) || 1),
     groupSizeMin,
     groupSizeMax,
-    difficulty: String(formData.get("difficulty") ?? "").trim() || undefined,
+    difficulty: String(formData.get("difficulty") ?? "").trim() || null,
     inclusions: linesToArray(formData.get("inclusions")),
     exclusions: linesToArray(formData.get("exclusions")),
     itinerary: linesToArray(formData.get("itinerary")),
-    guideId: guideId || undefined
+    guideId: guideId || null
   };
 }
 
 export function parseRestaurantFields(formData: FormData) {
   const openingHours = String(formData.get("openingHours") ?? "").trim();
+  const duration = Number(formData.get("reservationDurationMinutes") || 90);
+  if (formData.get("acceptsReservationRequests") === "on" && !dailyOpeningWindow({summary:openingHours})) throw new Error("For online reservations use Daily · HH:MM - HH:MM opening hours.");
+  if (!Number.isInteger(duration) || duration < 30 || duration > 240) throw new Error("Reservation duration must be between 30 and 240 minutes.");
   return {
-    cuisineType: String(formData.get("cuisineType") ?? "").trim() || undefined,
-    priceRange: String(formData.get("priceRange") ?? "").trim() || undefined,
-    menuUrl: String(formData.get("menuUrl") ?? "").trim() || undefined,
-    seatingCapacity: formData.get("seatingCapacity") ? Number(formData.get("seatingCapacity")) : undefined,
+    cuisineType: String(formData.get("cuisineType") ?? "").trim() || null,
+    priceRange: String(formData.get("priceRange") ?? "").trim() || null,
+    menuUrl: String(formData.get("menuUrl") ?? "").trim() || null,
+    seatingCapacity: formData.get("seatingCapacity") ? Number(formData.get("seatingCapacity")) : null,
     acceptsReservationRequests: formData.get("acceptsReservationRequests") === "on",
     // Stored as { summary } to match how the reader (restaurants/[id]/page.tsx) and seed data shape it.
-    openingHours: openingHours ? { summary: openingHours } : undefined
+    openingHours: openingHours ? { summary: openingHours, reservationDurationMinutes: duration } : Prisma.DbNull
   };
 }
 
@@ -154,7 +170,7 @@ export function parseTransportFields(formData: FormData) {
     category: String(formData.get("category") ?? "AIRPORT_TRANSFER") as TransportCategory,
     vehicleType: String(formData.get("vehicleType") ?? "").trim(),
     capacity: Math.max(1, Number(formData.get("capacity")) || 1),
-    estimatedDurationMinutes: formData.get("estimatedDurationMinutes") ? Number(formData.get("estimatedDurationMinutes")) : undefined,
-    pricingModel: String(formData.get("pricingModel") ?? "").trim() || undefined
+    estimatedDurationMinutes: formData.get("estimatedDurationMinutes") ? Number(formData.get("estimatedDurationMinutes")) : null,
+    pricingModel: String(formData.get("pricingModel") ?? "").trim() || null
   };
 }
