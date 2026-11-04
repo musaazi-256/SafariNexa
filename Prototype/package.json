@@ -12,7 +12,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "db:demo:nile": "tsx scripts/seed-nile-crater.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
