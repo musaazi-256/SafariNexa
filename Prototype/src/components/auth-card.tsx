@@ -44,6 +44,8 @@ export function AuthCard({
   error?: string;
 }) {
   const meta = SURFACE_META[surface];
+  const demo = isDemoMode();
+  const demoAccount = DEMO_ACCOUNT[surface];
   const target = safeReturnTo(returnTo, meta.defaultReturn);
 
   async function credentialsAction(formData: FormData) {
@@ -76,7 +78,7 @@ export function AuthCard({
       <CardHeader>
         <p className="text-xs font-medium uppercase tracking-wide text-primary">{surface} authentication</p>
         <CardTitle className="text-3xl">Sign in to your {meta.label}</CardTitle>
-        <CardDescription>{isDemoMode() ? "Choose an account below or sign in with your email." : "Continue with Google or your SafariNexa email."}</CardDescription>
+        <CardDescription>{demo ? "This is a demo. The details below are filled in for you, so just continue." : "Continue with Google or your SafariNexa email."}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {error ? (
@@ -85,17 +87,21 @@ export function AuthCard({
           </p>
         ) : null}
 
-        {!hideGoogle && <Button asChild variant="secondary" className="w-full">
-          <Link href={`${meta.googleHref}?returnTo=${encodeURIComponent(target)}`}>Continue with Google</Link>
-        </Button>}
-
-        <div className="flex items-center gap-3">
-          <Separator className="flex-1" />
-          <span className="text-xs font-medium uppercase text-muted-foreground">or</span>
-          <Separator className="flex-1" />
-        </div>
+        {!hideGoogle && !demo ? (
+          <>
+            <Button asChild variant="secondary" className="w-full">
+              <Link href={`${meta.googleHref}?returnTo=${encodeURIComponent(target)}`}>Continue with Google</Link>
+            </Button>
+            <div className="flex items-center gap-3">
+              <Separator className="flex-1" />
+              <span className="text-xs font-medium uppercase text-muted-foreground">or</span>
+              <Separator className="flex-1" />
+            </div>
+          </>
+        ) : null}
 
         <form action={credentialsAction} className="flex flex-col gap-3">
+          {demo ? <input type="hidden" name="demo" value="true" /> : null}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor={`${surface}-email`}>Email</Label>
             <Input
@@ -104,6 +110,8 @@ export function AuthCard({
               type="email"
               placeholder="you@example.com"
               autoComplete="username"
+              defaultValue={demo ? demoAccount.email : undefined}
+              readOnly={demo}
               required
             />
           </div>
@@ -115,11 +123,13 @@ export function AuthCard({
               type="password"
               placeholder="Your password"
               autoComplete="current-password"
+              defaultValue={demo ? DEMO_PASSWORD : undefined}
+              readOnly={demo}
               required
             />
           </div>
           <Button type="submit" className="mt-1">
-            Sign in with email
+            {demo ? demoAccount.label : "Sign in with email"}
           </Button>
         </form>
 
@@ -145,20 +155,6 @@ export function AuthCard({
           </p>
         ) : null}
 
-        {isDemoMode() ? (
-          <div className="rounded-xl border border-border bg-secondary/30 p-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Quick access</p>
-            <form action={credentialsAction} className="mt-2">
-              <input type="hidden" name="demo" value="true" />
-              <input type="hidden" name="email" value={DEMO_ACCOUNT[surface].email} />
-              <input type="hidden" name="password" value={DEMO_PASSWORD} />
-              <Button type="submit" variant="outline" className="w-full border-border text-foreground hover:bg-secondary">
-                {DEMO_ACCOUNT[surface].label}
-              </Button>
-            </form>
-
-          </div>
-        ) : null}
       </CardContent>
     </Card>
   );

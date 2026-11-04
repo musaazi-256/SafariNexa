@@ -1,6 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 
+import { getAuthSecret, isDemoMode } from "@/lib/dev-mode";
+
 /**
  * Edge-safe auth config used by middleware. Deliberately excludes the
  * Credentials providers, PrismaAdapter, and bcrypt — none of those are
@@ -11,7 +13,9 @@ import Google from "next-auth/providers/google";
  * components, server actions).
  */
 export default {
-  secret: process.env.AUTH_SECRET,
+  secret: getAuthSecret(),
+  // Demo builds run on preview/any host; live mode relies on AUTH_URL / Vercel detection.
+  trustHost: isDemoMode() || undefined,
   session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 30 },
   pages: {
     signIn: "/auth/sign-in",

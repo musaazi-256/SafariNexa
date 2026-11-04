@@ -350,3 +350,17 @@ The admin portal Figma pass showed that several high-impact admin actions ran th
 Lower-risk or reversible actions (approve business, request changes, start review, reactivate, publish/flag review, other case statuses) still submit on one click.
 
 **Verified:** `tsc` and `eslint` clean; new `src/components/admin/confirm-submit.test.tsx` (3 tests: confirm submits with the chosen decision, cancel doesn't submit, empty required fields block the dialog). Not yet browser-verified against the running app.
+
+---
+
+## 4 November 2026 — live demo repaired: database schema sync + configuration-free demo sign-in
+
+The Vercel deploy of `9ca40bc` built cleanly but every database-backed page showed the error screen, and sign-in returned "There was a problem with the server configuration".
+
+**Cause 1 — schema never reached the hosted database.** The 2 Nov change removed `prisma db push && prisma db seed` from `build`, but that batch also added 3 tables (`ListingSubmission`, `ListingImageUpload`, `MessageReadReceipt`) and 11 columns. The hosted database was synced manually with `prisma db push` + `prisma db seed` (purely additive; verified with `prisma migrate diff` before and after). **Future schema changes must be pushed to the hosted database by hand** until a migration step is added to deploys.
+
+**Cause 2 — no `AUTH_SECRET` on Vercel.** The 2 Nov fix removed the hardcoded fallback secret. Now `getAuthSecret()` (`src/lib/dev-mode.ts`) uses `AUTH_SECRET` when set, and in demo mode only falls back to a fixed public demo secret; demo mode also sets `trustHost`. Live mode (`SAFARINEXA_DEMO_MODE=false`) still requires a real secret. This is acceptable because demo mode already lets anyone sign in as any seeded account, so a forgeable session grants nothing extra.
+
+**Demo sign-in UI:** in demo mode the customer, business and admin sign-in cards show the email and password fields prefilled (read-only) with the seeded account, and the main button ("Continue as customer/business/admin") signs straight in through the passwordless `demo` provider. Google sign-in and the separate "Quick access" box are hidden in demo mode. Live mode is unchanged.
+
+**Verified:** tsc, lint, Jest 206 tests / 42 suites; local run with `AUTH_SECRET` unset: `/api/auth/session` no longer errors, demo admin sign-in returns a Super Admin session and `/admin/dashboard` loads.
