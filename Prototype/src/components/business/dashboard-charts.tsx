@@ -1,39 +1,22 @@
 "use client";
+import { formatUGX } from "@/lib/booking";
+import { PLATFORM_COMMISSION_RATE } from "@/lib/revenue";
+
 
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const bookingData = [
-  { name: 'May 1', completed: 20, upcoming: 10, cancelled: 2 },
-  { name: 'May 8', completed: 35, upcoming: 15, cancelled: 5 },
-  { name: 'May 15', completed: 40, upcoming: 20, cancelled: 3 },
-  { name: 'May 22', completed: 35, upcoming: 25, cancelled: 4 },
-  { name: 'May 31', completed: 45, upcoming: 20, cancelled: 6 },
-];
-
-const revenueData = [
-  { name: 'May 1', amount: 150000 },
-  { name: 'May 4', amount: 200000 },
-  { name: 'May 8', amount: 260000 },
-  { name: 'May 11', amount: 210000 },
-  { name: 'May 15', amount: 120000 },
-  { name: 'May 18', amount: 110000 },
-  { name: 'May 22', amount: 230000 },
-  { name: 'May 25', amount: 310000 },
-  { name: 'May 28', amount: 140000 },
-  { name: 'May 31', amount: 350000 },
-];
-
-export function DashboardCharts() {
+export function DashboardCharts({bookingData,revenueData}:{bookingData:Array<{name:string;completed:number;upcoming:number;cancelled:number}>;revenueData:Array<{name:string;amount:number}>}) {
+  const completed=bookingData.reduce((s,r)=>s+r.completed,0),upcoming=bookingData.reduce((s,r)=>s+r.upcoming,0),cancelled=bookingData.reduce((s,r)=>s+r.cancelled,0);
+  const revenue=revenueData.reduce((s,r)=>s+r.amount,0);
   return (
     <div className="grid gap-6 lg:grid-cols-2 mt-6">
-      <Card className="rounded-2xl shadow-sm border-slate-100">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-base font-bold text-slate-900">Bookings overview</CardTitle>
-            <span className="bg-orange-100 text-orange-700 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">Simulated Data</span>
+      <Card className="rounded-2xl shadow-card border-slate-100">
+        <CardHeader className="flex flex-col items-start justify-between gap-3 pb-2 sm:flex-row sm:items-center">
+          <div className="flex flex-wrap items-center gap-2">
+            <CardTitle className="text-base font-semibold text-slate-800">Bookings overview</CardTitle>
             <Info className="h-4 w-4 text-muted-foreground" />
           </div>
           <Select defaultValue="this-month">
@@ -42,21 +25,20 @@ export function DashboardCharts() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="this-month">This month</SelectItem>
-              <SelectItem value="last-month">Last month</SelectItem>
             </SelectContent>
           </Select>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-8 mb-6 mt-2">
             <div>
-              <p className="text-sm text-slate-500">Total bookings</p>
+              <p className="text-sm text-slate-500 leading-relaxed">Total bookings</p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-2xl font-bold text-slate-900">124</span>
-                <span className="flex items-center text-xs font-semibold text-green-700 bg-green-50 px-1.5 py-0.5 rounded">
-                  ↑ 22%
+                <span className="text-2xl font-semibold text-slate-800">{completed+upcoming+cancelled}</span>
+                <span className="flex items-center text-xs font-medium text-green-700 bg-green-50 px-1.5 py-0.5 rounded">
+                  Recorded
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-1">vs last month</p>
+              <p className="text-xs text-slate-500 mt-1">this month</p>
             </div>
             
             <div className="flex flex-col gap-2 mt-2 sm:mt-0 text-sm">
@@ -65,21 +47,21 @@ export function DashboardCharts() {
                   <div className="w-2 h-2 rounded-full bg-[#0B4928]" />
                   <span className="text-slate-600">Completed</span>
                 </div>
-                <span className="font-semibold text-slate-900">96</span>
+                <span className="font-semibold text-slate-900">{completed}</span>
               </div>
               <div className="flex items-center justify-between min-w-[120px]">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-blue-500" />
                   <span className="text-slate-600">Upcoming</span>
                 </div>
-                <span className="font-semibold text-slate-900">20</span>
+                <span className="font-semibold text-slate-900">{upcoming}</span>
               </div>
               <div className="flex items-center justify-between min-w-[120px]">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-red-500" />
                   <span className="text-slate-600">Cancelled</span>
                 </div>
-                <span className="font-semibold text-slate-900">8</span>
+                <span className="font-semibold text-slate-900">{cancelled}</span>
               </div>
             </div>
           </div>
@@ -88,8 +70,8 @@ export function DashboardCharts() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={bookingData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
                 <Tooltip />
                 <Line type="monotone" dataKey="completed" stroke="#0B4928" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
                 <Line type="monotone" dataKey="upcoming" stroke="#3b82f6" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
@@ -100,11 +82,10 @@ export function DashboardCharts() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl shadow-sm border-slate-100">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-base font-bold text-slate-900">Revenue overview</CardTitle>
-            <span className="bg-orange-100 text-orange-700 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">Simulated Data</span>
+      <Card className="rounded-2xl shadow-card border-slate-100">
+        <CardHeader className="flex flex-col items-start justify-between gap-3 pb-2 sm:flex-row sm:items-center">
+          <div className="flex flex-wrap items-center gap-2">
+            <CardTitle className="text-base font-semibold text-slate-800">Revenue overview</CardTitle>
             <Info className="h-4 w-4 text-muted-foreground" />
           </div>
           <Select defaultValue="this-month">
@@ -113,33 +94,32 @@ export function DashboardCharts() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="this-month">This month</SelectItem>
-              <SelectItem value="last-month">Last month</SelectItem>
             </SelectContent>
           </Select>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-8 mb-6 mt-2">
             <div>
-              <p className="text-sm text-slate-500">Total revenue</p>
+              <p className="text-sm text-slate-500 leading-relaxed">Total revenue</p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-2xl font-bold text-slate-900">UGX 995,000</span>
+                <span className="text-2xl font-semibold text-slate-800">{formatUGX(revenue)}</span>
               </div>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="flex items-center text-xs font-semibold text-green-700 bg-green-50 px-1.5 py-0.5 rounded">
-                  ↑ 18.6%
+                <span className="flex items-center text-xs font-medium text-green-700 bg-green-50 px-1.5 py-0.5 rounded">
+                  Recorded
                 </span>
-                <span className="text-xs text-slate-500">vs last month</span>
+                <span className="text-xs text-slate-500">this month</span>
               </div>
             </div>
             
             <div className="flex flex-col justify-center gap-3">
               <div>
                 <p className="text-xs text-slate-500">Net revenue</p>
-                <p className="text-sm font-semibold text-slate-900 mt-0.5">UGX 865,650</p>
+                <p className="text-sm font-semibold text-slate-900 mt-0.5 leading-relaxed">{formatUGX(Math.round(revenue*(1-PLATFORM_COMMISSION_RATE)))}</p>
               </div>
               <div>
                 <p className="text-xs text-slate-500">Commission</p>
-                <p className="text-sm font-semibold text-slate-900 mt-0.5">UGX 129,350</p>
+                <p className="text-sm font-semibold text-slate-900 mt-0.5 leading-relaxed">{formatUGX(Math.round(revenue*PLATFORM_COMMISSION_RATE))}</p>
               </div>
             </div>
           </div>
@@ -148,11 +128,11 @@ export function DashboardCharts() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={revenueData} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} dy={10} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 10, fill: '#64748b' }} 
+                  tick={{ fontSize: 12, fill: '#64748b' }}
                   tickFormatter={(value) => `${value / 1000}K`}
                 />
                 <Tooltip formatter={(value: any) => `UGX ${Number(value).toLocaleString()}`} />

@@ -52,8 +52,8 @@ export function EditCartItemModal({
 
   // Calculate unit price per night (or per participant)
   const initialNights = isMultiNight && item.startDate && item.endDate ? Math.max(1, nightsBetween(item.startDate, item.endDate)) : 1;
-  const unitPricePerNight = item.unitPriceMinor ?? Math.round(item.totalMinor / initialNights);
-  const calculatedTotal = isMultiNight ? unitPricePerNight * nights : unitPricePerNight * (item.pricingBasis === "fixed" || item.type.toLowerCase() === "transport" && item.pricingBasis !== "per_person" ? 1 : participants || 1);
+  const unitPricePerNight = isAccommodation ? Math.round(item.totalMinor / initialNights) : item.unitPriceMinor ?? Math.round(item.totalMinor / Math.max(1, item.participants));
+  const calculatedTotal = item.type.toLowerCase() === "restaurant" ? 0 : isMultiNight ? unitPricePerNight * nights : unitPricePerNight * (item.pricingBasis === "fixed" || item.type.toLowerCase() === "transport" && item.pricingBasis !== "per_person" ? 1 : participants || 1);
 
   const handleAddNight = () => {
     if (!endDate) return;
@@ -72,7 +72,10 @@ export function EditCartItemModal({
     }
   };
 
+  const validDetails = Boolean(startDate && startDate >= todayIsoDate() && (!isMultiNight || endDate > startDate) && (item.time === undefined || time));
+
   const handleSave = () => {
+    if (!validDetails) return;
     updateItem(item.id, {
       startDate: isAccommodation || item.startDate ? startDate : undefined,
       endDate: isMultiNight ? endDate : startDate,
@@ -85,11 +88,11 @@ export function EditCartItemModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div role="dialog" aria-modal="true" aria-label="Edit booking details" className="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-card border border-border shadow-2xl transition-all">
+      <div role="dialog" aria-modal="true" aria-label="Edit booking details" className="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-2xl bg-card border border-border shadow-floating transition-all">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-muted/40">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-foreground">Edit Booking Details</h2>
+            <h2 className="text-lg font-semibold text-foreground">Edit Booking Details</h2>
           </div>
           <button
             aria-label="Close booking editor"
@@ -112,8 +115,8 @@ export function EditCartItemModal({
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold uppercase tracking-wider text-primary">{item.type}</p>
-            <h3 className="font-bold text-base truncate">{item.title}</h3>
+            <p className="text-xs font-medium uppercase tracking-wider text-primary">{item.type}</p>
+            <h3 className="font-semibold text-base truncate">{item.title}</h3>
             {item.roomTypeName && <p className="text-xs text-muted-foreground font-medium">Room: {item.roomTypeName}</p>}
           </div>
         </div>
@@ -124,7 +127,7 @@ export function EditCartItemModal({
           {isMultiNight && (
             <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm font-bold text-foreground">Duration of stay</p>
+                <p className="text-sm font-medium text-foreground leading-relaxed">Duration of stay</p>
                 <p className="text-xs text-muted-foreground font-medium">
                   {nights} night{nights > 1 ? "s" : ""} ({formatUGX(unitPricePerNight)} / night)
                 </p>
@@ -136,18 +139,18 @@ export function EditCartItemModal({
                   size="sm"
                   disabled={nights <= 1}
                   onClick={handleSubtractNight}
-                  className="h-9 w-9 rounded-lg p-0 font-bold"
+                  className="h-9 w-9 rounded-lg p-0 font-medium"
                   title="Remove 1 night"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="w-8 text-center text-base font-extrabold">{nights}</span>
+                <span className="w-8 text-center text-base font-semibold">{nights}</span>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={handleAddNight}
-                  className="h-9 w-9 rounded-lg p-0 font-bold bg-white text-primary border-primary/30 hover:bg-primary/10"
+                  className="h-9 w-9 rounded-lg p-0 font-medium bg-white text-primary border-primary/30 hover:bg-primary/10"
                   title="Add 1 night"
                 >
                   <Plus className="h-4 w-4" />
@@ -159,29 +162,31 @@ export function EditCartItemModal({
           {/* Dates Input */}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                 <CalendarIcon className="h-3.5 w-3.5 text-primary" /> {isAccommodation ? "Check-in date" : "Service date"}
               </label>
               <input
                 type="date"
+                aria-label={isAccommodation ? "Check-in date" : "Service date"}
                 min={todayIsoDate()}
                 value={startDate}
                 onChange={(e) => handleStartDateChange(e.target.value)}
-                className="h-11 rounded-xl border border-input bg-card px-3 text-sm font-medium outline-none focus:border-primary"
+                className="form-control font-medium outline-none"
               />
             </div>
 
             {isMultiNight && (
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                   <CalendarIcon className="h-3.5 w-3.5 text-primary" /> Check-out Date
                 </label>
                 <input
                   type="date"
+                  aria-label="Check-out date"
                   min={addDaysToIsoDate(startDate || todayIsoDate(), 1)}
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="h-11 rounded-xl border border-input bg-card px-3 text-sm font-medium outline-none focus:border-primary"
+                  className="form-control font-medium outline-none"
                 />
               </div>
             )}
@@ -190,25 +195,27 @@ export function EditCartItemModal({
           {/* Time Input (if applicable) */}
           {item.time !== undefined && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5 text-primary" /> Preferred Time
               </label>
               <input
                 type="time"
+                aria-label="Preferred time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="h-11 rounded-xl border border-input bg-card px-3 text-sm font-medium outline-none focus:border-primary"
+                className="form-control font-medium outline-none"
               />
             </div>
           )}
 
           {/* Guests / Participants Selector */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <Users className="h-3.5 w-3.5 text-primary" /> Guests / Participants
             </label>
             <div className="flex h-11 items-center rounded-xl border border-input bg-card px-3">
               <select
+                aria-label="Guests / Participants"
                 value={participants}
                 onChange={(e) => setParticipants(Number(e.target.value) || 1)}
                 className="w-full appearance-none bg-transparent text-sm font-medium outline-none"
@@ -225,7 +232,7 @@ export function EditCartItemModal({
           {/* Price Breakdown Preview */}
           <div className="rounded-xl border border-border bg-muted/30 p-4 flex items-center justify-between">
             <span className="text-sm font-semibold text-muted-foreground">Updated Total</span>
-            <span className="text-2xl font-extrabold text-foreground">{formatUGX(calculatedTotal)}</span>
+            <span className="text-2xl font-semibold text-foreground">{formatUGX(calculatedTotal)}</span>
           </div>
         </div>
 
@@ -234,7 +241,7 @@ export function EditCartItemModal({
           <Button type="button" variant="outline" onClick={onClose} className="font-semibold">
             Cancel
           </Button>
-          <Button type="button" onClick={handleSave} className="bg-brand-green hover:bg-brand-green/90 text-white font-bold gap-2">
+          <Button type="button" onClick={handleSave} disabled={!validDetails} className="bg-brand-green hover:bg-brand-green/90 text-white font-medium gap-2">
             <Check className="h-4 w-4" /> Save Changes
           </Button>
         </div>

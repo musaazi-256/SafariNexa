@@ -1,3 +1,5 @@
+import { AuthCard } from "@/components/auth-card";
+import { isDemoMode } from "@/lib/dev-mode";
 import { ShieldAlert } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
@@ -11,6 +13,7 @@ export default function AdminGooglePage({ searchParams }: { searchParams: { retu
   const returnTo = safeReturnTo(searchParams.returnTo, "/admin/dashboard");
   const callbackUrl = `/admin/auth/google/callback?returnTo=${encodeURIComponent(returnTo)}`;
 
+  if (isDemoMode()) return <main className="flex justify-center p-8"><AuthCard hideGoogle surface="admin" returnTo={searchParams.returnTo} /></main>;
   return (
     <>
       <SiteHeader />
@@ -28,7 +31,7 @@ export default function AdminGooglePage({ searchParams }: { searchParams: { retu
           <div className="max-w-sm">
             <GoogleAuthTrigger provider="google-admin" callbackUrl={callbackUrl} />
           </div>
-          <h2 className="mb-3 mt-10 text-sm font-bold uppercase tracking-wide text-muted-foreground">
+          <h2 className="mb-3 mt-10 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             What happens after Google responds
           </h2>
           <GoogleFlowPanel surface="admin" />

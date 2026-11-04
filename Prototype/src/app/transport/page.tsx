@@ -33,7 +33,7 @@ export default async function TransportPage({ searchParams }: { searchParams: { 
             title="Airport transfers and special hire"
             description="Phase 1 covers airport transfers and Kampala special hire — compare fixed fares before creating an account."
           />
-          <p className="mb-4 text-sm text-muted-foreground">{totalCount} transport options</p>
+          <p className="mb-4 text-sm text-muted-foreground leading-relaxed">{totalCount} transport options</p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {listings.map((listing) => (
               <ListingCard

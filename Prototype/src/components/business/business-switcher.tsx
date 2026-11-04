@@ -1,5 +1,7 @@
 "use client";
 
+import { useAsyncTask } from "@/hooks/use-async-task";
+
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -24,7 +26,8 @@ export function BusinessSwitcher({
   activeBusinessId?: string;
 }) {
   const router = useRouter();
-  const [pending, startTransition] = React.useTransition();
+  const [pending, startTransition] = useAsyncTask();
+  const [error, setError] = React.useState("");
   const active = businesses.find((business) => business.id === activeBusinessId) ?? businesses[0];
 
   if (businesses.length === 0) return null;
@@ -32,19 +35,20 @@ export function BusinessSwitcher({
   function handleSelect(businessId: string) {
     if (businessId === active?.id) return;
     startTransition(async () => {
-      await setActiveBusiness(businessId);
-      router.refresh();
+      setError("");
+      try { await setActiveBusiness(businessId); router.refresh(); }
+      catch { setError("The business could not be switched. Please try again."); }
     });
   }
 
   return (
-    <DropdownMenu>
+    <><DropdownMenu>
       <DropdownMenuTrigger asChild disabled={pending}>
-        <SidebarMenuButton className="justify-between">
+        <SidebarMenuButton aria-busy={pending} className="justify-between">
           <span className="flex min-w-0 items-center gap-2.5">
             <Building2 className="h-4 w-4 shrink-0 text-primary" />
             <span className="flex min-w-0 flex-col items-start">
-              <span className="truncate text-sm font-bold leading-tight">{active?.name ?? "Select business"}</span>
+              <span className="truncate text-sm font-medium leading-tight">{active?.name ?? "Select business"}</span>
               {businesses.length > 1 ? <span className="text-xs font-normal text-muted-foreground">{businesses.length} businesses</span> : null}
             </span>
           </span>
@@ -72,6 +76,6 @@ export function BusinessSwitcher({
           </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
+    </DropdownMenu>{error && <p role="alert" className="px-2 text-xs text-destructive">{error}</p>}</>
   );
 }

@@ -21,8 +21,6 @@ import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { ScoreBadge } from "@/components/ui/rating";
 import { db } from "@/lib/db";
-import { BookingModeNotice } from "@/components/booking-mode-notice";
-import { ListingTrustSummary } from "@/components/listing-trust-summary";
 import { findEligibleReviewBooking, findRelatedListings, getRoomTypeAvailability, getRoomTypeRemainingToday, ratingBreakdown, ratingSummary } from "@/lib/listings";
 
 export default async function AccommodationDetailPage({ params }: { params: { id: string } }) {
@@ -113,8 +111,6 @@ export default async function AccommodationDetailPage({ params }: { params: { id
             ]}
           />
 
-          <BookingModeNotice listing={listing}/>
-          <ListingTrustSummary listingId={listing.id}/>
           <PhotoGallery
             images={listing.images.length > 0 ? listing.images : listing.coverImageUrl ? [listing.coverImageUrl] : []}
             title={listing.title}
@@ -142,7 +138,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
                       {accommodation.propertyType}
                     </Badge>
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">{listing.title}</h1>
+                      <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{listing.title}</h1>
                       <SaveButton listingId={listing.id} initialSaved={Boolean(savedItem)} isSignedIn={Boolean(session?.user)} showLabel />
                       <InquiryDialog listingId={listing.id} listingTitle={listing.title} businessName={listing.business.name} isSignedIn={Boolean(session?.user)} />
                     </div>
@@ -150,7 +146,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
                 </div>
                 <p className="mt-1 text-muted-foreground">{listing.city}</p>
                 <div className="mt-3">
-                  {average ? <ScoreBadge value={average} count={count} /> : <p className="text-sm text-muted-foreground">No reviews yet</p>}
+                  {average ? <ScoreBadge value={average} count={count} /> : <p className="text-sm text-muted-foreground leading-relaxed">No reviews yet</p>}
                 </div>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -168,7 +164,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
                   </div>
                 </div>
 
-                <h2 className="mt-10 text-xl font-bold">About this property</h2>
+                <h2 className="mt-10 text-xl font-semibold">About this property</h2>
                 <p className="mt-3 text-base leading-relaxed text-muted-foreground">{listing.description}</p>
                 
                 <div className="mt-4 flex max-w-fit items-start gap-2 rounded-xl bg-primary/5 p-3 text-xs text-primary">
@@ -178,7 +174,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
               </section>
 
               <section id="rooms" className="mt-12 scroll-mt-32 border-t border-border pt-10">
-                <h2 className="mb-6 text-2xl font-bold">Rooms</h2>
+                <h2 className="mb-6 text-2xl font-semibold">Rooms</h2>
                 <div className="flex flex-col gap-6">
                   {(() => {
                     const minPrice = accommodation.roomTypes.length > 0
@@ -199,7 +195,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
               </section>
 
               <section id="amenities" className="mt-12 scroll-mt-32 border-t border-border pt-10">
-                <h2 className="mb-6 text-2xl font-bold">Amenities</h2>
+                <h2 className="mb-6 text-2xl font-semibold">Amenities</h2>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {accommodation.amenities.map((item) => (
                     <div key={item} className="flex items-center gap-3 text-sm">
@@ -211,9 +207,9 @@ export default async function AccommodationDetailPage({ params }: { params: { id
               </section>
 
               <section id="policies" className="mt-12 scroll-mt-32 border-t border-border pt-10">
-                <h2 className="mb-6 text-2xl font-bold">Policies</h2>
+                <h2 className="mb-6 text-2xl font-semibold">Policies</h2>
                 <div className="rounded-2xl border border-border p-6 bg-card shadow-sm">
-                  <h3 className="font-bold">Cancellation & Payment</h3>
+                  <h3 className="font-semibold">Cancellation & Payment</h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                     {accommodation.cancellationPolicy || "No special cancellation policies provided. Standard non-refundable terms apply."}
                   </p>
@@ -221,14 +217,14 @@ export default async function AccommodationDetailPage({ params }: { params: { id
               </section>
 
               <section id="reviews" className="mt-12 scroll-mt-32 border-t border-border pt-10">
-                <h2 className="mb-6 text-2xl font-bold">Guest reviews</h2>
+                <h2 className="mb-6 text-2xl font-semibold">Guest reviews</h2>
                 <ReviewSummary average={average} count={count} breakdown={breakdown} />
                 
                 <div className="mt-10">
                   {session?.user ? (
                     eligibleBooking ? (
                       <div className="rounded-2xl bg-secondary p-6">
-                        <h3 className="font-bold mb-4">Add your review</h3>
+                        <h3 className="font-semibold mb-4">Add your review</h3>
                         <ReviewForm bookingId={eligibleBooking.id} listingTitle={listing.title} action={submitDirectReview} />
                       </div>
                     ) : (
@@ -281,7 +277,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
                     <div className="flex items-start gap-2">
                       <MapPin className="h-4 w-4 shrink-0 text-muted-foreground mt-0.5" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-foreground">{listing.address || listing.city}</p>
+                        <p className="text-sm font-medium text-foreground leading-relaxed">{listing.address || listing.city}</p>
                         <a href={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}`} target="_blank" rel="noreferrer" className="mt-0.5 inline-block text-xs font-semibold text-blue-600 hover:underline">
                           View in map
                         </a>

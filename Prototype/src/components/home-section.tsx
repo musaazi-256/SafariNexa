@@ -23,9 +23,9 @@ export function HomeSection({
     <section className="py-10">
       <div className="mb-5 flex items-end justify-between gap-4">
         <div>
-          {eyebrow ? <p className="text-xs font-extrabold uppercase tracking-wide text-primary">{eyebrow}</p> : null}
-          <h2 className={cn("text-2xl font-extrabold text-secondary-foreground sm:text-3xl", eyebrow && "mt-1")}>{title}</h2>
-          {description ? <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">{description}</p> : null}
+          {eyebrow ? <p className="type-eyebrow text-primary">{eyebrow}</p> : null}
+          <h2 className={cn("type-section text-foreground", eyebrow && "mt-1")}>{title}</h2>
+          {description ? <p className="mt-1.5 text-sm text-muted-foreground sm:text-base leading-relaxed">{description}</p> : null}
         </div>
         {moreHref ? (
           <Link href={moreHref} className="flex shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline">

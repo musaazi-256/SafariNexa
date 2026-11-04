@@ -1,3 +1,7 @@
+import { StatCard, StatGrid } from "@/components/ui/stat-card";
+import { PortalSearch } from "@/components/portal-search";
+import { ReviewStatusBadge } from "@/components/ui/status-badge";
+import { toReviewStatus } from "@/lib/status";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Star, MessageSquare, Clock, Flag, Users, Search, Filter, Info, MoreVertical, CheckCircle2 } from "lucide-react";
@@ -17,7 +21,7 @@ import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-export default async function BusinessReviewsPage({ searchParams }: { searchParams: { status?: string; page?: string; q?: string } }) {
+export default async function BusinessReviewsPage({ searchParams }: { searchParams: { status?: string; page?: string; q?: string; sort?: string } }) {
   const { business, businessId } = await requireBusinessSession();
 
   if (!business || !businessId) {
@@ -31,6 +35,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
   const requestedStatus = searchParams.status?.toUpperCase();
   const activeTab = requestedStatus && ["PENDING","PUBLISHED","HIDDEN","FLAGGED"].includes(requestedStatus) ? requestedStatus : "ALL";
   const page = parsePage(searchParams.page);
+  const sort = ["highest", "lowest"].includes(searchParams.sort ?? "") ? searchParams.sort! : "newest";
   
   const where = { 
     businessId,
@@ -48,7 +53,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
     db.review.findMany({
       where: where as never,
       include: { listing: true, author: { select: { name: true, email: true } }, booking: { select: { bookingRef: true } } },
-      orderBy: { createdAt: "desc" },
+      orderBy: sort === "newest" ? [{ createdAt: "desc" }] : [{ rating: sort === "highest" ? "desc" : "asc" }, { createdAt: "desc" }],
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE
     }),
@@ -137,120 +142,34 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
 
         <div className="flex items-center gap-3 w-full lg:w-auto shrink-0">
 <PortalFilter />
-          <div className="relative flex-1 lg:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input placeholder="Search reviews..." className="pl-9 h-10 bg-white border-slate-200" />
-          </div>
+          <PortalSearch label="Search reviews" placeholder="Search reviews…" />
         </div>
       </div>
 
       {/* Stat Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-5 flex flex-col h-full justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-yellow-50 flex flex-col items-center justify-center shrink-0">
-                <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-3xl font-extrabold text-slate-900">{averageRating}</p>
-                <p className="text-xs font-semibold text-slate-500 truncate mt-1">Average rating</p>
-              </div>
-            </div>
-            <div className="mt-4 text-xs font-semibold text-slate-500">
-              From {totalCount} reviews
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-5 flex flex-col h-full justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-green-50 flex flex-col items-center justify-center shrink-0">
-                <MessageSquare className="h-5 w-5 text-green-600" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-3xl font-extrabold text-slate-900">{publishedCount}</p>
-                <p className="text-xs font-semibold text-slate-500 truncate mt-1">Published</p>
-              </div>
-            </div>
-            <div className="mt-4 text-xs font-semibold text-slate-500">
-              Reviews visible to customers
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-5 flex flex-col h-full justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-orange-50 flex flex-col items-center justify-center shrink-0">
-                <Clock className="h-5 w-5 text-orange-500" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-3xl font-extrabold text-slate-900">{pendingCount}</p>
-                <p className="text-xs font-semibold text-slate-500 truncate mt-1">Pending</p>
-              </div>
-            </div>
-            <div className="mt-4 text-xs font-semibold text-slate-500">
-              Awaiting your response
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-5 flex flex-col h-full justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-red-50 flex flex-col items-center justify-center shrink-0">
-                <Flag className="h-5 w-5 text-red-500" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-3xl font-extrabold text-slate-900">{flaggedCount}</p>
-                <p className="text-xs font-semibold text-slate-500 truncate mt-1">Flagged</p>
-              </div>
-            </div>
-            <div className="mt-4 text-xs font-semibold text-slate-500">
-              Reported reviews
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-5 flex flex-col h-full justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-blue-50 flex flex-col items-center justify-center shrink-0">
-                <Users className="h-5 w-5 text-blue-500" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-3xl font-extrabold text-slate-900">{totalCount > 999 ? (totalCount/1000).toFixed(1) + 'K' : totalCount}</p>
-                <p className="text-xs font-semibold text-slate-500 truncate mt-1">Total reviews</p>
-              </div>
-            </div>
-            <div className="mt-4 text-xs font-semibold text-slate-500">
-              All time
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <StatGrid columns={5}>
+        <StatCard label="Average rating" value={ratingResult._avg.rating===null?undefined:averageRating} description={String(totalCount)+" reviews across all moderation states · out of 5"} icon={Star} help="Average of all reviews recorded for this business. The public listing rating includes only published reviews." />
+        <StatCard label="Published reviews" value={publishedCount} description="Visible on your public listings" icon={MessageSquare} href="/business/reviews?status=published" actionLabel="View reviews" />
+        <StatCard label="Pending reviews" value={pendingCount} description="Awaiting admin moderation" icon={Clock} href="/business/reviews?status=pending" actionLabel="View reviews" />
+        <StatCard label="Flagged reviews" value={flaggedCount} description="Flagged for moderation" icon={Flag} href="/business/reviews?status=flagged" actionLabel="View reviews" />
+        <StatCard label="Total reviews" value={totalCount.toLocaleString("en-UG")} description="All moderation states · all time" icon={Users} />
+      </StatGrid>
 
       {/* Tabs & Sorting */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-4 mt-8">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border pb-4 mt-8">
         <FilterTabs
           activeValue={activeTab}
           tabs={TABS.map((tab) => ({
             value: tab.value,
             label: tab.label,
             count: tab.count,
-            href: tab.value === "ALL" ? "/business/reviews" : `/business/reviews?status=${tab.value.toLowerCase()}`
+            href: `/business/reviews?${new URLSearchParams({ ...(tab.value !== "ALL" ? { status: tab.value.toLowerCase() } : {}), ...(searchParams.q ? { q: searchParams.q } : {}), sort })}`
           }))}
         />
 
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
           Sort by: 
-          <select className="bg-transparent border-none outline-none font-bold text-slate-900 cursor-pointer pl-1">
-            <option>Newest</option>
-            <option>Highest rating</option>
-            <option>Lowest rating</option>
-          </select>
+          <ReviewSort />
         </div>
       </div>
 
@@ -264,24 +183,20 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
             const initials = customerName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
             
             // Status styling
-            let statusStyle = "bg-slate-100 text-slate-700";
-            if (review.status === "PUBLISHED") statusStyle = "bg-green-50 text-primary border-green-100";
-            if (review.status === "PENDING") statusStyle = "bg-orange-50 text-orange-600 border-orange-100";
-            if (review.status === "FLAGGED") statusStyle = "bg-red-50 text-red-600 border-red-100";
-            if (review.status === "HIDDEN") statusStyle = "bg-slate-100 text-slate-600 border-slate-200";
+
 
             return (
-              <div key={review.id} className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col md:flex-row gap-6 hover:border-slate-300 transition-colors">
+              <div key={review.id} className="bg-white rounded-2xl border border-border p-6 flex flex-col md:flex-row gap-6 hover:border-slate-300 transition-colors">
                 
                 {/* Left Column: Customer */}
                 <div className="w-full md:w-48 shrink-0 flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-semibold flex items-center justify-center shrink-0">
                     {initials}
                   </div>
                   <div className="flex flex-col pt-0.5">
-                    <span className="font-bold text-slate-900">{customerName}</span>
-                    <div className="flex items-center gap-1 text-primary text-xs font-bold mt-0.5">
-                      Verified guest <CheckCircle2 className="h-3 w-3 fill-primary text-white" />
+                    <span className="font-semibold text-slate-900">{customerName}</span>
+                    <div className="flex items-center gap-1 text-primary text-xs font-medium mt-0.5">
+                      {review.booking ? <>Booked guest <CheckCircle2 className="h-3 w-3" /></> : "Reviewer"}
                     </div>
                   </div>
                 </div>
@@ -290,7 +205,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-3">
                     {renderStars(review.rating)}
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
+                    <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                       <span>·</span>
                       <span className="text-slate-700">{review.rating}/5</span>
                       <span>·</span>
@@ -298,7 +213,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                     </div>
                   </div>
                   
-                  {review.title && <h4 className="font-bold text-slate-900 mb-1">{review.title}</h4>}
+                  {review.title && <h4 className="font-semibold text-slate-900 mb-1">{review.title}</h4>}
                   <p className="text-slate-700 text-sm leading-relaxed mb-6">
                     {review.body}
                   </p>
@@ -306,30 +221,28 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                   {review.businessReplyBody ? (
                     <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-bold text-slate-900 text-sm">Your reply</span>
-                        <span className="text-xs font-medium text-slate-400">·</span>
-                        <span className="text-xs font-medium text-slate-400">
+                        <span className="font-medium text-slate-900 text-sm">Your reply</span>
+                        <span className="text-xs font-medium text-slate-500">·</span>
+                        <span className="text-xs font-medium text-slate-500">
                           {review.businessRepliedAt ? new Date(review.businessRepliedAt).toLocaleDateString("en-UG", { day: 'numeric', month: 'short', year: 'numeric' }) : ""}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-700">{review.businessReplyBody}</p>
+                      <p className="text-sm text-slate-700 leading-relaxed">{review.businessReplyBody}</p>
                     </div>
                   ) : (
                     <form id={`reply-${review.id}`} action={replyToReview} className="flex flex-col gap-2 relative">
                       <input type="hidden" name="reviewId" value={review.id} />
                       <Textarea 
-                        name="businessReplyBody" 
+                        name="businessReplyBody"
+                        aria-label={`Public reply to ${customerName}`}
+                        maxLength={5000}
                         required 
                         placeholder={`Write a public reply to ${customerName.split(' ')[0]}...`}
-                        className="resize-none min-h-[60px] pb-8 bg-white border-slate-200 text-sm"
+                        className="resize-none min-h-[80px] bg-white text-sm"
                       />
-                      <div className="absolute bottom-2 left-3 flex items-center gap-1 text-xs text-slate-400 font-medium">
-                        Public reply visible with this review <Info className="h-3 w-3" />
-                      </div>
-                      <div className="absolute bottom-2 right-2 flex items-center gap-2 hidden group-focus-within:flex">
-                        <Button type="submit" size="sm" className="h-6 text-[10px] bg-primary hover:bg-primary/90">
-                          Post reply
-                        </Button>
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-xs leading-relaxed text-slate-500">Your reply will be public alongside this review.</p>
+                        <Button type="submit" size="sm" className="h-8 rounded-lg text-xs font-medium">Post reply</Button>
                       </div>
                     </form>
                   )}
@@ -338,9 +251,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                 {/* Right Column: Meta & Actions */}
                 <div className="w-full md:w-48 shrink-0 flex md:flex-col items-center md:items-end justify-between md:justify-start gap-4">
                   <div className="flex flex-col items-end gap-1.5">
-                    <div className={cn("px-2.5 py-1 rounded-full border text-[10px] font-bold tracking-wider uppercase", statusStyle)}>
-                      {review.status}
-                    </div>
+                    <ReviewStatusBadge status={toReviewStatus(review.status)} />
                     {review.booking && (
                       <div className="text-xs font-medium text-slate-500">
                         Order: {review.booking.bookingRef}
@@ -352,7 +263,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
 <Button asChild variant="outline" size="sm"><a href={`#reply-${review.id}`}>Reply</a></Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="icon" className="h-8 w-8 text-slate-400 border-slate-200">
+                        <Button aria-label="Review actions" variant="outline" size="icon" className="h-8 w-8 text-slate-400 border-border">
                           <MoreVertical className="h-4 w-4 text-slate-600" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -372,18 +283,18 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-4 flex flex-wrap gap-3 items-center justify-between">
           <span className="text-sm font-medium text-slate-500">
             Showing {((page - 1) * PAGE_SIZE) + 1} to {Math.min(page * PAGE_SIZE, totalFilteredCount)} of {totalCount} reviews
           </span>
           <Pagination
             currentPage={page}
             totalPages={totalPages}
-            buildHref={(p) => `/business/reviews?${new URLSearchParams({ ...(activeTab !== "ALL" ? { status: activeTab.toLowerCase() } : {}), page: String(p) }).toString()}`}
+            buildHref={(p) => `/business/reviews?${new URLSearchParams({ ...(activeTab !== "ALL" ? { status: activeTab.toLowerCase() } : {}), ...(searchParams.q ? { q: searchParams.q } : {}), sort, page: String(p) }).toString()}`}
           />
         </div>
       )}
     </div>
   );
 }
-import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";
+import { ExportVisibleRows, PortalFilter, ReviewSort } from "@/components/portal-tools";

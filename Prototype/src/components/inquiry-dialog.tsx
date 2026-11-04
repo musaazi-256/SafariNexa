@@ -1,4 +1,5 @@
 "use client";
+import { MessageComposer } from "@/components/messages/conversation";
 
 import { useState } from "react";
 import { MessageSquare, Send, Loader2, CheckCircle2 } from "lucide-react";
@@ -63,7 +64,7 @@ export function InquiryDialog({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="border-slate-200 bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-bold text-xs rounded-xl h-10 px-4 gap-2 shadow-xs"
+          className="border-border bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium text-xs rounded-xl h-10 px-4 gap-2 shadow-xs"
         >
           <MessageSquare className="h-4 w-4 text-[#0d5932]" />
           <span>Inquire / Contact Host</span>
@@ -71,53 +72,26 @@ export function InquiryDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md rounded-2xl font-sans">
         <DialogHeader>
-          <DialogTitle className="text-lg font-bold flex items-center gap-2">
+          <DialogTitle className="text-lg font-semibold flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-[#0d5932]" />
             Send Inquiry to {businessName}
           </DialogTitle>
           <DialogDescription className="text-xs text-slate-500 font-medium">
-            Asking about <span className="font-bold text-slate-700">{listingTitle}</span>. The host will reply directly to your messages inbox.
+            Asking about <span className="font-semibold text-slate-700">{listingTitle}</span>. The host will reply directly to your messages inbox.
           </DialogDescription>
         </DialogHeader>
 
         {sentSuccess ? (
           <div className="py-8 flex flex-col items-center justify-center text-center space-y-2">
             <CheckCircle2 className="h-10 w-10 text-emerald-600 animate-bounce" />
-            <h4 className="font-bold text-base text-slate-900">Inquiry Sent Successfully!</h4>
+            <h4 className="font-semibold text-base text-slate-900">Message sent</h4>
             <p className="text-xs text-slate-500">Your message has been sent to {businessName}. Replies appear in your Messages inbox.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-            {errorMessage && <p role="alert" className="text-sm text-red-700">{errorMessage}</p>}
-            <div>
-              <label className="text-xs font-bold text-slate-700 mb-1.5 block">Your Question or Special Request</label>
-              <Textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder={`Hi! I'm interested in ${listingTitle}. Can you tell me more about check-in times or availability...`}
-                rows={4}
-                className="resize-none rounded-xl border-slate-200 text-xs font-medium focus-visible:ring-[#0d5932]"
-              />
-            </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setOpen(false)}
-                className="text-xs font-bold text-slate-500 rounded-xl"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={!content.trim() || isSending}
-                className="bg-[#0d5932] hover:bg-[#0a4526] text-white font-bold text-xs rounded-xl h-10 px-5 gap-2"
-              >
-                {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                Send Inquiry
-              </Button>
-            </div>
-          </form>
+          <div className="pt-2">
+            <MessageComposer draft={content} onDraftChange={setContent} onSubmit={handleSubmit} pending={isSending} error={errorMessage} placeholder="Type your question or special request…" />
+            <div className="flex justify-end"><Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button></div>
+          </div>
         )}
       </DialogContent>
     </Dialog>

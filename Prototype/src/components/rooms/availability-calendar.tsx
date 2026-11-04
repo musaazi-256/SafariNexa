@@ -38,49 +38,89 @@ function MonthGrid({
   month,
   bookedDates,
   todayKey,
+  startDate,
+  endDate,
+  onSelectDate,
   showMonthLabel = true
 }: {
   year: number;
   month: number;
   bookedDates: Set<string>;
   todayKey: string;
+  startDate: string;
+  endDate: string;
+  onSelectDate: (date: string) => void;
   showMonthLabel?: boolean;
 }) {
   const firstWeekday = new Date(Date.UTC(year, month, 1)).getUTCDay();
   const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
   const cells: Array<number | null> = [...Array.from({ length: firstWeekday }, () => null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
+  while (cells.length % 7 !== 0) cells.push(null);
+  const weeks = Array.from({ length: cells.length / 7 }, (_, weekIndex) => cells.slice(weekIndex * 7, weekIndex * 7 + 7));
 
   return (
     <div>
       {showMonthLabel ? (
-        <p className="mb-2 text-center text-xs font-bold">
+        <p className="mb-2 text-center text-xs font-medium">
           {MONTH_LABELS[month]} {year}
         </p>
       ) : null}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7">
         {WEEKDAY_LABELS.map((label, index) => (
-          <span key={index} className="text-center text-[10px] font-semibold text-muted-foreground">
+          <span key={index} className="text-center text-xs font-medium text-muted-foreground">
             {label}
           </span>
         ))}
-        {cells.map((day, index) => {
-          if (day === null) return <span key={index} />;
-          const key = dateKey(year, month, day);
-          const isBooked = bookedDates.has(key);
-          const isToday = key === todayKey;
-          const isPast = key < todayKey;
+        {weeks.map((week, weekIndex) => {
+          const rangeSlots = week.flatMap((day, slot) => {
+            if (day === null) return [];
+            const key = dateKey(year, month, day);
+            return startDate && endDate && key >= startDate && key <= endDate ? [slot] : [];
+          });
+          const firstRangeSlot = rangeSlots[0];
+          const lastRangeSlot = rangeSlots[rangeSlots.length - 1];
+
           return (
-            <span
-              key={index}
-              className={cn(
-                "mx-auto flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold",
-                isBooked ? "bg-[#dcdcdc] text-[#6e6e6e] line-through" : 
-                isPast ? "text-muted-foreground/40 opacity-50" : "text-foreground hover:bg-secondary cursor-default",
-                isToday ? "border-2 border-brand-green font-bold" : ""
-              )}
-            >
-              {day}
-            </span>
+            <div key={weekIndex} className="relative col-span-7 grid h-9 grid-cols-7">
+              {rangeSlots.length > 0 ? (
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 z-0 bg-emerald-50"
+                  style={{ left: `${(firstRangeSlot / 7) * 100}%`, right: `${((6 - lastRangeSlot) / 7) * 100}%` }}
+                />
+              ) : null}
+              {week.map((day, slot) => {
+                if (day === null) return <span key={slot} />;
+                const key = dateKey(year, month, day);
+                const isBooked = bookedDates.has(key);
+                const isToday = key === todayKey;
+                const isPast = key < todayKey;
+                const isCheckIn = key === startDate;
+                const isCheckOut = key === endDate;
+                return (
+                  <span key={slot} className="relative z-10 flex items-center justify-center">
+                    <button
+                      type="button"
+                      disabled={isBooked || isPast}
+                      aria-label={`${isBooked ? "Booked, " : ""}${MONTH_LABELS[month]} ${day}, ${year}${isCheckIn ? ", check-in" : ""}${isCheckOut ? ", check-out" : ""}`}
+                      aria-pressed={isCheckIn || isCheckOut}
+                      onClick={() => onSelectDate(key)}
+                      className={cn(
+                        "flex h-9 w-9 items-center justify-center rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                        isBooked ? "bg-[#f2f0e9] text-muted-foreground line-through" :
+                        isPast ? "cursor-not-allowed text-muted-foreground/40" :
+                        isCheckIn || isCheckOut ? "bg-primary text-primary-foreground hover:bg-primary" :
+                        "text-foreground hover:bg-secondary",
+                        isToday && !isCheckIn && !isCheckOut ? "ring-1 ring-inset ring-primary" : "",
+                        isBooked || isPast ? "cursor-not-allowed" : "cursor-pointer"
+                      )}
+                    >
+                      {day}
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
           );
         })}
       </div>
@@ -88,11 +128,18 @@ function MonthGrid({
   );
 }
 
-/** Read-only "quick glance" calendar — not a date picker. Dates are still chosen via the
- * plain check-in/check-out inputs; this just shows which nights are already booked for the
- * selected room, computed from real bookings (see `getRoomTypeAvailability`). One month at a
- * time, with prev/next navigation, since guests may be booking several months out. */
-export function AvailabilityCalendar({ bookedDates }: { bookedDates: string[] }) {
+/** Room availability calendar with direct check-in and check-out selection. */
+export function AvailabilityCalendar({
+  bookedDates,
+  startDate,
+  endDate,
+  onSelectDate
+}: {
+  bookedDates: string[];
+  startDate: string;
+  endDate: string;
+  onSelectDate: (date: string) => void;
+}) {
   const now = new Date();
   const baseYear = now.getUTCFullYear();
   const baseMonth = now.getUTCMonth();
@@ -107,12 +154,15 @@ export function AvailabilityCalendar({ bookedDates }: { bookedDates: string[] })
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <p className="text-sm font-bold">Availability</p>
-        <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <p className="text-sm font-medium leading-relaxed">Availability</p>
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className="h-2.5 w-2.5 rounded-full bg-secondary" />
           Booked
         </span>
       </div>
+      <p className="mb-2 text-xs text-muted-foreground" aria-live="polite">
+        {startDate && !endDate ? "Select a check-out date" : "Select a check-in date"}
+      </p>
       <div className="mb-2 flex items-center justify-between">
         <button
           type="button"
@@ -123,7 +173,7 @@ export function AvailabilityCalendar({ bookedDates }: { bookedDates: string[] })
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <p className="text-xs font-bold">
+        <p className="text-xs font-medium">
           {MONTH_LABELS[month]} {year}
         </p>
         <button
@@ -136,7 +186,16 @@ export function AvailabilityCalendar({ bookedDates }: { bookedDates: string[] })
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
-      <MonthGrid year={year} month={month} bookedDates={bookedSet} todayKey={todayKey} showMonthLabel={false} />
+      <MonthGrid
+        year={year}
+        month={month}
+        bookedDates={bookedSet}
+        todayKey={todayKey}
+        startDate={startDate}
+        endDate={endDate}
+        onSelectDate={onSelectDate}
+        showMonthLabel={false}
+      />
     </div>
   );
 }

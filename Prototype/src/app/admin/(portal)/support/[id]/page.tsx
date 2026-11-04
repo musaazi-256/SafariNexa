@@ -1,3 +1,5 @@
+import { ConfirmSubmit } from "@/components/admin/confirm-submit";
+import { ConversationMessages } from "@/components/messages/conversation";
 import { notFound } from "next/navigation";
 import type { SupportCaseStatus as PrismaSupportCaseStatus } from "@prisma/client";
 
@@ -66,7 +68,13 @@ export default async function AdminSupportCaseDetailPage({ params }: { params: {
     const caseId = String(formData.get("caseId"));
     const nextStatus = String(formData.get("status")) as PrismaSupportCaseStatus;
 
-    await db.supportCase.update({ where: { id: caseId }, data: { status: nextStatus } });
+    if (!STATUS_OPTIONS.some(option=>option.status===nextStatus)) throw new Error("Choose a valid support status.");
+    await db.$transaction(async tx=>{
+      const target=await tx.supportCase.findUnique({where:{id:caseId}});
+      if(!target||target.status===nextStatus)return;
+      await tx.supportCase.update({where:{id:caseId},data:{status:nextStatus,closedAt:["CLOSED","RESOLVED"].includes(nextStatus)?new Date():null}});
+      await tx.notification.create({data:{userId:target.openedByUserId,type:"SUPPORT_UPDATE",title:"Support case status updated",body:`${target.caseRef}: ${nextStatus.toLowerCase().replaceAll("_"," ")}. Open your support case for details.`,relatedSupportCaseId:caseId}});
+    });
   }
 
   return (
@@ -75,15 +83,15 @@ export default async function AdminSupportCaseDetailPage({ params }: { params: {
 
           <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {supportCase.caseRef} · {supportCase.category}
               </p>
-              <h1 className="text-2xl font-extrabold">{supportCase.subject}</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <h1 className="type-page ">{supportCase.subject}</h1>
+              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
                 Opened by {supportCase.openedBy.name ?? supportCase.openedBy.email}
               </p>
             </div>
-            <SupportCaseStatusBadge status={status} />
+            <SupportCaseStatusBadge status={status}  perspective="staff" />
           </div>
 
           <div className="mb-6 mt-4 flex flex-wrap gap-2">
@@ -91,33 +99,28 @@ export default async function AdminSupportCaseDetailPage({ params }: { params: {
               <form key={option.status} action={setCaseStatus}>
                 <input type="hidden" name="caseId" value={supportCase.id} />
                 <input type="hidden" name="status" value={option.status} />
-                <Button type="submit" size="sm" variant="secondary">
-                  {option.label}
-                </Button>
+                {option.status === "CLOSED" ? (
+                  <ConfirmSubmit
+                    title="Close this case?"
+                    description="The case will be closed and the customer will no longer be able to reply to it. You can reopen it later."
+                    confirmLabel="Close case"
+                    trigger={<Button size="sm" variant="secondary">{option.label}</Button>}
+                  />
+                ) : (
+                  <Button type="submit" size="sm" variant="secondary">
+                    {option.label}
+                  </Button>
+                )}
               </form>
             ))}
           </div>
 
-          <div className="flex flex-col gap-3">
-            {supportCase.messages.map((message) => {
-              const isAdmin = message.authorRole === "ADMIN";
-              return (
-                <Card key={message.id} className={cn("max-w-[85%]", isAdmin ? "ml-auto bg-primary/5" : "")}>
-                  <CardContent className="pt-4">
-                    <p className="text-xs font-semibold text-muted-foreground">
-                      {isAdmin ? "SafariNexa support" : (message.author.name ?? "Customer")}
-                    </p>
-                    <p className="mt-1 text-sm leading-relaxed">{message.body}</p>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {message.createdAt.toLocaleString("en-UG", { dateStyle: "medium", timeStyle: "short" })}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+            <div className="max-h-[560px] min-h-[260px] overflow-y-auto bg-[#FAFBFA] p-4 sm:p-6"><ConversationMessages outgoingSenderIds={supportCase.messages.filter(message => message.authorRole === "ADMIN").map(message => message.authorUserId)} currentUserId={session.user.id} messages={supportCase.messages.map(message => ({ id: message.id, content: message.body, senderId: message.authorUserId, senderName: message.author.name ?? (message.authorRole === "ADMIN" ? "SafariNexa support" : "Customer"), createdAt: message.createdAt }))} /></div>
+            <SupportReplyForm caseId={supportCase.id} action={postAdminReply} />
           </div>
 
-      <SupportReplyForm caseId={supportCase.id} action={postAdminReply} />
+
     </div>
   );
 }

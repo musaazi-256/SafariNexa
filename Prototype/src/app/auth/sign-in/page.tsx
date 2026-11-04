@@ -13,7 +13,7 @@ export default function SignInPage({
       <main>
         <Container className="flex min-h-[75vh] flex-col items-center justify-center gap-4 py-14">
           {searchParams.reason ? (
-            <p className="text-sm font-semibold text-muted-foreground">Sign in to continue: {searchParams.reason}</p>
+            <p className="text-sm font-semibold text-muted-foreground leading-relaxed">Sign in to continue: {searchParams.reason}</p>
           ) : null}
           <AuthCard surface="customer" returnTo={searchParams.returnTo} error={searchParams.error} />
         </Container>

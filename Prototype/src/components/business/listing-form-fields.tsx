@@ -34,7 +34,7 @@ export function ListingBaseFields({
   previewHref?: string;
 }) {
   return (
-    <Card className="rounded-2xl shadow-sm border-slate-200">
+    <Card className="rounded-2xl shadow-card border-border">
       <CardHeader className="border-b border-slate-100 pb-4 flex flex-row items-center justify-between">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
@@ -42,11 +42,11 @@ export function ListingBaseFields({
           </div>
           <div>
             <CardTitle className="text-lg">Listing details</CardTitle>
-            <p className="text-sm text-slate-500 font-medium">Basic information about your listing.</p>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">Basic information about your listing.</p>
           </div>
         </div>
         {previewHref ? (
-          <Button variant="outline" size="sm" asChild className="hidden sm:flex text-slate-700 font-semibold border-slate-200">
+          <Button variant="outline" size="sm" asChild className="hidden sm:flex text-slate-700 font-medium border-border">
             <a href={previewHref} target="_blank" rel="noreferrer">
               <Eye className="h-4 w-4 mr-2" /> Preview listing
             </a>
@@ -57,33 +57,33 @@ export function ListingBaseFields({
       <CardContent className="grid gap-6 sm:grid-cols-2 pt-6">
         <div className="flex flex-col gap-1.5 sm:col-span-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="title" className="font-semibold text-slate-700">Title <span className="text-red-500">*</span></Label>
+            <Label htmlFor="title" className="font-medium text-slate-700">Title <span className="text-red-500">*</span></Label>
           </div>
           <div className="relative">
             <Input id="title" name="title" defaultValue={initial?.title} required className="pr-16" />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400 pointer-events-none">
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500 pointer-events-none">
               28 / 100
             </span>
           </div>
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label htmlFor="description" className="font-semibold text-slate-700">Description <span className="text-red-500">*</span></Label>
+          <Label htmlFor="description" className="font-medium text-slate-700">Description <span className="text-red-500">*</span></Label>
           <div className="relative">
             <Textarea id="description" name="description" defaultValue={initial?.description} required rows={5} className="resize-none pb-8" />
-            <span className="absolute right-3 bottom-3 text-xs font-medium text-slate-400 pointer-events-none">
+            <span className="absolute right-3 bottom-3 text-xs font-medium text-slate-500 pointer-events-none">
               105 / 500
             </span>
           </div>
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="city" className="font-semibold text-slate-700">City <span className="text-red-500">*</span></Label>
+          <Label htmlFor="city" className="font-medium text-slate-700">City <span className="text-red-500">*</span></Label>
           <select
             id="city"
             name="city"
             defaultValue={initial?.city ?? "Kampala"}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ExistingOption value={initial?.city} known={["Kampala","Entebbe","Jinja","Mbarara","Gulu","Fort Portal"]}/>
             <option value="Kampala">Kampala</option>
@@ -96,12 +96,12 @@ export function ListingBaseFields({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="destinationId" className="font-semibold text-slate-700">Destination (optional)</Label>
+          <Label htmlFor="destinationId" className="font-medium text-slate-700">Destination (optional)</Label>
           <select
             id="destinationId"
             name="destinationId"
             defaultValue={initial?.destinationId ?? ""}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <option value="">None / Unassigned</option>
             {destinations.map(d => (
@@ -112,33 +112,33 @@ export function ListingBaseFields({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="address" className="font-semibold text-slate-700">Address <span className="text-red-500">*</span></Label>
+          <Label htmlFor="address" className="font-medium text-slate-700">Address <span className="text-red-500">*</span></Label>
           <Input id="address" name="address" defaultValue={initial?.address ?? ""} required />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="latitude" className="font-semibold text-slate-700">Latitude (optional)</Label>
+          <Label htmlFor="latitude" className="font-medium text-slate-700">Latitude (optional)</Label>
           <Input id="latitude" name="latitude" type="number" step="any" defaultValue={initial?.latitude ?? ""} />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="longitude" className="font-semibold text-slate-700">Longitude (optional)</Label>
+          <Label htmlFor="longitude" className="font-medium text-slate-700">Longitude (optional)</Label>
           <Input id="longitude" name="longitude" type="number" step="any" defaultValue={initial?.longitude ?? ""} />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="basePriceMinor" className="font-semibold text-slate-700">Base price (UGX) <span className="text-red-500">*</span></Label>
+          <Label htmlFor="basePriceMinor" className="font-medium text-slate-700">Base price (UGX) <span className="text-red-500">*</span></Label>
           <Input id="basePriceMinor" name="basePriceMinor" type="number" min={0} defaultValue={initial?.basePriceMinor} required />
         </div>
 
-        <div className="flex flex-col gap-1.5"><Label htmlFor="bookingMode">Booking mode (reviewed by admin)</Label><select id="bookingMode" name="bookingMode" defaultValue={initial?.bookingMode || "REQUEST"} className="rounded border p-3"><option value="REQUEST">Request to book — accept before payment</option><option value="INSTANT">Instant — payment confirms availability</option></select><p className="text-xs text-muted-foreground">Use Instant only with reliably maintained inventory. Restaurants always use table-reservation requests with no online meal charge.</p></div>
+        <div className="flex flex-col gap-1.5"><Label htmlFor="bookingMode">Booking mode (reviewed by admin)</Label><select id="bookingMode" name="bookingMode" defaultValue={initial?.bookingMode || "REQUEST"} className="form-control"><option value="REQUEST">Request to book — accept before payment</option><option value="INSTANT">Instant — payment confirms availability</option></select><p className="text-xs text-muted-foreground">Use Instant only with reliably maintained inventory. Restaurants always use table-reservation requests with no online meal charge.</p></div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="coverImageUrl" className="font-semibold text-slate-700">Cover photo</Label>
+          <Label htmlFor="coverImageUrl" className="font-medium text-slate-700">Cover photo</Label>
           <ImageUploader name="coverImageUrl" multiple={false} defaultValue={initial?.coverImageUrl ?? ""} />
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label htmlFor="images" className="font-semibold text-slate-700">Gallery photos</Label>
+          <Label htmlFor="images" className="font-medium text-slate-700">Gallery photos</Label>
           <p className="text-xs text-slate-500 mb-1">Add up to 10 high-quality photos to showcase your property.</p>
           <ImageUploader name="images" multiple={true} defaultValue={initial?.images ?? []} />
         </div>
@@ -160,7 +160,7 @@ export function AccommodationTypeFields({
   };
 }) {
   return (
-    <Card className="rounded-2xl shadow-sm border-slate-200">
+    <Card className="rounded-2xl shadow-card border-border">
       <CardHeader className="border-b border-slate-100 pb-4">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
@@ -168,18 +168,18 @@ export function AccommodationTypeFields({
           </div>
           <div>
             <CardTitle className="text-lg">Accommodation details</CardTitle>
-            <p className="text-sm text-slate-500 font-medium">More information to help travelers know what to expect.</p>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">More information to help travelers know what to expect.</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="grid gap-6 sm:grid-cols-2 pt-6">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="propertyType" className="font-semibold text-slate-700">Property type <span className="text-red-500">*</span></Label>
+          <Label htmlFor="propertyType" className="font-medium text-slate-700">Property type <span className="text-red-500">*</span></Label>
           <select
             id="propertyType"
             name="propertyType"
             defaultValue={initial?.propertyType ?? "Lodge"}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ExistingOption value={initial?.propertyType} known={["hotel","guesthouse","lodge","apartment"]}/>
             <option value="hotel">Hotel</option>
@@ -189,19 +189,19 @@ export function AccommodationTypeFields({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="maxGuests" className="font-semibold text-slate-700">Max guests <span className="text-red-500">*</span></Label>
+          <Label htmlFor="maxGuests" className="font-medium text-slate-700">Max guests <span className="text-red-500">*</span></Label>
           <Input id="maxGuests" name="maxGuests" type="number" min={1} defaultValue={initial?.maxGuests ?? 2} required />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="checkInTime" className="font-semibold text-slate-700">Check-in time <span className="text-red-500">*</span></Label>
+          <Label htmlFor="checkInTime" className="font-medium text-slate-700">Check-in time <span className="text-red-500">*</span></Label>
           <Input id="checkInTime" name="checkInTime" placeholder="14:00" defaultValue={initial?.checkInTime ?? ""} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="checkOutTime" className="font-semibold text-slate-700">Check-out time <span className="text-red-500">*</span></Label>
+          <Label htmlFor="checkOutTime" className="font-medium text-slate-700">Check-out time <span className="text-red-500">*</span></Label>
           <Input id="checkOutTime" name="checkOutTime" placeholder="11:00" defaultValue={initial?.checkOutTime ?? ""} />
         </div>
         <div className="flex flex-col gap-3 sm:col-span-2">
-          <Label className="font-semibold text-slate-700">Amenities</Label>
+          <Label className="font-medium text-slate-700">Amenities</Label>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {[
               { value: "wifi", label: "Wi-Fi" },
@@ -225,7 +225,7 @@ export function AccommodationTypeFields({
           </div>
         </div>
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label htmlFor="cancellationPolicy" className="font-semibold text-slate-700">Cancellation policy</Label>
+          <Label htmlFor="cancellationPolicy" className="font-medium text-slate-700">Cancellation policy</Label>
           <Textarea id="cancellationPolicy" name="cancellationPolicy" defaultValue={initial?.cancellationPolicy ?? ""} />
         </div>
       </CardContent>
@@ -251,7 +251,7 @@ export function TourTypeFields({
   guides?: Array<{ id: string; name: string }>;
 }) {
   return (
-    <Card className="rounded-2xl shadow-sm border-slate-200">
+    <Card className="rounded-2xl shadow-card border-border">
       <CardHeader className="border-b border-slate-100 pb-4">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
@@ -259,18 +259,18 @@ export function TourTypeFields({
           </div>
           <div>
             <CardTitle className="text-lg">Tour details</CardTitle>
-            <p className="text-sm text-slate-500 font-medium">More information to help travelers know what to expect.</p>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">More information to help travelers know what to expect.</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="grid gap-6 sm:grid-cols-2 pt-6">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="tourType" className="font-semibold text-slate-700">Safari type <span className="text-red-500">*</span></Label>
+          <Label htmlFor="tourType" className="font-medium text-slate-700">Safari type <span className="text-red-500">*</span></Label>
           <select
             id="tourType"
             name="tourType"
             defaultValue={initial?.tourType ?? "wildlife"}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ExistingOption value={initial?.tourType} known={["wildlife","primate","cultural","adventure"]}/>
             <option value="wildlife">Wildlife Safari</option>
@@ -280,16 +280,16 @@ export function TourTypeFields({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="durationDays" className="font-semibold text-slate-700">Duration (days) <span className="text-red-500">*</span></Label>
+          <Label htmlFor="durationDays" className="font-medium text-slate-700">Duration (days) <span className="text-red-500">*</span></Label>
           <Input id="durationDays" name="durationDays" type="number" min={1} defaultValue={initial?.durationDays ?? 1} required />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="difficulty" className="font-semibold text-slate-700">Difficulty <span className="text-red-500">*</span></Label>
+          <Label htmlFor="difficulty" className="font-medium text-slate-700">Difficulty <span className="text-red-500">*</span></Label>
           <select
             id="difficulty"
             name="difficulty"
             defaultValue={initial?.difficulty ?? "Moderate"}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ExistingOption value={initial?.difficulty} known={["Easy","Moderate","Strenuous","Extreme"]}/>
             <option value="Easy">Easy</option>
@@ -299,32 +299,32 @@ export function TourTypeFields({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="groupSizeMin" className="font-semibold text-slate-700">Group size — min <span className="text-red-500">*</span></Label>
+          <Label htmlFor="groupSizeMin" className="font-medium text-slate-700">Group size — min <span className="text-red-500">*</span></Label>
           <Input id="groupSizeMin" name="groupSizeMin" type="number" min={1} defaultValue={initial?.groupSizeMin ?? 1} required />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="groupSizeMax" className="font-semibold text-slate-700">Group size — max <span className="text-red-500">*</span></Label>
+          <Label htmlFor="groupSizeMax" className="font-medium text-slate-700">Group size — max <span className="text-red-500">*</span></Label>
           <Input id="groupSizeMax" name="groupSizeMax" type="number" min={1} defaultValue={initial?.groupSizeMax ?? 12} required />
         </div>
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label htmlFor="inclusions" className="font-semibold text-slate-700">Included (one per line)</Label>
+          <Label htmlFor="inclusions" className="font-medium text-slate-700">Included (one per line)</Label>
           <Textarea id="inclusions" name="inclusions" defaultValue={initial?.inclusions?.join("\n") ?? ""} />
         </div>
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label htmlFor="exclusions" className="font-semibold text-slate-700">Not included (one per line)</Label>
+          <Label htmlFor="exclusions" className="font-medium text-slate-700">Not included (one per line)</Label>
           <Textarea id="exclusions" name="exclusions" defaultValue={initial?.exclusions?.join("\n") ?? ""} />
         </div>
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label htmlFor="itinerary" className="font-semibold text-slate-700">Itinerary (one day per line)</Label>
+          <Label htmlFor="itinerary" className="font-medium text-slate-700">Itinerary (one day per line)</Label>
           <Textarea id="itinerary" name="itinerary" defaultValue={initial?.itinerary?.join("\n") ?? ""} />
         </div>
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label htmlFor="guideId" className="font-semibold text-slate-700">Assigned Guide</Label>
+          <Label htmlFor="guideId" className="font-medium text-slate-700">Assigned Guide</Label>
           <select
             id="guideId"
             name="guideId"
             defaultValue={initial?.guideId ?? ""}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <option value="">No guide assigned</option>
             {guides.map((g) => (
@@ -353,7 +353,7 @@ export function RestaurantTypeFields({
   };
 }) {
   return (
-    <Card className="rounded-2xl shadow-sm border-slate-200">
+    <Card className="rounded-2xl shadow-card border-border">
       <CardHeader className="border-b border-slate-100 pb-4">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
@@ -361,18 +361,18 @@ export function RestaurantTypeFields({
           </div>
           <div>
             <CardTitle className="text-lg">Restaurant details</CardTitle>
-            <p className="text-sm text-slate-500 font-medium">More information to help travelers know what to expect.</p>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">More information to help travelers know what to expect.</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="grid gap-6 sm:grid-cols-2 pt-6">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="cuisineType" className="font-semibold text-slate-700">Cuisine type <span className="text-red-500">*</span></Label>
+          <Label htmlFor="cuisineType" className="font-medium text-slate-700">Cuisine type <span className="text-red-500">*</span></Label>
           <select
             id="cuisineType"
             name="cuisineType"
             defaultValue={initial?.cuisineType ?? "Ugandan home cooking"}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ExistingOption value={initial?.cuisineType} known={["local","continental","indian","cafe"]}/>
             <option value="local">Local Ugandan</option>
@@ -382,12 +382,12 @@ export function RestaurantTypeFields({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="priceRange" className="font-semibold text-slate-700">Price range <span className="text-red-500">*</span></Label>
+          <Label htmlFor="priceRange" className="font-medium text-slate-700">Price range <span className="text-red-500">*</span></Label>
           <select
             id="priceRange"
             name="priceRange"
             defaultValue={initial?.priceRange ?? "UGX 45,000 - 85,000 per person"}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ExistingOption value={initial?.priceRange} known={["Under UGX 20,000 per person","UGX 20,000 - 45,000 per person","UGX 45,000 - 85,000 per person","Over UGX 85,000 per person"]}/>
             <option value="Under UGX 20,000 per person">Under UGX 20,000 per person</option>
@@ -397,13 +397,13 @@ export function RestaurantTypeFields({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="openingHours" className="font-semibold text-slate-700">Opening hours <span className="text-red-500">*</span></Label>
+          <Label htmlFor="openingHours" className="font-medium text-slate-700">Opening hours <span className="text-red-500">*</span></Label>
           <p className="text-xs text-muted-foreground">Online reservations currently support daily hours, for example Daily · 08:00 - 22:00. Times are East Africa Time.</p>
           <select
             id="openingHours"
             name="openingHours"
             defaultValue={initial?.openingHours ?? "Daily · 08:00 - 22:00"}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ExistingOption value={initial?.openingHours} known={["Daily · 08:00 - 22:00","Daily · 10:00 - 23:00","Weekdays only","Weekends only"]}/>
             <option value="Daily · 08:00 - 22:00">Daily · 08:00 - 22:00</option>
@@ -415,11 +415,11 @@ export function RestaurantTypeFields({
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="reservationDurationMinutes">Reservation duration (minutes)</Label>
           <Input id="reservationDurationMinutes" name="reservationDurationMinutes" type="number" min={30} max={240} defaultValue={initial?.reservationDurationMinutes ?? 90} required />
-          <Label htmlFor="seatingCapacity" className="font-semibold text-slate-700">Seating capacity <span className="text-red-500">*</span></Label>
+          <Label htmlFor="seatingCapacity" className="font-medium text-slate-700">Seating capacity <span className="text-red-500">*</span></Label>
           <Input id="seatingCapacity" name="seatingCapacity" type="number" min={1} defaultValue={initial?.seatingCapacity ?? ""} />
         </div>
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label htmlFor="menuUrl" className="font-semibold text-slate-700">Menu URL (optional)</Label>
+          <Label htmlFor="menuUrl" className="font-medium text-slate-700">Menu URL (optional)</Label>
           <Input id="menuUrl" name="menuUrl" type="url" defaultValue={initial?.menuUrl ?? ""} placeholder="https://" />
         </div>
         <div className="sm:col-span-2 mt-2">
@@ -458,7 +458,7 @@ export function TransportTypeFields({
   };
 }) {
   return (
-    <Card className="rounded-2xl shadow-sm border-slate-200">
+    <Card className="rounded-2xl shadow-card border-border">
       <CardHeader className="border-b border-slate-100 pb-4">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
@@ -466,30 +466,30 @@ export function TransportTypeFields({
           </div>
           <div>
             <CardTitle className="text-lg">Transport details</CardTitle>
-            <p className="text-sm text-slate-500 font-medium">More information to help travelers know what to expect.</p>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">More information to help travelers know what to expect.</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="grid gap-6 sm:grid-cols-2 pt-6">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="category" className="font-semibold text-slate-700">Category <span className="text-red-500">*</span></Label>
+          <Label htmlFor="category" className="font-medium text-slate-700">Category <span className="text-red-500">*</span></Label>
           <select
             id="category"
             name="category"
             defaultValue={initial?.category ?? "AIRPORT_TRANSFER"}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <option value="AIRPORT_TRANSFER">Airport transfer</option>
             <option value="KAMPALA_SPECIAL_HIRE">Kampala special hire</option>
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="vehicleType" className="font-semibold text-slate-700">Vehicle type <span className="text-red-500">*</span></Label>
+          <Label htmlFor="vehicleType" className="font-medium text-slate-700">Vehicle type <span className="text-red-500">*</span></Label>
           <select
             id="vehicleType"
             name="vehicleType"
             defaultValue={initial?.vehicleType ?? "suv"}
-            className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ExistingOption value={initial?.vehicleType} known={["suv","van","sedan"]}/>
             <option value="suv">SUV / 4x4</option>
@@ -498,15 +498,15 @@ export function TransportTypeFields({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="capacity" className="font-semibold text-slate-700">Passenger capacity <span className="text-red-500">*</span></Label>
+          <Label htmlFor="capacity" className="font-medium text-slate-700">Passenger capacity <span className="text-red-500">*</span></Label>
           <Input id="capacity" name="capacity" type="number" min={1} defaultValue={initial?.capacity ?? 4} required />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="estimatedDurationMinutes" className="font-semibold text-slate-700">Estimated duration (minutes)</Label>
+          <Label htmlFor="estimatedDurationMinutes" className="font-medium text-slate-700">Estimated duration (minutes)</Label>
           <Input id="estimatedDurationMinutes" name="estimatedDurationMinutes" type="number" min={0} defaultValue={initial?.estimatedDurationMinutes ?? ""} />
         </div>
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label htmlFor="pricingModel" className="font-semibold text-slate-700">Fare notes</Label>
+          <Label htmlFor="pricingModel" className="font-medium text-slate-700">Fare notes</Label>
           <Textarea id="pricingModel" name="pricingModel" defaultValue={initial?.pricingModel ?? ""} />
         </div>
       </CardContent>

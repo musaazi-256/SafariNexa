@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { CalendarDays, Heart, LayoutDashboard, Bell, LifeBuoy, Settings, CreditCard, MessageSquareText } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
 
 const NAV_ITEMS = [
   { href: "/profile", label: "Profile", icon: LayoutDashboard },
@@ -38,9 +37,9 @@ export function AccountSidebar() {
             href={item.href}
             aria-current={isActive(item.href) ? "page" : undefined}
             className={cn(
-              "flex min-h-11 shrink-0 items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+              "flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
               isActive(item.href)
-                ? "border-primary/20 bg-primary/10 text-primary"
+                ? "border-transparent bg-primary text-primary-foreground shadow-sm"
                 : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
             )}
           >
@@ -59,9 +58,9 @@ export function AccountSidebar() {
             href={item.href}
             aria-current={isActive(item.href) ? "page" : undefined}
             className={cn(
-              "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+              "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
               isActive(item.href)
-                ? "bg-primary/10 text-primary"
+                ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground"
             )}
           >
@@ -71,12 +70,12 @@ export function AccountSidebar() {
         ))}
         </nav>
 
-        <div className="mt-8 rounded-xl border bg-card p-4">
-          <h4 className="mb-1 text-sm font-semibold">Need help?</h4>
-          <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
-            Get help with your account or bookings.
+        <div className="mt-8 rounded-2xl border border-border bg-slate-50/50 p-5">
+          <h4 className="font-semibold text-slate-900 mb-1">Need help?</h4>
+          <p className="text-sm font-medium text-slate-500 mb-4 leading-relaxed">
+            Our support team is here to help you succeed.
           </p>
-          <Link href="/support" className={cn(buttonVariants({ variant: "outline" }), "w-full")}>
+          <Link href="/support" className="inline-flex items-center gap-2 rounded-xl border border-border bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors w-full justify-center shadow-sm">
             <MessageSquareText className="h-4 w-4" />
             Contact support
           </Link>

@@ -1,9 +1,10 @@
+import { isDemoMode } from "@/lib/dev-mode";
 import { randomUUID } from "crypto";
 import fs from "fs/promises";
 import path from "path";
 export const DOCUMENT_DIRECTORY = process.env.PRIVATE_DOCUMENT_DIRECTORY || path.join(process.cwd(), ".private", "verification");
 export async function saveVerificationFile(file: File) {
-  if (process.env.NODE_ENV === "production" && !process.env.PRIVATE_DOCUMENT_DIRECTORY) throw new Error("Private persistent document storage is not configured.");
+  if (!isDemoMode() && process.env.NODE_ENV === "production" && !process.env.PRIVATE_DOCUMENT_DIRECTORY) throw new Error("Private persistent document storage is not configured.");
   if (file.size < 1 || file.size > 5 * 1024 * 1024) throw new Error("Documents must be between 1 byte and 5 MB.");
   const data = Buffer.from(await file.arrayBuffer());
   const extension = data.subarray(0, 5).toString() === "%PDF-" ? "pdf"

@@ -1,3 +1,6 @@
+import { NotificationBell } from "@/components/notifications/notification-bell";
+import { getUnreadNotificationCount } from "@/lib/notifications";
+import { DemoToolbar } from "@/components/demo-toolbar";
 import type { ReactNode } from "react";
 import { LiveRefresh } from "@/components/live-refresh";
 
@@ -6,18 +9,20 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { requireAdminSession } from "@/lib/admin";
 
 export default async function AdminPortalLayout({ children }: { children: ReactNode }) {
-  await requireAdminSession();
+  const session=await requireAdminSession();
+  const unreadCount=await getUnreadNotificationCount(session.user.id);
 
   return (
     <SidebarProvider>
       <LiveRefresh />
       <AdminSidebar />
-      <SidebarInset className="bg-muted/40">
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background px-4 sm:px-6">
+      <SidebarInset>
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
           <SidebarTrigger />
           <span className="text-sm font-semibold text-muted-foreground">Admin portal</span>
+          <div className="ml-auto flex items-center gap-2"><DemoToolbar surfaces={["customer", "business"]} /><NotificationBell surface="admin" unreadCount={unreadCount}/></div>
         </header>
-        <div className="mx-auto w-full min-w-0 max-w-[1440px] flex-1 space-y-6 p-4 sm:p-6 lg:p-8">{children}</div>
+        <div className="flex-1 min-w-0 space-y-6 p-4 sm:p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

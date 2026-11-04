@@ -1,3 +1,5 @@
+import { AuthCard } from "@/components/auth-card";
+import { isDemoMode } from "@/lib/dev-mode";
 import { SiteHeader } from "@/components/site-header";
 import { GoogleFlowPanel } from "@/components/google-flow-panel";
 import { GoogleAuthTrigger } from "@/components/google-auth-trigger";
@@ -9,6 +11,7 @@ export default function BusinessGooglePage({ searchParams }: { searchParams: { r
   const returnTo = safeReturnTo(searchParams.returnTo, "/business/dashboard");
   const callbackUrl = `/business/auth/google/callback?returnTo=${encodeURIComponent(returnTo)}`;
 
+  if (isDemoMode()) return <main className="flex justify-center p-8"><AuthCard hideGoogle surface="business" returnTo={searchParams.returnTo} /></main>;
   return (
     <>
       <SiteHeader />
@@ -22,7 +25,7 @@ export default function BusinessGooglePage({ searchParams }: { searchParams: { r
           <div className="max-w-sm">
             <GoogleAuthTrigger provider="google" callbackUrl={callbackUrl} />
           </div>
-          <h2 className="mb-3 mt-10 text-sm font-bold uppercase tracking-wide text-muted-foreground">
+          <h2 className="mb-3 mt-10 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             What happens after Google responds
           </h2>
           <GoogleFlowPanel surface="business" />

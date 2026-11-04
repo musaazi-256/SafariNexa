@@ -1,5 +1,7 @@
 "use client";
 
+import { Bell } from "lucide-react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -47,6 +49,7 @@ const GROUPS = [
   {
     label: "Settings",
     items: [
+      { href: "/business/notifications", label: "Notifications", icon: Bell },
       { href: "/business/settings", label: "Settings", icon: SettingsIcon }
     ]
   }
@@ -67,7 +70,7 @@ export function BusinessSidebar({
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="mb-2 px-1.5">
-            <span className="text-xs font-extrabold uppercase tracking-wide text-primary">SafariNexa</span>
+            <span className="text-xs font-medium uppercase tracking-wide text-primary">SafariNexa</span>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <BusinessSwitcher businesses={businesses} activeBusinessId={activeBusinessId} />

@@ -20,9 +20,9 @@ export function ProtectedAction({
       <CardContent className="p-6">
         <div className="flex items-center gap-2 text-primary">
           <Lock className="h-4 w-4" />
-          <span className="text-xs font-extrabold uppercase tracking-wide">Account required</span>
+          <span className="text-xs font-medium uppercase tracking-wide">Account required</span>
         </div>
-        <h2 className="mt-2 text-xl font-bold">{action}</h2>
+        <h2 className="mt-2 text-xl font-semibold">{action}</h2>
         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
           Guests can browse freely, but SafariNexa asks for an account here. Sign in or create one and you&apos;ll come
           straight back to this exact step — nothing you selected is lost.

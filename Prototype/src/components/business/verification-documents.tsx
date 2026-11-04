@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useRef, useTransition } from "react";
+import { useAsyncTask } from "@/hooks/use-async-task";
+
+import { documentLink } from "@/lib/document-link";
+import { useState, useRef } from "react";
 import { format } from "date-fns";
 import { UploadCloud, FileText, Check, MoreVertical, ShieldCheck, Loader2, Trash2 } from "lucide-react";
 
@@ -27,27 +30,30 @@ interface BusinessDocument {
 
 interface VerificationDocumentsProps {
   documents: BusinessDocument[];
+  demo?: boolean;
 }
 
-export function VerificationDocuments({ documents }: VerificationDocumentsProps) {
+export function VerificationDocuments({ documents, demo = false }: VerificationDocumentsProps) {
   const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
   const [isUploading, setIsUploading] = useState(false);
-  const [isDeleting, startDeleteTransition] = useTransition();
+  const [error, setError] = useState("");
+  const [isDeleting, startDeleteTransition] = useAsyncTask();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDelete = (documentId: string) => {
+    setError("");
     startDeleteTransition(async () => {
       try {
         await deleteVerificationDocument(documentId);
       } catch (error) {
         console.error(error);
-        alert("Failed to delete document");
+        setError("The document could not be deleted. Please try again.");
       }
     });
   };
 
-  const activeDocuments = documents.filter(d => 
-    (d.type === activeTab) || 
+  const activeDocuments = documents.filter(d =>
+    (d.type === activeTab) ||
     (activeTab === "OTHER" && !CATEGORIES.some(c => c.id === d.type && c.id !== "OTHER"))
   );
 
@@ -55,6 +61,7 @@ export function VerificationDocuments({ documents }: VerificationDocumentsProps)
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setError("");
     setIsUploading(true);
     try {
       const formData = new FormData();
@@ -63,7 +70,7 @@ export function VerificationDocuments({ documents }: VerificationDocumentsProps)
       await submitVerificationDocument(formData);
     } catch (error) {
       console.error(error);
-      alert("Failed to upload document");
+      setError("The document could not be uploaded. Please try again.");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -72,24 +79,27 @@ export function VerificationDocuments({ documents }: VerificationDocumentsProps)
 
   return (
     <div className="mt-8">
-      <h2 className="text-xl font-bold text-slate-900 mb-4">Documents</h2>
-      
+      <h2 className="text-xl font-semibold text-slate-900 mb-4">Documents</h2>
+
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap items-center gap-1.5 mb-6">
         {CATEGORIES.map(category => {
           const isActive = activeTab === category.id;
           return (
             <button
               key={category.id}
+              type="button"
+              aria-pressed={isActive}
+              disabled={isUploading}
               onClick={() => setActiveTab(category.id)}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition-colors",
-                isActive 
-                  ? "border-green-600 text-green-700 bg-white shadow-sm ring-1 ring-green-600/20" 
-                  : "border-slate-200 text-slate-600 bg-white hover:bg-slate-50"
+                "inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-all",
+                isActive
+                  ? "border-slate-900 bg-slate-900 text-white shadow-xs"
+                  : "border-border bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
               )}
             >
-              <category.icon className={cn("h-4 w-4", isActive ? "text-green-600" : "text-slate-400")} />
+              <category.icon className={cn("h-3.5 w-3.5", isActive ? "text-white" : "text-slate-400")} />
               {category.label}
             </button>
           );
@@ -100,40 +110,38 @@ export function VerificationDocuments({ documents }: VerificationDocumentsProps)
       <div className="rounded-xl border border-green-200 bg-green-50 p-4 flex gap-3 mb-8">
         <ShieldCheck className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
         <div>
-          <h4 className="text-sm font-bold text-green-900">Why we need these documents</h4>
-          <p className="text-sm text-green-700 mt-1 flex items-center justify-between">
+          <h4 className="text-sm font-semibold text-green-900">Why we need these documents</h4>
+          <p className="text-sm text-green-700 mt-1 flex items-center justify-between leading-relaxed">
             <span>These help us verify your business is legitimate and compliant with local regulations.</span>
             <a href="/docs/overview" className="font-semibold text-green-800 hover:underline shrink-0 ml-4 hidden sm:inline">Learn more ↗</a>
           </p>
         </div>
       </div>
 
-      <h3 className="text-sm font-bold text-slate-900 mb-3">Uploaded documents</h3>
-      
+      <h3 className="text-sm font-semibold text-slate-900 mb-3">Uploaded documents</h3>
+
       <div className="space-y-4">
         {activeDocuments.map(doc => (
-          <div key={doc.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div key={doc.id} className="flex items-center justify-between p-4 rounded-xl border border-border bg-white shadow-sm">
             <div className="flex items-center gap-4">
               <div className="flex flex-col items-center justify-center h-12 w-10 rounded bg-red-50 text-red-600 border border-red-100 shrink-0">
                 <FileText className="h-5 w-5" />
-                <span className="text-[10px] font-bold mt-0.5 uppercase">{doc.fileUrl.split('.').pop() || 'PDF'}</span>
+                <span className="text-xs font-medium mt-0.5 uppercase">{doc.fileUrl.split('.').pop() || 'PDF'}</span>
               </div>
               <div>
-                <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="font-bold text-slate-900 hover:underline text-sm sm:text-base">
+                <a href={documentLink(doc.fileUrl, doc.type, demo, doc.id)} target="_blank" rel="noreferrer" className="font-medium text-slate-900 hover:underline text-sm sm:text-base">
                   {doc.fileUrl.split('/').pop() || "Document"}
                 </a>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Uploaded on {format(new Date(doc.uploadedAt), "dd MMM yyyy")} • 245 KB
+                  Uploaded on {format(new Date(doc.uploadedAt), "dd MMM yyyy")}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-semibold">
-                <ClockIcon className="h-3.5 w-3.5" /> Under review
-              </span>
+              <span className="hidden sm:inline-flex rounded-md border border-border bg-slate-50 px-2 py-1 text-xs text-slate-600">Attached</span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400" disabled={isDeleting}>
+                  <Button aria-label={`Actions for ${doc.type.replaceAll("_", " ")}`} variant="ghost" size="icon" className="h-8 w-8 text-slate-400" loading={isDeleting}>
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -147,56 +155,38 @@ export function VerificationDocuments({ documents }: VerificationDocumentsProps)
           </div>
         ))}
 
-        {/* Upload Zone */}
-        <div 
-          className="relative rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors p-8 text-center flex flex-col items-center justify-center"
-          onClick={() => !isUploading && fileInputRef.current?.click()}
-        >
-          <input 
-            type="file" 
-            className="hidden" 
-            ref={fileInputRef} 
+        <input
+            type="file"
+            className="hidden"
+            ref={fileInputRef}
             onChange={handleFileChange}
             accept=".pdf,.jpg,.jpeg,.png"
           />
+        {/* Upload Zone */}
+        <button type="button" disabled={isUploading} aria-busy={isUploading} aria-label="Choose a verification document to upload"
+          className="w-full relative rounded-xl border border-dashed border-border bg-slate-50 hover:bg-slate-100 transition-colors p-8 text-center flex flex-col items-center justify-center"
+          onClick={() => !isUploading && fileInputRef.current?.click()}
+        >
+
           {isUploading ? (
             <>
               <Loader2 className="h-8 w-8 text-green-600 animate-spin mb-3" />
-              <p className="text-sm font-semibold text-slate-900">Uploading document...</p>
+              <p className="text-sm font-semibold text-slate-900 leading-relaxed">Uploading document...</p>
             </>
           ) : (
             <>
               <div className="h-10 w-10 rounded-full bg-white shadow-sm flex items-center justify-center mb-3">
                 <UploadCloud className="h-5 w-5 text-green-600" />
               </div>
-              <p className="text-sm font-semibold text-slate-900">
-                Drag and drop files here, or <span className="text-green-600 cursor-pointer">browse</span>
+              <p className="text-sm font-semibold text-slate-900 leading-relaxed">
+                Choose a file to upload
               </p>
               <p className="text-xs text-slate-500 mt-1">PDF, JPG, PNG up to 5MB</p>
             </>
           )}
-        </div>
+        </button>
+        {error && <p role="alert" className="text-sm text-destructive leading-relaxed">{error}</p>}
       </div>
     </div>
-  );
-}
-
-function ClockIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
   );
 }

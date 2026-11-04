@@ -1,3 +1,9 @@
+import { ConfirmSubmit } from "@/components/admin/confirm-submit";
+import { StatCard, StatGrid } from "@/components/ui/stat-card";
+import { PortalSearch } from "@/components/portal-search";
+import { TableColumnLabel } from "@/components/ui/table-column-label";
+import { demoPayoutCandidates, settleDemoPayouts } from "@/lib/demo-payouts";
+import { isDemoMode } from "@/lib/dev-mode";
 import { Banknote, Percent, Landmark, Undo2, Search, Filter, Download } from "lucide-react";
 import { redirect } from "next/navigation";
 
@@ -28,7 +34,7 @@ const TABS = [
   { value: "REFUNDED", label: "Refunded" }
 ];
 
-export default async function AdminPaymentsPage({ searchParams }: { searchParams: { page?: string; q?: string; status?: string } }) {
+export default async function AdminPaymentsPage({ searchParams }: { searchParams: { page?: string; q?: string; status?: string; payout?: string } }) {
   await requireAdminSession();
 
   const page = parsePage(searchParams.page);
@@ -45,7 +51,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
     ];
   }
 
-  const [allPayments, pagePayments, totalCount, refunds] = await Promise.all([
+  const [allPayments, pagePayments, totalCount, refunds, demoCandidates] = await Promise.all([
     db.payment.findMany({ select: { status: true, amountMinor: true, payoutId: true, refunds: { where: { status: "COMPLETED" }, select: { amountMinor: true } } } }),
     db.payment.findMany({
       where,
@@ -59,10 +65,23 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
       include: { booking: { include: { listing: true } } },
       orderBy: { createdAt: "desc" },
       take: 20
-    })
+    }),
+    isDemoMode() ? demoPayoutCandidates(db) : Promise.resolve([])
   ]);
 
   const { grossMinor, commissionMinor, netMinor, refundedMinor, unsettledNetMinor } = summarizePayments(allPayments);
+
+  const demoPayoutTotal = demoCandidates.reduce((sum, candidate) => sum + candidate.allocations.reduce((total, allocation) => total + allocation.amountMinor, 0), 0);
+  async function simulatePayouts() {
+    "use server";
+    if (!isDemoMode()) throw new Error("Demo payouts are unavailable in live mode.");
+    const actor = await requireAdminSession("payments.manage");
+    await db.$transaction(async tx => {
+      const payoutIds = await settleDemoPayouts(tx);
+      await tx.auditLog.create({ data: { actorUserId: actor.user.id, actorEmail: actor.user.email, surface: "ADMIN", action: "demo_payouts_completed", outcome: "SUCCESS", metadata: { payoutIds } } });
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    redirect("/admin/payments?payout=simulated");
+  }
 
   async function approveRefund(formData: FormData) {
     "use server";
@@ -78,6 +97,13 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
       throw new Error("Invalid refund request.");
     }
 
+    if (isDemoMode() && targetRefund.payment.providerReference?.startsWith("DEMO-")) {
+      await db.$transaction(async tx => {
+        await tx.refund.update({where:{id:refundId},data:{reviewedByAdminId:adminSession.user.id}});
+        await completeRefund(tx, refundId);
+      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      redirect("/admin/payments");
+    }
     if (targetRefund.payment.provider !== "STRIPE" || !targetRefund.payment.providerReference?.startsWith("cs_") || !process.env.STRIPE_SECRET_KEY) {
       throw new Error("This payment requires manual provider reconciliation. No refund has been recorded as completed.");
     }
@@ -120,73 +146,15 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
         description="Track customer payments, provider references, refunds, and platform commission — platform-wide."
       />
 
+      {isDemoMode() && <p role="status" className="text-sm text-muted-foreground leading-relaxed">{searchParams.payout === "simulated" ? "Payouts completed." : "Settle eligible payments to verified businesses. Payments with pending refunds remain on hold."}</p>}
+
       {/* Stat Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-
-        {/* Gross Revenue */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Banknote className="h-5 w-5 text-primary" />
-              </div>
-              <span className="text-xl font-extrabold text-slate-900 leading-tight whitespace-nowrap">{formatUGX(grossMinor)}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[13px] font-bold text-slate-900">Gross revenue</span>
-              <span className="text-[11px] font-semibold text-slate-500">All time</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Platform Commission */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center shrink-0 border border-purple-100">
-                <Percent className="h-5 w-5 text-purple-600" />
-              </div>
-              <span className="text-xl font-extrabold text-slate-900 leading-tight whitespace-nowrap">{formatUGX(commissionMinor)}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[13px] font-bold text-slate-900">Platform commission ({Math.round(PLATFORM_COMMISSION_RATE * 100)}%)</span>
-              <span className="text-[11px] font-semibold text-slate-500">All time</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Net to Businesses */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100">
-                <Landmark className="h-5 w-5 text-blue-600" />
-              </div>
-              <span className="text-xl font-extrabold text-slate-900 leading-tight whitespace-nowrap">{formatUGX(netMinor)}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[13px] font-bold text-slate-900">Net to businesses</span>
-              <span className="text-[11px] font-semibold text-slate-500">All time</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Refunded */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="h-10 w-10 rounded-full bg-orange-50 flex items-center justify-center shrink-0 border border-orange-100">
-                <Undo2 className="h-5 w-5 text-orange-600" />
-              </div>
-              <span className="text-xl font-extrabold text-slate-900 leading-tight whitespace-nowrap">{formatUGX(refundedMinor)}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[13px] font-bold text-slate-900">Refunded</span>
-              <span className="text-[11px] font-semibold text-slate-500">All time</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <StatGrid>
+        <StatCard label="Gross payments" value={formatUGX(grossMinor)} description="Successful payments before refunds · all time" icon={Banknote} />
+        <StatCard label={"Platform commission ("+Math.round(PLATFORM_COMMISSION_RATE*100)+"%)"} value={formatUGX(commissionMinor)} description="After completed refunds · all time" icon={Percent} />
+        <StatCard label="Net business earnings" value={formatUGX(netMinor)} description="After completed refunds and commission" icon={Landmark} help="Calculated business share of successful payments, including amounts already settled. This is not a payout-status total." />
+        <StatCard label="Completed refunds" value={formatUGX(refundedMinor)} description="Recorded completed refunds · all time" icon={Undo2} />
+      </StatGrid>
 
       {/* Pill Filters */}
       <FilterTabs
@@ -194,33 +162,19 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
         tabs={TABS.map((tab) => ({
           value: tab.value,
           label: tab.label,
-          href: tab.value === "ALL" ? (q ? `/admin/payments?q=${q}` : "/admin/payments") : `/admin/payments?status=${tab.value.toLowerCase()}${q ? `&q=${q}` : ""}`
+          href: tab.value === "ALL" ? (q ? `/admin/payments?q=${encodeURIComponent(q)}` : "/admin/payments") : `/admin/payments?status=${tab.value.toLowerCase()}${q ? `&q=${encodeURIComponent(q)}` : ""}`
         }))}
       />
 
       {/* Table Toolbar */}
       <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <form className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            {activeTab && activeTab !== "ALL" && <input type="hidden" name="status" value={activeTab.toLowerCase()} />}
-            <input
-              type="search"
-              name="q"
-              defaultValue={q}
-              placeholder="Search payments..."
-              className="w-full h-9 pl-9 pr-4 rounded-full border border-slate-200 text-[13px] outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-white"
-            />
-          </form>
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <PortalSearch label="Search payments" placeholder="Search payments…" />
 <PortalFilter />
 <ExportVisibleRows />
-          {unsettledNetMinor > 0 && (
-            <div title="Payout provider and business settlement accounts must be configured before funds can be transferred.">
-              <Button disabled title="Payout integration is not configured" className="h-9 px-4 text-[13px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shrink-0 shadow-sm transition-all">
-                Payouts unavailable ({formatUGX(unsettledNetMinor)})
-              </Button>
-            </div>
-          )}
+          {isDemoMode() ? <form action={simulatePayouts}>
+            <Button type="submit" disabled={demoPayoutTotal === 0} size="sm">Settle payouts ({formatUGX(demoPayoutTotal)})</Button>
+          </form> : unsettledNetMinor > 0 && <p className="text-xs text-muted-foreground">Live payouts require a configured provider.</p>}
         </div>
       </div>
 
@@ -228,39 +182,39 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
       {pagePayments.length === 0 ? (
         <EmptyState title="No payments yet" description="Payments across the platform will show up here." />
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div>
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Date</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Item</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Business</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Method</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Status</TableHead>
-                <TableHead className="text-right text-[12px] font-bold text-slate-500 uppercase tracking-wider">Amount</TableHead>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Item</TableHead>
+                <TableHead>Business</TableHead>
+                <TableHead><TableColumnLabel help="The payment method recorded for the transaction.">Method</TableColumnLabel></TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right"><TableColumnLabel help="The amount recorded for this payment or refund, in Ugandan shillings.">Amount</TableColumnLabel></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {pagePayments.map((payment) => (
-                <TableRow key={payment.id} className="hover:bg-slate-50/50">
-                  <TableCell className="pl-6 text-[13px] font-semibold text-slate-600 whitespace-nowrap">
+                <TableRow key={payment.id}>
+                  <TableCell className="font-normal whitespace-nowrap">
                     {payment.createdAt.toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" })}
                   </TableCell>
-                  <TableCell className="text-[13px] font-semibold text-slate-900">
+                  <TableCell className="font-normal">
                     {payment.booking?.listing.title ?? (payment.order ? `Trip order · ${payment.order.id.slice(-8)}` : "—")}
                   </TableCell>
-                  <TableCell className="text-[13px] font-semibold text-slate-600">{payment.booking?.business.name ?? "—"}</TableCell>
-                  <TableCell className="text-[13px] font-semibold text-slate-600 capitalize">{payment.provider.replaceAll("_", " ").toLowerCase()}</TableCell>
+                  <TableCell className="font-normal">{payment.booking?.business.name ?? "—"}</TableCell>
+                  <TableCell className="font-normal capitalize">{payment.provider.replaceAll("_", " ").toLowerCase()}</TableCell>
                   <TableCell><PaymentStatusBadge status={toPaymentStatus(payment.status)} /></TableCell>
-                  <TableCell className="pr-6 text-right text-[13px] font-bold text-slate-900 whitespace-nowrap">{formatUGX(payment.amountMinor)}</TableCell>
+                  <TableCell className="text-right font-normal whitespace-nowrap">{formatUGX(payment.amountMinor)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
 
           {/* Pagination Footer */}
-          <div className="border-t border-slate-200 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-slate-500">
+          <div className="border-t border-border bg-slate-50/30 px-6 py-4 flex flex-wrap gap-3 items-center justify-between">
+            <span className="text-sm font-semibold text-slate-500">
               Showing {pagePayments.length > 0 ? (page - 1) * PAGE_SIZE + 1 : 0} to {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount} transactions
             </span>
             <Pagination currentPage={page} totalPages={totalPagesFor(totalCount)} buildHref={(p) => `/admin/payments?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), ...(q ? { q } : {}), page: String(p) }).toString()}`} />
@@ -270,42 +224,49 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
 
       {/* Refunds Table Container */}
       <div>
-        <h2 className="text-xl font-bold text-slate-900 mb-4">Recent refunds</h2>
+        <h2 className="text-xl font-semibold text-slate-900 mb-4">Recent refunds</h2>
         {refunds.length === 0 ? (
           <EmptyState title="No refunds yet" description="Refund requests will show up here." />
         ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div>
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Date</TableHead>
-                  <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Booking</TableHead>
-                  <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Reason</TableHead>
-                  <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Status</TableHead>
-                  <TableHead className="text-right text-[12px] font-bold text-slate-500 uppercase tracking-wider">Amount</TableHead>
-                  <TableHead className="text-right text-[12px] font-bold text-slate-500 uppercase tracking-wider">Action</TableHead>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Booking</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right"><TableColumnLabel help="The amount recorded for this payment or refund, in Ugandan shillings.">Amount</TableColumnLabel></TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {refunds.map((refund) => (
-                  <TableRow key={refund.id} className="hover:bg-slate-50/50">
-                    <TableCell className="pl-6 text-[13px] font-semibold text-slate-600 whitespace-nowrap">
+                  <TableRow key={refund.id}>
+                    <TableCell className="font-normal whitespace-nowrap">
                       {refund.createdAt.toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" })}
                     </TableCell>
-                    <TableCell className="text-[13px] font-semibold text-slate-900">{refund.booking.listing.title}</TableCell>
-                    <TableCell className="text-[13px] font-semibold text-slate-600">{refund.reason}</TableCell>
+                    <TableCell className="font-normal">{refund.booking.listing.title}</TableCell>
+                    <TableCell className="font-normal">{refund.reason}</TableCell>
                     <TableCell><RefundStatusBadge status={toRefundStatus(refund.status)} /></TableCell>
-                    <TableCell className="text-right text-[13px] font-bold text-slate-900 whitespace-nowrap">{formatUGX(refund.amountMinor)}</TableCell>
-                    <TableCell className="pr-6 text-right">
+                    <TableCell className="text-right font-normal whitespace-nowrap">{formatUGX(refund.amountMinor)}</TableCell>
+                    <TableCell className="text-right">
                       {refund.status === "REQUESTED" ? (
                         <form action={approveRefund}>
                           <input type="hidden" name="refundId" value={refund.id} />
-                          <Button type="submit" size="sm" variant="outline" className="text-xs font-semibold h-8 border-primary text-primary hover:bg-primary/10">
-                            Approve refund
-                          </Button>
+                          <ConfirmSubmit
+                            title="Approve this refund?"
+                            description={<>{formatUGX(refund.amountMinor)} for <strong>{refund.booking.listing.title}</strong> will be sent back to the traveller through the payment provider. This can&apos;t be undone.</>}
+                            confirmLabel="Approve refund"
+                            trigger={
+                              <Button size="sm" variant="outline" className="text-xs font-normal h-8 border-primary text-primary hover:bg-primary/10">
+                                Approve refund
+                              </Button>
+                            }
+                          />
                         </form>
                       ) : (
-                        <span className="text-[11px] font-semibold text-slate-400">Processed</span>
+                        <span className="text-xs font-normal text-slate-500">{refund.status === "COMPLETED" ? "Completed" : refund.status === "PROCESSING" ? "Awaiting provider" : refund.status.replaceAll("_", " ").toLowerCase()}</span>
                       )}
                     </TableCell>
                   </TableRow>

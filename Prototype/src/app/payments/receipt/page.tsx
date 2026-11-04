@@ -1,3 +1,7 @@
+import { CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { BookingStatusBadge } from "@/components/ui/status-badge";
+import { toBookingStatus } from "@/lib/status";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
@@ -30,19 +34,22 @@ export default async function PaymentReceiptPage({ searchParams }: { searchParam
   return <>
     <SiteHeader />
     <main><Container className="flex min-h-[70vh] items-center justify-center py-10">
-      <Card className="w-full max-w-xl">
-        <CardHeader><CardTitle>{state.title}</CardTitle><p role="status" className="text-sm text-muted-foreground">{state.description}</p></CardHeader>
-        <CardContent className="space-y-4">
-          {(order?.bookings ?? (booking ? [booking] : [])).map(b => <div key={b.id} className="flex flex-wrap justify-between gap-2 border-b pb-3">
-            <div className="min-w-0"><p className="font-semibold break-words">{b.listing.title}</p><p className="text-sm">{b.bookingRef}</p></div>
-            <p className="text-sm">{b.status.replaceAll("_", " ").toLowerCase()}</p>
+      <Card className="w-full max-w-lg">
+        <CardHeader className="items-center text-center"><span className={`flex h-12 w-12 items-center justify-center rounded-full ${state.paid ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>{state.paid ? <CheckCircle2 className="h-6 w-6"/> : state.pending ? <Clock className="h-6 w-6"/> : <XCircle className="h-6 w-6"/>}</span><CardTitle className="mt-3">{state.title}</CardTitle><p role="status" className="text-sm text-muted-foreground leading-relaxed">{payment?.providerReference?.startsWith("DEMO-") ? "Your payment status and booking details are shown below." : state.description}</p></CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          {(order?.bookings ?? (booking ? [booking] : [])).map(b => <div key={b.id} className="flex items-center justify-between gap-2 text-sm">
+            <div className="min-w-0"><p className="font-semibold break-words">{b.listing.title}</p><p className="text-sm leading-relaxed">{b.bookingRef}</p></div>
+            <BookingStatusBadge status={toBookingStatus(b.status)} />
           </div>)}
-          <div className="flex flex-wrap justify-between gap-2 font-bold"><span>{state.amountLabel}</span><span>{formatUGX(target.totalMinor)}</span></div>
-          {booking?.orderId && <p className="text-sm text-muted-foreground">Payment was collected for the combined order. The amount above is this booking’s share.</p>}
-          {payment && <p className="break-all text-sm text-muted-foreground">Provider status: {payment.status.replaceAll("_", " ").toLowerCase()}{payment.providerReference ? ` · ${payment.providerReference}` : ""}</p>}
+          <Separator />
+          <div className="flex items-center justify-between text-base font-semibold"><span>{state.amountLabel}</span><span>{formatUGX(target.totalMinor)}</span></div>
+          {booking?.orderId && <p className="text-sm text-muted-foreground leading-relaxed">Payment was collected for the combined order. The amount above is this booking’s share.</p>}
+          {payment && <p className="break-all text-sm text-muted-foreground leading-relaxed">Provider status: {payment.status.replaceAll("_", " ").toLowerCase()}{payment.providerReference ? ` · ${payment.providerReference}` : ""}</p>}
           {state.pending && <Button asChild className="w-full" variant="secondary"><Link href={`/payments/receipt?${query}`}>Refresh payment status</Link></Button>}
           {!state.paid && !state.pending && ["PENDING_PAYMENT", "PAYMENT_FAILED"].includes(target.status) && <Button asChild className="w-full"><Link href={`/payments?${query}`}>Review payment options</Link></Button>}
-          <Button asChild className="w-full" variant="secondary"><Link href={booking ? `/bookings/${booking.id}` : "/bookings"}>View bookings</Link></Button>
+          <Separator />
+          <Button asChild size="lg" className="w-full"><Link href={booking ? `/bookings/${booking.id}` : "/bookings"}>View bookings</Link></Button>
+          <Button asChild variant="secondary" className="w-full"><Link href="/explore">Continue browsing</Link></Button>
         </CardContent>
       </Card>
     </Container></main>

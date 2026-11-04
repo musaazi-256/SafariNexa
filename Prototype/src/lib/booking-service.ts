@@ -1,3 +1,4 @@
+import { isDemoMode } from "@/lib/dev-mode";
 import { Prisma } from "@prisma/client";
 
 import { db } from "@/lib/db";
@@ -84,7 +85,7 @@ export async function validateAndReserveBookings(
       const type = (item.type || listing.type).toUpperCase();
       if (listing.type !== type) throw new Error(`Listing type mismatch for "${listing.title}".`);
       const fulfilment = parseFulfilment(item.fulfilment, type);
-      const bookingMode = type === "RESTAURANT" ? "RESERVATION" : listing.bookingMode ?? "INSTANT";
+      const bookingMode = type === "RESTAURANT" ? "RESERVATION" : isDemoMode() ? "INSTANT" : listing.bookingMode ?? "INSTANT";
       let policySnapshot: Record<string, string | boolean | null> = {listingTitle:listing.title,type,bookingMode,cancellationPolicy:listing.accommodation?.cancellationPolicy ?? "Cancellation is subject to the terms agreed with the business. Contact support for assistance."};
 
       const participantsCount = item.participants ?? 1;
@@ -270,7 +271,7 @@ export async function validateAndReserveBookings(
     if (createOrder) {
       const orderTotalMinor = resolvedBookings.reduce((sum, b) => sum + b.totalMinor, 0);
       const order = await tx.order.create({
-        data: { customerId, totalMinor: orderTotalMinor, status: resolvedBookings.some(b=>b.bookingMode !== "INSTANT") ? "AWAITING_BUSINESS_CONFIRMATION" : "PENDING_PAYMENT" }
+        data: { customerId, totalMinor: orderTotalMinor, status: resolvedBookings.some(b=>b.totalMinor > 0 && b.bookingMode !== "INSTANT") || !resolvedBookings.some(b=>b.totalMinor > 0) ? "AWAITING_BUSINESS_CONFIRMATION" : "PENDING_PAYMENT" }
       });
       orderId = order.id;
     }

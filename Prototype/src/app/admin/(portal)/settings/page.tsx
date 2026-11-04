@@ -1,3 +1,6 @@
+import { PLATFORM_COMMISSION_RATE } from "@/lib/revenue";
+import { isDemoMode } from "@/lib/dev-mode";
+import { DemoSettingsForm } from "@/components/admin/demo-settings-form";
 import { PageHero } from "@/components/page-hero";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,10 +11,11 @@ import { requireAdminSession } from "@/lib/admin";
 
 export default async function AdminSettingsPage() {
   await requireAdminSession();
+  const demo = isDemoMode();
 
   return (
     <>
-      <PageHero variant="portal" eyebrow="Admin portal" title="Platform Settings" description="Configure global platform rules, categories, and commissions." />
+      <PageHero variant="portal" eyebrow="Admin portal" title="Platform Settings" description={demo ? "Manage platform settings and preferences on this device." : "Review platform configuration."} />
 
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="mb-6">
@@ -26,15 +30,16 @@ export default async function AdminSettingsPage() {
               <CardTitle>General Settings</CardTitle>
               <CardDescription>Global platform configuration.</CardDescription>
             </CardHeader>
+            <DemoSettingsForm storageKey="safarinexa-demo-general-settings">
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="platformName">Platform Name</Label>
-                  <Input id="platformName" defaultValue="SafariNexa" />
+                  <Input required id="platformName" defaultValue="SafariNexa" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="supportEmail">Global Support Email</Label>
-                  <Input id="supportEmail" type="email" defaultValue="support@safarinexa.com" />
+                  <Input required id="supportEmail" type="email" defaultValue="support@safarinexa.com" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="contactPhone">Global Support Phone</Label>
@@ -43,8 +48,9 @@ export default async function AdminSettingsPage() {
               </div>
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
-              <Button disabled className="bg-slate-200 text-slate-500 hover:bg-slate-200">Save changes (Coming Soon)</Button>
+              <Button type="submit" disabled={!demo}>Save changes</Button>
             </CardFooter>
+            </DemoSettingsForm>
           </Card>
         </TabsContent>
 
@@ -52,27 +58,25 @@ export default async function AdminSettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Commission & Fees</CardTitle>
-              <CardDescription>Set the default commission rates taken from bookings.</CardDescription>
+              <CardDescription>Current commission applied to revenue calculations and business settlements.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="accommodationFee">Accommodation Commission (%)</Label>
-                  <Input id="accommodationFee" type="number" defaultValue="15" />
+                  <Input id="accommodationFee" type="number" readOnly value={PLATFORM_COMMISSION_RATE * 100} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="tourFee">Safaris & Tours Commission (%)</Label>
-                  <Input id="tourFee" type="number" defaultValue="12" />
+                  <Input id="tourFee" type="number" readOnly value={PLATFORM_COMMISSION_RATE * 100} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="transportFee">Transport Commission (%)</Label>
-                  <Input id="transportFee" type="number" defaultValue="10" />
+                  <Input id="transportFee" type="number" readOnly value={PLATFORM_COMMISSION_RATE * 100} />
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="border-t px-6 py-4">
-              <Button disabled className="bg-slate-200 text-slate-500 hover:bg-slate-200">Save fees (Coming Soon)</Button>
-            </CardFooter>
+            <CardFooter className="border-t px-6 py-4"><p className="text-sm text-muted-foreground leading-relaxed">A standard rate applies to all paid service categories.</p></CardFooter>
           </Card>
         </TabsContent>
 
@@ -87,27 +91,27 @@ export default async function AdminSettingsPage() {
                 <div className="flex items-center justify-between border-b pb-4">
                   <div>
                     <p className="font-medium">Accommodation</p>
-                    <p className="text-sm text-muted-foreground">Hotels, lodges, guesthouses</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">Hotels, lodges, guesthouses</p>
                   </div>
-                  <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                  <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
                     Active
                   </span>
                 </div>
                 <div className="flex items-center justify-between border-b pb-4">
                   <div>
                     <p className="font-medium">Safaris & Tours</p>
-                    <p className="text-sm text-muted-foreground">Tour operators and packages</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">Tour operators and packages</p>
                   </div>
-                  <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                  <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
                     Active
                   </span>
                 </div>
                 <div className="flex items-center justify-between border-b pb-4 opacity-50">
                   <div>
                     <p className="font-medium">Restaurant Delivery</p>
-                    <p className="text-sm text-muted-foreground">Food delivery (Phase 2)</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">Food delivery (Phase 2)</p>
                   </div>
-                  <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+                  <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
                     Disabled
                   </span>
                 </div>

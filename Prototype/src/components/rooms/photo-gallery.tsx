@@ -24,6 +24,7 @@ export function PhotoGallery({ images, title }: { images: string[]; title: strin
       <>
         <button
           type="button"
+          aria-label={`Open photos of ${title}`}
           onClick={() => openAt(0)}
           className="relative mb-6 block h-72 w-full overflow-hidden rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-96"
         >
@@ -49,8 +50,9 @@ export function PhotoGallery({ images, title }: { images: string[]; title: strin
         {tiles[0] ? (
           <button
             type="button"
-            onClick={() => openAt(0)}
-            className="col-span-2 row-span-2 block h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+            aria-label={`Open photos of ${title}`}
+          onClick={() => openAt(0)}
+            className="relative overflow-hidden col-span-2 row-span-2 block h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
           >
             <Image src={tiles[0]} alt={title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
           </button>
@@ -59,8 +61,9 @@ export function PhotoGallery({ images, title }: { images: string[]; title: strin
           <button
             key={image + index}
             type="button"
+            aria-label={`Open photo ${index + 2} of ${title}`}
             onClick={() => openAt(index + 1)}
-            className="col-span-1 row-span-1 block h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+            className="relative overflow-hidden col-span-1 row-span-1 block h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
           >
             <Image src={image} alt={`${title} — photo ${index + 2}`} fill sizes="(max-width: 768px) 100vw, 16vw" className="object-cover" />
           </button>
@@ -68,8 +71,9 @@ export function PhotoGallery({ images, title }: { images: string[]; title: strin
 
         <button
           type="button"
+          aria-label={`Open photos of ${title}`}
           onClick={() => openAt(0)}
-          className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/90 px-3.5 py-2 text-xs font-semibold text-foreground shadow-card-hover transition-colors hover:bg-white"
+          className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/90 px-3.5 py-2 text-xs font-medium text-foreground shadow-card-hover transition-colors hover:bg-white"
         >
           <LayoutGrid className="h-3.5 w-3.5" />
           Show all photos

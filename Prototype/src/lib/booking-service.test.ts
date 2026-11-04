@@ -11,7 +11,9 @@ const details={fullName:"Audit Traveller",email:"audit@example.test",phone:"+256
 const base={id:"listing-1",businessId:"business-1",title:"Audit listing",status:"PUBLISHED",business:{verificationStatus:"APPROVED"},basePriceMinor:100000};
 const item={id:"cart-1",listingId:"listing-1",title:"Audit listing",type:"tour",participants:2,startDate:"2099-12-05",addOnIds:[],totalMinor:200000,fulfilment:{pickup:"Entebbe airport",dropoff:"Kampala hotel"}} satisfies CartItem;
 describe("Reservation service regressions",()=>{
+ afterAll(()=>{delete process.env.SAFARINEXA_DEMO_MODE;});
  beforeEach(()=>{
+  process.env.SAFARINEXA_DEMO_MODE="false";
   jest.clearAllMocks();
   (db.$transaction as jest.Mock).mockImplementation(fn=>fn(tx));
   tx.availability.findUnique.mockResolvedValue(null);
@@ -32,6 +34,19 @@ describe("Reservation service regressions",()=>{
   tx.listing.findUnique.mockResolvedValue({...base,type:"TOUR",bookingMode:"REQUEST",tour:{groupSizeMin:1,groupSizeMax:6}});
   const result=await validateAndReserveBookings("customer-1",[item],details);
   expect(result.bookings[0].status).toBe("AWAITING_BUSINESS_CONFIRMATION");expect(result.bookings[0].responseDueAt).toBeInstanceOf(Date);expect(tx.notification.createMany).toHaveBeenCalled();
+ });
+ it("collects payment at checkout for request listings in demo mode",async()=>{
+  process.env.SAFARINEXA_DEMO_MODE="true";
+  tx.listing.findUnique.mockResolvedValue({...base,type:"TOUR",bookingMode:"REQUEST",tour:{groupSizeMin:1,groupSizeMax:6}});
+  const result=await validateAndReserveBookings("customer-1",[item],details,true);
+  expect(result.bookings[0]).toEqual(expect.objectContaining({bookingMode:"INSTANT",status:"PENDING_PAYMENT",totalMinor:200000}));
+  expect(tx.order.create).toHaveBeenCalledWith({data:expect.objectContaining({status:"PENDING_PAYMENT"})});
+ });
+ it("allows payment for a demo cart containing a restaurant reservation",async()=>{
+  process.env.SAFARINEXA_DEMO_MODE="true";
+  tx.listing.findUnique.mockResolvedValueOnce({...base,type:"TOUR",bookingMode:"REQUEST",tour:{groupSizeMin:1,groupSizeMax:6}}).mockResolvedValueOnce({...base,id:"restaurant-1",type:"RESTAURANT",restaurant:{acceptsReservationRequests:true,seatingCapacity:10,openingHours:{summary:"Daily · 08:00 - 22:00"}}});
+  await validateAndReserveBookings("customer-1",[item,{...item,listingId:"restaurant-1",type:"restaurant",time:"12:00"}],details,true);
+  expect(tx.order.create).toHaveBeenCalledWith({data:expect.objectContaining({status:"PENDING_PAYMENT",totalMinor:200000})});
  });
  it("requires pickup and dropoff before reserving transport",async()=>{
   tx.listing.findUnique.mockResolvedValue({...base,type:"TRANSPORT",transport:{capacity:6,pricingModel:"Fixed fare per trip"}});

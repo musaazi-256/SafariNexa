@@ -26,6 +26,19 @@ export async function updateBusinessProfile(formData: FormData) {
     throw new Error("Missing required fields");
   }
 
+  const images: {logoUrl?: string | null; coverImageUrl?: string | null} = {};
+  for (const field of ["logoUrl", "coverImageUrl"] as const) {
+    if (!formData.has(field)) continue;
+    const value = String(formData.get(field) ?? "").trim();
+    if (value && value !== business[field]) {
+      const filename = value.match(/^\/api\/images\/([a-f0-9-]{36}\.(?:jpg|png|webp))$/)?.[1];
+      const upload = filename ? await db.listingImageUpload.findUnique({where:{filename}}) : null;
+      if (upload?.uploadedBy !== session.user.id) throw new Error("Upload an image from your account before saving.");
+    }
+    images[field] = value || null;
+  }
+  const contactFields = Object.fromEntries(["registrationNumber", "contactName", "contactRole"].filter(field => formData.has(field)).map(field => [field, String(formData.get(field) ?? "").trim() || null]));
+
   await db.businessProfile.update({
     where: { id: businessId },
     data: {
@@ -36,6 +49,8 @@ export async function updateBusinessProfile(formData: FormData) {
       city,
       country: country || "Uganda",
       description,
+      ...images,
+      ...contactFields,
     },
   });
 
@@ -52,4 +67,7 @@ export async function updateBusinessProfile(formData: FormData) {
 
   revalidatePath("/business/(portal)/settings", "page");
   revalidatePath("/business/(portal)/profile", "page");
+  revalidatePath("/business/dashboard");
+  revalidatePath("/profile/messages");
+  revalidatePath("/admin/businesses");
 }

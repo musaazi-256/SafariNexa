@@ -6,7 +6,7 @@ export default function BusinessOnboardingLayout({ children }: { children: React
   return (
     <div className="flex min-h-screen flex-col bg-[#FBFAF5]">
       <header className="flex h-16 shrink-0 items-center border-b bg-background px-6">
-        <Link href="/" className="flex items-center gap-2 font-bold text-primary">
+        <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
           <Logo size="md" />
         </Link>
       </header>

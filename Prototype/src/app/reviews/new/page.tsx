@@ -65,7 +65,7 @@ export default async function NewReviewPage({ searchParams }: { searchParams: { 
       <main>
         <Container className="pb-20 pt-6">
           <Breadcrumbs items={[{ label: "My bookings", href: "/bookings" }, { label: "Write a review" }]} />
-          <h1 className="mb-6 text-3xl font-extrabold">Leave a verified review</h1>
+          <h1 className="mb-6 text-3xl font-semibold">Leave a verified review</h1>
 
           {isEligible ? (
             <div className="max-w-lg">

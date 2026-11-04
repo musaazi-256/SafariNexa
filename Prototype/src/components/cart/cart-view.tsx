@@ -47,22 +47,22 @@ export function CartView() {
             </>
           )}
           <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
-          <span className="text-slate-900 font-bold">Cart</span>
+          <span className="text-slate-900 font-semibold">Cart</span>
         </div>
 
         {/* Page Title */}
-        <h1 className="mb-8 text-3xl font-extrabold sm:text-4xl text-[#0d5932] tracking-tight">
+        <h1 className="type-page mb-8 text-[#0d5932]">
           Cart
         </h1>
 
         {totalItems === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-16 text-center shadow-sm">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-white p-16 text-center shadow-sm">
             <ShoppingCart className="mb-6 h-16 w-16 text-slate-300 opacity-60" />
-            <h2 className="mb-3 text-2xl font-bold text-slate-900">Your cart is empty</h2>
-            <p className="mb-8 text-slate-500 max-w-md text-sm">
+            <h2 className="mb-3 text-2xl font-semibold text-slate-900">Your cart is empty</h2>
+            <p className="mb-8 text-slate-500 max-w-md text-sm leading-relaxed">
               Looks like you haven&apos;t added any trips, accommodations, or activities to your cart yet.
             </p>
-            <Button size="lg" className="bg-[#0d5932] hover:bg-[#0a4526] text-white font-bold rounded-full px-8" asChild>
+            <Button size="lg" className="bg-[#0d5932] hover:bg-[#0a4526] text-white font-medium rounded-full px-8" asChild>
               <Link href="/explore">Start Exploring</Link>
             </Button>
           </div>
@@ -75,7 +75,7 @@ export function CartView() {
                 const numNights = isMultiNight ? nightsBetween(item.startDate!, item.endDate!) : 0;
 
                 return (
-                  <div key={item.id} className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm transition-all hover:shadow-md">
+                  <div key={item.id} className="rounded-2xl border border-border bg-white p-6 shadow-sm transition-all hover:shadow-md">
                     <div className="flex flex-col sm:flex-row gap-5">
                       {/* Thumbnail Image */}
                       {item.image ? (
@@ -93,16 +93,16 @@ export function CartView() {
                         <div>
                           <div className="flex items-start justify-between gap-4">
                             <div>
-                              <span className="text-xs font-bold tracking-wider text-[#0d5932] uppercase">
+                              <span className="text-xs font-medium tracking-wider text-[#0d5932] uppercase">
                                 {item.type}
                               </span>
-                              <h2 className="text-xl font-extrabold text-slate-900 line-clamp-1 mt-0.5">
+                              <h2 className="text-xl font-semibold text-slate-900 line-clamp-1 mt-0.5">
                                 {item.title}
                               </h2>
                             </div>
 
                             <div className="text-right shrink-0 hidden sm:block">
-                              <span className="text-xl font-extrabold text-slate-900">
+                              <span className="text-xl font-semibold text-slate-900">
                                 {formatUGX(item.totalMinor)}
                               </span>
                             </div>
@@ -112,7 +112,7 @@ export function CartView() {
                             {isMultiNight && (
                               <p className="flex items-center gap-2 font-medium">
                                 <span className="font-semibold text-slate-700">Dates:</span> {item.startDate} to {item.endDate}
-                                <span className="inline-block rounded-full bg-slate-100 px-3 py-0.5 text-xs font-bold text-slate-700">
+                                <span className="inline-block rounded-full bg-slate-100 px-3 py-0.5 text-xs font-medium text-slate-700">
                                   {numNights} night{numNights > 1 ? "s" : ""}
                                 </span>
                               </p>
@@ -137,7 +137,7 @@ export function CartView() {
                         </div>
 
                         <div className="sm:hidden mt-3">
-                          <span className="text-lg font-extrabold text-slate-900">{formatUGX(item.totalMinor)}</span>
+                          <span className="text-lg font-semibold text-slate-900">{formatUGX(item.totalMinor)}</span>
                         </div>
                       </div>
                     </div>
@@ -150,7 +150,7 @@ export function CartView() {
                       <div className="flex items-center gap-4">
                         <button
                           onClick={() => setEditingItem(item)}
-                          className="flex items-center gap-1.5 text-sm font-bold text-[#0d5932] hover:text-[#0a4526] transition-colors"
+                          className="flex items-center gap-1.5 text-sm font-medium text-[#0d5932] hover:text-[#0a4526] transition-colors"
                         >
                           <Pencil className="h-4 w-4" />
                           Edit
@@ -166,7 +166,7 @@ export function CartView() {
 
                       <Button
                         onClick={() => router.push(`/checkout/multi?itemId=${item.id}`)}
-                        className="bg-[#0d5932] hover:bg-[#0a4526] text-white font-bold rounded-full px-6 h-10 text-sm shadow-sm"
+                        className="bg-[#0d5932] hover:bg-[#0a4526] text-white font-medium rounded-full px-6 h-10 text-sm shadow-sm"
                       >
                         Only checkout this
                       </Button>
@@ -178,14 +178,14 @@ export function CartView() {
 
             {/* Right Summary Sidebar */}
             <div>
-              <div className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sticky top-28">
-                <h2 className="text-lg font-bold text-slate-900 mb-4">Booking summary</h2>
+              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm sticky top-28">
+                <h2 className="text-lg font-semibold text-slate-900 mb-4">Booking summary</h2>
                 
                 <div className="border-t border-slate-100 pt-4 mb-4 space-y-3">
                   {items.map((item) => (
                     <div key={item.id}>
-                      <p className="font-bold text-sm text-slate-900 truncate">{item.title}</p>
-                      <p className="text-xs text-slate-400 font-medium">
+                      <p className="font-medium text-sm text-slate-900 truncate leading-relaxed">{item.title}</p>
+                      <p className="text-xs text-slate-500 font-medium">
                         {item.roomTypeName || (item.type === "ACCOMMODATION" ? "Accommodation" : item.type)}
                       </p>
                     </div>
@@ -194,16 +194,16 @@ export function CartView() {
 
                 <div className="border-t border-slate-100 pt-4">
                   <div className="flex items-center justify-between text-slate-900 mb-1">
-                    <span className="text-base font-bold">Total</span>
-                    <span className="text-xl font-extrabold">{formatUGX(getTotalMinor())}</span>
+                    <span className="text-base font-semibold">Total</span>
+                    <span className="text-xl font-semibold">{formatUGX(getTotalMinor())}</span>
                   </div>
-                  <p className="text-xs text-slate-400 font-medium mb-6">
+                  <p className="text-xs text-slate-500 font-medium mb-6">
                     See rooms and total breakdown to the left
                   </p>
 
                   <Button
                     onClick={() => router.push("/checkout/multi")}
-                    className="w-full bg-[#0d5932] hover:bg-[#0a4526] text-white font-bold h-12 rounded-full text-base shadow-sm"
+                    className="w-full bg-[#0d5932] hover:bg-[#0a4526] text-white font-medium h-12 rounded-full text-base shadow-sm"
                   >
                     Checkout Now
                   </Button>

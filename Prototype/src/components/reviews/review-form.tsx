@@ -37,7 +37,7 @@ export function ReviewForm({
               name="rating"
               defaultValue={5}
               required
-              className="flex h-11 w-full rounded-xl border border-input bg-card px-3.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="form-control flex w-full text-foreground"
             >
               {RATING_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>

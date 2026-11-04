@@ -1,10 +1,12 @@
+import { StatCard, StatGrid } from "@/components/ui/stat-card";
+import { ListingStatusBadge, ListingSubmissionStatusBadge } from "@/components/ui/status-badge";
 import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
 import { submitListing } from "@/lib/actions/listing-review";
 import { redirect } from "next/navigation";
 import type { ListingType } from "@prisma/client";
 import { 
-  List, Hourglass, Eye, Calendar, Utensils, Bed, Tent, Car, 
+  Archive, List, Hourglass, Eye, Calendar, Utensils, Bed, Tent, Car,
   MapPin, Filter, ArrowUpDown, Pencil, MoreVertical, Plus 
 } from "lucide-react";
 
@@ -133,84 +135,21 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
           title="Listings"
           description="Create and manage your service offerings."
         />
-        <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md h-10 px-5 font-semibold shrink-0">
+        <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md h-10 px-5 font-medium shrink-0">
           <Link href="/business/listings/new"><Plus className="h-4 w-4 mr-2" /> Create listing</Link>
         </Button>
       </div>
 
       {/* Stat Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Total Listings */}
-        <Card className="rounded-2xl shadow-sm border-slate-100 flex flex-col justify-between">
-          <CardContent className="pt-6 pb-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-slate-500">Total listings</p>
-              <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
-                <List className="h-4 w-4 text-green-600" />
-              </div>
-            </div>
-            <p className="text-3xl font-extrabold text-slate-900">{totalListingsCount}</p>
-            <div className="mt-auto pt-4 flex items-center justify-between text-sm font-semibold">
-              <span className="text-slate-500">Published</span>
-              <span className="text-primary">{publishedCount}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Unpublished */}
-        <Card className="rounded-2xl shadow-sm border-slate-100 flex flex-col justify-between">
-          <CardContent className="pt-6 pb-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-slate-500">Unpublished</p>
-              <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center">
-                <Hourglass className="h-4 w-4 text-orange-500" />
-              </div>
-            </div>
-            <p className="text-3xl font-extrabold text-slate-900">{totalListingsCount - publishedCount}</p>
-            <div className="mt-auto pt-4 flex items-center justify-between text-sm font-semibold">
-              <span className="text-slate-500">Draft</span>
-              <span className="text-orange-500">{draftCount}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Views this month */}
-        <Card className="rounded-2xl shadow-sm border-slate-100 flex flex-col justify-between">
-          <CardContent className="pt-6 pb-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-slate-500">Archived listings</p>
-              <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
-                <Eye className="h-4 w-4 text-blue-500" />
-              </div>
-            </div>
-            <p className="text-3xl font-extrabold text-slate-900">{archivedCount}</p>
-            <div className="mt-auto pt-4 flex items-center gap-1.5">
-              <span className="text-xs font-bold text-primary">Not published</span>
-              <span className="text-xs text-slate-500 font-medium">Live database count</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Bookings this month */}
-        <Card className="rounded-2xl shadow-sm border-slate-100 flex flex-col justify-between">
-          <CardContent className="pt-6 pb-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-slate-500">Bookings this month</p>
-              <div className="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center">
-                <Calendar className="h-4 w-4 text-purple-500" />
-              </div>
-            </div>
-            <p className="text-3xl font-extrabold text-slate-900">{monthBookings}</p>
-            <div className="mt-auto pt-4 flex items-center gap-1.5">
-              <span className="text-xs font-bold text-primary">Created this month</span>
-              <span className="text-xs text-slate-500 font-medium">vs last month</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <StatGrid>
+        <StatCard label="Total listings" value={totalListingsCount} description={String(publishedCount)+" currently published"} icon={List} />
+        <StatCard label="Draft listings" value={draftCount} description="Not published; may include submitted drafts" icon={Hourglass} help="Listings whose publication status is Draft. Review progress is tracked separately in Submission & feedback." />
+        <StatCard label="Archived listings" value={archivedCount} description="Archived and unavailable for new bookings" icon={Archive} />
+        <StatCard label="Bookings this month" value={monthBookings} description="Bookings created this calendar month" icon={Calendar} href="/business/bookings" actionLabel="View bookings" />
+      </StatGrid>
 
       {/* Tabs & Filters */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-4 mt-8">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border pb-4 mt-8">
         <FilterTabs
           activeValue={activeType ?? "ALL"}
           tabs={TABS.map((tab) => ({
@@ -228,37 +167,37 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
       {listings.length === 0 ? (
         <EmptyState title="No listings found" description="You don't have any listings in this category yet." />
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div>
           <Table>
-            <TableHeader className="bg-slate-50 border-b border-slate-200">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-slate-600 h-12">
-                  <div className="flex items-center gap-2">Listing <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" /></div>
+            <TableHeader>
+              <TableRow>
+                <TableHead>
+                  <div className="flex items-center gap-2">Listing</div>
                 </TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12">
-                  <div className="flex items-center gap-2">Type <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" /></div>
+                <TableHead>
+                  <div className="flex items-center gap-2">Type</div>
                 </TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12">
-                  <div className="flex items-center gap-2">Location <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" /></div>
+                <TableHead>
+                  <div className="flex items-center gap-2">Location</div>
                 </TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12">
-                  <div className="flex items-center gap-2">Price <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" /></div>
+                <TableHead>
+                  <div className="flex items-center gap-2">Price</div>
                 </TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12">
-                  <div className="flex items-center gap-2">Status <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" /></div>
+                <TableHead>
+                  <div className="flex items-center gap-2">Status</div>
                 </TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12">
-                  <div className="flex items-center gap-2">Updated <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" /></div>
+                <TableHead>
+                  <div className="flex items-center gap-2">Updated</div>
                 </TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12 text-right">Actions</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {listings.map((listing) => (
-                <TableRow key={listing.id} className="border-b border-slate-100 hover:bg-slate-50/50 group">
-                  <TableCell className="py-4">
+                <TableRow key={listing.id} className="group">
+                  <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 shrink-0 rounded-lg bg-slate-100 overflow-hidden shadow-sm border border-slate-200/60">
+                      <div className="h-12 w-12 shrink-0 rounded-lg bg-slate-100 overflow-hidden shadow-sm border border-border/60">
                         {listing.coverImageUrl ? (
                           <RemoteImage src={listing.coverImageUrl} alt="" className="h-full w-full object-cover" />
                         ) : (
@@ -266,8 +205,8 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                         )}
                       </div>
                       <div className="min-w-0 flex flex-col">
-                        <p className="font-bold text-slate-900 truncate">{listing.title}</p>
-                        <p className="text-xs text-slate-500 font-medium">
+                        <p className="font-normal text-slate-700 truncate">{listing.title}</p>
+                        <p className="text-xs text-slate-500 font-normal">
                           {listing.type.substring(0,3).toUpperCase()}-{listing.id.slice(-4).toUpperCase()}
                         </p>
                       </div>
@@ -275,47 +214,35 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                   </TableCell>
                   
                   <TableCell>
-                    <div className="flex items-center gap-2 font-medium text-slate-700 capitalize">
+                    <div className="flex items-center gap-2 font-normal text-slate-700 capitalize">
                       {getTypeIcon(listing.type)}
                       {listing.type.toLowerCase()}
                     </div>
                   </TableCell>
                   
                   <TableCell>
-                    <div className="flex items-center gap-2 font-medium text-slate-700">
+                    <div className="flex items-center gap-2 font-normal text-slate-700">
                       <MapPin className="h-4 w-4 shrink-0 text-slate-500" />
                       {listing.city ?? "—"}
                     </div>
                   </TableCell>
                   
-                  <TableCell className="font-medium text-slate-900">
+                  <TableCell className="font-normal">
                     {formatUGX(listing.basePriceMinor)}
                   </TableCell>
                   
                   <TableCell>
-                    <div className="flex items-center gap-2 font-bold text-[11px] tracking-wider uppercase">
-                      <div className={cn(
-                        "h-2 w-2 rounded-full",
-                        listing.status === "PUBLISHED" ? "bg-primary" :
-                        listing.status === "DRAFT" ? "bg-orange-500" : "bg-slate-400"
-                      )} />
-                      <span className={
-                        listing.status === "PUBLISHED" ? "text-primary" :
-                        listing.status === "DRAFT" ? "text-orange-600" : "text-slate-500"
-                      }>
-                        {listing.status}
-                      </span>
-                    </div>
-                    <Link href={`/business/listings/${listing.id}/review`} className="mt-2 block text-xs underline">{listing.submissions[0]?.status.replaceAll("_", " ") || "Not submitted"} · Submission & feedback</Link>
+                    <ListingStatusBadge status={listing.status} />
+                    <Link href={`/business/listings/${listing.id}/review`} className="mt-2 block text-xs underline"><ListingSubmissionStatusBadge status={listing.submissions[0]?.status || "NOT_SUBMITTED"} /> <span className="ml-1">Submission & feedback</span></Link>
                   </TableCell>
 
-                  <TableCell className="text-sm font-medium text-slate-600">
+                  <TableCell className="font-normal">
                     {getRelativeDate(listing.updatedAt)}
                   </TableCell>
 
-                  <TableCell className="text-right py-4">
+                  <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Button asChild size="sm" variant="outline" className="h-8 font-semibold text-slate-700 bg-white">
+                      <Button asChild size="sm" variant="outline" className="h-8 font-normal text-slate-700 bg-white">
                         <Link href={`/business/listings/${listing.id}/edit`}>
                           <Pencil className="h-3.5 w-3.5 mr-2 text-slate-400" /> Edit
                         </Link>
@@ -327,22 +254,22 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40 font-medium text-sm">
+                        <DropdownMenuContent align="end" className="w-40 font-normal text-sm">
                           {listing.status === "PUBLISHED" ? (
                             <form action={setListingStatus}>
                               <input type="hidden" name="listingId" value={listing.id} />
                               <input type="hidden" name="status" value="DRAFT" />
                               <DropdownMenuItem asChild>
-                                <button type="submit" className="w-full cursor-pointer">Unpublish</button>
+                                <Button variant="ghost" type="submit" className="w-full cursor-pointer">Unpublish</Button>
                               </DropdownMenuItem>
                             </form>
                           ) : (
                             <form action={submitListing}>
                               <input type="hidden" name="listingId" value={listing.id} />
                               <DropdownMenuItem asChild>
-                                <button type="submit" className="w-full cursor-pointer text-primary" disabled={business.verificationStatus !== "APPROVED" || listing.status !== "DRAFT" || ["SUBMITTED", "UNDER_REVIEW"].includes(listing.submissions[0]?.status || "")}>
+                                <Button variant="ghost" type="submit" className="w-full cursor-pointer text-primary" disabled={business.verificationStatus !== "APPROVED" || listing.status !== "DRAFT" || ["SUBMITTED", "UNDER_REVIEW"].includes(listing.submissions[0]?.status || "")}>
                                   Submit for review
-                                </button>
+                                </Button>
                               </DropdownMenuItem>
                             </form>
                           )}
@@ -351,7 +278,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                             <input type="hidden" name="listingId" value={listing.id} />
                             <input type="hidden" name="status" value="DELETED" />
                             <DropdownMenuItem asChild>
-                              <button type="submit" className="w-full cursor-pointer text-red-600">Archive</button>
+                              <Button variant="ghost" type="submit" className="w-full cursor-pointer text-red-600">Archive</Button>
                             </DropdownMenuItem>
                           </form>
                         </DropdownMenuContent>
@@ -364,7 +291,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
           </Table>
 
           {/* Pagination */}
-          <div className="border-t border-slate-200 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
+          <div className="border-t border-border bg-slate-50/30 px-6 py-4 flex items-center justify-between">
             <span className="text-sm font-medium text-slate-500">
               Showing {((page - 1) * PAGE_SIZE) + 1} to {Math.min(page * PAGE_SIZE, totalFilteredCount)} of {totalFilteredCount} listings
             </span>

@@ -35,10 +35,12 @@ export function ListingTabs({
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              type="button"
+              aria-pressed={activeTab === tab.id}
               onClick={() => scrollTo(tab.id)}
               className={cn(
                 "relative h-full flex items-center px-1 text-muted-foreground hover:text-foreground transition-colors",
-                activeTab === tab.id && "text-blue-600 font-bold"
+                activeTab === tab.id && "text-blue-600 font-medium"
               )}
             >
               {tab.label}
@@ -51,7 +53,7 @@ export function ListingTabs({
         {actionLabel && actionTargetId && (
           <button
             onClick={() => scrollTo(actionTargetId)}
-            className="rounded-full bg-blue-600 px-6 py-2 text-sm font-bold text-white transition-colors hover:bg-blue-700"
+            className="rounded-full bg-blue-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
           >
             {actionLabel}
           </button>

@@ -48,7 +48,7 @@ export function UserMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full ring-offset-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+      <DropdownMenuTrigger aria-label="Account menu" className="rounded-full ring-offset-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
         <Avatar>
           {image ? <AvatarImage src={image} alt={name ?? "Account"} /> : null}
           <AvatarFallback>{initials(name, email)}</AvatarFallback>
@@ -84,7 +84,7 @@ export function UserMenu({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/notifications">
+          <Link href={isBusiness ? "/business/notifications" : "/notifications"}>
             <Bell className="h-4 w-4" />
             Notifications
             {unreadCount > 0 ? (

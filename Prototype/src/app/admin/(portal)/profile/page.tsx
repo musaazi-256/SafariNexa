@@ -39,7 +39,7 @@ export default async function AdminProfilePage() {
         description="Manage your personal admin account details and preferences."
       />
 
-      <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
+      <Card className="border-border shadow-card rounded-2xl overflow-hidden bg-white">
         <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-6 pt-8 px-8">
           <div className="flex items-center gap-4">
             <div className="h-16 w-16 rounded-full bg-primary/10 text-primary flex items-center justify-center border-2 border-white shadow-sm">
@@ -47,7 +47,7 @@ export default async function AdminProfilePage() {
             </div>
             <div>
               <CardTitle className="text-xl">{user.adminUser.displayName || "Admin User"}</CardTitle>
-              <CardDescription className="text-[13px] font-semibold text-slate-500 mt-1">
+              <CardDescription className="text-sm font-semibold text-slate-500 mt-1">
                 {user.adminUser.role.name}
               </CardDescription>
             </div>
@@ -56,20 +56,20 @@ export default async function AdminProfilePage() {
         <CardContent className="p-8">
           <form action={saveProfile} className="space-y-6 max-w-[500px]">
             <div className="space-y-2">
-              <Label htmlFor="email" className="font-semibold text-slate-700 flex items-center gap-2">
+              <Label htmlFor="email" className="font-medium text-slate-700 flex items-center gap-2">
                 <Mail className="h-4 w-4 text-slate-400" /> Email address
               </Label>
-              <Input 
-                id="email" 
-                value={user.email} 
-                disabled 
-                className="bg-slate-50 text-slate-500 border-slate-200" 
+              <Input
+                id="email"
+                value={user.email}
+                disabled
+                className="bg-slate-50 text-slate-500"
               />
-              <p className="text-xs text-slate-400 font-medium mt-1">Email cannot be changed directly.</p>
+              <p className="text-xs text-slate-500 font-medium mt-1">Email cannot be changed directly.</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="name" className="font-semibold text-slate-700 flex items-center gap-2">
+              <Label htmlFor="name" className="font-medium text-slate-700 flex items-center gap-2">
                 <User className="h-4 w-4 text-slate-400" /> Full name
               </Label>
               <Input
@@ -82,7 +82,7 @@ export default async function AdminProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone" className="font-semibold text-slate-700 flex items-center gap-2">
+              <Label htmlFor="phone" className="font-medium text-slate-700 flex items-center gap-2">
                 <Phone className="h-4 w-4 text-slate-400" /> Phone number
               </Label>
               <Input
@@ -95,7 +95,7 @@ export default async function AdminProfilePage() {
             </div>
 
             <div className="pt-4">
-              <Button type="submit" className="h-11 px-8 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-sm transition-all">
+              <Button type="submit" className="h-11 px-8 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm transition-all">
                 Save changes
               </Button>
             </div>

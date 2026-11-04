@@ -36,7 +36,7 @@ export default async function AccommodationPage({ searchParams }: { searchParams
             title="Find verified stays"
             description="Browse lodges, boutique hotels, and tented camps as a guest. Booking starts the protected authentication flow — search and comparison stay open."
           />
-          <p className="mb-4 text-sm text-muted-foreground">{totalCount} verified stays</p>
+          <p className="mb-4 text-sm text-muted-foreground leading-relaxed">{totalCount} verified stays</p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {listings.map((listing) => {
               const { average, count } = ratingSummary(listing.reviews);

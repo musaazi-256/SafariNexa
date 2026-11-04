@@ -4,7 +4,7 @@ import { MapPin, ShieldCheck, Star } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ScoreBadge } from "@/components/ui/rating";
+import { scoreLabel, ScoreBadge } from "@/components/ui/rating";
 import { Button } from "@/components/ui/button";
 import { RoomPreviewModal } from "@/components/rooms/room-preview-modal";
 
@@ -44,26 +44,26 @@ export function ListingRow({
   return (
     <Card className="group relative flex flex-col overflow-hidden transition-shadow hover:shadow-card-hover sm:flex-row p-4 gap-5">
       <Link href={href} className="absolute inset-0 z-10" aria-label={title} />
-      <div className={`relative h-[210px] shrink-0 sm:w-[300px] overflow-hidden rounded-[14px] ${imageUrl ? "" : "bg-gradient-to-br from-brand-green to-[#062617]"}`}>
-        {imageUrl ? <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 300px" className="object-cover transition-transform duration-500 group-hover:scale-105" /> : null}
+      <div className={`relative h-[210px] shrink-0 sm:w-[300px] overflow-hidden rounded-xl ${imageUrl ? "" : "bg-gradient-to-br from-brand-green to-[#062617]"}`}>
+        {imageUrl ? <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 300px" className="object-cover" /> : null}
         <Badge className="absolute left-3 top-3 border-transparent bg-white/90 text-[#0B4928]">{type}</Badge>
       </div>
-      <div className="flex min-w-0 flex-1 flex-col py-1">
+      <div className="flex flex-1 flex-col py-1">
         <div className="flex flex-col items-start gap-1">
-          <h3 className="text-[20px] font-bold leading-tight text-foreground">{title}</h3>
-          <p className="flex items-center gap-1 text-[13px] font-medium text-muted-foreground">
+          <h3 className="text-xl font-semibold leading-tight text-slate-800">{title}</h3>
+          <p className="flex items-center gap-1 text-sm font-medium text-muted-foreground leading-relaxed">
             <MapPin className="h-3.5 w-3.5" />
             {location}
           </p>
-          {typeof rating === "number" ? (
-            <div className="flex items-center gap-1 text-[13px] font-medium mt-1">
+          {typeof rating === "number" && (reviewCount ?? 0) > 0 ? (
+            <div className="flex items-center gap-1 text-sm font-medium mt-1">
               <Star className="h-3.5 w-3.5 fill-[#FFCE06] text-[#FFCE06]" />
-              <span className="font-bold text-foreground">{rating.toFixed(1)}</span>
-              <span className="text-muted-foreground">· Very good · {reviewCount ?? 0} {reviewCount === 1 ? 'review' : 'reviews'}</span>
+              <span className="font-semibold text-foreground">{rating.toFixed(1)}</span>
+              <span className="text-muted-foreground">· {scoreLabel(rating)} · {reviewCount ?? 0} {reviewCount === 1 ? 'review' : 'reviews'}</span>
             </div>
           ) : null}
         </div>
-        <p className="text-[14px] leading-relaxed text-muted-foreground mt-3 line-clamp-2">{description}</p>
+        <p className="text-sm leading-relaxed text-muted-foreground mt-3 line-clamp-2">{description}</p>
         <div className="mt-3">
         {tags?.includes("Verified partner") ? (
           <Badge variant="success-soft" className="w-fit border-transparent">
@@ -80,12 +80,12 @@ export function ListingRow({
           </div>
         ) : null}
          </div>
-        <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-4">
+        <div className="mt-auto pt-4 flex items-end justify-between">
           <div>
-            <div className="flex flex-wrap items-baseline gap-1">
-              <strong className="text-[20px] font-extrabold text-foreground">{price}</strong>
-              {!price.includes("/") ? (
-                <span className="text-[13px] text-muted-foreground">
+            <div className="flex items-baseline gap-1">
+              <strong className="text-xl font-semibold text-slate-800">{price}</strong>
+              {!price.includes("/") && type !== "Restaurant" && /\d/.test(price) ? (
+                <span className="text-sm text-muted-foreground">
                   {type === "Guide" ? "/ hr" : type === "Transport" ? "/ trip" : type === "Accommodation" ? "/ night" : "/ person"}
                 </span>
               ) : null}

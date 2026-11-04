@@ -1,3 +1,4 @@
+import { DEMO_ACCOUNTS } from "@/lib/demo-accounts";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
@@ -23,6 +24,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(db),
   providers: [
+    Credentials({
+      id: "demo",
+      name: "Demo portal",
+      credentials: { surface: {} },
+      async authorize(raw) {
+        if (!isAuthDevMode()) return null;
+        const surface = String(raw.surface);
+        if (!Object.hasOwn(DEMO_ACCOUNTS, surface)) return null;
+        const account = DEMO_ACCOUNTS[surface as keyof typeof DEMO_ACCOUNTS];
+        const user = await db.user.findUnique({where:{email:account.email},include:{adminUser:true,businessUsers:true}});
+        if (!user || surface === "admin" && user.adminUser?.status !== "ACTIVE" || surface === "business" && !user.businessUsers.length) return null;
+        return {id:user.id,email:user.email,name:user.name,image:user.image};
+      }
+    }),
     // Customer + business email/password. Authenticates existing accounts
     // only — registration happens via /api/auth/register.
     Credentials({

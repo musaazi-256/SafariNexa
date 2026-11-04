@@ -22,15 +22,15 @@ export function PreferencesForm({
   return (
     <form action={action} className="flex flex-col gap-6">
       <div>
-        <h2 className="text-lg font-bold">Notifications</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Choose the categories shown by default in your notification centre. This does not configure email or SMS delivery; individual category tabs still show their full history.</p>
+        <h2 className="text-lg font-semibold">Notifications</h2>
+        <p className="mt-1 text-sm text-muted-foreground leading-relaxed">Choose the categories shown by the My categories filter in your notification centre. All and Unread show every category. These preferences do not configure email or SMS delivery.</p>
         <div className="mt-4 grid sm:grid-cols-2 gap-4">
           {NOTIFICATION_TYPES.map((type: NotificationType) => (
             <label
               key={type}
-              className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-slate-200 px-4 py-3.5 text-sm has-[:checked]:border-[#1e613c] has-[:checked]:bg-[#1e613c]/5 transition-colors"
+              className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border px-4 py-3.5 text-sm has-[:checked]:border-[#1e613c] has-[:checked]:bg-[#1e613c]/5 transition-colors"
             >
-              <span className="font-bold text-slate-700">{NOTIFICATION_TYPE_LABELS[type]}</span>
+              <span className="font-semibold text-slate-700">{NOTIFICATION_TYPE_LABELS[type]}</span>
               <input type="checkbox" name={`notify_${type}`} defaultChecked={notify[type]} className="h-4 w-4 accent-[#1e613c]" />
             </label>
           ))}
@@ -40,8 +40,8 @@ export function PreferencesForm({
       <Separator />
 
       <div>
-        <h2 className="text-lg font-bold">Traveller defaults</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Pre-filled at checkout so you don&apos;t retype them each time.</p>
+        <h2 className="text-lg font-semibold">Traveller defaults</h2>
+        <p className="mt-1 text-sm text-muted-foreground leading-relaxed">Pre-filled at checkout so you don&apos;t retype them each time.</p>
         <div className="mt-4 flex flex-col gap-3">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="nationality">Nationality</Label>
@@ -54,7 +54,7 @@ export function PreferencesForm({
         </div>
       </div>
 
-      <Button type="submit" className="self-start bg-[#1e613c] hover:bg-[#164a2e] text-white font-bold h-11 px-6 rounded-lg shadow-sm">
+      <Button type="submit" className="self-start bg-[#1e613c] hover:bg-[#164a2e] text-white font-medium h-11 px-6 rounded-xl shadow-sm">
         Save preferences
       </Button>
     </form>

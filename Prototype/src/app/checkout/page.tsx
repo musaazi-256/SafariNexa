@@ -141,7 +141,7 @@ export default async function CheckoutPage({
             ]}
           />
 
-          <h1 className="mb-6 text-3xl font-extrabold">Checkout</h1>
+          <h1 className="type-page mb-6">Checkout</h1>
 
           {searchParams.error ? (
             <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm font-medium text-destructive">
@@ -263,8 +263,8 @@ export default async function CheckoutPage({
               </CardHeader>
               <CardContent className="flex flex-col gap-3">
                 <div>
-                  <p className="font-bold">{listing.title}</p>
-                  <p className="text-sm text-muted-foreground">{listing.city}</p>
+                  <p className="font-semibold">{listing.title}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{listing.city}</p>
                 </div>
                 <Separator />
                 {type === "accommodation" ? (
@@ -276,7 +276,7 @@ export default async function CheckoutPage({
                     </span>
                     <span className="font-semibold">UGX {(unitPriceMinor * tourParticipants).toLocaleString("en-UG")}</span>
                   </div>
-                ) : type === "restaurant" ? <p className="text-sm">Table reservation request — no online meal charge. The restaurant must confirm availability. Meals are paid separately.</p> : (
+                ) : type === "restaurant" ? <p className="text-sm leading-relaxed">Table reservation request — no online meal charge. The restaurant must confirm availability. Meals are paid separately.</p> : (
                   <>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Price</span>
@@ -289,7 +289,7 @@ export default async function CheckoutPage({
                 )}
                 <Separator />
                 <Button type="submit" size="lg" className="w-full">
-                  Submit and check booking status
+                  {type === "restaurant" ? "Request a table" : "Continue to payment"}
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
                   Booked by {session.user.name ?? session.user.email}

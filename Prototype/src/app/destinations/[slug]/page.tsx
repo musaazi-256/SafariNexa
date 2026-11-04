@@ -65,7 +65,7 @@ export default async function DestinationDetailPage({ params }: { params: { slug
           <Badge variant="secondary" className="mb-2">
             {destination.region}
           </Badge>
-          <h1 className="text-3xl font-extrabold sm:text-4xl">{destination.name}</h1>
+          <h1 className="text-3xl font-semibold sm:text-4xl">{destination.name}</h1>
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">{destination.description}</p>
 
           {destination.safetyNotes ? (
@@ -83,7 +83,7 @@ export default async function DestinationDetailPage({ params }: { params: { slug
 
             return (
               <section key={section.type} className="mt-12">
-                <h2 className="mb-4 text-xl font-bold">{section.heading}</h2>
+                <h2 className="mb-4 text-xl font-semibold">{section.heading}</h2>
                 <div className="flex flex-col gap-4">
                   {items.map((item) => (
                     <ListingRow key={item.id} {...item} />

@@ -823,20 +823,55 @@ async function main() {
     create: { name: "Super Admin", description: "Full platform access across verification, users, payments, and settings." }
   });
 
-  await db.role.upsert({
+  const supportAgentRole = await db.role.upsert({
     where: { name: "Support Agent" },
     update: {},
     create: { name: "Support Agent", description: "Handles support cases and read-only booking/payment visibility." }
   });
 
-  for (const key of ["businesses.manage", "users.manage", "payments.manage", "support.manage", "reviews.moderate"]) {
+  const financeManagerRole = await db.role.upsert({
+    where: { name: "Finance Manager" },
+    update: {},
+    create: { name: "Finance Manager", description: "Approves refunds and settles payouts." }
+  });
+
+  const verificationReviewerRole = await db.role.upsert({
+    where: { name: "Verification Reviewer" },
+    update: {},
+    create: { name: "Verification Reviewer", description: "Reviews business verification submissions and listing changes." }
+  });
+
+  const contentModeratorRole = await db.role.upsert({
+    where: { name: "Content Moderator" },
+    update: {},
+    create: { name: "Content Moderator", description: "Moderates customer reviews." }
+  });
+
+  // Permission levels: every key a non-Super-Admin role can actually be
+  // granted. "roles.manage" (defining permission levels themselves) is
+  // deliberately never granted below — only Super Admin can hold it, via the
+  // hardcoded role-name bypass in requireAdminSession(), not a RolePermission
+  // row, so a lower role can never escalate itself by editing its own grants.
+  for (const key of ["businesses.manage", "users.manage", "payments.manage", "support.manage", "reviews.moderate", "roles.manage"]) {
+    await db.permission.upsert({ where: { key }, update: {}, create: { key } });
+  }
+
+  async function grantPermission(roleId: string, key: string) {
     const permission = await db.permission.upsert({ where: { key }, update: {}, create: { key } });
     await db.rolePermission.upsert({
-      where: { roleId_permissionId: { roleId: superAdminRole.id, permissionId: permission.id } },
+      where: { roleId_permissionId: { roleId, permissionId: permission.id } },
       update: {},
-      create: { roleId: superAdminRole.id, permissionId: permission.id }
+      create: { roleId, permissionId: permission.id }
     });
   }
+
+  for (const key of ["businesses.manage", "users.manage", "payments.manage", "support.manage", "reviews.moderate", "roles.manage"]) {
+    await grantPermission(superAdminRole.id, key);
+  }
+  await grantPermission(supportAgentRole.id, "support.manage");
+  await grantPermission(financeManagerRole.id, "payments.manage");
+  await grantPermission(verificationReviewerRole.id, "businesses.manage");
+  await grantPermission(contentModeratorRole.id, "reviews.moderate");
 
   const adminUser = await db.user.upsert({
     where: { email: "admin@safarinexa.test" },
@@ -1750,12 +1785,7 @@ async function main() {
   });
 
   // --- More admin users, for admin/users --------------------------------------
-  const supportAgentRole = await db.role.upsert({
-    where: { name: "Support Agent" },
-    update: {},
-    create: { name: "Support Agent", description: "Handles support cases and read-only booking/payment visibility." }
-  });
-
+  // supportAgentRole already upserted above, alongside the other permission levels.
   const supportAgentUser = await db.user.upsert({
     where: { email: "agent.support@safarinexa.test" },
     update: {},

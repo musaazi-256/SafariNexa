@@ -18,7 +18,7 @@ export function AccountLayout({ children, eyebrow, title, description }: Account
     <>
       <LiveRefresh />
       <SiteHeader />
-      <main className="min-h-screen bg-muted/40 pb-16 pt-6 sm:pt-10">
+      <main className="bg-muted/10 min-h-screen pb-24 pt-8">
         <Container>
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-10">
             <aside className="w-full shrink-0 md:sticky md:top-24 md:w-64">
@@ -27,13 +27,13 @@ export function AccountLayout({ children, eyebrow, title, description }: Account
             <div className="flex-1 min-w-0">
               <div className="mb-8">
                 {eyebrow && (
-                  <p className="mb-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                  <p className="mb-2 type-eyebrow text-brand-green leading-relaxed">
                     {eyebrow}
                   </p>
                 )}
-                <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
+                <h1 className="type-page">{title}</h1>
                 {description && (
-                  <p className="mt-2 text-base text-muted-foreground max-w-2xl">
+                  <p className="mt-2 text-base text-muted-foreground max-w-2xl leading-relaxed">
                     {description}
                   </p>
                 )}

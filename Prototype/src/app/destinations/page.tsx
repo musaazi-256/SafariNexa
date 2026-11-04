@@ -49,13 +49,13 @@ export default async function DestinationsPage() {
                       )}
                     </div>
                     <CardContent className="pt-5">
-                      <p className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-primary">
+                      <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-primary">
                         <MapPin className="h-3.5 w-3.5" />
                         {destination.region}
                       </p>
-                      <h2 className="mt-1 text-lg font-bold">{destination.name}</h2>
+                      <h2 className="mt-1 text-lg font-semibold">{destination.name}</h2>
                       <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{destination.summary}</p>
-                      <p className="mt-3 text-xs font-semibold text-muted-foreground">{count} listings</p>
+                      <p className="mt-3 text-xs font-medium text-muted-foreground">{count} listings</p>
                     </CardContent>
                   </Card>
                 </Link>

@@ -12,10 +12,10 @@ const STEPS = [
 
 export function TripPlannerBanner() {
   return (
-    <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-green to-[#062617] p-8 text-white sm:p-12">
+    <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-brand-green to-[#062617] p-8 text-white sm:p-12">
       <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
-          <h2 className="text-2xl font-extrabold sm:text-3xl">Plan a full trip, not just one booking</h2>
+          <h2 className="text-2xl font-semibold sm:text-3xl">Plan a full trip, not just one booking</h2>
           <p className="mt-2 max-w-lg text-white/85">
             Browse verified stays, safaris, restaurants, and rides across Uganda. Compare freely — you only need an
             account when you&apos;re ready to book.
@@ -32,7 +32,7 @@ export function TripPlannerBanner() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 backdrop-blur sm:h-12 sm:w-12">
                   <step.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </span>
-                <span className="text-xs font-semibold">{step.label}</span>
+                <span className="text-xs font-medium">{step.label}</span>
               </div>
               {index < STEPS.length - 1 ? <span className="mx-1.5 mb-5 h-px w-6 border-t border-dashed border-white/40 sm:mx-2 sm:w-12" /> : null}
             </div>

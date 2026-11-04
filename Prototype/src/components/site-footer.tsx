@@ -1,3 +1,4 @@
+import { isDemoMode } from "@/lib/dev-mode";
 import Link from "next/link";
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Twitter } from "lucide-react";
 
@@ -52,10 +53,11 @@ export function SiteFooter() {
             in one marketplace.
           </p>
           <div className="mt-4 flex gap-2">
-            {SOCIALS.filter(social => social.href.startsWith("https://")).map((social) => (
+            {SOCIALS.map((social) => (
               <a
                 key={social.label}
-                href={social.href}
+                href={social.href.startsWith("https://") ? social.href : undefined}
+                aria-disabled={!social.href.startsWith("https://")}
                 aria-label={social.label}
                 className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
               >
@@ -67,7 +69,7 @@ export function SiteFooter() {
 
         {COLUMNS.map((column) => (
           <div key={column.title}>
-            <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">{column.title}</p>
+            <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground leading-relaxed">{column.title}</p>
             <ul className="mt-3 flex flex-col gap-2">
               {column.links.map((link) => (
                 <li key={link.href}>
@@ -81,7 +83,7 @@ export function SiteFooter() {
         ))}
 
         <div>
-          <p className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Contact us</p>
+          <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground leading-relaxed">Contact us</p>
           <ul className="mt-3 flex flex-col gap-2.5 text-sm text-foreground/80">
             <li className="flex items-center gap-2">
               <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -100,9 +102,10 @@ export function SiteFooter() {
       </Container>
       <div className="border-t border-border py-5 pb-[calc(68px+env(safe-area-inset-bottom))] md:pb-5">
         <Container className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} SafariNexa. Phase 1 MVP — East Africa marketplace.</p>
+          <p>© {new Date().getFullYear()} SafariNexa. East Africa marketplace.</p>
           <div className="flex items-center gap-4">
-            <p>Payment availability depends on connected providers. Verified businesses only.</p>
+            <p>Payments via mobile money & card. Verified businesses only.</p>
+            {isDemoMode() && <Link href="/demo/inbox" className="font-semibold text-foreground/70 hover:text-primary">Email inbox</Link>}
             <Link href="/docs" className="font-semibold text-foreground/70 hover:text-primary">
               Engineering docs
             </Link>

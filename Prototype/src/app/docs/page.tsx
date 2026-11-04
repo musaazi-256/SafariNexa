@@ -36,8 +36,8 @@ export default function DocsIndexPage() {
                       <FileText className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
-                      <h2 className="text-lg font-bold text-foreground">{DOC_META[slug].title}</h2>
-                      <p className="mt-1 text-sm text-muted-foreground">{DOC_META[slug].description}</p>
+                      <h2 className="text-lg font-semibold text-foreground">{DOC_META[slug].title}</h2>
+                      <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{DOC_META[slug].description}</p>
                     </div>
                     <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
                       Read <ArrowRight className="h-3.5 w-3.5" />

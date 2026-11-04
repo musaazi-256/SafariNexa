@@ -31,8 +31,8 @@ export function GuideProfile({
           <AvatarFallback className="text-base">{initials}</AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <p className="text-xs font-extrabold uppercase tracking-wide text-primary">Your guide</p>
-          <h3 className="text-lg font-bold">{name}</h3>
+          <p className="text-xs font-medium uppercase tracking-wide text-primary">Your guide</p>
+          <h3 className="text-lg font-semibold">{name}</h3>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{bio}</p>
           <div className="mt-3 flex flex-wrap gap-1.5">
             <Badge variant="secondary" className="gap-1">

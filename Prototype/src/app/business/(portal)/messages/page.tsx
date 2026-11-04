@@ -80,12 +80,6 @@ export default async function BusinessMessagesPage({
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 pb-20 font-sans">
-      <PageHero
-        variant="portal"
-        eyebrow="Business portal"
-        title="Messages"
-        description="Reply to customer questions and booking conversations."
-      />
       <MessageInbox
         initialThreads={threads.map(thread => ({...thread, messages: projectMessageReadState(thread.messages, session.user.id, thread.customerId)})) as any}
         businessUserId={session.user.id} 

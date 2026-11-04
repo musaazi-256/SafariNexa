@@ -1,3 +1,4 @@
+import { isDemoMode } from "@/lib/dev-mode";
 import { randomUUID } from "crypto";
 import fs from "fs/promises";
 import path from "path";
@@ -11,7 +12,7 @@ export async function POST(req:Request){
  const member=await db.businessUser.findFirst({where:{userId:session.user.id,role:{in:["OWNER","MANAGER"]}}});
  if(!member)return new Response("Only business owners and managers can upload listing images.",{status:403});
  if(req.headers.get("origin")&&req.headers.get("origin")!==new URL(process.env.AUTH_URL||process.env.NEXTAUTH_URL||req.url).origin)return new Response("Forbidden origin",{status:403});
- if(process.env.NODE_ENV==="production"&&!process.env.PUBLIC_IMAGE_DIRECTORY)return new Response("Persistent image storage is not configured.",{status:503});
+ if(!isDemoMode()&&process.env.NODE_ENV==="production"&&!process.env.PUBLIC_IMAGE_DIRECTORY)return new Response("Persistent image storage is not configured.",{status:503});
  if(Number(req.headers.get("content-length")||0)>6*1024*1024)return new Response("Image is too large.",{status:413});
  const form=await req.formData();const file=form.get("file");
  if(!(file instanceof File)||file.size<1||file.size>5*1024*1024)return new Response("Choose an image up to 5 MB.",{status:400});

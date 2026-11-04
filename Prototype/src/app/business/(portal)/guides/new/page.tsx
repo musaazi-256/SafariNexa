@@ -68,7 +68,7 @@ export default async function NewGuidePage() {
           { label: "Add guide", href: "/business/guides/new" }
         ]}
       />
-      <h1 className="mb-6 text-3xl font-extrabold">Add a new guide</h1>
+      <h1 className="type-page mb-6">Add a new guide</h1>
 
       <form action={createGuide} className="flex flex-col gap-6">
         <Card>
@@ -109,7 +109,7 @@ export default async function NewGuidePage() {
                 id="specialization"
                 name="specialization"
                 defaultValue="GENERAL"
-                className="flex h-11 w-full rounded-xl border border-input bg-card px-3.5 text-sm"
+                className="form-control flex w-full"
               >
                 <option value="GENERAL">General Guide</option>
                 <option value="DESTINATION_SPECIALIST">Destination Specialist</option>
@@ -122,7 +122,7 @@ export default async function NewGuidePage() {
                 id="destinationId"
                 name="destinationId"
                 defaultValue=""
-                className="flex h-11 w-full rounded-xl border border-input bg-card px-3.5 text-sm"
+                className="form-control flex w-full"
               >
                 <option value="">No specific destination</option>
                 {destinations.map((destination) => (

@@ -17,15 +17,15 @@
     --primary: 148 88% 25%; /* #087A3E */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 150 8% 96%;
+    --secondary: 45 30% 94%;
     --secondary-foreground: 148 74% 16%; /* #0B4928 — rich brand green used for section headings */
 
-    --muted: 150 8% 96%;
+    --muted: 42 24% 94%;
     --muted-foreground: 103 3% 42%; /* #6B6F68 */
 
     /* Gold is an accent for ratings/highlights only — never a default CTA background,
        and never paired with white text (see design system rules). */
-    --accent: 150 12% 94%; /* Neutral interaction surface; gold stays a brand highlight. */
+    --accent: 48 100% 51%; /* #FFCE06 accent gold */
     --accent-foreground: 150 10% 10%;
 
     --destructive: 0 75% 42%;
@@ -39,11 +39,11 @@
     --warning: 38 92% 50%;
     --warning-foreground: 150 10% 10%;
 
-    --border: 150 8% 88%;
-    --input: 150 8% 86%;
+    --border: 214 32% 91%; /* #E2E8F0 — quiet surface outlines */
+    --input: 215 20% 65%; /* #94A3B8 — distinguish editable fields */
     --ring: 146 82% 25%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
     --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -72,29 +72,15 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    overflow-wrap: break-word;
+    @apply bg-background text-foreground font-sans font-normal antialiased;
+    line-height: 1.5;
+    font-synthesis: none;
   }
 
-  main, .container, .grid > * {
-    min-width: 0;
-  }
-
-  input, select, textarea {
-    max-width: 100%;
-  }
-
-  :where(a, button, input, select, textarea, summary):focus-visible {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 3px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
+  input::placeholder,
+  textarea::placeholder {
+    color: hsl(var(--muted-foreground));
+    opacity: 1;
   }
 
   ::selection {
@@ -137,11 +123,11 @@
   }
 
   .card {
-    @apply rounded-xl border border-border bg-card text-card-foreground shadow-sm;
+    @apply rounded-2xl border border-border bg-card text-card-foreground shadow-card;
   }
 
   .button {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-transparent bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-transparent bg-gradient-to-r from-primary to-brand-green-dark px-[18px] text-sm font-medium text-primary-foreground shadow-sm transition-all duration-300 hover:shadow-md hover:opacity-90 active:scale-95;
   }
 
   .button.secondary {
@@ -167,4 +153,113 @@
       @apply grid-cols-3;
     }
   }
+}
+
+/* Dense portal tables: neutral surfaces, readable links, quiet status chips. */
+.data-table tbody a:not(.table-action):not([role="menuitem"]) {
+  color: #286047;
+  font-weight: 400;
+  text-decoration: underline;
+  text-decoration-color: #a8bfb2;
+  text-underline-offset: 3px;
+}
+.data-table tbody a:not(.table-action):hover {
+  color: #184a32;
+  text-decoration-color: currentColor;
+}
+.data-table tbody a:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.data-table [data-slot="badge"],
+.data-table [data-table-status] {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.data-table [data-table-status] svg,
+.data-table [data-table-status] > div {
+  opacity: 0.7;
+}
+.data-table tbody button:not([role="switch"]),
+.data-table .table-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 400;
+  box-shadow: none;
+  text-decoration: none;
+}
+.data-table .table-action { padding: 0 10px; white-space: nowrap; }
+.data-table tbody button:not([role="switch"]):hover,
+.data-table .table-action:hover { background: #f8fafc; border-color: #cbd5e1; color: #334155; }
+.data-table tbody td.tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* Status uses a small semantic dot so colour supports, rather than dominates, the label. */
+[data-status-tone]::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+[data-status-tone="success"]::before { background: #6b967b; }
+[data-status-tone="warning"]::before { background: #b39562; }
+[data-status-tone="destructive"]::before { background: #b67d7d; }
+[data-status-tone="default"]::before { background: #78918a; }
+
+/* Native controls follow the same keyboard and unavailable-state contract. */
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 3px;
+}
+button:disabled { cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) {
+  button, a[role="button"] { transition: none; animation: none; }
+}
+
+@layer components {
+  .form-control, .filter-select {
+    @apply h-11 min-w-0 w-full rounded-xl border border-input bg-background px-3 py-2 text-base font-normal text-foreground shadow-none transition-colors placeholder:text-muted-foreground hover:border-slate-500 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-muted-foreground disabled:opacity-60 md:text-sm;
+  }
+  .form-control-compact, .filter-select {
+    @apply md:h-9;
+  }
+  .form-textarea {
+    @apply min-h-28 min-w-0 w-full resize-y rounded-xl border border-input bg-background px-3 py-2.5 text-base font-normal leading-relaxed text-foreground shadow-none transition-colors placeholder:text-muted-foreground hover:border-slate-500 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/15 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-muted-foreground disabled:opacity-60 md:text-sm;
+  }
+  .form-control[aria-invalid="true"], .form-textarea[aria-invalid="true"], .filter-select[aria-invalid="true"] {
+    @apply border-destructive focus-visible:border-destructive focus-visible:ring-destructive/15;
+  }
+  .field-shell {
+    @apply flex h-11 min-w-0 items-center rounded-xl border border-input bg-background px-3 transition-colors hover:border-slate-500 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15;
+  }
+}
+
+/* Shared typography roles. Colours remain separate for light/image surfaces. */
+@layer components {
+  .type-display { @apply text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl; }
+  .type-page { @apply text-2xl font-semibold leading-tight tracking-tight sm:text-3xl; }
+  .type-section { @apply text-xl font-semibold leading-snug tracking-tight sm:text-2xl; }
+  .type-card { @apply text-lg font-semibold leading-snug tracking-tight; }
+  .type-body { @apply text-base font-normal leading-relaxed; }
+  .type-body-sm { @apply text-sm font-normal leading-relaxed; }
+  .type-label { @apply text-sm font-medium leading-5; }
+  .type-caption { @apply text-xs font-normal leading-5; }
+  .type-eyebrow { @apply text-xs font-medium uppercase leading-5 tracking-wider; }
 }

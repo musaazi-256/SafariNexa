@@ -59,8 +59,8 @@ export default async function ExplorePage() {
                       <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <category.icon className="h-5 w-5" />
                       </span>
-                      <p className="font-bold">{category.label}</p>
-                      <p className="text-sm text-muted-foreground">{count} listings</p>
+                      <p className="font-semibold">{category.label}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{count} listings</p>
                     </CardContent>
                   </Card>
                 </Link>
@@ -69,7 +69,7 @@ export default async function ExplorePage() {
           </div>
 
           <div className="mt-12 mb-6 flex items-end justify-between gap-4">
-            <h2 className="text-2xl font-extrabold">Popular right now</h2>
+            <h2 className="text-2xl font-semibold">Popular right now</h2>
             <Link href="/search" className="text-sm font-semibold text-primary hover:underline">
               Open full search
             </Link>
@@ -91,7 +91,7 @@ export default async function ExplorePage() {
           </div>
 
           <div className="mt-12 mb-6 flex items-end justify-between gap-4">
-            <h2 className="text-2xl font-extrabold">Browse by destination</h2>
+            <h2 className="text-2xl font-semibold">Browse by destination</h2>
             <Link href="/destinations" className="text-sm font-semibold text-primary hover:underline">
               All destinations
             </Link>
@@ -101,12 +101,12 @@ export default async function ExplorePage() {
               <Link key={destination.slug} href={`/destinations/${destination.slug}`}>
                 <Card className="h-full transition-shadow hover:shadow-card-hover">
                   <CardContent className="flex flex-col gap-1.5 pt-6">
-                    <p className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-primary">
+                    <p className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-primary">
                       <MapPin className="h-3.5 w-3.5" />
                       {destination.region}
                     </p>
-                    <p className="font-bold">{destination.name}</p>
-                    <p className="text-sm text-muted-foreground">{destination.summary}</p>
+                    <p className="font-semibold">{destination.name}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{destination.summary}</p>
                   </CardContent>
                 </Card>
               </Link>

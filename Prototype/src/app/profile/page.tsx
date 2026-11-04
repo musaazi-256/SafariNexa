@@ -85,16 +85,16 @@ export default async function ProfilePage() {
       title="Profile"
       description="Your identity, contact details, and account security."
     >
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         
         {/* Left Column: Forms */}
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader>
+        <div className="flex flex-col gap-8 order-2 lg:order-1">
+          <Card className="overflow-hidden border-border shadow-card rounded-2xl">
+            <CardHeader className="bg-muted/30 pb-4">
               <CardTitle className="text-xl">Account details</CardTitle>
-              <p className="text-sm text-muted-foreground">Update your name, phone number, and date of birth.</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">Update your name, phone number, and date of birth.</p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <EditProfileForm
                 name={user.name ?? ""}
                 phone={user.phone ?? ""}
@@ -105,20 +105,20 @@ export default async function ProfilePage() {
           </Card>
 
           {user.passwordHash ? (
-            <Card>
-              <CardHeader>
+            <Card className="overflow-hidden border-border shadow-card rounded-2xl">
+              <CardHeader className="bg-muted/30 pb-4">
                 <CardTitle className="text-xl">Password</CardTitle>
-                <p className="text-sm text-muted-foreground">Change the password you use to sign in.</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">Change the password you use to sign in.</p>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <ChangePasswordForm action={changePassword} />
               </CardContent>
             </Card>
           ) : (
-            <Card>
-              <CardHeader>
+            <Card className="overflow-hidden border-border shadow-card rounded-2xl">
+              <CardHeader className="bg-muted/30 pb-4">
                 <CardTitle className="text-xl">Password</CardTitle>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   This account signs in with Google only — there&apos;s no SafariNexa password to change.
                 </p>
               </CardHeader>
@@ -127,34 +127,34 @@ export default async function ProfilePage() {
         </div>
 
         {/* Right Column: Avatar Summary */}
-        <div>
-          <Card className="sticky top-24 text-center">
-            <CardContent className="flex flex-col items-center gap-4 pt-6">
-              <Avatar className="h-16 w-16 border border-border">
+        <div className="order-1 lg:order-2">
+          <Card className="sticky top-24 overflow-hidden border-border shadow-card rounded-2xl text-center">
+            <CardContent className="flex flex-col items-center gap-4 pt-10 pb-8">
+              <Avatar className="h-24 w-24 border-0 shadow-sm mt-4">
                 {user.image ? <AvatarImage src={user.image} alt={user.name ?? "Account"} /> : null}
-                <AvatarFallback className="bg-primary/10 text-xl font-semibold text-primary">
+                <AvatarFallback className="text-3xl font-semibold bg-[#E4F2E8] text-[#1e613c]">
                   {initials(user.name, user.email)}
                 </AvatarFallback>
               </Avatar>
               <div className="space-y-1 mb-2">
-                <p className="text-lg font-semibold">{user.name ?? "Traveller"}</p>
-                <p className="break-all text-sm text-muted-foreground">{user.email}</p>
+                <p className="text-xl font-semibold">{user.name ?? "Traveller"}</p>
+                <p className="text-sm font-medium text-slate-500 leading-relaxed">{user.email}</p>
               </div>
               
               <div className="mt-4 flex flex-col w-full text-left">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-t py-4 text-xs">
+                <div className="flex items-center justify-between text-sm border-t border-slate-100 py-4">
                   <div className="flex items-center gap-3">
-                    <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">Member since</span>
+                    <ShieldCheck className="h-4 w-4 text-[#1e613c]" />
+                    <span className="font-semibold text-slate-700">Member since</span>
                   </div>
-                  <span className="text-muted-foreground">
+                  <span className="text-slate-500 font-medium">
                     {user.createdAt.toLocaleDateString("en-UG", { dateStyle: "medium" })}
                   </span>
                 </div>
-                <div className="flex items-center gap-3 border-t py-4 text-xs">
+                <div className="flex items-center justify-between text-sm border-t border-slate-100 py-4 cursor-pointer hover:bg-slate-50 transition-colors -mx-6 px-6">
                   <div className="flex items-center gap-3">
-                    <Key className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{hasGoogle ? "Google connected" : "Email & password"}</span>
+                    <Key className="h-4 w-4 text-[#1e613c]" />
+                    <span className="font-semibold text-slate-700">{hasGoogle ? "Google connected" : "Email & password"}</span>
                   </div>
                 </div>
               </div>

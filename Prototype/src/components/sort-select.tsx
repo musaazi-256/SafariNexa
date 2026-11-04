@@ -23,12 +23,13 @@ export function SortSelect() {
     } else {
       params.set("sort", value);
     }
+    params.delete("page");
     router.push(`/search?${params.toString()}`);
   }
 
   return (
     <Select value={current} onValueChange={handleChange}>
-      <SelectTrigger className="w-40 max-w-full sm:w-48" aria-label="Sort search results">
+      <SelectTrigger className="h-11 md:h-9 w-40 max-w-full rounded-xl bg-white px-3.5 text-base md:text-sm font-medium text-slate-700 shadow-none transition-colors hover:border-slate-300 hover:bg-slate-50 sm:w-48" aria-label="Sort search results">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

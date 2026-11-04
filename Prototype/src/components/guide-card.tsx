@@ -49,16 +49,16 @@ export function GuideCard({
             <h3 className="truncate text-lg font-semibold text-foreground">{name}</h3>
             <div className="mt-2 flex items-center gap-1">
               {isTopGuide ? (
-                <Badge variant="accent" className="shrink-0 whitespace-nowrap px-1.5 py-0.5 text-[10px]">
+                <Badge variant="accent" className="shrink-0 whitespace-nowrap px-1.5 py-0.5 text-xs">
                   Top guide
                 </Badge>
               ) : null}
               {isVerified ? (
-                <Badge variant="success-soft" className="shrink-0 whitespace-nowrap px-1.5 py-0.5 text-[10px]">
+                <Badge variant="success-soft" className="shrink-0 whitespace-nowrap px-1.5 py-0.5 text-xs">
                   Verified
                 </Badge>
               ) : null}
-              {location ? <span className="min-w-0 flex-1 truncate text-[10px] text-muted-foreground">{location}</span> : null}
+              {location ? <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">{location}</span> : null}
             </div>
           </div>
         </div>
@@ -69,16 +69,16 @@ export function GuideCard({
           {rating || availabilityNote ? (
             <div className="flex items-center gap-3">
               {rating ? (
-                <span className="flex items-center gap-1 text-[13px] font-medium text-foreground">
+                <span className="flex items-center gap-1 text-sm font-medium text-foreground">
                   <Star className="h-3.5 w-3.5 fill-accent text-accent" />
                   {rating.toFixed(1)} {reviewCount ? `(${reviewCount})` : null}
                 </span>
               ) : null}
-              {availabilityNote ? <span className="text-[13px] font-medium text-success">{availabilityNote}</span> : null}
+              {availabilityNote ? <span className="text-sm font-medium text-success">{availabilityNote}</span> : null}
             </div>
           ) : null}
 
-          {hourlyRateMinor ? <p className="text-base font-semibold text-foreground">{formatUGX(hourlyRateMinor)} / hour</p> : null}
+          {hourlyRateMinor ? <p className="text-base font-semibold text-foreground leading-relaxed">{formatUGX(hourlyRateMinor)} / hour</p> : null}
         </div>
       </Card>
     </Link>

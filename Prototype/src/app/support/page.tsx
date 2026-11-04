@@ -1,3 +1,4 @@
+import { notifyAdmins } from "@/lib/admin-notifications";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LifeBuoy, Plus } from "lucide-react";
@@ -33,7 +34,8 @@ export default async function SupportPage() {
     const message = String(formData.get("message") ?? "").trim();
     if (!subject || !message) return;
 
-    const created = await db.supportCase.create({
+    const created = await db.$transaction(async tx => {
+    const record=await tx.supportCase.create({
       data: {
         caseRef: generateCaseRef(),
         openedByUserId: activeSession.user.id,
@@ -45,6 +47,9 @@ export default async function SupportPage() {
       }
     });
 
+    await notifyAdmins(tx,"support.manage",{type:"SUPPORT_UPDATE",title:"New support case",body:`${record.caseRef}: ${record.subject}`,relatedSupportCaseId:record.id},activeSession.user.id);
+    return record;
+    });
     redirect(`/support/${created.id}`);
   }
 
@@ -55,17 +60,17 @@ export default async function SupportPage() {
       description="Bookings, payments, refunds, business verification, safety, and account access."
     >
       <div className="mb-6 flex items-center justify-between gap-3 bg-muted/30 p-4 rounded-2xl">
-        <h2 className="text-lg font-bold">Your cases</h2>
+        <h2 className="text-lg font-semibold">Your cases</h2>
         <Dialog>
           <DialogTrigger asChild>
-            <Button size="sm" className="bg-brand-green hover:bg-brand-green/90 text-white font-bold rounded-xl px-4">
+            <Button size="sm" className="bg-brand-green hover:bg-brand-green/90 text-white font-medium rounded-xl px-4">
               <Plus className="h-4 w-4 mr-2" />
               Open a new case
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-2xl border-none shadow-lg">
+          <DialogContent className="rounded-2xl border border-border shadow-floating">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-extrabold">Open a support case</DialogTitle>
+              <DialogTitle className="text-2xl font-semibold">Open a support case</DialogTitle>
               <DialogDescription>We&apos;ll get back to you here and notify you of any updates.</DialogDescription>
             </DialogHeader>
             <div className="mt-4">
@@ -81,14 +86,14 @@ export default async function SupportPage() {
         <div className="flex flex-col gap-4">
           {cases.map((supportCase) => (
             <Link key={supportCase.id} href={`/support/${supportCase.id}`}>
-              <Card className="transition-all hover:shadow-md hover:-translate-y-1 border-none shadow-sm rounded-2xl overflow-hidden">
+              <Card className="transition-shadow hover:shadow-card-hover  border-border shadow-card rounded-2xl overflow-hidden">
                 <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 pb-6">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1.5">
+                    <p className="text-xs font-medium uppercase tracking-widest text-brand-green mb-1.5">
                       {supportCase.caseRef} · {supportCase.category}
                     </p>
-                    <h3 className="font-extrabold text-lg">{supportCase.subject}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-lg">{supportCase.subject}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
                       Updated {supportCase.updatedAt.toLocaleDateString("en-UG", { dateStyle: "medium" })}
                     </p>
                   </div>

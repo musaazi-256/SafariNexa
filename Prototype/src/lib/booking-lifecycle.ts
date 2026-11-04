@@ -1,3 +1,4 @@
+import { notifyAdmins } from "@/lib/admin-notifications";
 import type { Prisma } from "@prisma/client";
 export const CANCELLABLE = ["AUTH_REQUIRED", "PENDING_TRAVELLER_DETAILS", "PENDING_PAYMENT", "PAYMENT_FAILED", "AWAITING_BUSINESS_CONFIRMATION", "CONFIRMED"];
 import { releaseAvailabilityForBooking } from "@/lib/booking-service";
@@ -13,6 +14,7 @@ export async function syncOrderStatus(tx: Prisma.TransactionClient, orderId: str
     : statuses.some(s => s === "REFUND_REQUESTED" || s === "REFUND_PROCESSING") ? "REFUND_REQUESTED"
     : statuses.every(s => ["COMPLETED", "REVIEW_PENDING", "REVIEWED", ...cancelled].includes(s)) ? "COMPLETED"
     : statuses.every(s => ["CONFIRMED", "COMPLETED", "REVIEW_PENDING", "REVIEWED", ...cancelled].includes(s)) ? "CONFIRMED"
+    : statuses.some(s => ["PENDING_PAYMENT", "PAYMENT_FAILED"].includes(s)) ? "PENDING_PAYMENT"
     : statuses.some(s => s === "AWAITING_BUSINESS_CONFIRMATION") ? "AWAITING_BUSINESS_CONFIRMATION"
     : "PENDING_PAYMENT";
   const payment = await tx.payment.findFirst({where:{orderId,status:{in:["SUCCESSFUL","PARTIALLY_REFUNDED","REFUNDED","PROCESSING","PENDING_PROVIDER_CONFIRMATION"]}}});
@@ -46,6 +48,7 @@ export async function cancelReservedBooking(tx: Prisma.TransactionClient, bookin
     } });
   } else await releaseAvailabilityForBooking(tx, bookingId);
   await syncOrderStatus(tx, booking.orderId);
+  if(payment) await notifyAdmins(tx,"payments.manage",{type:"PAYMENT_UPDATE",title:"Refund request needs review",body:`Booking ${booking.bookingRef} was cancelled and has a refund request awaiting review.`,relatedBookingId:bookingId},actorId);
   await tx.notification.create({ data: { userId: booking.customerId, type: "BOOKING_UPDATE",
     title: payment ? "Refund requested" : "Booking cancelled",
     body: `Booking ${booking.bookingRef}: ${payment ? "a refund has been requested; it is not yet completed" : "reservation cancelled"}.`, relatedBookingId: bookingId } });

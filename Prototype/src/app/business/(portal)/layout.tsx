@@ -1,3 +1,5 @@
+import { NotificationBell } from "@/components/notifications/notification-bell";
+import { DemoToolbar } from "@/components/demo-toolbar";
 import type { ReactNode } from "react";
 import { LiveRefresh } from "@/components/live-refresh";
 
@@ -18,13 +20,15 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
     <SidebarProvider>
       <LiveRefresh />
       <BusinessSidebar businesses={businesses} activeBusinessId={businessId} />
-      <SidebarInset className="bg-muted/40">
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border bg-background px-4 sm:px-6">
-          <div className="flex items-center gap-4">
+      <SidebarInset className="bg-[#f8f9fa]">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border bg-white px-4 sm:px-6">
+          <div className="flex items-center gap-2 sm:gap-4">
             <SidebarTrigger />
-            <span className="text-sm font-semibold text-muted-foreground">Business portal</span>
+            <span className="hidden text-sm font-semibold text-slate-900 sm:inline">Business portal</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <DemoToolbar surfaces={["customer", "admin"]} />
+            <NotificationBell surface="business" unreadCount={unreadCount}/>
             {session?.user && (
               <UserMenu
                 name={session.user.name}
@@ -38,7 +42,7 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
             )}
           </div>
         </header>
-        <div className="mx-auto w-full min-w-0 max-w-[1440px] flex-1 space-y-6 p-4 sm:p-6 lg:p-8">{children}</div>
+        <div className="flex-1 min-w-0 space-y-6 p-4 sm:p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -20,7 +20,7 @@ export default function BusinessLandingPage() {
             <Building2 className="h-8 w-8 text-primary" />
           </div>
           
-          <h1 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-foreground">
+          <h1 className="type-display mt-6 text-foreground">
             Partner with SafariNexa
           </h1>
           

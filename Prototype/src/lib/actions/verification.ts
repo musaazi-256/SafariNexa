@@ -1,5 +1,6 @@
 "use server";
 
+import { adminNotificationData } from "@/lib/admin-notifications";
 import { revalidatePath } from "next/cache";
 import { saveVerificationFile } from "@/lib/private-documents";
 
@@ -39,19 +40,22 @@ export async function submitVerificationDocument(formData: FormData) {
   });
 
   const isInFlight = current && (IN_FLIGHT_STATUSES as readonly string[]).includes(current.status);
+  const adminAlerts = await adminNotificationData(db,"businesses.manage",{type:"SYSTEM",title:"Business verification submitted",body:`${business.name} submitted a ${type.replaceAll("_"," ").toLowerCase()} document. Open the business verification queue to review the latest submission.`},session.user.id);
 
   if (isInFlight && current) {
     await db.$transaction([
       db.businessDocument.create({ data: { businessVerificationId: current.id, type, fileUrl } }),
       db.businessVerification.update({ where: { id: current.id }, data: { status: "SUBMITTED", submittedAt: new Date(), submittedProfile: businessReviewSnapshot(business) } }),
-      db.businessProfile.update({ where: { id: businessId }, data: { verificationStatus: "SUBMITTED" } })
+      db.businessProfile.update({ where: { id: businessId }, data: { verificationStatus: "SUBMITTED" } }),
+      db.notification.createMany({data:adminAlerts})
     ]);
   } else {
     await db.$transaction([
       db.businessVerification.create({
         data: { businessId, submittedProfile: businessReviewSnapshot(business), documents: { create: { type, fileUrl } } }
       }),
-      db.businessProfile.update({ where: { id: businessId }, data: { verificationStatus: "SUBMITTED" } })
+      db.businessProfile.update({ where: { id: businessId }, data: { verificationStatus: "SUBMITTED" } }),
+      db.notification.createMany({data:adminAlerts})
     ]);
   }
   

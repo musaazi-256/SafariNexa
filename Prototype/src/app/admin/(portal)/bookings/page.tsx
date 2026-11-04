@@ -1,8 +1,11 @@
+import { PortalSearch } from "@/components/portal-search";
+import { TableColumnLabel } from "@/components/ui/table-column-label";
+import { BookingStatusBadge } from "@/components/ui/status-badge";
+import { toBookingStatus } from "@/lib/status";
+import { TableActionLink } from "@/components/ui/table-action-link";
 import {
-  Search, Filter, Download, Calendar, ArrowUpDown, MoreVertical,
-  CheckCircle2, Clock, Hourglass, RefreshCw, XCircle, ChevronDown
+  Search, Calendar
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { FilterTabs } from "@/components/ui/filter-tabs";
@@ -80,55 +83,6 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   // Fallback mock items matching screenshot
 
 
-  function renderStatusBadge(status: string) {
-    const s = status.toUpperCase();
-    if (s === "CONFIRMED") {
-      return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/90 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
-          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-          Confirmed
-        </span>
-      );
-    }
-    if (s === "PAYMENT_REQUIRED" || s === "PENDING_PAYMENT") {
-      return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200/90 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">
-          <Clock className="h-3.5 w-3.5 text-amber-600" />
-          Payment required
-        </span>
-      );
-    }
-    if (s === "AWAITING_BUSINESS_CONFIRMATION" || s === "AWAITING_CONFIRMATION") {
-      return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200/90 bg-orange-50/80 px-3 py-1 text-xs font-bold text-orange-800">
-          <Hourglass className="h-3.5 w-3.5 text-orange-600" />
-          Awaiting confirmation
-        </span>
-      );
-    }
-    if (s === "REFUNDED") {
-      return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-200/90 bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700">
-          <RefreshCw className="h-3.5 w-3.5 text-teal-600" />
-          Refunded
-        </span>
-      );
-    }
-    if (s === "COMPLETED" || s === "REVIEWED") {
-      return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200/90 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
-          <CheckCircle2 className="h-3.5 w-3.5 text-blue-600" />
-          Completed
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200/90 bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700">
-        <XCircle className="h-3.5 w-3.5 text-rose-600" />
-        Cancelled
-      </span>
-    );
-  }
 
   return (
     <div className="max-w-[1550px] mx-auto space-y-6 pb-20 font-sans">
@@ -141,7 +95,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
         />
 
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">All dates</span>
+          <span className="inline-flex h-10 items-center rounded-xl border border-border bg-white px-4 text-xs font-medium text-slate-700 shadow-sm"><Calendar className="mr-2 h-4 w-4 text-slate-400"/>All dates</span>
 <ExportVisibleRows />
         </div>
       </div>
@@ -159,18 +113,8 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
 
       {/* Toolbar (Search & Filter Action Row) */}
       <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div className="flex min-w-0 flex-wrap items-center gap-3 w-full lg:w-auto">
-          <form className="relative w-full lg:w-80">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            {activeTabParam && activeTabParam !== "all" && <input type="hidden" name="status" value={activeTabParam} />}
-            <input
-              type="search"
-              name="q"
-              defaultValue={q}
-              placeholder="Search bookings, businesses, or customers..."
-              className="w-full h-10 pl-10 pr-4 rounded-xl border border-slate-200/90 text-xs font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-white shadow-sm placeholder:text-slate-400"
-            />
-          </form>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <PortalSearch label="Search bookings, businesses, or customers" placeholder="Search bookings, businesses, or customers…" />
 
 <PortalFilter />
 
@@ -179,19 +123,20 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
       </div>
 
       {/* Data Table */}
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div>
         <Table>
           <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <span className="inline-flex items-center gap-1.5">Date <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" /></span>
+            <TableRow>
+              <TableHead>
+                <TableColumnLabel help="The date and time the booking was created, rather than the service date.">Date</TableColumnLabel>
               </TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Reference</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Listing</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Business</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Customer</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status</TableHead>
-              <TableHead className="text-right text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total</TableHead>
+              <TableHead><TableColumnLabel help="The unique reference for this booking. Open it to view booking details.">Reference</TableColumnLabel></TableHead>
+              <TableHead>Listing</TableHead>
+              <TableHead>Business</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead><TableColumnLabel help="The current booking stage. Payment and booking confirmation are tracked separately.">Status</TableColumnLabel></TableHead>
+              <TableHead className="text-right"><TableColumnLabel help="The recorded booking total, including selected add-ons. Check payment details to see the amount paid.">Total</TableColumnLabel></TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -199,41 +144,41 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               bookings.map((booking) => {
                 const dateStr = booking.createdAt.toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" }) + ", " + booking.createdAt.toLocaleTimeString("en-UG", { hour: "2-digit", minute: "2-digit" });
                 return (
-                  <TableRow key={booking.id} className="hover:bg-slate-50/50">
-                    <TableCell className="pl-6 font-medium text-slate-500 text-xs whitespace-nowrap">{dateStr}</TableCell>
-                    <TableCell className="font-bold text-slate-900 text-xs">{booking.bookingRef}</TableCell>
+                  <TableRow key={booking.id}>
+                    <TableCell className="font-normal whitespace-nowrap">{dateStr}</TableCell>
+                    <TableCell className="font-normal"><Link href={`/admin/bookings/${booking.id}`}>{booking.bookingRef}</Link></TableCell>
                     <TableCell>
-                      <div className="font-semibold text-slate-800 text-xs">{booking.listing.title}</div>
+                      <div className="font-normal text-slate-700 text-sm">{booking.listing.title}</div>
                       {booking.roomTypeName || booking.roomType || booking.addOns.length > 0 ? (
-                        <div className="text-[11px] font-medium text-slate-400">
+                        <div className="text-xs font-normal text-slate-500">
                           {booking.roomTypeName || booking.roomType ? `Room: ${booking.roomTypeName ?? booking.roomType?.name}` : ""}
                           {(booking.roomTypeName || booking.roomType) && booking.addOns.length > 0 ? " · " : ""}
                           {booking.addOns.length > 0 ? `+${booking.addOns.length} add-on${booking.addOns.length > 1 ? "s" : ""}` : ""}
                         </div>
                       ) : null}
                     </TableCell>
-                    <TableCell className="font-semibold text-slate-700 text-xs">{booking.business.name}</TableCell>
-                    <TableCell className="font-medium text-slate-600 text-xs">{booking.customer.name ?? booking.customer.email}</TableCell>
-                    <TableCell>{renderStatusBadge(booking.status)}</TableCell>
-                    <TableCell className="pr-6 text-right">
+                    <TableCell className="font-normal"><Link href={`/admin/businesses/${booking.businessId}`}>{booking.business.name}</Link></TableCell>
+                    <TableCell className="font-normal">{booking.customer.name ?? booking.customer.email}</TableCell>
+                    <TableCell><BookingStatusBadge status={toBookingStatus(booking.status)} perspective="staff" /></TableCell>
+                    <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-3">
-                        <span className="font-extrabold text-slate-900 text-xs whitespace-nowrap">{formatUGX(booking.totalMinor)}</span>
-                        <Link className="text-primary underline" href={`/admin/bookings/${booking.id}`}>Details</Link>
+                        <span className="font-normal text-slate-700 text-sm whitespace-nowrap">{formatUGX(booking.totalMinor)}</span>
                       </div>
                     </TableCell>
+                    <TableCell className="text-right"><TableActionLink href={`/admin/bookings/${booking.id}`} description={`View booking ${booking.bookingRef}`} /></TableCell>
                   </TableRow>
                 );
               })
             ) : (
-              // Mock rows matching screenshot
-<TableRow><TableCell colSpan={7} className="py-10 text-center">No matching bookings.</TableCell></TableRow>
+              // Keep the empty result inside the table.
+<TableRow><TableCell colSpan={8} className="py-10 text-center">No matching bookings.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
 
         {/* Pagination Footer */}
-        <div className="border-t border-slate-200 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-500">
+        <div className="border-t border-border bg-slate-50/30 px-6 py-4 flex items-center justify-between">
+          <span className="text-xs font-medium text-slate-500">
             Showing {totalCount ? (page - 1) * PAGE_SIZE + 1 : 0} to {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount} bookings
           </span>
           <Pagination

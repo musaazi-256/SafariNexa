@@ -1,5 +1,8 @@
 "use client";
 
+import { ConfirmSubmit } from "@/components/admin/confirm-submit";
+import { Bell } from "lucide-react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
@@ -8,6 +11,7 @@ import {
   Building2,
   ClipboardCheck,
   Gauge,
+  KeyRound,
   LayoutDashboard,
   LifeBuoy,
   LogOut,
@@ -56,6 +60,7 @@ const GROUPS = [
     label: "Community",
     items: [
       { href: "/admin/users", label: "Users", icon: Users },
+      { href: "/admin/roles", label: "Roles & permissions", icon: KeyRound },
       { href: "/admin/reviews", label: "Reviews", icon: Star },
       { href: "/admin/support", label: "Support", icon: LifeBuoy },
       { href: "/admin/audit", label: "Audit trail", icon: Gauge }
@@ -64,6 +69,7 @@ const GROUPS = [
   {
     label: "Insights",
     items: [
+      { href: "/admin/notifications", label: "Notifications", icon: Bell },
       { href: "/admin/settings", label: "Settings", icon: Settings }
     ]
   }
@@ -81,8 +87,8 @@ export function AdminSidebar() {
             <Logo size="sm" />
           </SidebarMenuItem>
             <div className="flex flex-col ml-2">
-              <span className="text-[14px] font-bold text-slate-900 leading-none">Admin Portal</span>
-              <span className="text-[12px] font-semibold text-slate-500 mt-1">SafariNexa</span>
+              <span className="text-sm font-medium text-slate-900 leading-none">Admin Portal</span>
+              <span className="text-xs font-medium text-slate-500 mt-1">SafariNexa</span>
             </div>
         </SidebarMenu>
       </SidebarHeader>
@@ -109,30 +115,9 @@ export function AdminSidebar() {
         ))}
       </SidebarContent>
       <SidebarFooter className="p-4 gap-4">
-        {/* System Status Widget */}
-        <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100">
-          <div className="flex flex-col mb-4">
-            <span className="text-[13px] font-bold text-slate-900 mb-2">Monitoring not configured</span>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-[#1e613c]"></div>
-              <span className="text-[12px] font-bold text-[#1e613c]">Not connected to monitoring</span>
-            </div>
-            <span className="text-[11px] font-semibold text-slate-400 mt-0.5">Connect monitoring before launch</span>
-          </div>
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[12px] font-semibold text-slate-500">Uptime</span>
-              <span className="text-[12px] font-bold text-[#1e613c]">—</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[12px] font-semibold text-slate-500">Response time</span>
-              <span className="text-[12px] font-bold text-[#1e613c]">—</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[12px] font-semibold text-slate-500">Active users</span>
-              <span className="text-[12px] font-bold text-[#1e613c]">—</span>
-            </div>
-          </div>
+        <div className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-3">
+          <span className="text-xs font-medium text-slate-700">System health</span>
+          <p className="mt-1 text-xs leading-5 text-slate-500">Monitoring data is unavailable.</p>
         </div>
 
         <SidebarMenu>
@@ -146,10 +131,17 @@ export function AdminSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <form action={signOutAction}>
-              <SidebarMenuButton type="submit" className="text-destructive hover:bg-destructive/10">
-                <LogOut />
-                Sign out
-              </SidebarMenuButton>
+              <ConfirmSubmit
+                title="Sign out of the admin portal?"
+                description="You'll need to sign in again to manage SafariNexa."
+                confirmLabel="Sign out"
+                trigger={
+                  <SidebarMenuButton className="text-destructive hover:bg-destructive/10">
+                    <LogOut />
+                    Sign out
+                  </SidebarMenuButton>
+                }
+              />
             </form>
           </SidebarMenuItem>
         </SidebarMenu>

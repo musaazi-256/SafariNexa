@@ -89,8 +89,8 @@ const config: Config = {
   			]
   		},
   		boxShadow: {
-  			card: '0 1px 2px rgb(15 20 10 / 0.04), 0 8px 24px -12px rgb(15 20 10 / 0.12)',
-  			'card-hover': '0 4px 10px rgb(15 20 10 / 0.06), 0 16px 32px -14px rgb(15 20 10 / 0.16)',
+        card: '0 1px 3px rgb(15 23 42 / 0.04)',
+        'card-hover': '0 3px 10px rgb(15 23 42 / 0.07)',
   			floating: '0 20px 40px -10px rgb(0 0 0 / 0.16), 0 8px 16px -4px rgb(0 0 0 / 0.08)'
   		},
   		keyframes: {

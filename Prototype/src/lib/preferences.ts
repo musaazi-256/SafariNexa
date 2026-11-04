@@ -15,7 +15,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   REVIEW_PROMPT: "Review prompts",
   SUPPORT_UPDATE: "Support updates",
   SAFETY_ADVISORY: "Safety advisories",
-  SYSTEM: "System announcements"
+  SYSTEM: "Account updates"
 };
 
 export type NotificationPreferences = Record<NotificationType, boolean>;

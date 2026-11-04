@@ -31,13 +31,7 @@ export const AMENITIES = [
   { value: "airport-transfer", label: "Airport transfer" }
 ];
 
-export const LOCATIONS = [
-  { value: "kololo", label: "Kololo" },
-  { value: "ntinda", label: "Ntinda" },
-  { value: "muyenga", label: "Muyenga" },
-  { value: "bugolobi", label: "Bugolobi" },
-  { value: "entebbe", label: "Entebbe" }
-];
+export const LOCATIONS: Array<{value:string;label:string}> = [];
 
 export const TOUR_TYPES = [
   { value: "wildlife", label: "Wildlife Safari" },
@@ -66,9 +60,8 @@ export const CUISINES = [
 ];
 
 export const GUIDE_SPECIALTIES = [
-  { value: "wildlife", label: "Wildlife & Birding" },
-  { value: "history", label: "History & Culture" },
-  { value: "photography", label: "Photography" }
+  { value: "general", label: "General guide" },
+  { value: "destination-specialist", label: "Destination specialist" }
 ];
 
 function CheckboxGroup({ title, param, options }: { title: string; param: string; options: Array<{ value: string; label: string }> }) {
@@ -84,45 +77,45 @@ function CheckboxGroup({ title, param, options }: { title: string; param: string
     } else {
       next.add(value);
     }
+    params.delete("page");
     params.delete(param);
     for (const item of next) params.append(param, item);
     router.push(`/search?${params.toString()}`);
   }
 
   return (
-    <div className="border-b border-border pb-6">
-      <p className="mb-3 text-sm font-bold text-foreground">{title}</p>
-      <div className="flex flex-col gap-2.5">
+    <fieldset className="border-b border-slate-100 pb-5 last:border-b-0 last:pb-0">
+      <legend className="mb-3 text-sm font-semibold text-slate-900">{title}</legend>
+      <div className="flex flex-col gap-1.5">
         {options.map((option) => (
-          <label key={option.value} className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground cursor-pointer transition-colors">
+          <label key={option.value} className="group flex min-h-8 items-center gap-2.5 rounded-lg px-1.5 py-1 text-sm text-slate-600 transition-colors hover:text-slate-900 has-[:checked]:font-medium has-[:checked]:text-slate-900 cursor-pointer">
             <input
               type="checkbox"
               checked={selected.has(option.value)}
               onChange={() => toggle(option.value)}
-              className="h-4 w-4 rounded border-input text-primary focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-4 w-4 rounded border-slate-300 accent-slate-900 focus-visible:ring-2 focus-visible:ring-ring"
             />
             {option.label}
           </label>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 }
 
-export function SearchFilters() {
+export function SearchFilters({locations=LOCATIONS}:{locations?:Array<{value:string;label:string}>}={}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const category = searchParams.get("category") || "accommodation";
   
   function clearAll() {
-    const params = new URLSearchParams();
-    if (searchParams.has("category")) params.set("category", searchParams.get("category")!);
-    if (searchParams.has("q")) params.set("q", searchParams.get("q")!);
+    const params = new URLSearchParams(searchParams.toString());
+    for(const key of ["price","rating","propertyType","tourType","tourDuration","vehicleType","cuisine","specialty","location","amenities","page"])params.delete(key);
     router.push(`/search?${params.toString()}`);
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <CheckboxGroup title="Price range (UGX)" param="price" options={PRICE_RANGES} />
       
       {category === "accommodation" ? (
@@ -130,14 +123,14 @@ export function SearchFilters() {
           <CheckboxGroup title="Property type" param="propertyType" options={PROPERTY_TYPES} />
           <CheckboxGroup title="Guest rating" param="rating" options={RATING_TIERS} />
           <CheckboxGroup title="Amenities" param="amenities" options={AMENITIES} />
-          <CheckboxGroup title="Location" param="location" options={LOCATIONS} />
+          {locations.length>0&&<CheckboxGroup title="Location" param="location" options={locations} />}
         </>
       ) : null}
 
       {category === "tours" ? (
         <>
           <CheckboxGroup title="Safari Type" param="tourType" options={TOUR_TYPES} />
-          <CheckboxGroup title="Duration" param="duration" options={TOUR_DURATIONS} />
+          <CheckboxGroup title="Duration" param="tourDuration" options={TOUR_DURATIONS} />
           <CheckboxGroup title="Guest rating" param="rating" options={RATING_TIERS} />
         </>
       ) : null}
@@ -163,7 +156,7 @@ export function SearchFilters() {
         </>
       ) : null}
 
-      <Button variant="outline" className="w-full text-foreground hover:bg-secondary border-border rounded-lg" onClick={clearAll}>
+      <Button variant="outline" size="sm" className="h-9 w-full rounded-full border-border bg-white text-sm font-medium text-slate-700 shadow-none hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900" onClick={clearAll}>
         Clear filters
       </Button>
     </div>

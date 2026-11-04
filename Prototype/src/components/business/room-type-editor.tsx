@@ -147,7 +147,7 @@ export function RoomTypeEditor({ initial }: { initial: RoomTypeRow[] }) {
                 value={Array.isArray(row.roomFeatures) ? row.roomFeatures.join(", ") : (row.roomFeatures ?? "")}
                 onChange={(e) => updateRow(index, { roomFeatures: e.target.value })}
               />
-              <p className="text-[11px] text-muted-foreground">Specify unique room highlights shown on the room preview card.</p>
+              <p className="text-xs text-muted-foreground">Specify unique room highlights shown on the room preview card.</p>
             </div>
 
             <div className="flex flex-col gap-1.5">

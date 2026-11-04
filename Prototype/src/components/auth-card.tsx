@@ -1,3 +1,4 @@
+import { isDemoMode } from "@/lib/dev-mode";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
@@ -18,14 +19,11 @@ const SURFACE_META: Record<Surface, { label: string; googleHref: string; provide
   admin: { label: "admin account", googleHref: "/admin/auth/google", provider: "admin-credentials", defaultReturn: "/admin/dashboard", signInPath: "/admin/login" }
 };
 
-// Local-only testing convenience. Never shown on a production build (`next build`
-// always sets NODE_ENV=production, including Vercel preview/production deploys) —
-// only ever renders under `next dev`. Submits through the exact same credentials
-// form/server action as a real sign-in; nothing in auth.ts changes for this.
+// Seeded identities remain available in deployed demo builds.
 const DEMO_ACCOUNT: Record<Surface, { email: string; label: string }> = {
-  customer: { email: "customer@safarinexa.test", label: "Quick sign in as customer" },
-  business: { email: "business@dev.test", label: "Quick sign in as business (all 4 listings)" },
-  admin: { email: "admin@safarinexa.test", label: "Quick sign in as admin" }
+  customer: { email: "customer@safarinexa.test", label: "Continue as customer" },
+  business: { email: "business@dev.test", label: "Continue as business" },
+  admin: { email: "admin@safarinexa.test", label: "Continue as admin" }
 };
 const DEMO_PASSWORD = "Passw0rd!";
 
@@ -35,10 +33,12 @@ const ERROR_COPY: Record<string, string> = {
 };
 
 export function AuthCard({
+  hideGoogle = false,
   surface = "customer",
   returnTo,
   error
 }: {
+  hideGoogle?: boolean;
   surface?: Surface;
   returnTo?: string;
   error?: string;
@@ -56,7 +56,8 @@ export function AuthCard({
         redirect(`${meta.signInPath}?error=invalid_credentials`);
       }
 
-      await signIn(meta.provider, {
+      await signIn(isDemoMode() && formData.get("demo") === "true" ? "demo" : meta.provider, {
+        surface,
         email,
         password,
         redirectTo: target
@@ -73,24 +74,24 @@ export function AuthCard({
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <p className="text-xs font-extrabold uppercase tracking-wide text-primary">{surface} authentication</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-primary">{surface} authentication</p>
         <CardTitle className="text-3xl">Sign in to your {meta.label}</CardTitle>
-        <CardDescription>Continue with Google or the email already stored in the SafariNexa database.</CardDescription>
+        <CardDescription>{isDemoMode() ? "Choose an account below or sign in with your email." : "Continue with Google or your SafariNexa email."}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {error ? (
-          <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive">
+          <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm font-medium text-destructive leading-relaxed">
             {ERROR_COPY[error] ?? "Something went wrong. Please try again."}
           </p>
         ) : null}
 
-        <Button asChild variant="secondary" className="w-full">
+        {!hideGoogle && <Button asChild variant="secondary" className="w-full">
           <Link href={`${meta.googleHref}?returnTo=${encodeURIComponent(target)}`}>Continue with Google</Link>
-        </Button>
+        </Button>}
 
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
-          <span className="text-xs font-semibold uppercase text-muted-foreground">or</span>
+          <span className="text-xs font-medium uppercase text-muted-foreground">or</span>
           <Separator className="flex-1" />
         </div>
 
@@ -123,7 +124,7 @@ export function AuthCard({
         </form>
 
         {surface === "customer" ? (
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground leading-relaxed">
             New to SafariNexa?{" "}
             <Link href={`/auth/create-account?returnTo=${encodeURIComponent(target)}`} className="font-semibold text-primary hover:underline">
               Create an account
@@ -131,7 +132,7 @@ export function AuthCard({
           </p>
         ) : null}
         {surface === "business" ? (
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground leading-relaxed">
             New business?{" "}
             <Link href="/business/onboarding" className="font-semibold text-primary hover:underline">
               Start onboarding
@@ -144,17 +145,18 @@ export function AuthCard({
           </p>
         ) : null}
 
-        {process.env.NODE_ENV !== "production" ? (
-          <div className="rounded-xl border border-dashed border-amber-400/60 bg-amber-50 p-3">
-            <p className="text-[10px] font-extrabold uppercase tracking-wide text-amber-700">Dev only · never shown in production</p>
+        {isDemoMode() ? (
+          <div className="rounded-xl border border-border bg-secondary/30 p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Quick access</p>
             <form action={credentialsAction} className="mt-2">
+              <input type="hidden" name="demo" value="true" />
               <input type="hidden" name="email" value={DEMO_ACCOUNT[surface].email} />
               <input type="hidden" name="password" value={DEMO_PASSWORD} />
-              <Button type="submit" variant="outline" className="w-full border-amber-400/60 text-amber-800 hover:bg-amber-100">
+              <Button type="submit" variant="outline" className="w-full border-border text-foreground hover:bg-secondary">
                 {DEMO_ACCOUNT[surface].label}
               </Button>
             </form>
-            <p className="mt-1.5 text-[11px] text-amber-700">{DEMO_ACCOUNT[surface].email} / {DEMO_PASSWORD}</p>
+
           </div>
         ) : null}
       </CardContent>

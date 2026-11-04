@@ -99,7 +99,7 @@ export function RoomPreviewCard({
   const refundText = room.refundPolicyText || cancellationPolicy || "Before check-in";
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all sm:flex-row">
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-shadow sm:flex-row">
       {/* Left side: Image Carousel */}
       <div className="relative h-64 w-full shrink-0 bg-muted sm:h-auto sm:w-[320px]">
         {hasImages ? (
@@ -153,7 +153,7 @@ export function RoomPreviewCard({
         
         {/* Features Column */}
         <div className="flex-1">
-          <h3 className="text-xl font-bold mb-4">{room.name}</h3>
+          <h3 className="text-xl font-semibold mb-4">{room.name}</h3>
           
           <ul className="space-y-2.5 text-sm text-foreground/80 mb-6">
             {/* Display configured room highlights if provided */}
@@ -205,7 +205,7 @@ export function RoomPreviewCard({
             isRefundable={room.isRefundable}
             refundPolicyText={room.refundPolicyText}
             trigger={
-              <button className="text-sm font-bold text-foreground hover:underline focus-visible:outline-none">
+              <button className="text-sm font-medium text-foreground hover:underline focus-visible:outline-none">
                 More details &gt;
               </button>
             }
@@ -216,7 +216,7 @@ export function RoomPreviewCard({
         <div className="mt-6 flex flex-col justify-end sm:mt-0 sm:ml-6 sm:w-48 sm:items-end sm:text-right border-t sm:border-t-0 sm:border-l border-border pt-6 sm:pt-0 sm:pl-6">
           {room.discountNotice ? (
             <div className="mb-4 hidden sm:block w-full">
-              <div className="text-xs font-bold text-emerald-800 bg-emerald-50 rounded px-2 py-1 text-center border border-emerald-200">
+              <div className="text-xs font-medium text-emerald-800 bg-emerald-50 rounded px-2 py-1 text-center border border-emerald-200">
                 {room.discountNotice}
               </div>
             </div>
@@ -227,23 +227,23 @@ export function RoomPreviewCard({
               We have {totalRoomsLeft} left
             </div>
             <div className="text-right">
-              <div className="text-2xl font-extrabold">{formatUGX(room.priceMinor)}</div>
+              <div className="text-2xl font-semibold">{formatUGX(room.priceMinor)}</div>
               <div className="text-xs text-muted-foreground font-medium mt-1">Total with taxes and fees</div>
             </div>
           </div>
           
-          <div className="hidden sm:block text-xs text-foreground font-semibold mb-3 w-full text-left">
+          <div className="hidden sm:block text-xs text-foreground font-medium mb-3 w-full text-left">
             We have {totalRoomsLeft} left
           </div>
 
           <Button 
-            className="w-full bg-[#0d5932] hover:bg-[#0a4526] text-white font-bold h-11"
+            className="w-full bg-[#0d5932] hover:bg-[#0a4526] text-white font-medium h-11"
             onClick={handleReserve}
           >
             Reserve
           </Button>
           
-          <div className="text-[11px] text-muted-foreground text-center w-full mt-2">
+          <div className="text-xs text-muted-foreground text-center w-full mt-2">
             You will not be charged yet
           </div>
         </div>

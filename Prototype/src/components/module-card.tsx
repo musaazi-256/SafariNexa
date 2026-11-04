@@ -15,7 +15,7 @@ export function ModuleCard({
   badge?: React.ReactNode;
 }) {
   const content = (
-    <Card className="group h-full min-h-[168px] transition-shadow hover:shadow-card-hover">
+    <Card className={`group h-full min-h-[168px] ${href ? "hover:shadow-card-hover" : ""}`}>
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <CardTitle>{title}</CardTitle>

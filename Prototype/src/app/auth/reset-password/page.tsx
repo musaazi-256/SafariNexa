@@ -1,3 +1,7 @@
 import { SiteHeader } from "@/components/site-header";
 import { AccountEmailForm } from "@/components/account-email-form";
-export default function ResetPasswordPage({searchParams}:{searchParams:{token?:string}}){return <><SiteHeader/><main className="container max-w-lg space-y-5 py-12"><h1 className="text-2xl font-bold">Choose a new password</h1><AccountEmailForm purpose="reset" token={searchParams.token}/></main></>;}
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
+export default function ResetPasswordPage({searchParams}:{searchParams:{token?:string}}) {
+  return <><SiteHeader /><main><Container className="flex min-h-[70vh] items-center justify-center py-14"><Card className="w-full max-w-md"><CardHeader><CardTitle>Choose a new password</CardTitle><CardDescription>Enter and confirm your new password to secure your account.</CardDescription></CardHeader><CardContent><AccountEmailForm purpose="reset" token={searchParams.token} /></CardContent></Card></Container></main></>;
+}

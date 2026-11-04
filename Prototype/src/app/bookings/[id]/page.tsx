@@ -83,26 +83,26 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
           <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
             <div>
               <BookingStatusBadge status={toBookingStatus(booking.status)} />
-              <h1 className="mt-2 text-3xl font-extrabold">{booking.listing.title}</h1>
+              <h1 className="type-page mt-2">{booking.listing.title}</h1>
               <p className="mt-1 text-muted-foreground">Booked with {booking.business.name}</p>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Reference</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Reference</p>
                   <p className="font-semibold">{booking.bookingRef}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Participants</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Participants</p>
                   <p className="font-semibold">{booking.participantsCount}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Start</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Start</p>
                   <p className="font-semibold">
                     {booking.startDate ? formatBookingDate(booking.startDate, booking.listing.type) : "—"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">End</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">End</p>
                   <p className="font-semibold">
                     {booking.endDate ? formatBookingDate(booking.endDate, booking.listing.type) : "—"}
                   </p>
@@ -111,7 +111,7 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
 
               {booking.roomTypeName || booking.roomType || booking.addOns.length > 0 ? (
                 <>
-                  <h2 className="mb-2 mt-8 text-lg font-bold">Room &amp; add-ons</h2>
+                  <h2 className="mb-2 mt-8 text-lg font-semibold">Room &amp; add-ons</h2>
                   <Card>
                     <CardContent className="grid gap-2 pt-6 text-sm">
                       {booking.roomTypeName || booking.roomType ? (
@@ -135,7 +135,7 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
 
               {primaryParticipant ? (
                 <>
-                  <h2 className="mb-2 mt-8 text-lg font-bold">Traveller details</h2>
+                  <h2 className="mb-2 mt-8 text-lg font-semibold">Traveller details</h2>
                   <Card>
                     <CardContent className="grid gap-2 pt-6 text-sm">
                       <p>
@@ -157,7 +157,7 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
 
               {paymentHistory.length > 0 ? (
                 <>
-                  <h2 className="mb-2 mt-8 text-lg font-bold">Payment history</h2>
+                  <h2 className="mb-2 mt-8 text-lg font-semibold">Payment history</h2>
                   <div className="flex flex-col gap-2">
                     {paymentHistory.map((payment) => (
                       <Card key={payment.id}>

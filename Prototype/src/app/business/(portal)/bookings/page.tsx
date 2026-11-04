@@ -1,3 +1,8 @@
+import { StatCard, StatGrid } from "@/components/ui/stat-card";
+import { PortalSearch } from "@/components/portal-search";
+import { BookingStatusBadge } from "@/components/ui/status-badge";
+import { toBookingStatus } from "@/lib/status";
+import { TableColumnLabel } from "@/components/ui/table-column-label";
 import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
 import { Download, Calendar, Hourglass, Check, CalendarCheck, X, Banknote, Filter, Search, MoreVertical, ArrowUpDown } from "lucide-react";
@@ -91,21 +96,6 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
 
   const totalPages = totalPagesFor(totalFilteredCount);
 
-  // Status mapping for dot badges
-  const getStatusDisplay = (status: string) => {
-    if (STATUS_GROUPS.PENDING_PAYMENT.includes(status)) return {text:"Awaiting customer payment",dot:"bg-amber-500",bg:"bg-amber-50",textCol:"text-amber-700"};
-    if (STATUS_GROUPS.AWAITING_BUSINESS_CONFIRMATION.includes(status)) return { text: "Awaiting confirmation", dot: "bg-orange-500", bg: "bg-orange-50", textCol: "text-orange-600" };
-    if (STATUS_GROUPS.CONFIRMED.includes(status)) return { text: "Confirmed", dot: "bg-green-500", bg: "bg-green-50", textCol: "text-green-700" };
-    if (STATUS_GROUPS.COMPLETED.includes(status)) return { text: "Completed", dot: "bg-purple-500", bg: "bg-purple-50", textCol: "text-purple-700" };
-    if (STATUS_GROUPS.CANCELLED.includes(status)) return { text: "Cancelled", dot: "bg-red-500", bg: "bg-red-50", textCol: "text-red-700" };
-    
-    // Some extra statuses based on design (e.g. refunded, payment failed, payment required)
-    if (status === "REFUNDED") return { text: "Refunded", dot: "bg-green-500", bg: "bg-green-50", textCol: "text-green-700" };
-    if (status === "PAYMENT_FAILED") return { text: "Payment failed", dot: "bg-red-500", bg: "bg-red-50", textCol: "text-red-700" };
-    if (status === "PAYMENT_REQUIRED" || status === "PENDING_PAYMENT") return { text: "Payment required", dot: "bg-orange-500", bg: "bg-orange-50", textCol: "text-orange-600" };
-    
-    return { text: status, dot: "bg-slate-500", bg: "bg-slate-100", textCol: "text-slate-700" };
-  };
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 pb-20">
@@ -125,118 +115,29 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
       </div>
 
       {/* Stat Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-5 flex flex-col h-full justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-orange-50 flex flex-col items-center justify-center shrink-0">
-                <Hourglass className="h-5 w-5 text-orange-500" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-slate-500 truncate">Awaiting confirmation</p>
-                <p className="text-3xl font-extrabold text-slate-900 mt-1">{awaitingCount}</p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center justify-between text-xs font-semibold text-slate-500 hover:text-slate-900 cursor-pointer">
-              <span>Requests pending</span>
-              <span>&gt;</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-5 flex flex-col h-full justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-green-50 flex flex-col items-center justify-center shrink-0">
-                <Check className="h-5 w-5 text-green-600" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-slate-500 truncate">Confirmed</p>
-                <p className="text-3xl font-extrabold text-slate-900 mt-1">{confirmedCount}</p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center justify-between text-xs font-semibold text-slate-500 hover:text-slate-900 cursor-pointer">
-              <span>Bookings confirmed</span>
-              <span>&gt;</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-5 flex flex-col h-full justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-purple-50 flex flex-col items-center justify-center shrink-0">
-                <CalendarCheck className="h-5 w-5 text-purple-500" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-slate-500 truncate">Completed</p>
-                <p className="text-3xl font-extrabold text-slate-900 mt-1">{completedCount}</p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center justify-between text-xs font-semibold text-slate-500 hover:text-slate-900 cursor-pointer">
-              <span>Bookings completed</span>
-              <span>&gt;</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-5 flex flex-col h-full justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-red-50 flex flex-col items-center justify-center shrink-0">
-                <X className="h-5 w-5 text-red-500" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-slate-500 truncate">Cancelled</p>
-                <p className="text-3xl font-extrabold text-slate-900 mt-1">{cancelledCount}</p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center justify-between text-xs font-semibold text-slate-500 hover:text-slate-900 cursor-pointer">
-              <span>Bookings cancelled</span>
-              <span>&gt;</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl shadow-sm border-slate-100">
-          <CardContent className="p-5 flex flex-col h-full justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-blue-50 flex flex-col items-center justify-center shrink-0">
-                <Banknote className="h-5 w-5 text-blue-500" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-slate-500 truncate">Total revenue</p>
-                <p className="text-xl font-extrabold text-slate-900 mt-2 truncate">
-                  {formatUGX(totalRevenue)}
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center justify-between text-xs font-semibold text-slate-500 hover:text-slate-900 cursor-pointer">
-              <span>From all bookings</span>
-              <span>&gt;</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <StatGrid columns={5}>
+        <StatCard label="Awaiting confirmation" value={awaitingCount} description="Requests needing a response" icon={Hourglass} href="/business/bookings?status=awaiting_business_confirmation" actionLabel="View requests" />
+        <StatCard label="Confirmed" value={confirmedCount} description="Currently confirmed bookings" icon={Check} href="/business/bookings?status=confirmed" actionLabel="View bookings" />
+        <StatCard label="Completed" value={completedCount} description="Includes bookings awaiting or receiving a review" icon={CalendarCheck} href="/business/bookings?status=completed" actionLabel="View bookings" />
+        <StatCard label="Cancelled" value={cancelledCount} description="Cancelled by customers, businesses or admins" icon={X} href="/business/bookings?status=cancelled" actionLabel="View bookings" />
+        <StatCard label="Confirmed booking value" value={formatUGX(totalRevenue)} description="Confirmed and completed bookings · all time" icon={Banknote} help="Sum of booking totals for confirmed, completed and reviewed bookings. This is booking value, not a settled-payment or payout total." />
+      </StatGrid>
 
       {/* Tabs & Filters */}
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-4 mt-8">
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-4 border-b border-border pb-4 mt-8">
         <FilterTabs
           activeValue={activeTab ?? "ALL"}
           tabs={TABS.map((tab) => ({
             value: tab.value,
             label: tab.label,
             count: tab.count,
-            href: tab.value === "ALL" ? "/business/bookings" : `/business/bookings?status=${tab.value.toLowerCase()}`
+            href: `/business/bookings?${new URLSearchParams({ ...(tab.value !== "ALL" ? { status: tab.value.toLowerCase() } : {}), ...(searchParams.q ? { q: searchParams.q } : {}) })}`
           }))}
         />
 
         <div className="flex items-center gap-3 w-full lg:w-auto">
 <PortalFilter />
-          <div className="relative flex-1 lg:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input placeholder="Search bookings..." className="pl-9 h-10 bg-slate-50/50 border-slate-200" />
-          </div>
+          <PortalSearch label="Search bookings" placeholder="Search bookings…" />
         </div>
       </div>
 
@@ -244,36 +145,36 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
       {bookings.length === 0 ? (
         <EmptyState title="No bookings found" description="You don't have any bookings in this category yet." />
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div>
           <Table>
-            <TableHeader className="bg-slate-50 border-b border-slate-200">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-slate-600 h-12 w-[120px]">Reference</TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12 w-[350px]">Listing</TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12">Customer</TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12">
-                  <div className="flex items-center gap-2">Date <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" /></div>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[120px]"><TableColumnLabel help="The unique reference for this booking. Open it to view booking details.">Reference</TableColumnLabel></TableHead>
+                <TableHead className="w-[350px]">Listing</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>
+                  <div className="flex items-center gap-2">Date</div>
                 </TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12">Status</TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12 text-right">
-                  <div className="flex items-center justify-end gap-2">Total <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" /></div>
+                <TableHead><TableColumnLabel help="The current booking stage. Payment and booking confirmation are tracked separately.">Status</TableColumnLabel></TableHead>
+                <TableHead className="text-right">
+                  <div className="flex items-center justify-end gap-2">Total</div>
                 </TableHead>
-                <TableHead className="font-semibold text-slate-600 h-12 text-right">Actions</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {bookings.map((booking) => {
-                const statusInfo = getStatusDisplay(booking.status);
+
                 
                 return (
-                  <TableRow key={booking.id} className="border-b border-slate-100 hover:bg-slate-50/50 group">
-                    <TableCell className="font-bold text-slate-900 py-4">
-                      {booking.bookingRef}
+                  <TableRow key={booking.id} className="group">
+                    <TableCell className="font-normal">
+                      <Link href={`/business/bookings/${booking.id}`}>{booking.bookingRef}</Link>
                     </TableCell>
                     
-                    <TableCell className="py-4">
+                    <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-100 overflow-hidden shadow-sm border border-slate-200/60">
+                        <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-100 overflow-hidden shadow-sm border border-border/60">
                           {booking.listing.coverImageUrl ? (
                             <RemoteImage src={booking.listing.coverImageUrl} alt="" className="h-full w-full object-cover" />
                           ) : (
@@ -281,49 +182,46 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
                           )}
                         </div>
                         <div className="min-w-0 flex flex-col">
-                          <p className="font-bold text-slate-900 truncate">{booking.listing.title}</p>
-                          <p className="text-xs text-slate-500 font-medium truncate">{booking.bookingRef}</p>
+                          <p className="font-normal text-slate-700 truncate">{booking.listing.title}</p>
+                          <p className="text-xs text-slate-500 font-normal truncate">{booking.bookingRef}</p>
                         </div>
                       </div>
                     </TableCell>
                     
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-bold text-slate-900 truncate">{booking.customer.name ?? booking.customer.email}</span>
-                        <span className="text-xs text-slate-500 font-medium truncate">{booking.customer.phone ?? "No phone provided"}</span>
+                        <span className="font-normal text-slate-700 truncate">{booking.customer.name ?? booking.customer.email}</span>
+                        <span className="text-xs text-slate-500 font-normal truncate">{booking.customer.phone ?? "No phone provided"}</span>
                       </div>
                     </TableCell>
                     
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-semibold text-slate-700">
+                        <span className="font-normal text-slate-700">
                           {booking.startDate ? new Date(booking.startDate).toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                         </span>
-                        <span className="text-xs text-slate-500 font-medium">
+                        <span className="text-xs text-slate-500 font-normal">
                           {booking.startDate ? new Date(booking.startDate).toLocaleTimeString("en-UG", { hour: "numeric", minute: "2-digit" }) : ""}
                         </span>
                       </div>
                     </TableCell>
                     
                     <TableCell>
-                      <div className={cn("inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-bold", statusInfo.bg, statusInfo.textCol)}>
-                        <div className={cn("h-1.5 w-1.5 rounded-full", statusInfo.dot)} />
-                        {statusInfo.text}
-                      </div>
+                      <BookingStatusBadge status={toBookingStatus(booking.status)} perspective="staff" />
                     </TableCell>
 
-                    <TableCell className="text-right font-bold text-slate-900">
+                    <TableCell className="text-right font-normal">
                       {formatUGX(booking.totalMinor)}
                     </TableCell>
 
-                    <TableCell className="text-right py-4">
+                    <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="icon" className="h-8 w-8 text-slate-400 border-slate-200 ml-auto">
+                          <Button aria-label={`Actions for booking ${booking.bookingRef}`} title="Booking actions" variant="outline" size="icon" className="h-8 w-8 text-slate-400 border-border ml-auto">
                             <MoreVertical className="h-4 w-4 text-slate-600" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40 font-medium text-sm">
+                        <DropdownMenuContent align="end" className="w-40 font-normal text-sm">
                           <DropdownMenuItem asChild>
                             <Link href={`/business/bookings/${booking.id}`} className="w-full cursor-pointer">View details</Link>
                           </DropdownMenuItem>
@@ -342,14 +240,14 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
           </Table>
 
           {/* Pagination */}
-          <div className="border-t border-slate-200 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
+          <div className="border-t border-border bg-slate-50/30 px-6 py-4 flex flex-wrap gap-3 items-center justify-between">
             <span className="text-sm font-medium text-slate-500">
               Showing {((page - 1) * PAGE_SIZE) + 1} to {Math.min(page * PAGE_SIZE, totalFilteredCount)} of {totalFilteredCount} bookings
             </span>
             <Pagination
               currentPage={page}
               totalPages={totalPages}
-              buildHref={(p) => `/business/bookings?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), page: String(p) }).toString()}`}
+              buildHref={(p) => `/business/bookings?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), ...(searchParams.q ? { q: searchParams.q } : {}), page: String(p) }).toString()}`}
             />
           </div>
         </div>

@@ -1,3 +1,30 @@
-import { SiteHeader } from "@/components/site-header";
 import { AccountEmailForm } from "@/components/account-email-form";
-export default function ForgotPasswordPage(){return <><SiteHeader/><main className="container max-w-lg space-y-5 py-12"><h1 className="text-2xl font-bold">Reset your password</h1><p>Request a single-use password reset link. Google-only accounts should use Google sign-in.</p><AccountEmailForm purpose="reset"/></main></>;}
+import { SiteHeader } from "@/components/site-header";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export default function ForgotPasswordPage() {
+  return (
+    <>
+      <SiteHeader />
+      <main>
+        <Container className="flex min-h-[70vh] items-center justify-center py-14">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Reset your password</CardTitle>
+              <CardDescription>
+                Request a single-use password reset link for your SafariNexa account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              <AccountEmailForm purpose="reset" />
+            </CardContent>
+          </Card>
+        </Container>
+      </main>
+    </>
+  );
+}

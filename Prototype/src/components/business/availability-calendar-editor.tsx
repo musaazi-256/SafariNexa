@@ -73,7 +73,7 @@ export function AvailabilityCalendarEditor({
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <p className="font-bold">
+        <p className="font-semibold">
           {MONTH_LABELS[month]} {year}
         </p>
         <button
@@ -89,7 +89,7 @@ export function AvailabilityCalendarEditor({
 
       <div className="grid grid-cols-7 gap-1.5">
         {WEEKDAY_LABELS.map((label, index) => (
-          <span key={index} className="text-center text-xs font-semibold text-muted-foreground">
+          <span key={index} className="text-center text-xs font-medium text-muted-foreground">
             {label}
           </span>
         ))}
@@ -108,7 +108,7 @@ export function AvailabilityCalendarEditor({
               )}
             >
               <span className="font-semibold">{day}</span>
-              <span className="text-[10px] text-muted-foreground">{info ? `${info.remaining}/${info.capacity}` : "Set"}</span>
+              <span className="text-xs text-muted-foreground">{info ? `${info.remaining}/${info.capacity}` : "Set"}</span>
             </button>
           );
         })}
@@ -127,8 +127,8 @@ export function AvailabilityCalendarEditor({
               <Input id="capacity" name="capacity" type="number" min={0} defaultValue={selected?.capacity ?? 1} required />
             </div>
             <div className="flex flex-col gap-1.5">
-              <p className="text-sm font-medium">Remaining</p>
-              <p id="remaining" className="text-sm text-muted-foreground">Calculated automatically from capacity minus existing reservations.</p>
+              <p className="text-sm font-medium leading-relaxed">Remaining</p>
+              <p id="remaining" className="text-sm text-muted-foreground leading-relaxed">Calculated automatically from capacity minus existing reservations.</p>
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="priceOverrideMinor">Price override (UGX, optional)</Label>

@@ -1,3 +1,4 @@
+import { TableColumnLabel } from "@/components/ui/table-column-label";
 import Link from "next/link";
 import type { SupportCaseStatus as PrismaSupportCaseStatus } from "@prisma/client";
 
@@ -62,31 +63,31 @@ export default async function AdminSupportPage({ searchParams }: { searchParams:
       {cases.length === 0 ? (
         <EmptyState title="No cases here" description="Nothing matches this filter right now." />
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div>
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Case</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Subject</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Opened by</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Category</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Status</TableHead>
-                <TableHead className="text-right text-[12px] font-bold text-slate-500 uppercase tracking-wider">Updated</TableHead>
+              <TableRow>
+                <TableHead>Case</TableHead>
+                <TableHead>Subject</TableHead>
+                <TableHead>Opened by</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right"><TableColumnLabel help="The most recent saved update to this support case.">Updated</TableColumnLabel></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {cases.map((supportCase) => (
-                <TableRow key={supportCase.id} className="hover:bg-slate-50/50">
-                  <TableCell className="pl-6 font-bold text-[13px] text-slate-900">
+                <TableRow key={supportCase.id}>
+                  <TableCell className="font-normal">
                     <Link href={`/admin/support/${supportCase.id}`} className="hover:text-primary transition-colors">
                       {supportCase.caseRef}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-[13px] font-semibold text-slate-600">{supportCase.subject}</TableCell>
-                  <TableCell className="text-[13px] font-semibold text-slate-600">{supportCase.openedBy.name ?? supportCase.openedBy.email}</TableCell>
-                  <TableCell className="text-[13px] font-semibold text-slate-600 capitalize">{supportCase.category.replaceAll("_", " ").toLowerCase()}</TableCell>
-                  <TableCell><SupportCaseStatusBadge status={toSupportCaseStatus(supportCase.status)} /></TableCell>
-                  <TableCell className="pr-6 text-right text-[13px] font-semibold text-slate-500 whitespace-nowrap">
+                  <TableCell className="font-normal">{supportCase.subject}</TableCell>
+                  <TableCell className="font-normal">{supportCase.openedBy.name ?? supportCase.openedBy.email}</TableCell>
+                  <TableCell className="font-normal capitalize">{supportCase.category.replaceAll("_", " ").toLowerCase()}</TableCell>
+                  <TableCell><SupportCaseStatusBadge status={toSupportCaseStatus(supportCase.status)}  perspective="staff" /></TableCell>
+                  <TableCell className="text-right font-normal whitespace-nowrap">
                     {supportCase.updatedAt.toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" })}
                   </TableCell>
                 </TableRow>
@@ -95,8 +96,8 @@ export default async function AdminSupportPage({ searchParams }: { searchParams:
           </Table>
 
           {/* Pagination Footer */}
-          <div className="border-t border-slate-200 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-slate-500">
+          <div className="border-t border-border bg-slate-50/30 px-6 py-4 flex items-center justify-between">
+            <span className="text-sm font-semibold text-slate-500">
               Showing {cases.length > 0 ? (page - 1) * PAGE_SIZE + 1 : 0} to {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount} cases
             </span>
             <Pagination

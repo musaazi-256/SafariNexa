@@ -124,7 +124,7 @@ export function AccommodationReservationFields({
 
   const hasDates = Boolean(startDate && endDate);
   const hasValidRoom = roomTypes.length === 0 || (Boolean(selectedRoom) && selectedRoomFits);
-  const canReserve = Boolean(startDate && endDate && endDate > startDate && hasValidRoom);
+  const canReserve = Boolean(startDate && startDate >= todayIsoDate() && endDate && endDate > startDate && hasValidRoom);
   const nights = hasDates ? nightsBetween(startDate, endDate) : 1;
   const selectedAddOns = addOns.filter((addOn) => addOnIds.has(addOn.id));
   const roomTotal = unitPriceMinor * nights;
@@ -143,6 +143,17 @@ export function AccommodationReservationFields({
   function handleStartDateChange(value: string) {
     setStartDate(value);
     if (value && endDate && endDate <= value) setEndDate(dayAfter(value));
+  }
+
+  function handleCalendarDateSelect(value: string) {
+    // A complete range starts over on the next calendar selection. With a check-in
+    // selected, a later date completes the range; an earlier date starts it again.
+    if (!startDate || endDate || value <= startDate) {
+      setStartDate(value);
+      setEndDate("");
+      return;
+    }
+    setEndDate(value);
   }
 
   const addItem = useCartStore((state) => state.addItem);
@@ -176,7 +187,7 @@ export function AccommodationReservationFields({
     <div id="reservation-card" className="flex flex-col gap-4 rounded-xl transition-all duration-500">
       {roomTypes.length > 0 ? (
         <div>
-          <p className="mb-2 text-sm font-bold">Room type</p>
+          <p className="mb-2 text-sm font-medium leading-relaxed">Room type</p>
           <div className="flex flex-col gap-2">
             {roomTypes.map((room) => {
               const fits = room.maxOccupancy >= participantsNum;
@@ -203,7 +214,7 @@ export function AccommodationReservationFields({
                         className="mt-1 h-4 w-4 shrink-0 text-primary focus:ring-primary border-input"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-base">{room.name}</p>
+                        <p className="font-semibold text-base leading-relaxed">{room.name}</p>
                         <p className={cn("text-xs mt-0.5", !fits ? "font-semibold text-destructive" : "text-muted-foreground")}>
                           {fits
                             ? `${room.bedType || "1 Double Bed"} · Up to ${room.maxOccupancy} guests${room.breakfastIncluded ? " · Breakfast included" : ""}`
@@ -217,7 +228,7 @@ export function AccommodationReservationFields({
                       </div>
                       <span className="shrink-0 whitespace-nowrap font-semibold">
                         {formatUGX(room.priceMinor)}
-                        <span className="ml-1 text-[10px] font-normal text-muted-foreground">/night</span>
+                        <span className="ml-1 text-xs font-normal text-muted-foreground">/night</span>
                       </span>
                     </label>
                     <div className="pl-7">
@@ -241,13 +252,14 @@ export function AccommodationReservationFields({
       ) : null}
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold text-muted-foreground">Guests</label>
-        <div className="flex h-11 items-center rounded-xl border border-input bg-card px-3">
+        <label className="text-xs font-medium text-muted-foreground">Guests</label>
+        <div className="field-shell">
           <select
             name="participants"
+            aria-label="Guests"
             value={participants}
             onChange={(event) => setParticipants(event.target.value)}
-            className="w-full appearance-none bg-transparent text-sm font-medium outline-none"
+            className="w-full appearance-none bg-transparent text-base md:text-sm font-medium outline-none"
           >
             {Array.from({ length: overallMaxGuests }, (_, index) => index + 1).map((n) => (
               <option key={n} value={n}>
@@ -260,44 +272,40 @@ export function AccommodationReservationFields({
 
       {mode === "link" && selectedRoom ? (
         <AvailabilityCalendar 
-          bookedDates={
-            selectedRoom.bookedDates?.length 
-              ? selectedRoom.bookedDates 
-              : (() => {
-                  const today = new Date();
-                  const y = today.getFullYear();
-                  const m = String(today.getMonth() + 1).padStart(2, "0");
-                  return [`${y}-${m}-15`, `${y}-${m}-16`, `${y}-${m}-17`];
-                })()
-          } 
+          bookedDates={selectedRoom.bookedDates ?? []}
+          startDate={startDate}
+          endDate={endDate}
+          onSelectDate={handleCalendarDateSelect}
         />
       ) : null}
 
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-muted-foreground">Check-in</label>
-          <div className="flex h-11 items-center rounded-xl border border-input bg-card px-3">
+          <label className="text-xs font-medium text-muted-foreground">Check-in</label>
+          <div className="field-shell">
             <input
               type="date"
               name="startDate"
+              aria-label="Check-in"
               min={todayIsoDate()}
               value={startDate}
               onChange={(event) => handleStartDateChange(event.target.value)}
-              className="w-full bg-transparent text-sm font-medium outline-none"
+              className="w-full bg-transparent text-base md:text-sm font-medium outline-none"
               required
             />
           </div>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-muted-foreground">Check-out</label>
-          <div className="flex h-11 items-center rounded-xl border border-input bg-card px-3">
+          <label className="text-xs font-medium text-muted-foreground">Check-out</label>
+          <div className="field-shell">
             <input
               type="date"
               name="endDate"
+              aria-label="Check-out"
               min={startDate ? dayAfter(startDate) : todayIsoDate()}
               value={endDate}
               onChange={(event) => setEndDate(event.target.value)}
-              className="w-full bg-transparent text-sm font-medium outline-none"
+              className="w-full bg-transparent text-base md:text-sm font-medium outline-none"
               required
             />
           </div>
@@ -306,7 +314,7 @@ export function AccommodationReservationFields({
 
       {addOns.length > 0 ? (
         <div>
-          <p className="mb-2 text-sm font-bold">Optional add-ons</p>
+          <p className="mb-2 text-sm font-medium leading-relaxed">Optional add-ons</p>
           <div className="flex flex-col gap-2">
             {addOns.map((addOn) => (
               <label
@@ -354,7 +362,7 @@ export function AccommodationReservationFields({
               </div>
             ))}
             <Separator />
-            <div className="flex items-center justify-between text-base font-bold">
+            <div className="flex items-center justify-between text-base font-semibold">
               <span>Total</span>
               <span>{formatUGX(total)}</span>
             </div>
@@ -368,11 +376,11 @@ export function AccommodationReservationFields({
           
           <div className="flex items-center gap-2">
             {canReserve ? (
-              <Button size="lg" variant="secondary" className="flex-1 font-bold bg-secondary hover:bg-secondary/80" onClick={() => handleAddToCart()}>
+              <Button size="lg" variant="secondary" className="flex-1 font-medium bg-secondary hover:bg-secondary/80" onClick={() => handleAddToCart()}>
                 Add to cart
               </Button>
             ) : (
-              <Button size="lg" variant="secondary" className="flex-1 font-bold opacity-50" disabled>
+              <Button size="lg" variant="secondary" className="flex-1 font-medium opacity-50" disabled>
                 Add to cart
               </Button>
             )}
@@ -389,7 +397,7 @@ export function AccommodationReservationFields({
           </div>
 
           {canReserve ? (
-            <Button size="lg" className="w-full bg-brand-green hover:bg-brand-green/90 text-white font-bold" onClick={() => handleAddToCart(true)}>
+            <Button size="lg" className="w-full bg-brand-green hover:bg-brand-green/90 text-white font-medium" onClick={() => handleAddToCart(true)}>
               Continue to checkout
             </Button>
           ) : (

@@ -1,5 +1,7 @@
 "use client";
 
+import { useAsyncTask } from "@/hooks/use-async-task";
+
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +14,7 @@ export function ChangePasswordForm({
   action: (formData: FormData) => Promise<{ error?: string }>;
 }) {
   const formRef = React.useRef<HTMLFormElement>(null);
-  const [pending, startTransition] = React.useTransition();
+  const [pending, startTransition] = useAsyncTask();
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
 
@@ -28,6 +30,7 @@ export function ChangePasswordForm({
     }
 
     startTransition(async () => {
+      try {
       const result = await action(formData);
       if (result?.error) {
         setError(result.error);
@@ -35,16 +38,17 @@ export function ChangePasswordForm({
         setSuccess(true);
         formRef.current?.reset();
       }
+      } catch { setError("The password could not be updated. Please try again."); }
     });
   }
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
       {error ? (
-        <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">{error}</p>
+        <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive leading-relaxed">{error}</p>
       ) : null}
       {success ? (
-        <p className="rounded-xl border border-success/30 bg-success/10 px-3.5 py-2.5 text-sm text-success">Password updated.</p>
+        <p role="status" className="rounded-xl border border-success/30 bg-success/10 px-3.5 py-2.5 text-sm text-success leading-relaxed">Password updated.</p>
       ) : null}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="currentPassword">Current password</Label>
@@ -59,7 +63,7 @@ export function ChangePasswordForm({
         <Label htmlFor="confirmPassword">Confirm new password</Label>
         <Input id="confirmPassword" name="confirmPassword" type="password" minLength={8} required />
       </div>
-      <Button type="submit" disabled={pending} className="mt-1 self-start">
+      <Button type="submit" loading={pending} className="mt-1 self-start">
         {pending ? "Updating…" : "Update password"}
       </Button>
     </form>

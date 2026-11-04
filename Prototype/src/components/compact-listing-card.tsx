@@ -29,11 +29,11 @@ export function CompactListingCard({
   return (
     <Link
       href={href}
-      className={`group flex w-72 shrink-0 snap-start items-center gap-3 rounded-2xl border border-border bg-card p-2.5 shadow-card transition-all duration-300 hover:shadow-card-hover ${className ?? ""}`}
+      className={`group flex w-72 shrink-0 snap-start items-center gap-3 rounded-2xl border border-border bg-card p-2.5 shadow-card transition-shadow duration-150 hover:shadow-card-hover ${className ?? ""}`}
     >
       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-muted">
         {imageUrl ? (
-          <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+          <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover" />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-brand-green to-[#062617]" />
         )}

@@ -53,7 +53,7 @@ export default async function EditListingPage({ params }: { params: { id: string
   if (!liveListing || liveListing.businessId !== businessId) notFound();
   const listing = liveListing.draftSnapshot && liveListing.status === "PUBLISHED" ? {...liveListing,...liveListing.draftSnapshot as object} as typeof liveListing : liveListing;
   const pendingReview = await db.listingSubmission.findFirst({where: {listingId: listing.id, status: {in: ["SUBMITTED", "UNDER_REVIEW"]}}});
-  if (pendingReview) return <div className="mx-auto max-w-2xl space-y-4 p-4"><h1 className="text-2xl font-bold">Submission is locked during review</h1><p>Withdraw the pending submission before editing. The approved live version remains unchanged.</p><Link className="block underline" href={`/business/listings/${listing.id}/review`}>Submission & feedback</Link><Link className="block underline" href="/business/listings">Back to listings</Link></div>;
+  if (pendingReview) return <div className="mx-auto max-w-2xl space-y-4 p-4"><h1 className="type-page ">Submission is locked during review</h1><p>Withdraw the pending submission before editing. The approved live version remains unchanged.</p><Link className="block underline" href={`/business/listings/${listing.id}/review`}>Submission & feedback</Link><Link className="block underline" href="/business/listings">Back to listings</Link></div>;
 
   let guides: Array<{ id: string; name: string }> = [];
   if (listing.type === "TOUR") {
@@ -175,22 +175,22 @@ export default async function EditListingPage({ params }: { params: { id: string
         <ChevronRight className="h-4 w-4" />
         <Link href="/business/listings" className="hover:text-slate-900 transition-colors">Listings</Link>
         <ChevronRight className="h-4 w-4" />
-        <span className="text-slate-900 font-bold">{listing.title}</span>
+        <span className="text-slate-900 font-semibold">{listing.title}</span>
       </div>
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mb-1">
+          <h1 className="type-page text-slate-900 mb-1">
             Edit {typeLabel(listing.type)} listing
           </h1>
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-slate-500 font-medium leading-relaxed">
             Update your listing details to keep your information accurate and up to date.
           </p>
         </div>
         
         <div className="flex items-center gap-3 shrink-0">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-100 font-bold text-[11px] tracking-wider uppercase text-[#0B4928]">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-100 font-medium text-xs tracking-wider uppercase text-[#0B4928]">
             {listing.status}
           </div>
           <Button asChild variant="outline" size="sm"><Link href={`/${PREVIEW_PATH[listing.type]}/${listing.id}`}>View public listing</Link></Button>
@@ -302,12 +302,12 @@ export default async function EditListingPage({ params }: { params: { id: string
         ) : null}
 
         {/* Sticky Bottom Bar */}
-        <div className="fixed bottom-0 left-0 right-0 sm:left-64 p-4 bg-white/80 backdrop-blur-md border-t border-slate-200 z-50 flex items-center justify-between gap-4">
+        <div className="fixed bottom-0 left-0 right-0 sm:left-64 p-4 bg-white/80 backdrop-blur-md border-t border-border z-50 flex items-center justify-between gap-4">
           <div className="max-w-4xl w-full mx-auto flex items-center justify-between gap-4">
-            <Button asChild type="button" variant="outline" className="h-12 px-8 font-semibold text-slate-700 bg-white hover:bg-slate-50 border-slate-200 rounded-lg">
+            <Button asChild type="button" variant="outline" className="h-12 px-8 font-medium text-slate-700 bg-white hover:bg-slate-50 border-border rounded-lg">
               <Link href="/business/listings">Cancel</Link>
             </Button>
-            <Button type="submit" className="h-12 flex-1 max-w-2xl bg-[#0B4928] hover:bg-[#0B4928]/90 text-white font-bold rounded-lg text-base shadow-sm">
+            <Button type="submit" className="h-12 flex-1 max-w-2xl bg-[#0B4928] hover:bg-[#0B4928]/90 text-white font-medium rounded-lg text-base shadow-sm">
               Save changes
             </Button>
           </div>

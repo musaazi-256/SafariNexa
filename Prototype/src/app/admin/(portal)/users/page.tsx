@@ -1,3 +1,6 @@
+import { ConfirmSubmit } from "@/components/admin/confirm-submit";
+import { PortalSearch } from "@/components/portal-search";
+import { TableColumnLabel } from "@/components/ui/table-column-label";
 import Link from "next/link";
 import { Search, Filter } from "lucide-react";
 import type { UserRole } from "@prisma/client";
@@ -10,7 +13,7 @@ import { FilterTabs } from "@/components/ui/filter-tabs";
 import { PageHero } from "@/components/page-hero";
 import { AdminAccessStatusBadge } from "@/components/ui/status-badge";
 import { requireAdminSession } from "@/lib/admin";
-import { toggleAdminUserStatus } from "@/lib/actions/admin";
+import { toggleAdminUserStatus, updateAdminUserRole } from "@/lib/actions/admin";
 import { db } from "@/lib/db";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { toAdminAccessStatus } from "@/lib/status";
@@ -24,7 +27,8 @@ const TABS: Array<{ value: UserRole | "ALL"; label: string }> = [
 ];
 
 export default async function AdminUsersPage({ searchParams }: { searchParams: { role?: string; page?: string; q?: string } }) {
-  await requireAdminSession();
+  const session = await requireAdminSession();
+  const canManageRoles = session.user.adminRoleName === "Super Admin";
 
   const roleParam = searchParams.role?.toUpperCase();
   const activeRole = roleParam && ["CUSTOMER", "BUSINESS_OWNER", "BUSINESS_STAFF", "ADMIN", "SUPER_ADMIN"].includes(roleParam) ? roleParam as UserRole : undefined;
@@ -42,7 +46,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
     ];
   }
 
-  const [users, totalCount] = await Promise.all([
+  const [users, totalCount, roles] = await Promise.all([
     db.user.findMany({
       where,
       include: { adminUser: { include: { role: true } }, businessUsers: true },
@@ -50,7 +54,8 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE
     }),
-    db.user.count({ where })
+    db.user.count({ where }),
+    canManageRoles ? db.role.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }) : Promise.resolve([])
   ]);
 
   return (
@@ -74,23 +79,11 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
           })}
         />
         <div className="flex items-center gap-3 w-full sm:w-auto mt-4 sm:mt-0">
-          <form className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            {activeRole && (activeRole as string) !== "ALL" && <input type="hidden" name="role" value={activeRole.toLowerCase()} />}
-            <input
-              type="search"
-              name="q"
-              defaultValue={q}
-              placeholder="Search users..."
-              className="w-full h-9 pl-9 pr-4 rounded-full border border-slate-200 text-[13px] outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-white"
-            />
-          </form>
+          <PortalSearch label="Search users" placeholder="Search users…" />
 <PortalFilter />
-          <Link href="/admin/users/new">
-            <Button className="h-9 px-4 text-[13px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm rounded-full shrink-0">
+          <Button asChild className="h-9 px-4 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm rounded-full shrink-0"><Link href="/admin/users/new">
               Add user
-            </Button>
-          </Link>
+            </Link></Button>
         </div>
       </div>
 
@@ -98,40 +91,76 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
       {users.length === 0 ? (
         <EmptyState title="No users here" description="Nothing matches this filter right now." />
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div>
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">User</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Email</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Role</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Admin access</TableHead>
-                <TableHead className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Businesses</TableHead>
-                <TableHead className="text-right text-[12px] font-bold text-slate-500 uppercase tracking-wider">Action</TableHead>
+              <TableRow>
+                <TableHead>User</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead><TableColumnLabel help="Whether this user can currently sign in to the admin portal.">Admin access</TableColumnLabel></TableHead>
+                <TableHead><TableColumnLabel help="The role that determines which administrative actions this user can perform.">Permission level</TableColumnLabel></TableHead>
+                <TableHead>Businesses</TableHead>
+                <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.map((user) => (
-                <TableRow key={user.id} className="hover:bg-slate-50/50">
-                  <TableCell className="pl-6 font-bold text-[13px] text-slate-900">{user.name ?? "—"}</TableCell>
-                  <TableCell className="text-[13px] font-semibold text-slate-600 truncate">{user.email}</TableCell>
-                  <TableCell className="text-[13px] font-semibold text-slate-900 capitalize">
+                <TableRow key={user.id}>
+                  <TableCell className="font-normal">{user.name ?? "—"}</TableCell>
+                  <TableCell className="font-normal truncate">{user.email}</TableCell>
+                  <TableCell className="font-normal capitalize">
                     {user.role === "BUSINESS_OWNER" ? "Business Owner" : user.role === "BUSINESS_STAFF" ? "Business Staff" : user.role === "ADMIN" ? "Admin" : "Customer"}
                   </TableCell>
                   <TableCell>
                     {user.adminUser ? (
                       <AdminAccessStatusBadge status={toAdminAccessStatus(user.adminUser.status)} />
                     ) : (
-                      <span className="text-[13px] font-semibold text-slate-400">Not an admin</span>
+                      <span className="text-sm font-normal text-slate-500">Not an admin</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-[13px] font-bold text-slate-900">{user.businessUsers.length}</TableCell>
-                  <TableCell className="pr-6 text-right">
+                  <TableCell>
+                    {!user.adminUser ? (
+                      <span className="text-sm font-normal text-slate-500">—</span>
+                    ) : canManageRoles && user.id !== session.user.id ? (
+                      <form action={updateAdminUserRole.bind(null, user.adminUser.id)} className="flex items-center gap-2">
+                        <select
+                          name="roleId"
+                          defaultValue={user.adminUser.roleId}
+                          className="form-control form-control-compact font-normal"
+                        >
+                          {roles.map((role) => (
+                            <option key={role.id} value={role.id}>{role.name}</option>
+                          ))}
+                        </select>
+                        <Button type="submit" variant="outline" className="h-8 px-3 text-xs font-normal shadow-none rounded-full">
+                          Save
+                        </Button>
+                      </form>
+                    ) : (
+                      <span className="text-sm font-normal text-slate-700">{user.adminUser.role.name}</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="font-normal">{user.businessUsers.length}</TableCell>
+                  <TableCell className="text-right">
                     {user.adminUser && user.adminUser.status !== "INVITED" ? (
                       <form action={toggleAdminUserStatus.bind(null, user.adminUser.id)} className="inline-block">
-                        <Button type="submit" variant="outline" className={`h-7 px-3 text-[11px] font-bold shadow-none rounded-full ${user.adminUser.status === "ACTIVE" ? "text-slate-600 border-slate-200 hover:bg-slate-50" : "text-primary border-primary/30 hover:bg-primary/10"}`}>
-                          {user.adminUser.status === "ACTIVE" ? "Suspend" : "Reactivate"}
-                        </Button>
+                        {user.adminUser.status === "ACTIVE" ? (
+                          <ConfirmSubmit
+                            title={`Suspend ${user.name ?? user.email}?`}
+                            description="They will lose access to the admin portal straight away. You can reactivate them later."
+                            confirmLabel="Suspend admin"
+                            trigger={
+                              <Button variant="outline" className="h-7 px-3 text-xs font-normal shadow-none rounded-full text-slate-600 border-border hover:bg-slate-50">
+                                Suspend
+                              </Button>
+                            }
+                          />
+                        ) : (
+                          <Button type="submit" variant="outline" className="h-7 px-3 text-xs font-normal shadow-none rounded-full text-primary border-primary/30 hover:bg-primary/10">
+                            Reactivate
+                          </Button>
+                        )}
                       </form>
                     ) : null}
                   </TableCell>
@@ -141,8 +170,8 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
           </Table>
 
           {/* Pagination Footer */}
-          <div className="border-t border-slate-200 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-slate-500">
+          <div className="border-t border-border bg-slate-50/30 px-6 py-4 flex items-center justify-between">
+            <span className="text-sm font-semibold text-slate-500">
               Showing {users.length > 0 ? (page - 1) * PAGE_SIZE + 1 : 0} to {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount} users
             </span>
             <Pagination

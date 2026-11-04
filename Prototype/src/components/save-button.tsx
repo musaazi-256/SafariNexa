@@ -1,5 +1,7 @@
 "use client";
 
+import { useAsyncTask } from "@/hooks/use-async-task";
+
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
@@ -25,7 +27,7 @@ export function SaveButton({
   className?: string;
 }) {
   const [saved, setSaved] = React.useState(initialSaved);
-  const [pending, startTransition] = React.useTransition();
+  const [pending, startTransition] = useAsyncTask();
   const router = useRouter();
 
   function handleClick(event: React.MouseEvent) {
@@ -55,9 +57,10 @@ export function SaveButton({
         type="button"
         onClick={handleClick}
         disabled={pending}
+        aria-busy={pending}
         aria-pressed={saved}
         className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-red-600 disabled:opacity-60",
+          "flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-white text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-red-600 disabled:opacity-60",
           saved && "border-red-200 bg-red-50 text-red-600",
           className
         )}
@@ -73,6 +76,7 @@ export function SaveButton({
       type="button"
       onClick={handleClick}
       disabled={pending}
+        aria-busy={pending}
       aria-pressed={saved}
       aria-label={saved ? "Remove from saved" : "Save to favorites"}
       className={cn(

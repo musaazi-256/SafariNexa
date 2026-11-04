@@ -24,20 +24,22 @@ export function GoogleAuthTrigger({
   label?: string;
 }) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   return (
-    <Button
+    <><Button
       type="button"
       variant="secondary"
       className="w-full"
-      disabled={loading}
-      onClick={() => {
-        setLoading(true);
-        void signIn(provider, { callbackUrl });
+      loading={loading}
+      onClick={async () => {
+        setLoading(true); setError("");
+        try { await signIn(provider, { callbackUrl }); }
+        catch { setError("Sign-in could not be started. Please try again."); setLoading(false); }
       }}
     >
       {GOOGLE_G}
       {loading ? "Redirecting to Google…" : label}
-    </Button>
+    </Button>{error && <p role="alert" className="mt-2 text-sm text-destructive leading-relaxed">{error}</p>}</>
   );
 }

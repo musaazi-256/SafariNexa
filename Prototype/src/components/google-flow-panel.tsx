@@ -19,7 +19,7 @@ export function GoogleFlowPanel({ surface }: { surface: Surface }) {
       {decisionsBySurface[surface].map((decision) => (
         <Card key={decision} className="border-dashed">
           <CardContent className="pt-5">
-            <strong className="text-sm font-bold capitalize">{decision.replaceAll("_", " ")}</strong>
+            <strong className="text-sm font-medium capitalize">{decision.replaceAll("_", " ")}</strong>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
               {describeGoogleAuthDecision(surface, decision)}
             </p>

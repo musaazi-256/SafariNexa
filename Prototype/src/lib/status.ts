@@ -51,6 +51,8 @@ export type SupportCaseStatus = "open" | "in_progress" | "waiting_on_customer" |
 
 export type RefundStatus = "requested" | "processing" | "completed" | "rejected";
 
+const unknownStatus = { label: "Unknown status", variant: "secondary" as const };
+
 type StatusMeta = { label: string; variant: NonNullable<BadgeProps["variant"]> };
 
 const bookingStatusMeta: Record<BookingStatus, StatusMeta> = {
@@ -71,9 +73,9 @@ const bookingStatusMeta: Record<BookingStatus, StatusMeta> = {
   refund_processing: { label: "Refund processing", variant: "warning" },
   refunded: { label: "Refunded", variant: "secondary" },
   completed: { label: "Completed", variant: "success" },
-  review_pending: { label: "Review pending", variant: "accent" },
+  review_pending: { label: "Review pending", variant: "secondary" },
   reviewed: { label: "Reviewed", variant: "secondary" },
-  support_case_open: { label: "Support case open", variant: "destructive" }
+  support_case_open: { label: "Support case open", variant: "warning" }
 };
 
 const paymentStatusMeta: Record<PaymentStatus, StatusMeta> = {
@@ -118,7 +120,7 @@ const reviewStatusMeta: Record<ReviewStatus, StatusMeta> = {
 const supportCaseStatusMeta: Record<SupportCaseStatus, StatusMeta> = {
   open: { label: "Open", variant: "warning" },
   in_progress: { label: "In progress", variant: "warning" },
-  waiting_on_customer: { label: "Waiting on you", variant: "accent" },
+  waiting_on_customer: { label: "Waiting on you", variant: "warning" },
   resolved: { label: "Resolved", variant: "success" },
   closed: { label: "Closed", variant: "secondary" }
 };
@@ -130,8 +132,9 @@ const refundStatusMeta: Record<RefundStatus, StatusMeta> = {
   rejected: { label: "Rejected", variant: "destructive" }
 };
 
-export function bookingStatusMetaOf(status: BookingStatus): StatusMeta {
-  return bookingStatusMeta[status];
+export function bookingStatusMetaOf(status: BookingStatus, perspective: "customer" | "staff" = "customer"): StatusMeta {
+  if (perspective === "staff" && status === "cancelled_by_customer") return { ...bookingStatusMeta[status], label: "Cancelled by customer" };
+  return bookingStatusMeta[status] ?? unknownStatus;
 }
 
 /** Prisma's BookingStatus enum is UPPER_SNAKE; this UI layer's type is
@@ -142,7 +145,7 @@ export function toBookingStatus(prismaStatus: string): BookingStatus {
 }
 
 export function paymentStatusMetaOf(status: PaymentStatus): StatusMeta {
-  return paymentStatusMeta[status];
+  return paymentStatusMeta[status] ?? unknownStatus;
 }
 
 /** Prisma's PaymentStatus enum is UPPER_SNAKE; this UI layer's type is
@@ -152,7 +155,7 @@ export function toPaymentStatus(prismaStatus: string): PaymentStatus {
 }
 
 export function verificationStatusMetaOf(status: VerificationStatus): StatusMeta {
-  return verificationStatusMeta[status];
+  return verificationStatusMeta[status] ?? unknownStatus;
 }
 
 /** Prisma's VerificationStatus enum is UPPER_SNAKE; this UI layer's type is
@@ -162,7 +165,7 @@ export function toVerificationStatus(prismaStatus: string): VerificationStatus {
 }
 
 export function adminAccessStatusMetaOf(status: AdminAccessStatus): StatusMeta {
-  return adminAccessStatusMeta[status];
+  return adminAccessStatusMeta[status] ?? unknownStatus;
 }
 
 /** Prisma's AdminUserStatus enum (ACTIVE/INVITED/SUSPENDED/INACTIVE) is a subset of the
@@ -173,7 +176,7 @@ export function toAdminAccessStatus(prismaStatus: string): AdminAccessStatus {
 }
 
 export function reviewStatusMetaOf(status: ReviewStatus): StatusMeta {
-  return reviewStatusMeta[status];
+  return reviewStatusMeta[status] ?? unknownStatus;
 }
 
 /** Prisma's ReviewStatus enum is UPPER_SNAKE; this UI layer's type is
@@ -183,8 +186,9 @@ export function toReviewStatus(prismaStatus: string): ReviewStatus {
   return prismaStatus.toLowerCase() as ReviewStatus;
 }
 
-export function supportCaseStatusMetaOf(status: SupportCaseStatus): StatusMeta {
-  return supportCaseStatusMeta[status];
+export function supportCaseStatusMetaOf(status: SupportCaseStatus, perspective: "customer" | "staff" = "customer"): StatusMeta {
+  if (perspective === "staff" && status === "waiting_on_customer") return { ...supportCaseStatusMeta[status], label: "Waiting on customer" };
+  return supportCaseStatusMeta[status] ?? unknownStatus;
 }
 
 /** Prisma's SupportCaseStatus enum is UPPER_SNAKE; this UI layer's type is
@@ -194,11 +198,32 @@ export function toSupportCaseStatus(prismaStatus: string): SupportCaseStatus {
 }
 
 export function refundStatusMetaOf(status: RefundStatus): StatusMeta {
-  return refundStatusMeta[status];
+  return refundStatusMeta[status] ?? unknownStatus;
 }
 
 /** Prisma's RefundStatus enum is UPPER_SNAKE; this UI layer's type is
  * lower_snake with identical member names, same convention as toBookingStatus. */
 export function toRefundStatus(prismaStatus: string): RefundStatus {
   return prismaStatus.toLowerCase() as RefundStatus;
+}
+
+const listingStatusMeta: Record<string, StatusMeta> = {
+  DRAFT: { label: "Draft", variant: "secondary" },
+  PUBLISHED: { label: "Published", variant: "success" },
+  ARCHIVED: { label: "Archived", variant: "secondary" }
+};
+const listingSubmissionStatusMeta: Record<string, StatusMeta> = {
+  NOT_SUBMITTED: { label: "Not submitted", variant: "secondary" },
+  SUBMITTED: { label: "Submitted", variant: "warning" },
+  UNDER_REVIEW: { label: "Under review", variant: "warning" },
+  NEEDS_CHANGES: { label: "Needs changes", variant: "warning" },
+  APPROVED: { label: "Approved", variant: "success" },
+  REJECTED: { label: "Rejected", variant: "destructive" },
+  WITHDRAWN: { label: "Withdrawn", variant: "secondary" }
+};
+export function listingStatusMetaOf(status: string): StatusMeta {
+  return listingStatusMeta[status.toUpperCase()] ?? unknownStatus;
+}
+export function listingSubmissionStatusMetaOf(status: string): StatusMeta {
+  return listingSubmissionStatusMeta[status.toUpperCase()] ?? unknownStatus;
 }

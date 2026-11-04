@@ -51,7 +51,7 @@ export default async function PreferencesPage({searchParams}: {searchParams: {sa
       title="Preferences"
       description="Control what SafariNexa notifies you about, and set your default traveller details."
     >
-      <Card className="border-none shadow-sm rounded-2xl">
+      <Card className="border-border shadow-card rounded-2xl">
         <CardContent className="pt-6 pb-6">
           {searchParams.saved && <p role="status" className="mb-4 text-primary">Preferences saved.</p>}
           <PreferencesForm

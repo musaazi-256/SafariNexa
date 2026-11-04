@@ -48,7 +48,7 @@ export function RoomDetailsModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ? trigger : (
-          <button className="text-sm font-semibold text-blue-600 hover:underline focus-visible:outline-none">
+          <button className="text-sm font-medium text-blue-600 hover:underline focus-visible:outline-none">
             More details &gt;
           </button>
         )}
@@ -67,6 +67,7 @@ export function RoomDetailsModal({
               <>
                 <button
                   type="button"
+                  aria-label="Previous room photo"
                   onClick={prevImage}
                   className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-foreground shadow-md transition-transform hover:scale-110 hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                 >
@@ -74,6 +75,7 @@ export function RoomDetailsModal({
                 </button>
                 <button
                   type="button"
+                  aria-label="Next room photo"
                   onClick={nextImage}
                   className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-foreground shadow-md transition-transform hover:scale-110 hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                 >
@@ -94,7 +96,7 @@ export function RoomDetailsModal({
         )}
 
         <div className="px-6 pt-6">
-          <h2 className="text-2xl font-bold">{name}</h2>
+          <h2 className="text-2xl font-semibold">{name}</h2>
           
           <div className="mt-6 grid grid-cols-2 gap-6 rounded-xl border border-border p-6 sm:grid-cols-4">
             <div className="flex flex-col gap-2">
@@ -131,7 +133,7 @@ export function RoomDetailsModal({
           {roomFeatures && roomFeatures.length > 0 ? (
             <>
               <Separator className="my-8" />
-              <h3 className="mb-4 text-xl font-bold">Room highlights</h3>
+              <h3 className="mb-4 text-xl font-semibold">Room highlights</h3>
               <ul className="grid grid-cols-1 gap-2 text-sm text-muted-foreground sm:grid-cols-2">
                 {roomFeatures.map((feature) => (
                   <li key={feature} className="list-disc pl-5">{feature}</li>
@@ -142,7 +144,7 @@ export function RoomDetailsModal({
 
           <Separator className="my-8" />
 
-          <h3 className="mb-4 text-xl font-bold">Room amenities</h3>
+          <h3 className="mb-4 text-xl font-semibold">Room amenities</h3>
           <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
             <div>
               <div className="mb-3 flex items-center gap-2 font-semibold">

@@ -50,22 +50,22 @@ export default async function SavedItemsPage() {
             <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center mb-1">
               <Heart className="h-5 w-5 text-slate-400" />
             </div>
-            <h4 className="font-bold text-[13px] text-slate-900">Save your favorites</h4>
-            <p className="text-[12px] font-medium text-slate-500">Quickly find places you love.</p>
+            <h4 className="font-semibold text-sm text-slate-900">Save your favorites</h4>
+            <p className="text-xs font-medium text-slate-500">Quickly find places you love.</p>
           </div>
           <div className="flex flex-col items-center text-center gap-2">
             <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center mb-1">
               <Scale className="h-5 w-5 text-slate-400" />
             </div>
-            <h4 className="font-bold text-[13px] text-slate-900">Compare easily</h4>
-            <p className="text-[12px] font-medium text-slate-500">Review saved items anytime.</p>
+            <h4 className="font-semibold text-sm text-slate-900">Compare easily</h4>
+            <p className="text-xs font-medium text-slate-500">Review saved items anytime.</p>
           </div>
           <div className="flex flex-col items-center text-center gap-2">
             <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center mb-1">
               <CalendarCheck className="h-5 w-5 text-slate-400" />
             </div>
-            <h4 className="font-bold text-[13px] text-slate-900">Book when ready</h4>
-            <p className="text-[12px] font-medium text-slate-500">Come back and book later.</p>
+            <h4 className="font-semibold text-sm text-slate-900">Book when ready</h4>
+            <p className="text-xs font-medium text-slate-500">Come back and book later.</p>
           </div>
         </div>
       </>

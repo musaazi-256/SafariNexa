@@ -98,34 +98,34 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
         <form action={respond} className="mb-4"><input type="hidden" name="bookingId" value={booking.id} /><Button name="decision" value="complete" type="submit">Mark service completed</Button></form>
       )}
       <Breadcrumbs items={[{ label: "Bookings", href: "/business/bookings" }, { label: booking.bookingRef }]} />
-      {booking.listing.type === "TRANSPORT" && booking.status === "CONFIRMED" && <form action={assignTransfer} className="mb-6 grid gap-3 rounded border p-4 sm:grid-cols-3"><h2 className="font-bold sm:col-span-3">Assign / update transfer driver and vehicle</h2><input type="hidden" name="bookingId" value={booking.id}/>{["driverName","driverPhone","vehicleRegistration"].map(key=><label key={key}>{key.replace(/([a-z])([A-Z])/g,"$1 $2")}<input name={key} required maxLength={key==="driverName"?120:40} defaultValue={String((booking.fulfilment as Record<string,unknown>|null)?.[key]||"")} className="mt-1 w-full rounded border p-2"/></label>)}<p className="text-sm sm:col-span-3">These details are shared with this booking’s customer.</p><Button>Save assignment and notify customer</Button></form>}
+      {booking.listing.type === "TRANSPORT" && booking.status === "CONFIRMED" && <form action={assignTransfer} className="mb-6 grid gap-3 rounded border p-4 sm:grid-cols-3"><h2 className="font-semibold sm:col-span-3">Assign / update transfer driver and vehicle</h2><input type="hidden" name="bookingId" value={booking.id}/>{["driverName","driverPhone","vehicleRegistration"].map(key=><label key={key}>{key.replace(/([a-z])([A-Z])/g,"$1 $2")}<input name={key} required maxLength={key==="driverName"?120:40} defaultValue={String((booking.fulfilment as Record<string,unknown>|null)?.[key]||"")} className="form-control mt-1 w-full"/></label>)}<p className="text-sm sm:col-span-3 leading-relaxed">These details are shared with this booking’s customer.</p><Button>Save assignment and notify customer</Button></form>}
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
             <div>
-              <BookingStatusBadge status={toBookingStatus(booking.status)} />
-              <h1 className="mt-2 text-3xl font-extrabold">{booking.listing.title}</h1>
+              <BookingStatusBadge status={toBookingStatus(booking.status)} perspective="staff" />
+              <h1 className="type-page mt-2">{booking.listing.title}</h1>
               <p className="mt-1 text-muted-foreground">Booking {booking.bookingRef}</p>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Participants</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Participants</p>
                   <p className="font-semibold">{booking.participantsCount}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Start</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Start</p>
                   <p className="font-semibold">
                     {booking.startDate ? formatBookingDate(booking.startDate, booking.listing.type) : "—"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">End</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">End</p>
                   <p className="font-semibold">{booking.endDate ? formatBookingDate(booking.endDate, booking.listing.type) : "—"}</p>
                 </div>
               </div>
 
               {booking.roomTypeName || booking.roomType || booking.addOns.length > 0 ? (
                 <>
-                  <h2 className="mb-2 mt-8 text-lg font-bold">Room &amp; add-ons</h2>
+                  <h2 className="mb-2 mt-8 text-lg font-semibold">Room &amp; add-ons</h2>
                   <Card>
                     <CardContent className="grid gap-2 pt-6 text-sm">
                       {booking.roomTypeName || booking.roomType ? (
@@ -149,7 +149,7 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
 
               <BookingTravellerSummary participants={booking.participants}/>
               <BookingOperationsSummary booking={booking} business/>
-              <h2 className="mb-2 mt-8 text-lg font-bold">Customer</h2>
+              <h2 className="mb-2 mt-8 text-lg font-semibold">Customer</h2>
               <Card>
                 <CardContent className="grid gap-2 pt-6 text-sm">
                   <p>
@@ -171,7 +171,7 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
 
               {paymentHistory.length > 0 ? (
                 <>
-                  <h2 className="mb-2 mt-8 text-lg font-bold">Payment history</h2>
+                  <h2 className="mb-2 mt-8 text-lg font-semibold">Payment history</h2>
                   <div className="flex flex-col gap-2">
                     {paymentHistory.map((payment) => (
                       <Card key={payment.id}>
@@ -192,7 +192,8 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
                 bookingId={booking.id}
                 initialMessages={chatMessages}
                 currentUserId={session?.user?.id ?? ""}
-                businessName={business.name}
+                businessName={booking.customer.name ?? "Customer"}
+                recipientId={booking.customerId}
                 isBusinessPortal={true}
               />
             </div>

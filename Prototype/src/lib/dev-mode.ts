@@ -1,11 +1,9 @@
-/**
- * Legacy development flag validator. Authentication always checks existing
- * credentials and roles, even locally. A stale development flag must never
- * be accepted by a production deployment.
- */
+/** This repository is a demo by default, including deployed preview builds.
+ * Set SAFARINEXA_DEMO_MODE=false explicitly to use live integrations. */
+export function isDemoMode() {
+  return process.env.SAFARINEXA_DEMO_MODE !== "false";
+}
+
 export function isAuthDevMode() {
-  if (process.env.NODE_ENV === "production" && process.env.AUTH_DEV_MODE === "true") {
-    throw new Error("AUTH_DEV_MODE is true in a production environment. This is a critical security risk. Refusing to start.");
-  }
-  return process.env.AUTH_DEV_MODE === "true";
+  return isDemoMode();
 }

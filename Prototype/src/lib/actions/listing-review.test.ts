@@ -9,6 +9,7 @@ jest.mock("@/lib/business", () => ({requireBusinessSession: jest.fn().mockResolv
 jest.mock("@/lib/db", () => ({db:{
   $transaction: jest.fn(), listing:{findUnique:jest.fn(),update:jest.fn()},
   listingSubmission:{findFirst:jest.fn(),findUnique:jest.fn(),create:jest.fn(),update:jest.fn(),updateMany:jest.fn()},
+  adminUser:{findMany:jest.fn().mockResolvedValue([])},
   businessUser:{findFirst:jest.fn(),findMany:jest.fn()},notification:{createMany:jest.fn()},auditLog:{create:jest.fn()}
 }}));
 const mock = db as unknown as {

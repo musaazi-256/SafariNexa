@@ -1,3 +1,8 @@
+import { ConfirmSubmit } from "@/components/admin/confirm-submit";
+import { VerificationStatusBadge } from "@/components/ui/status-badge";
+import { toVerificationStatus } from "@/lib/status";
+import { documentLink } from "@/lib/document-link";
+import { isDemoMode } from "@/lib/dev-mode";
 import { Square } from "lucide-react";
 import Link from "next/link";
 import type { VerificationStatus as PrismaVerificationStatus } from "@prisma/client";
@@ -62,14 +67,13 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
     await updateVerificationStatus(verificationId, status, notes || "No notes provided by reviewer.");
   }
 
-  // Fallback mock items matching the screenshot when database records are few
 
 
   return (
     <div className="max-w-[1450px] mx-auto space-y-6 pb-20 font-sans">
       
       {/* Header Row */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
         <PageHero
           variant="portal"
           eyebrow="Admin portal"
@@ -98,13 +102,14 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
             const dateStr = v.submittedAt.toLocaleDateString("en-UG", { day: 'numeric', month: 'short', year: 'numeric' });
 
             return (
-              <div key={v.id} className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 space-y-4">
+              <div key={v.id} className="bg-white rounded-2xl border border-border shadow-card p-6 space-y-4">
                 
                 {/* Header Row */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">{v.business.name}</h3>
-                    <p className="text-xs font-semibold text-slate-400 mt-0.5">{formattedCategory} · Submitted on {dateStr}</p>
+                    <h3 className="text-base font-semibold text-slate-900"><Link href={`/admin/verification/${v.id}`} className="hover:underline">{v.business.name}</Link></h3>
+                    <Link href={`/admin/verification/${v.id}`} className="mt-2 inline-block text-xs font-semibold text-primary underline">Review submitted profile and documents</Link>
+                    <p className="text-xs font-medium text-slate-500 mt-0.5">{formattedCategory} · Submitted on {dateStr}</p>
                   </div>
 
                   <form action={setVerificationStatus} className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-end gap-2 sm:justify-end">
@@ -112,66 +117,54 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
                     <textarea
                       name="notes"
                       placeholder="Reviewer notes (shown to the business)"
-                      rows={1}
-                      className="w-full sm:w-64 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      rows={3}
+                      className="form-textarea min-h-20 w-full sm:w-72 resize-y"
                     />
                     <div className="flex items-center gap-2 shrink-0">
-                      <Button type="submit" name="status" value="APPROVED" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-lg px-4 h-8 transition-colors">
+                      <Button type="submit" name="status" value="APPROVED" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-xs rounded-lg px-4 h-8 transition-colors">
                         Approve
                       </Button>
-                      <Button type="submit" name="status" value="NEEDS_CHANGES" variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-xs rounded-lg px-4 h-8 transition-colors">
+                      <Button type="submit" name="status" value="NEEDS_CHANGES" variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium text-xs rounded-lg px-4 h-8 transition-colors">
                         Request more
                       </Button>
-                      <Button type="submit" name="status" value="SUSPENDED" variant="secondary" className="bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs rounded-lg px-4 h-8 transition-colors">
-                        Flag
-                      </Button>
+                      <ConfirmSubmit
+                        name="status"
+                        value="SUSPENDED"
+                        title="Place a fraud hold?"
+                        description={<><strong>{v.business.name}</strong> will be suspended and its listings taken off the marketplace until the hold is lifted.</>}
+                        previewField="notes"
+                        previewLabel="Reviewer notes sent to the business"
+                        confirmLabel="Place fraud hold"
+                        trigger={
+                          <Button variant="secondary" className="bg-red-50 text-red-600 hover:bg-red-100 font-medium text-xs rounded-lg px-4 h-8 transition-colors">
+                            Flag
+                          </Button>
+                        }
+                      />
                     </div>
                   </form>
                 </div>
 
                 {/* Submitted Documents Section */}
                 <div>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">SUBMITTED DOCUMENTS</p>
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2.5">SUBMITTED DOCUMENTS</p>
                   
                   {v.documents.length > 0 ? (
                     <div className="flex flex-wrap gap-3">
                       {v.documents.map((doc) => {
                         const docLabel = doc.type.replace(/_/g, " ");
-                        const isApproved = v.status === "APPROVED";
-                        const isUnderReview = v.status === "UNDER_REVIEW";
-                        const isNeedsChanges = v.status === "NEEDS_CHANGES";
-
-                        const statusText = isApproved ? "Verified" : isNeedsChanges ? "Missing" : isUnderReview ? "Pending" : "Verified";
 
                         return (
-                          <div key={doc.id} className="inline-flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50/80 px-3.5 py-2 text-xs text-slate-700 font-bold">
+                          <a href={documentLink(doc.fileUrl, doc.type, isDemoMode(), doc.id)} target="_blank" rel="noreferrer" key={doc.id} className="inline-flex items-center gap-2.5 rounded-xl border border-border bg-slate-50/80 px-3.5 py-2 text-xs text-slate-700 font-medium">
                             <Square className="h-3.5 w-3.5 text-slate-400" />
                             <span>{docLabel}</span>
-                            <span className={cn(
-                              "text-[10px] font-extrabold px-2.5 py-0.5 rounded-md ml-1",
-                              statusText === "Verified" && "bg-emerald-100 text-emerald-800",
-                              statusText === "Pending" && "bg-amber-100 text-amber-800",
-                              statusText === "Missing" && "bg-blue-100 text-blue-800"
-                            )}>
-                              {statusText}
-                            </span>
-                          </div>
+                            <VerificationStatusBadge status={toVerificationStatus(v.status)} />
+                          </a>
                         );
                       })}
                     </div>
                   ) : (
-                    <div className="flex flex-wrap gap-3">
-                      <div className="inline-flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50/80 px-3.5 py-2 text-xs text-slate-700 font-bold">
-                        <Square className="h-3.5 w-3.5 text-slate-400" />
-                        <span>Trading License</span>
-                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-md ml-1">Verified</span>
-                      </div>
-                      <div className="inline-flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50/80 px-3.5 py-2 text-xs text-slate-700 font-bold">
-                        <Square className="h-3.5 w-3.5 text-slate-400" />
-                        <span>COI (Certificate)</span>
-                        <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-md ml-1">Pending</span>
-                      </div>
-                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">No documents submitted.</p>
                   )}
                 </div>
 
@@ -179,14 +172,13 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
             );
           })
         ) : (
-          // Mock Cards matching screenshot
 <p className="rounded-xl border bg-white p-6 text-muted-foreground">No matching verification submissions.</p>
         )}
       </div>
 
       {totalCount > 0 ? (
-        <div className="flex items-center justify-between px-1">
-          <span className="text-xs font-semibold text-slate-500">
+        <div className="flex flex-wrap gap-3 items-center justify-between px-1">
+          <span className="text-xs font-medium text-slate-500">
             Showing {(page - 1) * PAGE_SIZE + 1} to {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount} verifications
           </span>
           <Pagination

@@ -1,4 +1,5 @@
 "use server";
+import { isDemoMode } from "@/lib/dev-mode";
 import { randomBytes,createHash } from "crypto";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
@@ -19,7 +20,7 @@ export async function requestAccountEmail(_previous:{message:string},data:FormDa
   try{
     await sendAccountEmail(email,purpose==="reset"?"Reset your SafariNexa password":"Verify your SafariNexa email",`Open this link to ${purpose==="reset"?"reset your password":"verify your email"}: ${applicationOrigin()}/auth/${purpose==="reset"?"reset-password":"verify"}?token=${token}\nIf you did not request this, ignore this email.`,`account:${digest}`);
   }catch{return {message:"Email delivery failed. Please try again in a minute. No password has been changed."};}
-  return generic;
+  return isDemoMode() ? {message:"Your message is ready. Open the Email inbox from the footer to continue."} : generic;
 }
 export async function finishAccountEmail(_previous:{message:string},data:FormData) {
   const token=String(data.get("token")??"");

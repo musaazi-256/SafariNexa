@@ -36,7 +36,7 @@ export function MobileBottomNav() {
             )}
           >
             <item.icon className={cn("h-5 w-5", isActive && "fill-primary/20")} />
-            <span className="text-[10px] font-semibold">{item.label}</span>
+            <span className="text-xs font-medium">{item.label}</span>
           </Link>
         );
       })}

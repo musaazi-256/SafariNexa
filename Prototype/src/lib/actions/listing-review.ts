@@ -1,5 +1,6 @@
 "use server";
 
+import { notifyAdmins } from "@/lib/admin-notifications";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
@@ -23,6 +24,7 @@ export async function submitListing(form: FormData) {
     if (await tx.listingSubmission.findFirst({ where: { listingId, status: { in: ["SUBMITTED", "UNDER_REVIEW"] } } })) throw new Error("This listing is already awaiting review.");
     const { business, ...content } = listing; void business;
     await tx.listingSubmission.create({ data: { listingId, submittedBy: session.user.id, snapshot: isRevision ? listing.draftSnapshot! as Prisma.InputJsonObject : listingSnapshot(content), ...(isRevision ? {draftForm:listing.draftForm! as Prisma.InputJsonObject,baselineDigest:snapshotDigest(listingSnapshot(content))}:{}) } });
+    await notifyAdmins(tx,"businesses.manage",{type:"SYSTEM",title:"Listing submitted for review",body:`${listing.title} has a new listing and photo submission. Open the listing review queue to inspect it.`},session.user.id);
   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
   revalidatePath("/business/listings"); revalidatePath("/admin/listings");
   redirect(`/business/listings/${listingId}/review`);

@@ -20,30 +20,30 @@ export default function SafetyPage() {
         
         {/* SOS Quick Actions */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Emergency Assistance</h2>
+          <h2 className="text-2xl font-semibold mb-6">Emergency Assistance</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Button variant="destructive" className="h-auto py-6 flex flex-col items-center justify-center gap-2" asChild>
               <a href="tel:999">
                 <Phone className="h-8 w-8" />
-                <span className="font-bold text-lg">Call Police (999)</span>
+                <span className="font-semibold text-lg">Call Police (999)</span>
               </a>
             </Button>
             <Button variant="outline" className="h-auto py-6 flex flex-col items-center justify-center gap-2 text-red-600 border-red-200 hover:bg-red-50" asChild>
               <a href="tel:112">
                 <HeartPulse className="h-8 w-8" />
-                <span className="font-bold text-lg">Medical Emergency</span>
+                <span className="font-semibold text-lg">Medical Emergency</span>
               </a>
             </Button>
             <Button variant="outline" className="h-auto py-6 flex flex-col items-center justify-center gap-2 text-amber-600 border-amber-200 hover:bg-amber-50" asChild>
               <a href="tel:+256712667705">
                 <ShieldAlert className="h-8 w-8" />
-                <span className="font-bold text-lg">Tourism Police</span>
+                <span className="font-semibold text-lg">Tourism Police</span>
               </a>
             </Button>
             <Button variant="outline" className="h-auto py-6 flex flex-col items-center justify-center gap-2" asChild>
               <a href="tel:999">
                 <Building className="h-8 w-8 text-primary" />
-                <span className="font-bold text-lg">Contact My Hotel</span>
+                <span className="font-semibold text-lg">Contact My Hotel</span>
               </a>
             </Button>
           </div>
@@ -65,15 +65,15 @@ export default function SafetyPage() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium">Uganda Police (Toll Free)</span>
-                    <span className="font-bold">999 / 112</span>
+                    <span className="font-semibold">999 / 112</span>
                   </div>
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium">Tourism Police Commander</span>
-                    <span className="font-bold">+256 712 667 705</span>
+                    <span className="font-semibold">+256 712 667 705</span>
                   </div>
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium">Fire Brigade</span>
-                    <span className="font-bold">112</span>
+                    <span className="font-semibold">112</span>
                   </div>
                 </CardContent>
               </Card>
@@ -85,13 +85,13 @@ export default function SafetyPage() {
                 <CardContent className="space-y-4">
                   <div>
                     <h4 className="font-semibold">Nakasero Hospital (Kampala)</h4>
-                    <p className="text-sm text-muted-foreground"><MapPin className="inline h-3 w-3 mr-1" /> Akii Bua Road, Nakasero</p>
-                    <p className="text-sm font-medium mt-1">+256 312 246 000</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed"><MapPin className="inline h-3 w-3 mr-1" /> Akii Bua Road, Nakasero</p>
+                    <p className="text-sm font-medium mt-1 leading-relaxed">+256 312 246 000</p>
                   </div>
                   <div className="pt-2 border-t">
                     <h4 className="font-semibold">Mulago National Referral Hospital</h4>
-                    <p className="text-sm text-muted-foreground"><MapPin className="inline h-3 w-3 mr-1" /> Mulago Hill, Kampala</p>
-                    <p className="text-sm font-medium mt-1">+256 414 554 001</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed"><MapPin className="inline h-3 w-3 mr-1" /> Mulago Hill, Kampala</p>
+                    <p className="text-sm font-medium mt-1 leading-relaxed">+256 414 554 001</p>
                   </div>
                 </CardContent>
               </Card>
@@ -123,7 +123,7 @@ export default function SafetyPage() {
                 <Button asChild className="w-full sm:w-auto">
                   <Link href="/support">Open Support Chat</Link>
                 </Button>
-                <p className="text-sm text-muted-foreground mt-4">
+                <p className="text-sm text-muted-foreground mt-4 leading-relaxed">
                   Or email us at <span className="font-medium">urgent@safarinexa.com</span> for critical issues.
                 </p>
               </CardContent>

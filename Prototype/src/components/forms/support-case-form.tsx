@@ -19,7 +19,7 @@ export function SupportCaseForm({ action }: { action: (formData: FormData) => vo
           {SUPPORT_CATEGORIES.map((item) => (
             <label
               key={item}
-              className="flex cursor-pointer items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:text-primary"
+              className="flex cursor-pointer items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:text-primary"
             >
               <input
                 type="radio"

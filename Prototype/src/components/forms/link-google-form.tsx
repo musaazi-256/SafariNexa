@@ -1,5 +1,7 @@
 "use client";
 
+import { GoogleAuthTrigger } from "@/components/google-auth-trigger";
+
 import * as React from "react";
 import { signIn } from "next-auth/react";
 import { Link2 } from "lucide-react";
@@ -40,7 +42,7 @@ export function LinkGoogleForm({ email, returnTo }: { email: string; returnTo: s
       <CardHeader>
         <div className="flex items-center gap-2 text-primary">
           <Link2 className="h-4 w-4" />
-          <span className="text-xs font-extrabold uppercase tracking-wide">Confirm it&apos;s you</span>
+          <span className="text-xs font-medium uppercase tracking-wide">Confirm it&apos;s you</span>
         </div>
         <CardTitle>Link Google to your existing account</CardTitle>
         <CardDescription>
@@ -51,15 +53,15 @@ export function LinkGoogleForm({ email, returnTo }: { email: string; returnTo: s
       <CardContent>
         {status === "linked" ? (
           <div className="flex flex-col gap-3">
-            <p className="rounded-xl border border-success/30 bg-success/10 px-3.5 py-2.5 text-sm font-medium text-success">
+            <p className="rounded-xl border border-success/30 bg-success/10 px-3.5 py-2.5 text-sm font-medium text-success leading-relaxed">
               Google linked. Continue with Google once more to finish signing in.
             </p>
-            <Button onClick={() => signIn("google", { callbackUrl: returnTo })}>Continue with Google</Button>
+            <GoogleAuthTrigger provider="google" callbackUrl={returnTo} />
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             {error ? (
-              <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
+              <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive leading-relaxed">
                 {error}
               </p>
             ) : null}

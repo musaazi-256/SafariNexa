@@ -70,7 +70,7 @@ export default async function BookingsPage({ searchParams }: { searchParams: { p
                 {/* Content */}
                 <div className="flex flex-col flex-1 py-1 sm:py-2">
                   <div className="flex justify-between items-start gap-4 mb-2">
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-[#1e613c]">
+                    <p className="text-xs font-medium uppercase tracking-widest text-[#1e613c]">
                       {booking.listing.city || listingTypeLabel(booking.listing.type)}
                     </p>
                     <div className="shrink-0">
@@ -78,14 +78,14 @@ export default async function BookingsPage({ searchParams }: { searchParams: { p
                     </div>
                   </div>
                   
-                  <h2 className="text-xl font-extrabold line-clamp-1 text-slate-900">{booking.listing.title}</h2>
+                  <h2 className="text-xl font-semibold line-clamp-1 text-slate-900">{booking.listing.title}</h2>
                   
                   <div className="flex items-center gap-4 mt-2">
-                    <div className="flex items-center gap-2 text-[13px] font-semibold text-slate-500">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-500">
                       <CalendarClock className="h-4 w-4" />
                       {booking.startDate ? new Date(booking.startDate).toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" }) : "TBD"}
                     </div>
-                    <div className="flex items-center gap-2 text-[13px] font-semibold text-slate-500">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-500">
                       <User className="h-4 w-4" />
                       2 Adults
                     </div>
@@ -95,8 +95,8 @@ export default async function BookingsPage({ searchParams }: { searchParams: { p
                   
                   <div className="mt-6 pt-5 flex justify-between items-center relative">
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Total</span>
-                      <strong className="text-[19px] font-extrabold text-slate-900">{formatUGX(booking.totalMinor)}</strong>
+                      <span className="text-xs font-medium text-slate-500 uppercase tracking-widest">Total</span>
+                      <strong className="text-xl font-semibold text-slate-900">{formatUGX(booking.totalMinor)}</strong>
                     </div>
                     <ChevronRight className="h-5 w-5 text-slate-400 absolute right-0 top-1/2 -translate-y-1/2" />
                   </div>

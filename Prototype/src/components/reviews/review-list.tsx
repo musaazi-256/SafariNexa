@@ -16,12 +16,12 @@ export function ReviewList({ reviews }: { reviews: ReviewListItem[] }) {
   return (
     <div className="mt-8 flex flex-col gap-6">
       {reviews.map((review) => (
-        <div key={review.id} className="rounded-3xl border border-border p-6 shadow-sm">
+        <div key={review.id} className="rounded-2xl border border-border p-6 shadow-sm">
           <div className="flex items-start justify-between">
-            <h4 className="text-lg font-bold text-gray-800">
+            <h4 className="text-lg font-semibold text-gray-800">
               {review.authorName ?? "Verified guest"}
             </h4>
-            <div className="flex items-center gap-1.5 font-bold">
+            <div className="flex items-center gap-1.5 font-semibold">
               <Star className="h-4 w-4 fill-[#FCA81B] text-[#FCA81B]" />
               <span className="text-sm">{review.rating}</span>
             </div>
@@ -29,18 +29,18 @@ export function ReviewList({ reviews }: { reviews: ReviewListItem[] }) {
           
           {review.title ? <p className="mt-1 font-semibold">{review.title}</p> : null}
           
-          <p className="mt-3 text-[15px] leading-relaxed text-gray-600">
+          <p className="mt-3 text-base leading-relaxed text-gray-600">
             {review.body}
           </p>
           
-          <p className="mt-1.5 text-sm text-gray-400">
+          <p className="mt-1.5 text-sm text-gray-500 leading-relaxed">
             {review.createdAt.toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" })}
           </p>
           
           {review.businessReplyBody ? (
             <div className="mt-5 rounded-2xl bg-[#F8F9FA] p-5">
-              <p className="font-bold text-gray-700">Business response</p>
-              <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">
+              <p className="font-semibold text-gray-700">Business response</p>
+              <p className="mt-2 text-base text-gray-600 leading-relaxed">
                 {review.businessReplyBody}
               </p>
             </div>

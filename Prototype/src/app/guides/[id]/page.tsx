@@ -63,7 +63,7 @@ export default async function GuideDetailPage({ params }: { params: { id: string
             </Avatar>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-3xl font-extrabold sm:text-4xl">{guide.name}</h1>
+                <h1 className="text-3xl font-semibold sm:text-4xl">{guide.name}</h1>
                 {guide.isTopGuide ? <Badge variant="accent">Top guide</Badge> : null}
                 {isVerified ? <Badge variant="success-soft">Verified</Badge> : null}
               </div>
@@ -102,7 +102,7 @@ export default async function GuideDetailPage({ params }: { params: { id: string
           </div>
 
           <section className="mt-12">
-            <h2 className="mb-4 text-xl font-bold">Trips with {guide.name}</h2>
+            <h2 className="mb-4 text-xl font-semibold">Trips with {guide.name}</h2>
             {tours.length === 0 ? (
               <EmptyState title="No published trips yet" description="This guide doesn't have any published tours right now." />
             ) : (

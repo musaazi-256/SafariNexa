@@ -39,7 +39,7 @@ export default async function AvailabilityPage({params, searchParams}:{params:{i
     revalidatePath(`/business/listings/${params.id}/availability`);
     revalidatePath(`/accommodation/${params.id}`);revalidatePath(`/tours/${params.id}`);
   }
-  return <div className="mx-auto max-w-2xl space-y-5"><Link href={`/business/listings/${listing.id}/edit`} className="underline">Back to listing</Link><h1 className="break-words text-2xl font-bold">Availability — {listing.title}</h1><p>Capacity includes existing bookings. Set zero to close an unbooked date. Prices are whole UGX and are confirmed at checkout.</p>
-  <div className="flex flex-wrap gap-3">{rooms.map(r=><Link className="rounded-full border px-4 py-2" aria-current={r.id===room?.id?"page":undefined} key={r.id} href={`?room=${r.id}`}>{r.name}</Link>)}</div>
+  return <div className="mx-auto max-w-2xl space-y-5"><Link href={`/business/listings/${listing.id}/edit`} className="underline">Back to listing</Link><h1 className="type-page break-words">Availability — {listing.title}</h1><p>Capacity includes existing bookings. Set zero to close an unbooked date. Prices are whole UGX and are confirmed at checkout.</p>
+  <div className="flex flex-wrap items-center gap-1.5">{rooms.map(r=><Link className={r.id===room?.id?"inline-flex h-9 items-center rounded-full border border-slate-900 bg-slate-900 px-3.5 text-sm font-medium text-white shadow-xs transition-all":"inline-flex h-9 items-center rounded-full border border-border bg-white px-3.5 text-sm font-medium text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"} aria-current={r.id===room?.id?"page":undefined} key={r.id} href={`?room=${r.id}`}>{r.name}</Link>)}</div>
   <AvailabilityCalendarEditor listingId={listing.id} basePriceMinor={room?.priceMinor??listing.basePriceMinor} availabilityByDate={byDate} action={update}/></div>;
 }

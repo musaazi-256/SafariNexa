@@ -1,3 +1,5 @@
+import { adminNotificationData } from "@/lib/admin-notifications";
+import { ConversationMessages } from "@/components/messages/conversation";
 import { notFound, redirect } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 
@@ -38,9 +40,11 @@ export default async function SupportCaseDetailPage({ params }: { params: { id: 
     const target = await db.supportCase.findUnique({ where: { id: caseId } });
     if (!target || target.openedByUserId !== activeSession.user.id) throw new Error("Support case not found.");
 
+    const alerts=await adminNotificationData(db,"support.manage",{type:"SUPPORT_UPDATE",title:"Customer replied to a support case",body:`${target.caseRef}: ${target.subject}`,relatedSupportCaseId:target.id},activeSession.user.id);
     await db.$transaction([
       db.supportMessage.create({ data: { supportCaseId: caseId, authorUserId: activeSession.user.id, authorRole: "CUSTOMER", body } }),
-      db.supportCase.update({ where: { id: caseId }, data: { updatedAt: new Date() } })
+      db.supportCase.update({ where: { id: caseId }, data: { updatedAt: new Date(), ...( ["CLOSED", "RESOLVED"].includes(target.status) ? { status: "OPEN", closedAt: null } : {} ) } }),
+      db.notification.createMany({data:alerts})
     ]);
   }
 
@@ -53,10 +57,10 @@ export default async function SupportCaseDetailPage({ params }: { params: { id: 
 
           <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {supportCase.caseRef} · {supportCase.category}
               </p>
-              <h1 className="text-2xl font-extrabold">{supportCase.subject}</h1>
+              <h1 className="text-2xl font-semibold">{supportCase.subject}</h1>
             </div>
             <SupportCaseStatusBadge status={status} />
           </div>
@@ -68,26 +72,12 @@ export default async function SupportCaseDetailPage({ params }: { params: { id: 
             </div>
           ) : null}
 
-          <div className="flex flex-col gap-3">
-            {supportCase.messages.map((message) => {
-              const isCustomer = message.authorRole === "CUSTOMER";
-              return (
-                <Card key={message.id} className={cn("max-w-[85%]", isCustomer ? "ml-auto bg-primary/5" : "")}>
-                  <CardContent className="pt-4">
-                    <p className="text-xs font-semibold text-muted-foreground">
-                      {isCustomer ? "You" : (message.author.name ?? "SafariNexa support")}
-                    </p>
-                    <p className="mt-1 text-sm leading-relaxed">{message.body}</p>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {message.createdAt.toLocaleString("en-UG", { dateStyle: "medium", timeStyle: "short" })}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+            <div className="max-h-[560px] min-h-[260px] overflow-y-auto bg-[#FAFBFA] p-4 sm:p-6"><ConversationMessages currentUserId={session.user.id} messages={supportCase.messages.map(message => ({ id: message.id, content: message.body, senderId: message.authorUserId, senderName: message.author.name ?? (message.authorRole === "ADMIN" ? "SafariNexa support" : "Customer"), createdAt: message.createdAt }))} /></div>
+            <SupportReplyForm caseId={supportCase.id} action={postSupportReply} />
           </div>
 
-          <SupportReplyForm caseId={supportCase.id} action={postSupportReply} />
+
         </Container>
       </main>
       <SiteFooter />

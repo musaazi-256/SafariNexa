@@ -60,7 +60,7 @@ export function SimpleReservationFields({
   const addItem = useCartStore((state) => state.addItem);
   const router = useRouter();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (checkout = false) => {
     if (!canReserve) return;
     
     addItem({
@@ -80,7 +80,8 @@ export function SimpleReservationFields({
       unitPriceMinor: priceMinor
     });
     
-    router.push("/cart");
+    const added = useCartStore.getState().items.at(-1);
+    router.push(checkout && added ? `/checkout/multi?itemId=${encodeURIComponent(added.id)}` : "/cart");
   };
 
   const options = Array.from({ length: participantMax - participantMin + 1 }, (_, index) => participantMin + index);
@@ -89,8 +90,8 @@ export function SimpleReservationFields({
     <div className="flex flex-col gap-4">
       <div className={showTime ? "grid grid-cols-2 gap-3" : "flex flex-col gap-1"}>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-muted-foreground">Date</label>
-          <div className="flex h-11 items-center rounded-xl border border-input bg-card px-3">
+          <label className="text-xs font-medium text-muted-foreground">Date</label>
+          <div className="field-shell">
             <input
               type="date"
               name="date"
@@ -98,22 +99,22 @@ export function SimpleReservationFields({
               min={todayIsoDate()}
               value={date}
               onChange={(event) => setDate(event.target.value)}
-              className="w-full bg-transparent text-sm font-medium outline-none"
+              className="w-full bg-transparent text-base md:text-sm font-medium outline-none"
               required
             />
           </div>
         </div>
         {showTime ? (
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-semibold text-muted-foreground">Time</label>
-            <div className="flex h-11 items-center rounded-xl border border-input bg-card px-3">
+            <label className="text-xs font-medium text-muted-foreground">Time</label>
+            <div className="field-shell">
               <input
                 type="time"
                 name="time"
                 aria-label="Reservation time"
                 value={time}
                 onChange={(event) => setTime(event.target.value)}
-                className="w-full bg-transparent text-sm font-medium outline-none"
+                className="w-full bg-transparent text-base md:text-sm font-medium outline-none"
                 required
               />
             </div>
@@ -122,14 +123,14 @@ export function SimpleReservationFields({
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold text-muted-foreground">{participantLabel}</label>
-        <div className="flex h-11 items-center rounded-xl border border-input bg-card px-3">
+        <label className="text-xs font-medium text-muted-foreground">{participantLabel}</label>
+        <div className="field-shell">
           <select
             name="participants"
             aria-label={participantLabel}
             value={participants}
             onChange={(event) => setParticipants(event.target.value)}
-            className="w-full appearance-none bg-transparent text-sm font-medium outline-none"
+            className="w-full appearance-none bg-transparent text-base md:text-sm font-medium outline-none"
           >
             {options.map((n) => (
               <option key={n} value={n}>
@@ -144,13 +145,13 @@ export function SimpleReservationFields({
         <>
           <Separator />
           <div className="flex flex-col gap-1.5 text-sm">
-            <div className="flex items-center justify-between">
+            {listingType !== "restaurant" && <div className="flex items-center justify-between">
               <span className="text-muted-foreground">
                 {formatUGX(priceMinor ?? 0)} ({priceUnitLabel}) × {isFixedFare ? 1 : participants}
               </span>
               <span>{formatUGX(total)}</span>
-            </div>
-            <div className="flex items-center justify-between text-base font-bold">
+            </div>}
+            <div className="flex items-center justify-between text-base font-semibold">
               <span>{listingType === "restaurant" ? "Table reservation · meals paid separately" : "Total"}</span>
               <span>{formatUGX(total)}</span>
             </div>
@@ -163,11 +164,11 @@ export function SimpleReservationFields({
         
         <div className="flex items-center gap-2">
           {canReserve ? (
-            <Button size="lg" variant="secondary" className="flex-1 font-bold bg-secondary hover:bg-secondary/80" onClick={handleAddToCart}>
+            <Button size="lg" variant="secondary" className="flex-1 font-medium bg-secondary hover:bg-secondary/80" onClick={() => handleAddToCart()}>
               Add to cart
             </Button>
           ) : (
-            <Button size="lg" variant="secondary" className="flex-1 font-bold opacity-50" disabled>
+            <Button size="lg" variant="secondary" className="flex-1 font-medium opacity-50" disabled>
               Add to cart
             </Button>
           )}
@@ -184,7 +185,7 @@ export function SimpleReservationFields({
         </div>
 
         {canReserve ? (
-          <Button size="lg" className="w-full bg-brand-green hover:bg-brand-green/90 text-white font-bold" onClick={handleAddToCart}>
+          <Button size="lg" className="w-full bg-brand-green hover:bg-brand-green/90 text-white font-medium" onClick={() => handleAddToCart(true)}>
             Reserve
           </Button>
         ) : (

@@ -25,7 +25,7 @@ export const revalidate = 60;
 const TRUST_POINTS = [
   { icon: ShieldCheck, title: "Verified businesses only", description: "Every listing belongs to a business that passed SafariNexa's verification review." },
   { icon: Lock, title: "Browse before you sign in", description: "Explore accommodation, safaris, restaurants, and transport freely — accounts are only for booking and paying." },
-  { icon: Wallet, title: "Clear booking and payment status", description: "See whether your request needs acceptance or payment. Only configured payment methods are available at checkout." }
+  { icon: Wallet, title: "Mobile money & card", description: "Pay with MTN Mobile Money, Airtel Money, or card through secure, trusted rails." }
 ];
 
 const CARD_WIDTH = "w-72 shrink-0 snap-start sm:w-80";
@@ -82,8 +82,8 @@ export default async function HomePage() {
             <Badge variant="accent" className="mb-4">
               See it all first
             </Badge>
-            <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.03] tracking-tight sm:text-6xl">
-              Explore Uganda. Book with <span className="text-accent">confidence</span>.
+            <h1 className="max-w-3xl text-4xl font-semibold leading-[1.03] tracking-tight sm:text-6xl">
+              See it all first. Book only when <span className="text-accent">you&apos;re ready</span>.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/90 sm:text-xl">
               Browse verified stays, restaurants, and rides across Uganda. Compare freely — you only need an account
@@ -97,7 +97,7 @@ export default async function HomePage() {
         </Container>
 
         <Container className="pt-14">
-          <HomeSection title="Find your next stay" description="Compare room prices and check each listing’s inclusions and cancellation terms." moreHref="/accommodation">
+          <HomeSection title="Stay at our top accommodations" description="Well curated stays for you — all costs included." moreHref="/accommodation">
             <ScrollRow>
               {accommodationListings.map((listing) => {
                 const { average, count } = ratingSummary(listing.reviews);
@@ -133,7 +133,7 @@ export default async function HomePage() {
                     <point.icon className="h-5 w-5" />
                   </span>
                   <div>
-                    <p className="font-bold">{point.title}</p>
+                    <p className="font-semibold">{point.title}</p>
                     <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{point.description}</p>
                   </div>
                 </div>
@@ -145,8 +145,8 @@ export default async function HomePage() {
         <Container>
           <section className="py-10">
             <div className="text-center">
-              <h2 className="text-2xl font-extrabold text-secondary-foreground sm:text-3xl">Explore Popular Destinations</h2>
-              <p className="mx-auto mt-1.5 max-w-xl text-sm text-muted-foreground sm:text-base">
+              <h2 className="text-2xl font-semibold text-secondary-foreground sm:text-3xl">Explore Popular Destinations</h2>
+              <p className="mx-auto mt-1.5 max-w-xl text-sm text-muted-foreground sm:text-base leading-relaxed">
                 Uganda&apos;s top national parks, lakes, and cities — see what&apos;s nearby before you decide where to go.
               </p>
             </div>
@@ -177,7 +177,7 @@ export default async function HomePage() {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 p-3 text-white">
-                      <p className="flex items-center gap-1 font-bold">
+                      <p className="flex items-center gap-1 font-semibold">
                         <MapPin className="h-3.5 w-3.5" />
                         {destination.name}
                       </p>
@@ -189,7 +189,7 @@ export default async function HomePage() {
             </div>
           </section>
 
-          <HomeSection title="One Day Tours" description="Explore experiences and review what is included before requesting a booking." moreHref="/tours">
+          <HomeSection title="One Day Tours" description="Well curated trips for you — all costs included." moreHref="/tours">
             <ScrollRow>
               {oneDayTours.map((tour) => (
                 <CompactListingCard
@@ -204,7 +204,7 @@ export default async function HomePage() {
             </ScrollRow>
           </HomeSection>
 
-          <HomeSection title="Meet your tour guides" description="Compare guide profiles, experience and languages, then confirm availability." moreHref="/guides">
+          <HomeSection title="Meet your tour guides" description="Licensed, verified guides ready to lead your next trip." moreHref="/guides">
             <ScrollRow>
               {guides.map((guide) => {
                 const { average, count } = guideRatingSummary(guide.tours);
@@ -282,8 +282,8 @@ export default async function HomePage() {
 
           <section className="py-14">
             <div className="rounded-2xl border border-primary/20 bg-primary/5 p-7 sm:p-9">
-              <h2 className="text-xl font-bold">Protected actions</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <h2 className="text-xl font-semibold">Protected actions</h2>
+              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
                 These actions ask for an account and resume exactly where you left off:
               </p>
               <div className="mt-4 flex flex-wrap gap-2">

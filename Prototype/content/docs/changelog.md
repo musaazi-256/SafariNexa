@@ -309,3 +309,44 @@ A full-product audit (`SAFARINEXA_FULL_PRODUCT_ENGINEERING_AUDIT_2026-11-01.md`,
 
 **Not fixed by this batch** (still open — see "Still required before release" in `SAFARINEXA_FIXES_AND_VERIFICATION_2026-11-01.md` for the full list): no real payment provider is actually configured yet, so checkout is honestly disabled rather than live; mobile money and payouts remain unimplemented as live transfer integrations; email/SMS delivery is still unconfigured so password reset/invitation-acceptance email can't be exercised end to end; admin platform settings (§4.9) and admin reporting (§4.10) remain unbuilt.
 
+---
+
+## 2 November 2026 — admin permission levels: invite-time role picker + a real roles & permissions page
+
+A Figma documentation pass on the admin invite flow surfaced a real product gap, not just a documentation one: `/admin/users/new` was a single email field, and `inviteAdmin()` hardcoded every invite to one role server-side. The `Role`/`Permission`/`RolePermission` tables already existed in the schema and were already checked throughout the admin actions via `requireAdminSession("some.permission.key")`, but nothing in the UI let anyone actually choose or define what a permission level grants. This session built that missing layer.
+
+**New:**
+- `/admin/roles` — lists every permission level (role) with its description, how many admins currently hold it, and an editable checklist of what it grants (`businesses.manage`, `users.manage`, `payments.manage`, `support.manage`, `reviews.moderate`). "Super Admin" renders as a fixed, non-editable "full access" row — it bypasses permission checks by role name in `requireAdminSession()`, not through grants, so letting someone "edit" it would be misleading.
+- `/admin/roles/new` — create a new permission level from scratch with exactly the permissions it needs.
+- `inviteAdmin(email, roleId)` — now takes a real `roleId` instead of silently assigning one hardcoded role; `/admin/users/new` gained a "Permission level" dropdown populated from the real `Role` table.
+- `/admin/users` — each admin's actual permission level (not just the coarse customer/business/admin `User.role`) is now shown, and can be changed in place via a new `updateAdminUserRole` action — except on your own row, mirroring the existing self-suspend guard on `toggleAdminUserStatus`.
+- New permission key `roles.manage`, gating all of the above. It's deliberately never granted to any role through a `RolePermission` row — only Super Admin can reach it, via the same hardcoded role-name bypass that makes Super Admin all-powerful — so no lower permission level can ever escalate itself by editing its own grants.
+- Seed data: three new starter roles giving every existing permission key a dedicated home — Finance Manager (`payments.manage`), Verification Reviewer (`businesses.manage`), Content Moderator (`reviews.moderate`) — and Support Agent, previously created with zero actual grants despite its description promising support-case access, now actually has `support.manage`.
+
+**Verified**: `tsc`/`eslint` clean; new `src/lib/actions/roles.test.ts` and `src/lib/actions/admin.test.ts` cover role creation, permission-grant/revoke sync, the Super-Admin-is-uneditable guard, the self-role-change guard, and invite-role validation (16 new tests, 123/123 passing project-wide). Browser-verified end to end against the real seeded database: the invite form's dropdown lists all 6 roles; toggling a permission on an existing role and reloading shows it persisted; changing `agent.support`'s level away from and back to "Support Agent" round-tripped correctly; your own row never shows the role-change control.
+
+**Still not built**: role deletion, and a way to see at a glance which permission a given admin action actually requires (today that mapping only lives in each server action's `requireAdminSession("...")` call). Neither was asked for — scoped to exactly what the invite/role-assignment gap needed.
+
+
+---
+
+## 4 November 2026 — confirmation step for risky one-click admin actions
+
+The admin portal Figma pass showed that several high-impact admin actions ran the instant the button was clicked, with no "Are you sure?" step — a misclick could refund money, reject a business or suspend an admin. These now open a confirmation dialog first, matching the "PROPOSED" frames in the Figma file.
+
+**New:** `src/components/admin/confirm-submit.tsx` — a client `ConfirmSubmit` wrapper that sits inside an existing server-action `<form>`. Its button opens a dialog instead of submitting; confirming submits the same form with the same `name`/`value`, so no server action changed. It runs the form's own validation before opening (e.g. required reviewer notes), can preview what the admin typed, and closes once the action settles.
+
+| Where | Action | Dialog |
+|---|---|---|
+| `/admin/verification/[id]` | Reject submission | "Reject this submission?" with reviewer-notes preview |
+| `/admin/verification` | Flag (suspends the business) | "Place a fraud hold?" |
+| `/admin/listings/[id]` | Reject / Approve and publish | "Reject this listing?" / "Approve and publish?" |
+| `/admin/users` | Suspend (not Reactivate) | "Suspend [name]?" |
+| `/admin/payments` | Approve refund | "Approve this refund?" with amount |
+| `/admin/reviews` | Hide review | "Hide this review?" |
+| `/admin/support/[id]` | Close | "Close this case?" |
+| Admin sidebar | Sign out | "Sign out of the admin portal?" |
+
+Lower-risk or reversible actions (approve business, request changes, start review, reactivate, publish/flag review, other case statuses) still submit on one click.
+
+**Verified:** `tsc` and `eslint` clean; new `src/components/admin/confirm-submit.test.tsx` (3 tests: confirm submits with the chosen decision, cancel doesn't submit, empty required fields block the dialog). Not yet browser-verified against the running app.

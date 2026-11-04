@@ -15,14 +15,16 @@ export function DashboardQuickActions({ verificationStatus }: { verificationStat
     { href: "/business/settings", label: "Business settings", icon: Settings }
   ];
   return <>
-    <div className="grid gap-1 sm:grid-cols-2 xl:grid-cols-1">
-      {actions.map(action => <Button key={action.href} asChild variant="ghost" className="h-auto min-h-11 justify-start px-3 py-3">
+    <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 overflow-x-auto custom-scrollbar whitespace-nowrap">
+      <span className="text-sm font-medium text-slate-900 shrink-0 px-2 sm:px-4">Quick actions</span>
+      <div className="w-px h-6 bg-slate-200 hidden sm:block shrink-0" />
+      {actions.map(action => <Button key={action.href} asChild variant="ghost" className="text-slate-700 font-medium shrink-0">
         <Link href={action.href} onClick={event => {
           if (action.href === "/business/listings/new" && verificationStatus !== "APPROVED") {
             event.preventDefault();
             setModalOpen(true);
           }
-        }}><action.icon className="text-muted-foreground" /><span className="flex-1 text-left">{action.label}</span><ArrowUpRight className="text-muted-foreground" /></Link>
+        }}><action.icon className="text-muted-foreground" /><span className="flex-1 text-left">{action.label}</span></Link>
       </Button>)}
     </div>
     <VerificationActionModal isOpen={modalOpen} onOpenChange={setModalOpen} verificationStatus={verificationStatus} attemptedAction="add a new listing" />

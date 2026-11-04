@@ -51,8 +51,8 @@ function Field({
   className?: string;
 }) {
   return (
-    <div className={cn("flex min-w-0 flex-1 flex-col justify-center px-4 py-3 hover:bg-muted/50 transition-colors", className)}>
-      <span className="text-xs font-bold tracking-wide text-foreground">{label}</span>
+    <div className={cn("flex min-w-0 flex-1 flex-col justify-center px-4 py-3 hover:bg-slate-50 focus-within:bg-slate-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary/30 transition-colors", className)}>
+      <span className="text-xs font-medium text-slate-600">{label}</span>
       <div className="flex items-center mt-0.5">
         {children}
       </div>
@@ -64,7 +64,7 @@ function TextField(props: React.InputHTMLAttributes<HTMLInputElement> & { label:
   const { label, className, ...inputProps } = props;
   return (
     <Field label={label} className={className}>
-      <input {...inputProps} aria-label={label} className="w-full min-w-0 bg-transparent text-sm font-medium text-muted-foreground outline-none placeholder:text-muted-foreground/70" />
+      <input {...inputProps} aria-label={label} className="w-full min-w-0 bg-transparent text-base md:text-sm font-normal text-slate-700 outline-none placeholder:text-muted-foreground" />
     </Field>
   );
 }
@@ -89,7 +89,7 @@ function SelectField({
           aria-label={label}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="w-full appearance-none bg-transparent pr-5 text-sm font-medium text-muted-foreground outline-none"
+          className="w-full appearance-none bg-transparent pr-5 text-sm font-normal text-slate-700 outline-none"
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -223,23 +223,24 @@ export function SearchBar({ className }: { className?: string }) {
           <button
             key={item.id}
             type="button"
+            aria-pressed={category === item.id}
             onClick={() => handleTabClick(item.id)}
             className={cn(
-              "flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors",
+              "inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-all",
               category === item.id
-                ? "border-transparent bg-[#0B4928] text-white"
-                : "border-border bg-card text-foreground hover:bg-secondary"
+                ? "border-slate-900 bg-slate-900 text-white shadow-xs"
+                : "border-border bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
             )}
           >
-            <item.icon className="h-4 w-4" />
+            <item.icon className="h-3.5 w-3.5" />
             {item.label}
           </button>
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-1 flex flex-col sm:flex-row sm:items-center rounded-3xl sm:rounded-full border border-border bg-card shadow-sm overflow-hidden">
+      <form onSubmit={handleSubmit} className="mt-1 flex flex-col sm:flex-row sm:items-center rounded-xl sm:rounded-2xl border border-border bg-card shadow-card overflow-hidden">
         {category === "transport" ? (
-          <div className="flex border-b border-border sm:border-b-0 sm:border-r p-3 gap-2">
+          <div className="flex border-b border-border sm:border-b-0 sm:border-r p-3 gap-1.5">
             {(
               [
                 { id: "airport", label: "Airport transfer" },
@@ -249,10 +250,13 @@ export function SearchBar({ className }: { className?: string }) {
               <button
                 key={option.id}
                 type="button"
+                aria-pressed={transportSubcategory === option.id}
                 onClick={() => setTransportSubcategory(option.id)}
                 className={cn(
-                  "rounded-full px-4 py-2 text-xs font-semibold transition-colors",
-                  transportSubcategory === option.id ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
+                  "inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition-all",
+                  transportSubcategory === option.id
+                    ? "border-slate-900 bg-slate-900 text-white shadow-xs"
+                    : "border-border bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
                 )}
               >
                 {option.label}
@@ -264,7 +268,7 @@ export function SearchBar({ className }: { className?: string }) {
         <div className="flex flex-col sm:flex-row flex-1 divide-y sm:divide-y-0 sm:divide-x divide-border">
           {category === "accommodation" ? (
             <>
-              <TextField label="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-full sm:min-w-[200px]" />
+              <TextField label="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-2xl sm:min-w-[200px]" />
               <TextField label="Check-in" type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
               <TextField label="Check-out" type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
               <SelectField label="Guests" value={guests} onChange={setGuests} options={guestOptions("Adult")} />
@@ -273,7 +277,7 @@ export function SearchBar({ className }: { className?: string }) {
 
           {category === "tours" ? (
             <>
-              <TextField label="Destination" value={tourDestination} onChange={(e) => setTourDestination(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-full" />
+              <TextField label="Destination" value={tourDestination} onChange={(e) => setTourDestination(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-2xl" />
               <TextField label="Start date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
               <SelectField label="Guests" value={tourGuests} onChange={setTourGuests} options={guestOptions("Adult")} />
             </>
@@ -281,7 +285,7 @@ export function SearchBar({ className }: { className?: string }) {
 
           {category === "restaurants" ? (
             <>
-              <TextField label="Area" value={area} onChange={(e) => setArea(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-full" />
+              <TextField label="Area" value={area} onChange={(e) => setArea(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-2xl" />
               <TextField label="Date" type="date" value={reservationDate} onChange={(e) => setReservationDate(e.target.value)} />
               <TextField label="Time" type="time" value={reservationTime} onChange={(e) => setReservationTime(e.target.value)} />
               <SelectField label="Guests" value={partySize} onChange={setPartySize} options={guestOptions("Adult")} />
@@ -309,13 +313,13 @@ export function SearchBar({ className }: { className?: string }) {
 
           {category === "guides" ? (
             <>
-              <TextField label="Destination" value={guideDestination} onChange={(e) => setGuideDestination(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-full" />
+              <TextField label="Destination" value={guideDestination} onChange={(e) => setGuideDestination(e.target.value)} placeholder="Where in East Africa?" className="sm:rounded-l-2xl" />
             </>
           ) : null}
         </div>
 
         <div className="p-4 sm:p-2 sm:shrink-0 bg-card sm:bg-transparent mt-auto sm:mt-0 pb-10 sm:pb-2">
-          <Button type="submit" size="lg" className="w-full sm:w-auto rounded-full px-8 h-12 text-base font-bold bg-primary hover:bg-[#066130]">
+          <Button type="submit" size="lg" className="w-full sm:w-auto rounded-full px-8 h-12 text-base font-medium bg-primary hover:bg-[#066130]">
             <Search className="h-5 w-5 mr-2" />
             {SEARCH_BUTTON_LABELS[category]}
           </Button>
@@ -335,14 +339,14 @@ export function SearchBar({ className }: { className?: string }) {
             <button className="flex w-full items-center gap-3 rounded-full border border-border bg-card px-4 py-3 shadow-sm transition-colors hover:bg-secondary">
               <Search className="h-5 w-5 text-primary" />
               <div className="flex flex-col items-start">
-                <span className="text-sm font-bold text-foreground">Where to?</span>
+                <span className="text-sm font-medium text-foreground">Where to?</span>
                 <span className="text-xs text-muted-foreground">Anywhere • Any week • Add guests</span>
               </div>
             </button>
           </SheetTrigger>
           <SheetContent side="bottom" className="h-[100dvh] w-full rounded-none p-0 overflow-y-auto bg-background flex flex-col">
             <SheetHeader className="px-4 py-4 border-b border-border/50 text-left sticky top-0 bg-background z-10 shrink-0">
-              <SheetTitle className="text-xl font-bold">Where to?</SheetTitle>
+              <SheetTitle className="text-xl font-semibold">Where to?</SheetTitle>
             </SheetHeader>
             <div className="flex-1 p-4 sm:p-0">
               {searchContent}

@@ -1,3 +1,6 @@
+import { NotificationBell } from "@/components/notifications/notification-bell";
+import { DemoToolbar } from "@/components/demo-toolbar";
+import { isDemoMode } from "@/lib/dev-mode";
 import Link from "next/link";
 import { Search } from "lucide-react";
 
@@ -47,6 +50,7 @@ export async function SiteHeader() {
             </Link>
           </Button>
 
+          {isDemoMode() ? <DemoToolbar /> : <>
           <div className="hidden items-center gap-2 border-r border-border pr-2 mr-1 lg:flex">
             <Link href="/business" className="px-2 text-xs font-semibold text-muted-foreground hover:text-foreground">
               Business
@@ -55,8 +59,10 @@ export async function SiteHeader() {
               Admin
             </Link>
           </div>
+          </>}
 
           <CartDropdown />
+          {session?.user && <NotificationBell surface="customer" unreadCount={unreadCount}/>}
 
           {session?.user ? (
             <UserMenu name={session.user.name} email={session.user.email} image={session.user.image} unreadCount={unreadCount}>

@@ -1,5 +1,6 @@
 "use server";
 
+import { verificationStatusMetaOf, toVerificationStatus } from "@/lib/status";
 import { revalidatePath } from "next/cache";
 import { randomBytes, createHash } from "crypto";
 import { applicationOrigin, emailConfigured, sendAccountEmail } from "@/lib/email";
@@ -70,8 +71,8 @@ export async function updateVerificationStatus(verificationId: string, status: V
         data: {
           userId: owner.userId,
           type: "SYSTEM",
-          title: `Business Verification ${status}`,
-          body: `Your business verification for ${verification.business.name} has been marked as ${status}.${notesLine}`
+          title: `Business verification: ${verificationStatusMetaOf(toVerificationStatus(status)).label.toLowerCase()}`,
+          body: `Your business verification for ${verification.business.name} has been marked as ${verificationStatusMetaOf(toVerificationStatus(status)).label.toLowerCase()}.${notesLine}`
         }
       });
     }
@@ -92,7 +93,7 @@ export async function updateVerificationStatus(verificationId: string, status: V
   revalidatePath(`/admin/verification/${verificationId}`);
 }
 
-export async function inviteAdmin(email: string) {
+export async function inviteAdmin(email: string, roleId: string) {
   await requireAdminSession("users.manage");
   if (!emailConfigured()) throw new Error("Email invitations are not configured. No access has been granted.");
   const session = await auth();
@@ -102,12 +103,9 @@ export async function inviteAdmin(email: string) {
 
   const normalizedEmail = email.toLowerCase().trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) throw new Error("Enter a valid email.");
-  
-  // Find "Super Admin" role
-  let superAdminRole = await db.role.findUnique({ where: { name: "Support Agent" } });
-  if (!superAdminRole) {
-    superAdminRole = await db.role.create({ data: { name: "Support Agent" } });
-  }
+
+  const role = await db.role.findUnique({ where: { id: roleId } });
+  if (!role) throw new Error("Choose a valid permission level.");
 
   await db.$transaction(async (tx) => {
     // Check if user exists
@@ -135,7 +133,7 @@ export async function inviteAdmin(email: string) {
       await tx.adminUser.create({
         data: {
           userId: targetUser.id,
-          roleId: superAdminRole.id,
+          roleId: role.id,
           status: "INVITED"
         }
       });
@@ -158,7 +156,7 @@ export async function inviteAdmin(email: string) {
     surface: "ADMIN",
     action: "admin_invite_user",
     outcome: "SUCCESS",
-    metadata: { targetEmail: normalizedEmail }
+    metadata: { targetEmail: normalizedEmail, roleId: role.id, roleName: role.name }
   });
 
   revalidatePath("/admin/(portal)/users", "page");
@@ -198,6 +196,34 @@ export async function toggleAdminUserStatus(adminUserId: string) {
     action: "admin_toggle_user_access",
     outcome: "SUCCESS",
     metadata: { targetAdminUserId: adminUserId, targetUserEmail: adminUser.user.email, newStatus: nextStatus }
+  });
+
+  revalidatePath("/admin/(portal)/users", "page");
+}
+
+export async function updateAdminUserRole(adminUserId: string, formData: FormData) {
+  const session = await requireAdminSession("roles.manage");
+
+  const adminUser = await db.adminUser.findUnique({ where: { id: adminUserId }, include: { user: true, role: true } });
+  if (!adminUser) throw new Error("Admin user not found");
+  if (adminUser.userId === session.user.id) {
+    throw new Error("You cannot change your own permission level");
+  }
+
+  const roleId = formData.get("roleId") as string | null;
+  const role = roleId ? await db.role.findUnique({ where: { id: roleId } }) : null;
+  if (!role) throw new Error("Choose a valid permission level.");
+  if (role.id === adminUser.roleId) return;
+
+  await db.adminUser.update({ where: { id: adminUserId }, data: { roleId: role.id } });
+
+  await logAuditEvent({
+    actorUserId: session.user.id,
+    actorEmail: session.user.email ?? undefined,
+    surface: "ADMIN",
+    action: "admin_change_user_role",
+    outcome: "SUCCESS",
+    metadata: { targetAdminUserId: adminUserId, targetUserEmail: adminUser.user.email, previousRoleName: adminUser.role.name, newRoleName: role.name }
   });
 
   revalidatePath("/admin/(portal)/users", "page");

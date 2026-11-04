@@ -20,7 +20,7 @@ export default async function MultiCheckoutPage() {
         <Container className="pb-20 pt-6">
           <Breadcrumbs items={[{ label: "Cart", href: "/cart" }, { label: "Checkout" }]} />
 
-          <h1 className="mb-6 text-3xl font-extrabold">Complete your booking</h1>
+          <h1 className="type-page mb-6">Complete your booking</h1>
 
           <MultiCheckoutForm defaults={{ fullName: user?.name ?? "", email: user?.email ?? "", phone: user?.phone ?? "", nationality: user?.customerProfile?.nationality, emergencyContact: user?.customerProfile?.emergencyContact }} />
         </Container>

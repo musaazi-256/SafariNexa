@@ -5,8 +5,8 @@ export function BookingOperationsSummary({booking,business=false}: {business?:bo
  const info=booking.fulfilment as FulfilmentDetails|null;
  const policy=booking.policySnapshot as Record<string,unknown>|null;
  const deadline=["AWAITING_BUSINESS_CONFIRMATION","PENDING_PAYMENT","PAYMENT_FAILED"].includes(booking.status) ? booking.responseDueAt||booking.paymentDueAt : null;
- return <section className="my-5 space-y-3 rounded border bg-muted/20 p-4">
-  <h2 className="text-lg font-bold">Booking progress & service details</h2>
+ return <section className="my-5 space-y-4 rounded-2xl border bg-card p-6 shadow-sm">
+  <h2 className="text-lg font-semibold">Booking progress & service details</h2>
   <p>{booking.status === "AWAITING_BUSINESS_CONFIRMATION" && booking.bookingMode === "RESERVATION" ? "Table request sent. The restaurant must confirm availability; no online meal charge is collected." : booking.status === "AWAITING_BUSINESS_CONFIRMATION" && booking.bookingMode !== "LEGACY" ? "Request sent. No payment collected; the business must accept before payment." : booking.status === "PENDING_PAYMENT" && booking.bookingMode === "REQUEST" ? "The business accepted your request. Payment is still required to confirm it." : booking.bookingMode === "RESERVATION" && booking.status === "CONFIRMED" ? "Table reservation confirmed. Meals are paid separately at the restaurant." : `Status: ${booking.status.replaceAll("_"," ").toLowerCase()}.`}</p>
   {deadline && <p>{booking.responseDueAt ? "Business response due" : "Payment due"}: {deadline.toLocaleString("en-GB",{timeZone:"Africa/Kampala"})} EAT</p>}
   {!business && booking.status === "PENDING_PAYMENT" && <Link href={`/payments?${booking.orderId?`orderId=${booking.orderId}`:`bookingId=${booking.id}`}`} className="block underline">Continue to payment</Link>}

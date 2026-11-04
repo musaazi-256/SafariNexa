@@ -39,7 +39,7 @@ export function CreateAccountForm({ returnTo }: { returnTo: string }) {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <p className="text-xs font-extrabold uppercase tracking-wide text-primary">Customer account</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-primary">Customer account</p>
         <CardTitle className="text-3xl">Create your account</CardTitle>
         <CardDescription>Only needed when you book, pay, save, message, or review — browsing stays open.</CardDescription>
       </CardHeader>
@@ -50,13 +50,13 @@ export function CreateAccountForm({ returnTo }: { returnTo: string }) {
 
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
-          <span className="text-xs font-semibold uppercase text-muted-foreground">or</span>
+          <span className="text-xs font-medium uppercase text-muted-foreground">or</span>
           <Separator className="flex-1" />
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           {error ? (
-            <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive">
+            <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive leading-relaxed">
               {error}
             </p>
           ) : null}
@@ -91,7 +91,7 @@ export function CreateAccountForm({ returnTo }: { returnTo: string }) {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-sm text-muted-foreground leading-relaxed">
           Already have an account?{" "}
           <Link href={`/auth/sign-in?returnTo=${encodeURIComponent(returnTo)}`} className="font-semibold text-primary hover:underline">
             Sign in

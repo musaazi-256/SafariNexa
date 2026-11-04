@@ -17,5 +17,9 @@ export async function completeRefund(tx: Prisma.TransactionClient, refundId:stri
    await releaseAvailabilityForBooking(tx,booking.id);
    await syncOrderStatus(tx,booking.orderId);
  }
- await tx.notification.create({data:{userId:booking.customerId,type:"PAYMENT_UPDATE",title:"Refund confirmed by provider",body:`A refund of UGX ${refund.amountMinor.toLocaleString("en-UG")} for ${booking.bookingRef} has been confirmed by the payment provider.`,relatedBookingId:booking.id}});
+ await tx.notification.create({data:{userId:booking.customerId,type:"PAYMENT_UPDATE",title:refund.payment.providerReference?.startsWith("DEMO-") ? "Refund completed" : "Refund confirmed by provider",body:refund.payment.providerReference?.startsWith("DEMO-") ? `Refund completed for ${booking.bookingRef}.` :`A refund of UGX ${refund.amountMinor.toLocaleString("en-UG")} for ${booking.bookingRef} has been confirmed by the payment provider.`,relatedBookingId:booking.id}});
+ const members=await tx.businessUser.findMany({where:{businessId:booking.businessId},select:{userId:true}});
+ const recipients=[...new Set(members.map(member=>member.userId))].filter(userId=>userId!==booking.customerId);
+ if(recipients.length)await tx.notification.createMany({data:recipients.map(userId=>({userId,type:"PAYMENT_UPDATE" as const,title:"Booking refund completed",body:`A refund of ${refund.payment.currency} ${refund.amountMinor.toLocaleString("en-UG")} was recorded for booking ${booking.bookingRef}.`,relatedBookingId:booking.id}))});
+
 }

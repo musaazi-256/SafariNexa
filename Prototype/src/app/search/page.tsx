@@ -1,3 +1,4 @@
+import { matchesSearchFacets, RATING_FILTER_MIN, type SearchFacets } from "@/lib/search-facets";
 import { Suspense } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import type { Prisma } from "@prisma/client";
@@ -36,11 +37,6 @@ const PRICE_RANGE_BOUNDS: Record<string, { min?: number; max?: number }> = {
   "above-1500000": { min: 1500000 }
 };
 
-const RATING_TIER_MIN: Record<string, number> = {
-  exceptional: 4.7,
-  excellent: 4.3,
-  "very-good": 3.8
-};
 
 function toStringArray(value: string | string[] | undefined) {
   if (!value) return [];
@@ -69,6 +65,7 @@ export default async function SearchPage({
     rating?: string | string[];
     propertyType?: string | string[];
     tourType?: string | string[];
+    tourDuration?: string | string[];
     vehicleType?: string | string[];
     cuisine?: string | string[];
     specialty?: string | string[];
@@ -122,11 +119,13 @@ export default async function SearchPage({
     rating?: number;
     reviewCount?: number;
     imageUrl?: string | null;
+    facets?: SearchFacets;
+    priceKnown?: boolean;
   }> = [];
 
   if (activeType === "Guide") {
     const guides = await db.guide.findMany({
-      where: query
+      where: {business:{verificationStatus:"APPROVED"}, ...(query
         ? {
             OR: [
               { name: { contains: query, mode: "insensitive" as const } },
@@ -134,7 +133,7 @@ export default async function SearchPage({
               { destination: { name: { contains: query, mode: "insensitive" as const } } }
             ]
           }
-        : {},
+        : {})},
       include: {
         destination: true,
         business: { select: { verificationStatus: true } },
@@ -166,13 +165,15 @@ export default async function SearchPage({
         description: guide.bio,
         rating: average,
         reviewCount: count,
+        facets:{specialization:guide.specialization},
+        priceKnown:guide.hourlyRateMinor!==null,
         imageUrl: guide.photoUrl
       };
     });
   } else {
     const listings = await db.listing.findMany({
       where,
-      include: { restaurant: true, reviews: { where: { status: "PUBLISHED" }, select: { rating: true } } }
+      include: { accommodation: true, tour: true, transport: true, restaurant: true, reviews: { where: { status: "PUBLISHED" }, select: { rating: true } } }
     });
 
     results = listings.map((listing) => {
@@ -188,15 +189,19 @@ export default async function SearchPage({
         description: listing.description,
         rating: average,
         reviewCount: count,
+        facets:{propertyType:listing.accommodation?.propertyType,amenities:listing.accommodation?.amenities,tourType:listing.tour?.tourType,durationDays:listing.tour?.durationDays,vehicleType:listing.transport?.vehicleType,cuisineType:listing.restaurant?.cuisineType},
+        priceKnown:listing.type!=="RESTAURANT"||numericPrice>0,
         imageUrl: listing.coverImageUrl
       };
     });
   }
 
+  const availableLocations=[...new Set(results.map(item=>item.location).filter(Boolean))].sort().map(value=>({value,label:value}));
   const selectedPriceRanges = toStringArray(searchParams.price);
   if (selectedPriceRanges.length > 0) {
     results = results.filter((listing) =>
       selectedPriceRanges.some((rangeKey) => {
+        if(!listing.priceKnown)return false;
         const bounds = PRICE_RANGE_BOUNDS[rangeKey];
         if (!bounds) return false;
         if (bounds.min !== undefined && listing.priceValue < bounds.min) return false;
@@ -209,88 +214,11 @@ export default async function SearchPage({
   const selectedRatingTiers = toStringArray(searchParams.rating);
   if (selectedRatingTiers.length > 0) {
     results = results.filter((listing) =>
-      selectedRatingTiers.some((tierKey) => (listing.rating ?? 0) >= (RATING_TIER_MIN[tierKey] ?? 0))
+      selectedRatingTiers.some((tierKey) => (listing.rating ?? 0) >= (RATING_FILTER_MIN[tierKey as keyof typeof RATING_FILTER_MIN] ?? 0))
     );
   }
 
-  const selectedPropertyTypes = toStringArray(searchParams.propertyType);
-  if (selectedPropertyTypes.length > 0) {
-    results = results.filter((item) =>
-      selectedPropertyTypes.some((pt) =>
-        item.title.toLowerCase().includes(pt.toLowerCase()) ||
-        item.description.toLowerCase().includes(pt.toLowerCase())
-      )
-    );
-  }
-
-  const selectedTourTypes = toStringArray(searchParams.tourType);
-  if (selectedTourTypes.length > 0) {
-    results = results.filter((item) =>
-      selectedTourTypes.some((tt) =>
-        item.title.toLowerCase().includes(tt.toLowerCase()) ||
-        item.description.toLowerCase().includes(tt.toLowerCase())
-      )
-    );
-  }
-
-  const selectedDurations = toStringArray(searchParams.duration);
-  if (selectedDurations.length > 0) {
-    results = results.filter((item) =>
-      selectedDurations.some((dur) =>
-        item.title.toLowerCase().includes(dur.toLowerCase()) ||
-        item.description.toLowerCase().includes(dur.toLowerCase())
-      )
-    );
-  }
-
-  const selectedVehicleTypes = toStringArray(searchParams.vehicleType);
-  if (selectedVehicleTypes.length > 0) {
-    results = results.filter((item) =>
-      selectedVehicleTypes.some((vt) =>
-        item.title.toLowerCase().includes(vt.toLowerCase()) ||
-        item.description.toLowerCase().includes(vt.toLowerCase())
-      )
-    );
-  }
-
-  const selectedCuisines = toStringArray(searchParams.cuisine);
-  if (selectedCuisines.length > 0) {
-    results = results.filter((item) =>
-      selectedCuisines.some((c) =>
-        item.title.toLowerCase().includes(c.toLowerCase()) ||
-        item.description.toLowerCase().includes(c.toLowerCase())
-      )
-    );
-  }
-
-  const selectedSpecialties = toStringArray(searchParams.specialty);
-  if (selectedSpecialties.length > 0) {
-    results = results.filter((item) =>
-      selectedSpecialties.some((s) =>
-        item.title.toLowerCase().includes(s.toLowerCase()) ||
-        item.description.toLowerCase().includes(s.toLowerCase())
-      )
-    );
-  }
-
-  const selectedLocations = toStringArray(searchParams.location);
-  if (selectedLocations.length > 0) {
-    results = results.filter((item) =>
-      selectedLocations.some((loc) =>
-        item.location.toLowerCase().includes(loc.toLowerCase()) ||
-        item.title.toLowerCase().includes(loc.toLowerCase())
-      )
-    );
-  }
-
-  const selectedAmenities = toStringArray(searchParams.amenities);
-  if (selectedAmenities.length > 0) {
-    results = results.filter((item) =>
-      selectedAmenities.some((am) =>
-        item.description.toLowerCase().includes(am.toLowerCase())
-      )
-    );
-  }
+  results=results.filter(result=>matchesSearchFacets(result,searchParams));
 
   if (searchParams.sort === "price-asc") {
     results = [...results].sort((a, b) => a.priceValue - b.priceValue);
@@ -348,14 +276,14 @@ export default async function SearchPage({
         <Container className="py-8">
           <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
             <aside className="hidden lg:block">
-              <Card className="sticky top-24 border-0 shadow-none bg-transparent">
-                <CardContent className="flex flex-col gap-6 p-0">
-                  <div className="flex items-center gap-2 text-sm font-bold">
+              <Card className="sticky top-24 border-border bg-white shadow-card">
+                <CardContent className="flex flex-col gap-5 p-5">
+                  <div className="flex items-center gap-2 text-sm font-medium">
                     <SlidersHorizontal className="h-4 w-4" />
                     Filter results
                   </div>
                   <Suspense fallback={null}>
-                    <SearchFilters />
+                    <SearchFilters locations={availableLocations} />
                   </Suspense>
                 </CardContent>
               </Card>
@@ -364,17 +292,17 @@ export default async function SearchPage({
             <div className="min-w-0">
               <div className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">
+                  <h1 className="text-2xl font-semibold text-foreground">
                     {totalResults} {noun} found{query ? ` in ${query}` : ""}
                   </h1>
                   {summaryParts.length > 0 ? (
-                    <p className="text-sm text-muted-foreground mt-1">{summaryParts.join(" · ")}</p>
+                    <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{summaryParts.join(" · ")}</p>
                   ) : null}
-                  <p className="text-sm text-muted-foreground mt-2">Browse freely. Sign in when you&apos;re ready to book.</p>
+                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">Browse freely. Sign in when you&apos;re ready to book.</p>
                 </div>
-                <div className="flex max-w-full flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2">
                   <Suspense fallback={null}>
-                    <MobileFilters />
+                    <MobileFilters locations={availableLocations} />
                   </Suspense>
                   <SortSelect />
                 </div>

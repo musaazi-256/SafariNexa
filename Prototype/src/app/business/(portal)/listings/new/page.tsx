@@ -116,7 +116,7 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
           <div className="h-16 w-16 bg-orange-100 rounded-full flex items-center justify-center mb-2">
             <Building2 className="h-8 w-8 text-orange-600" />
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900">Your account is under review</h1>
+          <h1 className="type-page text-slate-900">Your account is under review</h1>
           <p className="text-slate-500 font-medium">
             You cannot create listings yet. Our admins are currently reviewing your submitted verification documents. Once you are fully approved, you will be able to start adding your services here.
           </p>
@@ -130,7 +130,7 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
     return (
       <>
         <Breadcrumbs items={[{ label: "Listings", href: "/business/listings" }, { label: "Create listing" }]} />
-        <h1 className="mb-6 text-3xl font-extrabold">What are you listing?</h1>
+        <h1 className="type-page mb-6">What are you listing?</h1>
         <div className="grid gap-5 sm:grid-cols-2">
           {TYPE_OPTIONS.map((option) => (
             <Link key={option.value} href={`/business/listings/new?type=${option.value.toLowerCase()}`}>
@@ -139,8 +139,8 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
                   <div className="flex items-center justify-between">
                     <option.icon className="h-6 w-6 text-primary" />
                   </div>
-                  <p className="font-bold">{option.label}</p>
-                  <p className="text-sm text-muted-foreground">{option.description}</p>
+                  <p className="font-semibold">{option.label}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{option.description}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -159,7 +159,7 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
           { label: TYPE_OPTIONS.find((option) => option.value === type)?.label ?? "" }
         ]}
       />
-      <h1 className="mb-6 text-3xl font-extrabold">New {TYPE_OPTIONS.find((option) => option.value === type)?.label.toLowerCase()} listing</h1>
+      <h1 className="type-page mb-6">New {TYPE_OPTIONS.find((option) => option.value === type)?.label.toLowerCase()} listing</h1>
 
       <form action={createListing} className="flex flex-col gap-6">
         <input type="hidden" name="listingType" value={type} />

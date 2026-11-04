@@ -39,7 +39,7 @@ export default async function DocPage({ params }: { params: { slug: string } }) 
           </Link>
           <PageHero eyebrow="Engineering" title={meta.title} description={meta.description} />
 
-          <article className="prose prose-slate max-w-none pb-12 prose-headings:font-extrabold prose-a:text-primary prose-table:text-sm">
+          <article className="prose prose-slate max-w-none pb-12 prose-headings:font-semibold prose-a:text-primary prose-table:text-sm">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
           </article>
         </Container>

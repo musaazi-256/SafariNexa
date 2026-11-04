@@ -1,5 +1,7 @@
 "use client";
 
+import { useAsyncTask } from "@/hooks/use-async-task";
+
 import Image from "next/image";
 import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -35,9 +37,18 @@ export function MultiCheckoutForm({ defaults }: { defaults?: { fullName: string;
     [cartItems]
   );
 
+  const hasRestaurant = cartItems.some(item => item.type.toUpperCase() === "RESTAURANT");
+  const hasPaidService = cartItems.some(item => item.type.toUpperCase() !== "RESTAURANT");
+  const restaurantOnly = hasRestaurant && !hasPaidService;
+  const checkoutNotice = restaurantOnly
+    ? "Review your table reservation details and send your request. No payment is required."
+    : hasRestaurant
+      ? "Review your booking details, then continue to payment for the paid items. Restaurant table reservations do not require payment."
+      : "Review your booking and traveller details, then continue to payment.";
+
   const [error, setError] = React.useState("");
   const [mounted, setMounted] = React.useState(false);
-  const [isPending, startTransition] = React.useTransition();
+  const [isPending, startTransition] = useAsyncTask();
   const router = useRouter();
 
   React.useEffect(() => {
@@ -71,7 +82,7 @@ export function MultiCheckoutForm({ defaults }: { defaults?: { fullName: string;
   return (
     <form action={handleCheckout} className="grid gap-8 lg:grid-cols-[1fr_360px]">
       <div className="flex flex-col gap-6">
-        <p className="rounded border p-4 text-sm">Request-to-book services require acceptance before payment. Restaurant requests reserve tables, not meals. Final prices are validated on the server.</p>
+        <p className="rounded border p-4 text-sm leading-relaxed">{checkoutNotice}</p>
         {cartItems.map(item=><ServiceDetailsFields key={item.id} prefix={item.id} type={item.type} initial={item.fulfilment}/>)}
         <Card>
           <CardHeader>
@@ -95,26 +106,26 @@ export function MultiCheckoutForm({ defaults }: { defaults?: { fullName: string;
         </Card>
 
         <div className="flex flex-col gap-4 mt-4">
-          <h2 className="text-xl font-bold">Your Itinerary</h2>
+          <h2 className="text-xl font-semibold">Your Itinerary</h2>
           {cartItems.map((item) => (
             <Card key={item.id}>
-              <CardContent className="flex flex-wrap gap-3 p-4">
+              <CardContent className="p-4 flex gap-4">
                 {item.image && (
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-secondary">
                     <Image src={item.image} alt={item.title} fill sizes="80px" className="object-cover" />
                   </div>
                 )}
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <p className="font-bold">{item.title}</p>
-                  <p className="text-sm text-muted-foreground capitalize">{item.type}</p>
+                <div className="flex flex-col flex-1">
+                  <p className="font-semibold">{item.title}</p>
+                  <p className="text-sm text-muted-foreground capitalize leading-relaxed">{item.type}</p>
                   {item.startDate && item.endDate && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {item.startDate} to {item.endDate}
                     </p>
                   )}
-                  {item.roomTypeName && <p className="text-sm font-medium text-brand-blue">{item.roomTypeName}</p>}
+                  {item.roomTypeName && <p className="text-sm font-medium text-brand-blue leading-relaxed">{item.roomTypeName}</p>}
                 </div>
-                <div className="font-bold whitespace-nowrap">{item.type.toUpperCase()==="RESTAURANT" ? "Table request · no prepayment" : formatUGX(item.totalMinor)}</div>
+                <div className="font-semibold whitespace-nowrap">{item.type.toUpperCase()==="RESTAURANT" ? "Table request · no prepayment" : formatUGX(item.totalMinor)}</div>
               </CardContent>
             </Card>
           ))}
@@ -127,15 +138,15 @@ export function MultiCheckoutForm({ defaults }: { defaults?: { fullName: string;
           <CardTitle>Order summary</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          <div className="flex items-center justify-between text-base font-bold">
-            <span>Estimated booking total</span>
+          <div className="flex items-center justify-between text-base font-semibold">
+            <span>{restaurantOnly ? "Reservation total" : "Estimated booking total"}</span>
             <span>{formatUGX(totalMinor)}</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">Not charged on submission. Review listing inclusions and exclusions. The server validates the final payable amount.</p>
+          <p className="text-xs text-muted-foreground mt-1">{restaurantOnly ? "Meals are paid separately at the restaurant." : "You’ll review the final amount and choose your payment method in the next step."}</p>
           <Separator className="my-2" />
-          {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">{error}</p>}
-          <Button type="submit" size="lg" className="w-full" disabled={isPending || cartItems.length === 0}>
-            {isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : "Submit and check booking status"}
+          {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive leading-relaxed">{error}</p>}
+          <Button type="submit" size="lg" className="w-full" loading={isPending} loadingText="Continuing…" disabled={cartItems.length === 0}>
+            {restaurantOnly ? "Send reservation request" : "Continue to payment"}
           </Button>
         </CardContent>
       </Card>

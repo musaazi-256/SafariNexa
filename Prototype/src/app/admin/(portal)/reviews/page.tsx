@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from "@/components/admin/confirm-submit";
 import { redirect } from "next/navigation";
 import { Star } from "lucide-react";
 import type { ReviewStatus as PrismaReviewStatus } from "@prisma/client";
@@ -125,15 +126,15 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {reviews.map((review) => (
-            <div key={review.id} className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col p-6">
+            <div key={review.id} className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden flex flex-col p-6">
               
               {/* Header: Title and Rating/Status */}
               <div className="flex items-start justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
-                <h3 className="font-bold text-[16px] text-slate-900">Latest reviews</h3>
+                <h3 className="font-semibold text-base text-slate-900">Latest reviews</h3>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4 fill-primary text-primary" />
-                    <span className="font-bold text-[14px] text-slate-900">{review.rating}</span>
+                    <span className="font-medium text-sm text-slate-900">{review.rating}</span>
                   </div>
                   <ReviewStatusBadge status={toReviewStatus(review.status)} />
                 </div>
@@ -142,22 +143,22 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
               {/* Data Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-x-4 gap-y-4 mb-6">
                 
-                <span className="text-[12px] font-bold text-slate-500">Reviewer</span>
-                <span className="text-[13px] font-semibold text-slate-900">{review.author.name ?? review.author.email}</span>
+                <span className="text-xs font-medium text-slate-500">Reviewer</span>
+                <span className="text-sm font-semibold text-slate-900">{review.author.name ?? review.author.email}</span>
                 
-                <span className="text-[12px] font-bold text-slate-500">Date</span>
-                <span className="text-[13px] font-semibold text-slate-900">{review.createdAt.toLocaleDateString("en-UG", { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                <span className="text-xs font-medium text-slate-500">Date</span>
+                <span className="text-sm font-semibold text-slate-900">{review.createdAt.toLocaleDateString("en-UG", { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                 
-                <span className="text-[12px] font-bold text-slate-500">Listing</span>
-                <span className="text-[13px] font-semibold text-slate-900">{review.listing.title}</span>
+                <span className="text-xs font-medium text-slate-500">Listing</span>
+                <span className="text-sm font-semibold text-slate-900">{review.listing.title}</span>
                 
-                <span className="text-[12px] font-bold text-slate-500">Review</span>
-                <span className="text-[13px] font-semibold text-slate-900 italic">&ldquo;{review.body}&rdquo;</span>
+                <span className="text-xs font-medium text-slate-500">Review</span>
+                <span className="text-sm font-semibold text-slate-900 italic">&ldquo;{review.body}&rdquo;</span>
                 
                 {review.businessReplyBody && (
                   <>
-                    <span className="text-[12px] font-bold text-slate-500 mt-2">Business response</span>
-                    <span className="text-[13px] font-semibold text-slate-600 mt-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <span className="text-xs font-medium text-slate-500 mt-2">Business response</span>
+                    <span className="text-sm font-semibold text-slate-600 mt-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
                       {review.businessReplyBody}
                     </span>
                   </>
@@ -170,23 +171,36 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
                   .filter((status) => status !== review.status)
                   .map((status) => {
                     let label = "Publish review";
-                    let styleClass = "border-slate-200 text-primary hover:bg-primary/10";
+                    let styleClass = "border-border text-primary hover:bg-primary/10";
                     if (status === "FLAGGED") {
                       label = "Flag review";
-                      styleClass = "border-slate-200 text-orange-600 hover:bg-orange-50";
+                      styleClass = "border-border text-orange-600 hover:bg-orange-50";
                     }
                     if (status === "HIDDEN") {
                       label = "Hide review";
-                      styleClass = "border-slate-200 text-slate-700 hover:bg-slate-50";
+                      styleClass = "border-border text-slate-700 hover:bg-slate-50";
                     }
 
                     return (
                       <form key={status} action={setReviewStatus}>
                         <input type="hidden" name="reviewId" value={review.id} />
                         <input type="hidden" name="status" value={status} />
-                        <Button type="submit" variant="outline" className={`h-8 px-4 text-[12px] font-bold shadow-none rounded-full ${styleClass}`}>
-                          {label}
-                        </Button>
+                        {status === "HIDDEN" ? (
+                          <ConfirmSubmit
+                            title="Hide this review?"
+                            description="The review will no longer appear on the listing or count towards its rating. You can publish it again later."
+                            confirmLabel="Hide review"
+                            trigger={
+                              <Button variant="outline" className={`h-8 px-4 text-xs font-semibold shadow-none rounded-full ${styleClass}`}>
+                                {label}
+                              </Button>
+                            }
+                          />
+                        ) : (
+                          <Button type="submit" variant="outline" className={`h-8 px-4 text-xs font-semibold shadow-none rounded-full ${styleClass}`}>
+                            {label}
+                          </Button>
+                        )}
                       </form>
                     )
                   })}

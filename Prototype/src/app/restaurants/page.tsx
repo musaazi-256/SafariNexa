@@ -33,7 +33,7 @@ export default async function RestaurantsPage({ searchParams }: { searchParams: 
             title="Browse places to eat"
             description="Menus, hours, and restaurant profiles are open to guests. Reserving or requesting a table needs an account."
           />
-          <p className="mb-4 text-sm text-muted-foreground">{totalCount} restaurant profiles</p>
+          <p className="mb-4 text-sm text-muted-foreground leading-relaxed">{totalCount} restaurant profiles</p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {listings.map((listing) => (
               <ListingCard

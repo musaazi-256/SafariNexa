@@ -1,11 +1,23 @@
 import Link from "next/link";
 import { requireAdminSession } from "@/lib/admin";
 import { db } from "@/lib/db";
+import { PageHero } from "@/components/page-hero";
+import { FilterTabs } from "@/components/ui/filter-tabs";
+import { Button } from "@/components/ui/button";
 
 export default async function ListingQueue({searchParams}: {searchParams: {status?: string}}) {
   await requireAdminSession("businesses.manage");
   const statuses = ["SUBMITTED", "UNDER_REVIEW", "APPROVED", "NEEDS_CHANGES", "REJECTED", "WITHDRAWN"];
   const status = statuses.includes(searchParams.status || "") ? searchParams.status! : "SUBMITTED";
   const submissions = await db.listingSubmission.findMany({where: {status}, include: {listing: {include: {business: true}}}, orderBy: {submittedAt: "desc"}, take: 100});
-  return <div className="mx-auto max-w-5xl space-y-6"><h1 className="text-3xl font-bold">Listing review queue</h1><p>Business verification establishes the operator’s identity. This queue reviews each listing’s content, prices and photos before publication.</p><nav aria-label="Review status" className="flex flex-wrap gap-3">{statuses.map(item => <Link key={item} href={`/admin/listings?status=${item}`} aria-current={item === status ? "page" : undefined} className={`rounded border p-2 text-sm ${item === status ? "bg-primary text-white" : ""}`}>{item.replaceAll("_", " ")}</Link>)}</nav><p className="text-sm">Showing up to 100 most recent {status.toLowerCase().replaceAll("_", " ")} submissions.</p>{submissions.length ? submissions.map(item => <Link className="block rounded border p-4 hover:bg-muted" href={`/admin/listings/${item.id}`} key={item.id}><h2 className="font-bold">{item.listing.title}</h2><p>{item.listing.business.name} · {item.listing.type} · {item.submittedAt.toISOString()}</p><span className="underline">View submitted details and photos</span></Link>) : <p>No submissions in this status.</p>}</div>;
+  return <div className="max-w-[1450px] mx-auto space-y-6 pb-20 font-sans">
+    <PageHero variant="portal" eyebrow="Admin portal" title="Listing review queue" description="Review submitted listing details, prices and photos before publication." />
+    <FilterTabs activeValue={status} tabs={statuses.map(value=>({value,label:value.toLowerCase().replaceAll("_"," ").replace(/^./,s=>s.toUpperCase()),href:`/admin/listings?status=${value}`}))}/>
+    <div className="space-y-4">{submissions.map(item=><div key={item.id} className="bg-white rounded-2xl border border-border shadow-card p-6 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4"><div><h2 className="text-base font-semibold text-slate-900">{item.listing.title}</h2><p className="text-xs font-medium text-slate-500 mt-0.5">{item.listing.business.name} · {item.listing.type.toLowerCase()} · Submitted on {item.submittedAt.toLocaleDateString("en-GB",{timeZone:"Africa/Kampala"})}</p></div><Button asChild size="sm" className="font-medium text-xs"><Link href={`/admin/listings/${item.id}`}>Review listing</Link></Button></div>
+      <p className="text-sm font-medium text-slate-500 leading-relaxed">Review the submitted information and photos. Business verification is checked separately.</p>
+    </div>)}</div>
+    {!submissions.length && <div className="rounded-2xl border border-border bg-white p-10 text-center text-sm text-slate-500">No submissions in this status.</div>}
+    <p className="text-xs font-medium text-slate-500">Showing up to 100 most recent {status.toLowerCase().replaceAll("_", " ")} submissions.</p>
+  </div>;
 }

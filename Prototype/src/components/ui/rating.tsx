@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 export function Rating({ value, count, className }: { value: number; count?: number; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 text-[13px] font-medium text-foreground", className)}>
+    <span className={cn("inline-flex items-center gap-1 text-sm font-medium text-foreground", className)}>
       <Star className="h-3.5 w-3.5 fill-accent text-accent" />
       <span>{value.toFixed(1)}</span>
       {typeof count === "number" ? <span className="font-medium text-foreground">({count})</span> : null}
@@ -20,7 +20,7 @@ const SCORE_LABELS: Array<[number, string]> = [
   [0, "Fair"]
 ];
 
-function scoreLabel(value: number) {
+export function scoreLabel(value: number) {
   return SCORE_LABELS.find(([threshold]) => value >= threshold)?.[1] ?? "Fair";
 }
 
@@ -28,11 +28,11 @@ function scoreLabel(value: number) {
 export function ScoreBadge({ value, count, className }: { value: number; count?: number; className?: string }) {
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      <span className="flex h-9 min-w-9 items-center justify-center rounded-lg bg-primary px-1.5 text-sm font-extrabold text-primary-foreground">
+      <span className="flex h-9 min-w-9 items-center justify-center rounded-lg bg-primary px-1.5 text-sm font-semibold text-primary-foreground">
         {value.toFixed(1)}
       </span>
       <span className="flex flex-col leading-tight">
-        <span className="text-sm font-bold">{scoreLabel(value)}</span>
+        <span className="text-sm font-medium">{scoreLabel(value)}</span>
         {typeof count === "number" ? <span className="text-xs text-muted-foreground">{count} reviews</span> : null}
       </span>
     </span>

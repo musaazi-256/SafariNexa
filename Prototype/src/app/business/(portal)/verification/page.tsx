@@ -1,4 +1,7 @@
-import { Link2, Upload, HelpCircle, MessageCircle, Hourglass } from "lucide-react";
+import { isDemoMode } from "@/lib/dev-mode";
+import { VerificationStatusBadge } from "@/components/ui/status-badge";
+import { toVerificationStatus } from "@/lib/status";
+import { Upload, HelpCircle, MessageCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -33,14 +36,14 @@ export default async function BusinessVerificationPage() {
   const statusCopy: Record<string, string> = {
     NOT_STARTED: "You haven't submitted your business for verification yet.",
     DRAFT: "Your verification submission is saved as a draft.",
-    SUBMITTED: "Your documents are under review. We'll notify you once there's an update.",
+    SUBMITTED: "Your documents have been submitted and are awaiting review. We'll notify you once there's an update.",
     UNDER_REVIEW: "Your documents are under review. We'll notify you once there's an update.",
     NEEDS_CHANGES: "We need more information before we can approve your business. See the notes below and resubmit.",
     APPROVED: "Your business is verified. You can submit individual listings and photos for admin approval before publication.",
     REJECTED: "Your verification was not approved. See the notes below.",
     SUSPENDED: "Your business's verification has been flagged and is on hold. See the notes below."
   };
-  const bannerMessage = statusCopy[business.verificationStatus] ?? statusCopy.SUBMITTED;
+  const bannerMessage = statusCopy[business.verificationStatus] ?? "Your verification status is unavailable. Contact support for help."
   const reviewNotes = latestVerification?.reviewNotes?.trim();
   const showNotes = Boolean(reviewNotes);
 
@@ -54,21 +57,18 @@ export default async function BusinessVerificationPage() {
       />
 
       {/* Verification Status Banner */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
         <div className="p-8">
           <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8 items-center">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">Verification status</h3>
-              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50 border border-orange-100 text-orange-700 text-xs font-bold uppercase tracking-wider">
-                <Hourglass className="h-3.5 w-3.5" /> 
-                {business.verificationStatus.replace("_", " ")}
-              </div>
+              <h3 className="text-sm font-semibold text-slate-900">Verification status</h3>
+              <div className="mt-3"><VerificationStatusBadge status={toVerificationStatus(business.verificationStatus)} /></div>
               <p className="text-sm text-slate-500 mt-4 leading-relaxed">
                 {bannerMessage}
               </p>
               {showNotes ? (
-                <p className="text-sm text-slate-700 mt-3 leading-relaxed rounded-lg bg-slate-50 border border-slate-200 p-3">
-                  <span className="font-bold">Reviewer notes: </span>
+                <p className="text-sm text-slate-700 mt-3 leading-relaxed rounded-lg bg-slate-50 border border-border p-3">
+                  <span className="font-semibold">Reviewer notes: </span>
                   {reviewNotes}
                 </p>
               ) : null}
@@ -84,17 +84,17 @@ export default async function BusinessVerificationPage() {
         </div>
       </div>
 
-      <VerificationDocuments documents={documents} />
+      <VerificationDocuments documents={documents} demo={isDemoMode()} />
 
-      {/* Bottom Add Document Form (Fallback URL method) */}
-      <div className="bg-slate-50 rounded-2xl p-6 sm:p-8 border border-slate-200">
-        <h3 className="text-lg font-bold text-slate-900">Add a document</h3>
-        <p className="text-sm text-slate-500 mt-1">Registration documents, licenses, tax IDs, and other evidence. Submitting moves your business back into review.</p>
+      {/* Uploads use the same private storage as the document cards above. */}
+      <div className="bg-slate-50 rounded-2xl p-6 sm:p-8 border border-border">
+        <h3 className="text-lg font-semibold text-slate-900">Add a document</h3>
+        <p className="text-sm text-slate-500 mt-1 leading-relaxed">Registration documents, licenses, tax IDs, and other evidence. Submitting moves your business back into review.</p>
         
         <form action={async (fd) => { "use server"; await submitVerificationDocument(fd); }} className="mt-6 flex flex-col sm:flex-row gap-4 items-end">
            <div className="flex-1 w-full space-y-2">
-             <Label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Document type</Label>
-             <select name="type" className="flex h-11 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+             <Label htmlFor="verification-type" className="text-xs font-medium text-slate-700 uppercase tracking-wider">Document type</Label>
+             <select id="verification-type" name="type" required className="form-control flex w-full ring-offset-white">
                <option value="">Select document type</option>
                <option value="INCORPORATION">Incorporation</option>
                <option value="LICENSES">Licenses & permits</option>
@@ -105,28 +105,27 @@ export default async function BusinessVerificationPage() {
            </div>
            
            <div className="flex-[2] w-full space-y-2 relative">
-             <Label className="text-xs font-bold text-slate-700 uppercase tracking-wider">File</Label>
+             <Label htmlFor="verification-file" className="text-xs font-medium text-slate-700 uppercase tracking-wider">File (PDF, JPEG or PNG, up to 5 MB)</Label>
              <div className="relative">
-               <Input name="fileUrl" className="h-11 pl-4 pr-10 rounded-lg border-slate-200" placeholder="Paste file URL here" />
-               <Link2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+               <Input id="verification-file" name="file" type="file" accept="application/pdf,image/jpeg,image/png" required className="h-11 rounded-xl border-input" />
              </div>
            </div>
 
-           <Button type="submit" className="h-11 rounded-lg bg-green-700 hover:bg-green-800 shrink-0 px-6 font-bold">
+           <Button type="submit" className="h-11 shrink-0 px-6 font-medium">
              <Upload className="mr-2 h-4 w-4" /> Submit for review
            </Button>
         </form>
       </div>
 
       {/* Need help footer */}
-      <div className="bg-slate-50 rounded-2xl p-6 sm:p-8 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-slate-50 rounded-2xl p-6 sm:p-8 border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
          <div className="flex items-center gap-4">
             <div className="h-10 w-10 rounded-full border-2 border-slate-300 flex items-center justify-center shrink-0 bg-white shadow-sm">
               <HelpCircle className="h-5 w-5 text-slate-600" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-900">Need help?</h4>
-              <p className="text-sm text-slate-500 mt-0.5">If you&apos;re not sure what to upload, contact our support team.</p>
+              <h4 className="text-sm font-semibold text-slate-900">Need help?</h4>
+              <p className="text-sm text-slate-500 mt-0.5 leading-relaxed">If you&apos;re not sure what to upload, contact our support team.</p>
             </div>
          </div>
 <Button asChild variant="outline"><Link href="/support">Contact support</Link></Button>

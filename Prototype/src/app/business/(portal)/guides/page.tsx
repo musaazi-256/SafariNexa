@@ -59,7 +59,7 @@ export default async function GuidesPage() {
                       </div>
                     )}
                     <div>
-                      <h3 className="font-bold leading-tight">{guide.name}</h3>
+                      <h3 className="font-semibold leading-tight">{guide.name}</h3>
                       <p className="text-xs text-muted-foreground">{guide.specialization.replace("_", " ")}</p>
                     </div>
                   </div>

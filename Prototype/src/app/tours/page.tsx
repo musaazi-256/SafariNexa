@@ -33,7 +33,7 @@ export default async function ToursPage({ searchParams }: { searchParams: { page
             title="Guided experiences across Uganda"
             description="Compare safari itineraries, chimp treks, and city tours by duration, difficulty, and destination. Every listing includes a named, verified guide — meet them on the Guides page."
           />
-          <p className="mb-4 text-sm text-muted-foreground">{totalCount} guided experiences</p>
+          <p className="mb-4 text-sm text-muted-foreground leading-relaxed">{totalCount} guided experiences</p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {listings.map((listing) => (
               <ListingCard
