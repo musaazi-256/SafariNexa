@@ -1,11 +1,12 @@
+import { PortalToolbar } from "@/components/portal-toolbar";
 import { TableColumnLabel } from "@/components/ui/table-column-label";
 import Link from "next/link";
 import type { SupportCaseStatus as PrismaSupportCaseStatus } from "@prisma/client";
 
 import { EmptyState } from "@/components/ui/empty-state";
-import { Pagination } from "@/components/ui/pagination";
+import { Pagination } from "@/components/page-pagination";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { FilterTabs } from "@/components/ui/filter-tabs";
+import { RecordFilter } from "@/components/record-filter";
 import { PageHero } from "@/components/page-hero";
 import { SupportCaseStatusBadge } from "@/components/ui/status-badge";
 import { requireAdminSession } from "@/lib/admin";
@@ -25,7 +26,8 @@ const TABS: Array<{ value: PrismaSupportCaseStatus | "ALL"; label: string }> = [
 export default async function AdminSupportPage({ searchParams }: { searchParams: { status?: string; page?: string } }) {
   await requireAdminSession();
 
-  const activeStatus = (searchParams.status?.toUpperCase() as PrismaSupportCaseStatus | undefined) ?? undefined;
+  const requestedStatus = searchParams.status?.toUpperCase();
+  const activeStatus = TABS.some(option=>option.value===requestedStatus && option.value!=="ALL") ? requestedStatus as PrismaSupportCaseStatus : undefined;
   const page = parsePage(searchParams.page);
   const where = activeStatus ? { status: activeStatus } : undefined;
 
@@ -50,21 +52,20 @@ export default async function AdminSupportPage({ searchParams }: { searchParams:
       />
 
       {/* Pill Filters */}
-      <FilterTabs
-        activeValue={activeStatus ?? "ALL"}
-        tabs={TABS.map((tab) => ({
+      <PortalToolbar tableId="admin-support" filters={<RecordFilter label="Case status" name="status" defaultValue="ALL"
+        value={activeStatus ?? "ALL"}
+        options={TABS.map((tab) => ({
           value: tab.value,
           label: tab.label,
-          href: tab.value === "ALL" ? "/admin/support" : `/admin/support?status=${tab.value.toLowerCase()}`
         }))}
-      />
+      />} />
 
       {/* Table Container */}
       {cases.length === 0 ? (
         <EmptyState title="No cases here" description="Nothing matches this filter right now." />
       ) : (
         <div>
-          <Table>
+          <Table externalTools tableId="admin-support" aria-label="Support cases">
             <TableHeader>
               <TableRow>
                 <TableHead>Case</TableHead>

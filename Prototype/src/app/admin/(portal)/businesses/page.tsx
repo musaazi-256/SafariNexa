@@ -1,12 +1,13 @@
+import { PortalToolbar } from "@/components/portal-toolbar";
 import { PortalSearch } from "@/components/portal-search";
 import { TableActionLink } from "@/components/ui/table-action-link";
 import Link from "next/link";
 import { Search, Filter, Download, Building2, ChevronsUpDown } from "lucide-react";
 
 import { EmptyState } from "@/components/ui/empty-state";
-import { Pagination } from "@/components/ui/pagination";
+import { Pagination } from "@/components/page-pagination";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { FilterTabs } from "@/components/ui/filter-tabs";
+import { RecordFilter } from "@/components/record-filter";
 import { PageHero } from "@/components/page-hero";
 import { VerificationStatusBadge } from "@/components/ui/status-badge";
 import { requireAdminSession } from "@/lib/admin";
@@ -16,7 +17,9 @@ import { toVerificationStatus } from "@/lib/status";
 import { Button } from "@/components/ui/button";
 
 const TABS: Array<{ value: string; label: string }> = [
-  { value: "ALL", label: "All" },
+  { value: "ALL", label: "All verification states" },
+  { value: "NOT_STARTED", label: "Not started" },
+  { value: "DRAFT", label: "Draft" },
   { value: "SUBMITTED", label: "Submitted" },
   { value: "UNDER_REVIEW", label: "Under review" },
   { value: "APPROVED", label: "Approved" },
@@ -64,31 +67,23 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
       />
 
       {/* Pill Filters */}
-      <FilterTabs
-        activeValue={!activeStatus || activeStatus === "ALL" ? "ALL" : activeStatus}
-        tabs={TABS.map((tab) => {
+      <PortalToolbar tableId="admin-businesses" search={<PortalSearch label="Search businesses" placeholder="Search businesses…" />} filters={<><RecordFilter label="Verification status" name="status" defaultValue="ALL"
+        value={!activeStatus || activeStatus === "ALL" ? "ALL" : activeStatus}
+        options={TABS.map((tab) => {
           const params = new URLSearchParams();
           if (tab.value !== "ALL") params.set("status", tab.value.toLowerCase());
           if (q) params.set("q", q);
-          return { value: tab.value, label: tab.label, href: `/admin/businesses?${params.toString()}` };
+          return { value: tab.value, label: tab.label, };
         })}
-      />
+      /></>} />
 
-      {/* Table Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <PortalSearch label="Search businesses" placeholder="Search businesses…" />
-<PortalFilter />
-<ExportVisibleRows />
-        </div>
-      </div>
 
       {/* Table Container */}
       {businesses.length === 0 ? (
         <EmptyState title="No businesses here" description="Nothing matches this filter right now." />
       ) : (
         <div>
-          <Table>
+          <Table externalTools tableId="admin-businesses" aria-label="Businesses">
             <TableHeader>
               <TableRow>
                 <TableHead>
@@ -151,4 +146,3 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
     </div>
   );
 }
-import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

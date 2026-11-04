@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, CalendarDays, Star, Settings, ArrowUpRight } from "lucide-react";
+import { Plus, CalendarDays, Star, Settings, ArrowUpRight, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VerificationActionModal } from "./verification-modals";
 
@@ -11,6 +11,7 @@ export function DashboardQuickActions({ verificationStatus }: { verificationStat
   const actions = [
     { href: "/business/listings/new", label: "Add a listing", icon: Plus },
     { href: "/business/bookings/calendar", label: "Booking calendar", icon: CalendarDays },
+    { href: "/business/payments", label: "Payments & refunds", icon: CreditCard },
     { href: "/business/reviews", label: "Respond to reviews", icon: Star },
     { href: "/business/settings", label: "Business settings", icon: Settings }
   ];

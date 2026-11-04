@@ -35,18 +35,18 @@ describe("Reservation service regressions",()=>{
   const result=await validateAndReserveBookings("customer-1",[item],details);
   expect(result.bookings[0].status).toBe("AWAITING_BUSINESS_CONFIRMATION");expect(result.bookings[0].responseDueAt).toBeInstanceOf(Date);expect(tx.notification.createMany).toHaveBeenCalled();
  });
- it("collects payment at checkout for request listings in demo mode",async()=>{
+ it("holds request listings for business acceptance in demo mode",async()=>{
   process.env.SAFARINEXA_DEMO_MODE="true";
   tx.listing.findUnique.mockResolvedValue({...base,type:"TOUR",bookingMode:"REQUEST",tour:{groupSizeMin:1,groupSizeMax:6}});
   const result=await validateAndReserveBookings("customer-1",[item],details,true);
-  expect(result.bookings[0]).toEqual(expect.objectContaining({bookingMode:"INSTANT",status:"PENDING_PAYMENT",totalMinor:200000}));
-  expect(tx.order.create).toHaveBeenCalledWith({data:expect.objectContaining({status:"PENDING_PAYMENT"})});
+  expect(result.bookings[0]).toEqual(expect.objectContaining({bookingMode:"REQUEST",status:"AWAITING_BUSINESS_CONFIRMATION",totalMinor:200000}));
+  expect(tx.order.create).toHaveBeenCalledWith({data:expect.objectContaining({status:"AWAITING_BUSINESS_CONFIRMATION"})});
  });
- it("allows payment for a demo cart containing a restaurant reservation",async()=>{
+ it("holds mixed demo requests until the payable requests are accepted",async()=>{
   process.env.SAFARINEXA_DEMO_MODE="true";
   tx.listing.findUnique.mockResolvedValueOnce({...base,type:"TOUR",bookingMode:"REQUEST",tour:{groupSizeMin:1,groupSizeMax:6}}).mockResolvedValueOnce({...base,id:"restaurant-1",type:"RESTAURANT",restaurant:{acceptsReservationRequests:true,seatingCapacity:10,openingHours:{summary:"Daily · 08:00 - 22:00"}}});
   await validateAndReserveBookings("customer-1",[item,{...item,listingId:"restaurant-1",type:"restaurant",time:"12:00"}],details,true);
-  expect(tx.order.create).toHaveBeenCalledWith({data:expect.objectContaining({status:"PENDING_PAYMENT",totalMinor:200000})});
+  expect(tx.order.create).toHaveBeenCalledWith({data:expect.objectContaining({status:"AWAITING_BUSINESS_CONFIRMATION",totalMinor:200000})});
  });
  it("requires pickup and dropoff before reserving transport",async()=>{
   tx.listing.findUnique.mockResolvedValue({...base,type:"TRANSPORT",transport:{capacity:6,pricingModel:"Fixed fare per trip"}});
@@ -97,4 +97,17 @@ describe("Reservation service regressions",()=>{
   await validateAndReserveBookings("customer-1",[item],{...details,nationality:"Ugandan",emergencyContact:"TEST CONTACT — not a real person"});
   expect(tx.booking.create.mock.calls[0][0].data.participants.create).toEqual(expect.objectContaining({nationality:"Ugandan",emergencyContact:"TEST CONTACT — not a real person"}));
  });
+ it("demo mode respects request-to-book instead of bypassing the business",async()=>{
+  process.env.SAFARINEXA_DEMO_MODE="true";
+  tx.listing.findUnique.mockResolvedValue({...base,type:"TOUR",bookingMode:"REQUEST",tour:{groupSizeMin:1,groupSizeMax:6}});
+  const result=await validateAndReserveBookings("customer-1",[item],details);
+  expect(result.bookings[0]).toEqual(expect.objectContaining({bookingMode:"REQUEST",status:"AWAITING_BUSINESS_CONFIRMATION"}));
+ });
+ it("instant listings continue directly to payment in demo mode",async()=>{
+  process.env.SAFARINEXA_DEMO_MODE="true";
+  tx.listing.findUnique.mockResolvedValue({...base,type:"TOUR",bookingMode:"INSTANT",tour:{groupSizeMin:1,groupSizeMax:6}});
+  const result=await validateAndReserveBookings("customer-1",[item],details);
+  expect(result.bookings[0]).toEqual(expect.objectContaining({bookingMode:"INSTANT",status:"PENDING_PAYMENT"}));
+ });
+
 });

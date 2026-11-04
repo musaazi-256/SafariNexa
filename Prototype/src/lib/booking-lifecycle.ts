@@ -1,4 +1,3 @@
-import { notifyAdmins } from "@/lib/admin-notifications";
 import type { Prisma } from "@prisma/client";
 export const CANCELLABLE = ["AUTH_REQUIRED", "PENDING_TRAVELLER_DETAILS", "PENDING_PAYMENT", "PAYMENT_FAILED", "AWAITING_BUSINESS_CONFIRMATION", "CONFIRMED"];
 import { releaseAvailabilityForBooking } from "@/lib/booking-service";
@@ -41,14 +40,16 @@ export async function cancelReservedBooking(tx: Prisma.TransactionClient, bookin
   } });
   if (!claimed.count) return;
   if (payment) {
-    await tx.refund.create({ data: {
-      paymentId: payment.id, bookingId, amountMinor: booking.totalMinor,
+    const existingRefunds = await tx.refund.aggregate({where:{bookingId,status:{in:["REQUESTED","PROCESSING","COMPLETED"]}},_sum:{amountMinor:true}});
+    const amountMinor = Math.max(0,booking.totalMinor-(existingRefunds._sum.amountMinor??0));
+    if(amountMinor > 0) await tx.refund.create({ data: {
+      paymentId: payment.id, bookingId, amountMinor,
       reason: surface === "customer" ? "Customer cancellation" : "Business declined booking",
       status: "REQUESTED", requestedByUserId: actorId
     } });
-  } else await releaseAvailabilityForBooking(tx, bookingId);
+  }
+  await releaseAvailabilityForBooking(tx, bookingId);
   await syncOrderStatus(tx, booking.orderId);
-  if(payment) await notifyAdmins(tx,"payments.manage",{type:"PAYMENT_UPDATE",title:"Refund request needs review",body:`Booking ${booking.bookingRef} was cancelled and has a refund request awaiting review.`,relatedBookingId:bookingId},actorId);
   await tx.notification.create({ data: { userId: booking.customerId, type: "BOOKING_UPDATE",
     title: payment ? "Refund requested" : "Booking cancelled",
     body: `Booking ${booking.bookingRef}: ${payment ? "a refund has been requested; it is not yet completed" : "reservation cancelled"}.`, relatedBookingId: bookingId } });
@@ -61,7 +62,8 @@ export async function acceptBookingRequest(tx: Prisma.TransactionClient, booking
   if (!booking || !await tx.businessUser.findFirst({where:{businessId:booking.businessId,userId:actorId,role:{in:["OWNER","MANAGER"]}}})) throw new Error("Booking not found or access denied.");
   if (booking.status !== "AWAITING_BUSINESS_CONFIRMATION") throw new Error("This booking no longer needs a response.");
   if (booking.responseDueAt && booking.responseDueAt <= new Date()) throw new Error("This request has expired. Ask the customer to submit a new request.");
-  const status = nextAfterAcceptance(booking);
+  const received = await tx.payment.findFirst({where:{OR:[{bookingId:booking.id},...(booking.orderId?[{orderId:booking.orderId}]:[])],status:{in:["SUCCESSFUL","PARTIALLY_REFUNDED"]},amountMinor:{gte:booking.totalMinor}}});
+  const status = nextAfterAcceptance({...booking,hasConfirmedPayment:!!received});
   const updated = await tx.booking.updateMany({where:{id:booking.id,status:"AWAITING_BUSINESS_CONFIRMATION"},data:{status,responseDueAt:null,confirmedAt:status === "CONFIRMED" ? new Date():null,paymentDueAt:status === "PENDING_PAYMENT" ? new Date(Math.min(Date.now()+(booking.orderId?RESPONSE_HOURS*60:PAYMENT_MINUTES)*60000,booking.startDate?.getTime() ?? Infinity)):null}});
   if (!updated.count) throw new Error("Booking changed; refresh before responding.");
   if(booking.orderId && !await tx.booking.count({where:{orderId:booking.orderId,status:"AWAITING_BUSINESS_CONFIRMATION"}})) {

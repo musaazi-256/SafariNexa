@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/page-header";
 import { isDemoMode } from "@/lib/dev-mode";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -77,7 +78,7 @@ export function AuthCard({
     <Card className="w-full max-w-md">
       <CardHeader>
         <p className="text-xs font-medium uppercase tracking-wide text-primary">{surface} authentication</p>
-        <CardTitle className="text-3xl">Sign in to your {meta.label}</CardTitle>
+        <PageTitle>Sign in to your {meta.label}</PageTitle>
         <CardDescription>{demo ? "This is a demo. The details below are filled in for you, so just continue." : "Continue with Google or your SafariNexa email."}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

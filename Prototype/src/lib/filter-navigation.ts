@@ -1,7 +1,8 @@
-/** Preserve independent search/sort controls while changing a status/category tab. */
-export function filterHref(href:string,current:URLSearchParams) {
-  const target=new URL(href,"https://safarinexa.invalid");
-  for(const key of ["q","sort"])if(!target.searchParams.has(key)&&current.has(key))target.searchParams.set(key,current.get(key)!);
-  target.searchParams.delete("page");
-  return `${target.pathname}${target.searchParams.size?`?${target.searchParams}`:""}${target.hash}`;
+/** Change one facet without losing independent facets, repeated values, or search. */
+export function updateFilterParams(current: URLSearchParams, name: string, value?: string) {
+  const next = new URLSearchParams(current.toString());
+  if (value === undefined) next.delete(name);
+  else next.set(name, value);
+  next.delete("page");
+  return next;
 }

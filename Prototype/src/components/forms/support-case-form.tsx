@@ -8,15 +8,26 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SUPPORT_CATEGORIES } from "@/lib/support";
 
-export function SupportCaseForm({ action }: { action: (formData: FormData) => void }) {
-  const [category, setCategory] = React.useState<string>(SUPPORT_CATEGORIES[0]);
+export function SupportCaseForm({
+  action,
+  categories = SUPPORT_CATEGORIES,
+  bookings,
+  subjectPlaceholder = "e.g. Payment failed but I was charged"
+}: {
+  action: (formData: FormData) => void;
+  categories?: readonly string[];
+  /** Optional bookings the case can be linked to (business portal). */
+  bookings?: Array<{ id: string; label: string }>;
+  subjectPlaceholder?: string;
+}) {
+  const [category, setCategory] = React.useState<string>(categories[0]);
 
   return (
     <form action={action} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
         <Label>Category</Label>
         <div className="flex flex-wrap gap-1.5">
-          {SUPPORT_CATEGORIES.map((item) => (
+          {categories.map((item) => (
             <label
               key={item}
               className="flex cursor-pointer items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:text-primary"
@@ -38,8 +49,18 @@ export function SupportCaseForm({ action }: { action: (formData: FormData) => vo
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="subject">Subject</Label>
-        <Input id="subject" name="subject" required placeholder="e.g. Payment failed but I was charged" />
+        <Input id="subject" name="subject" required placeholder={subjectPlaceholder} />
       </div>
+
+      {bookings ? (
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="relatedBookingId">Related booking (optional)</Label>
+          <select id="relatedBookingId" name="relatedBookingId" defaultValue="" className="filter-select w-full">
+            <option value="">No specific booking</option>
+            {bookings.map((booking) => <option key={booking.id} value={booking.id}>{booking.label}</option>)}
+          </select>
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="message">Message</Label>

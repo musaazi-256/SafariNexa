@@ -17,8 +17,8 @@ type StatCardProps = {
   compact?: boolean;
 };
 
-/** One visual hierarchy for recorded metrics; a destination is always an explicit link. */
-export function StatCard({label,value,description,icon:Icon,help,href,actionLabel,compact=false}:StatCardProps) {
+/** Compact by default across the product; a destination is always an explicit link. */
+export function StatCard({label,value,description,icon:Icon,help,href,actionLabel,compact=true}:StatCardProps) {
   return <Card role="group" aria-label={label} data-slot="stat-card" className={cn("flex h-full flex-col",compact?"p-3":"min-h-40 p-5")}>
     <div className={cn("flex items-start justify-between gap-3",compact?"min-h-6":"min-h-10")}>
       <div className="min-w-0 text-xs font-medium leading-5 text-slate-500">{help?<TableColumnLabel help={help}>{label}</TableColumnLabel>:label}</div>
@@ -31,5 +31,5 @@ export function StatCard({label,value,description,icon:Icon,help,href,actionLabe
 }
 
 export function StatGrid({children,columns=4}:{children:ReactNode;columns?:4|5}) {
-  return <div className={cn("grid items-stretch gap-4 sm:grid-cols-2",columns===5?"lg:grid-cols-3 2xl:grid-cols-5":"xl:grid-cols-4")}>{children}</div>;
+  return <div className={cn("grid items-stretch gap-3",columns===5?"sm:grid-cols-[repeat(auto-fit,minmax(200px,1fr))]":"sm:grid-cols-2 xl:grid-cols-4")}>{children}</div>;
 }

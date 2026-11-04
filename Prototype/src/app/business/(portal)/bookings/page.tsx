@@ -1,9 +1,14 @@
+import { RecordDateFilter } from "@/components/record-date-filter";
+import { recordDateFilter } from "@/lib/record-date-filter";
+import { PortalToolbar } from "@/components/portal-toolbar";
+import { bookingPaymentSummary } from "@/lib/booking-payment-summary";
+import { PaymentStatusBadge } from "@/components/ui/status-badge";
+import { toPaymentStatus } from "@/lib/status";
 import { StatCard, StatGrid } from "@/components/ui/stat-card";
 import { PortalSearch } from "@/components/portal-search";
 import { BookingStatusBadge } from "@/components/ui/status-badge";
 import { toBookingStatus } from "@/lib/status";
 import { TableColumnLabel } from "@/components/ui/table-column-label";
-import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
 import { Download, Calendar, Hourglass, Check, CalendarCheck, X, Banknote, Filter, Search, MoreVertical, ArrowUpDown } from "lucide-react";
 
@@ -13,8 +18,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
-import { FilterTabs } from "@/components/ui/filter-tabs";
+import { Pagination } from "@/components/page-pagination";
+import { RecordFilter } from "@/components/record-filter";
+import { BUSINESS_BOOKING_FILTERS, businessBookingFilter } from "@/lib/business-booking-filters";
+import type { Prisma } from "@prisma/client";
 import { PageHero } from "@/components/page-hero";
 import { formatUGX } from "@/lib/booking";
 import { requireBusinessSession } from "@/lib/business";
@@ -22,15 +29,7 @@ import { db } from "@/lib/db";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 
-const STATUS_GROUPS: Record<string, string[]> = {
-  PENDING_PAYMENT: ["PENDING_PAYMENT","PAYMENT_FAILED","PAYMENT_PROCESSING"],
-  AWAITING_BUSINESS_CONFIRMATION: ["AWAITING_BUSINESS_CONFIRMATION"],
-  CONFIRMED: ["CONFIRMED"],
-  COMPLETED: ["COMPLETED", "REVIEW_PENDING", "REVIEWED"],
-  CANCELLED: ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN"]
-};
-
-export default async function BusinessBookingsPage({ searchParams }: { searchParams: { status?: string; page?: string; q?: string } }) {
+export default async function BusinessBookingsPage({ searchParams }: { searchParams: { status?: string; page?: string; q?: string; period?: string } }) {
   const { business, businessId } = await requireBusinessSession();
 
   if (!business || !businessId) {
@@ -41,25 +40,34 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
     );
   }
 
-  const activeTab = searchParams.status?.toUpperCase();
+  const selectedFilter = businessBookingFilter(searchParams.status);
+  const activeTab = selectedFilter?.value;
+  const q = searchParams.q?.trim();
   const page = parsePage(searchParams.page);
-  const where = { ...(searchParams.q ? { OR: [{ bookingRef: { contains: searchParams.q.trim(), mode: "insensitive" as const } }, { listing: { title: { contains: searchParams.q.trim(), mode: "insensitive" as const } } }] } : {}), businessId, ...(activeTab && STATUS_GROUPS[activeTab] ? { status: { in: STATUS_GROUPS[activeTab] } } : {}) };
+  const searchWhere: Prisma.BookingWhereInput = { businessId, ...recordDateFilter(searchParams.period), ...(q ? { OR: [
+    { bookingRef: { contains: q, mode: "insensitive" } },
+    { listing: { title: { contains: q, mode: "insensitive" } } },
+    { customer: { name: { contains: q, mode: "insensitive" } } },
+    { customer: { email: { contains: q, mode: "insensitive" } } }
+  ] } : {}) };
+  const where: Prisma.BookingWhereInput = { ...searchWhere, ...(selectedFilter ? { status: { in: selectedFilter.statuses } } : {}) };
 
   // Fetch data
   const [
     bookings, 
     totalFilteredCount, 
     statusCountsResult,
-    revenueResult
+    revenueResult,
+    matchingStatusCounts
   ] = await Promise.all([
     db.booking.findMany({
-      where: where as never,
-      include: { listing: true, customer: { select: { name: true, email: true, phone: true } } },
+      where,
+      include: { listing: true, customer: { select: { name: true, email: true, phone: true } }, payments:{include:{refunds:true}}, order:{include:{payments:{include:{refunds:true}}}} },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE
     }),
-    db.booking.count({ where: where as never }),
+    db.booking.count({ where }),
     db.booking.groupBy({
       by: ["status"],
       _count: { status: true },
@@ -68,7 +76,8 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
     db.booking.aggregate({
       _sum: { totalMinor: true },
       where: { businessId, status: { in: ["CONFIRMED", "COMPLETED", "REVIEW_PENDING", "REVIEWED"] } }
-    })
+    }),
+    db.booking.groupBy({ by: ["status"], _count: { status: true }, where: searchWhere })
   ]);
 
   // Aggregate counts
@@ -81,17 +90,14 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
   const confirmedCount = statusCounts["CONFIRMED"] || 0;
   const completedCount = (statusCounts["COMPLETED"] || 0) + (statusCounts["REVIEW_PENDING"] || 0) + (statusCounts["REVIEWED"] || 0);
   const cancelledCount = (statusCounts["CANCELLED_BY_CUSTOMER"] || 0) + (statusCounts["CANCELLED_BY_BUSINESS"] || 0) + (statusCounts["CANCELLED_BY_ADMIN"] || 0);
-  const allCount = Object.values(statusCounts).reduce((sum,count)=>sum+count,0);
   
   const totalRevenue = revenueResult._sum.totalMinor || 0;
 
-  const TABS = [
-    { value: "ALL", label: "All", count: allCount },
-    { value: "AWAITING_BUSINESS_CONFIRMATION", label: "Awaiting confirmation", count: awaitingCount },
-    { value: "PENDING_PAYMENT", label: "Awaiting customer payment", count: STATUS_GROUPS.PENDING_PAYMENT.reduce((sum,status)=>sum+(statusCounts[status]||0),0) },
-    { value: "CONFIRMED", label: "Confirmed", count: confirmedCount },
-    { value: "COMPLETED", label: "Completed", count: completedCount },
-    { value: "CANCELLED", label: "Cancelled", count: cancelledCount }
+  const filterOptions = [
+    { value: "ALL", label: "All bookings", count: matchingStatusCounts.reduce((sum, row) => sum + row._count.status, 0) },
+    ...BUSINESS_BOOKING_FILTERS.map(filter => ({ value: filter.value, label: filter.label,
+      count: matchingStatusCounts.filter(row => filter.statuses.includes(row.status)).reduce((sum, row) => sum + row._count.status, 0)
+    }))
   ];
 
   const totalPages = totalPagesFor(totalFilteredCount);
@@ -104,12 +110,11 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <PageHero
           variant="portal"
-          eyebrow="Business portal"
           title="Bookings"
           description="Handle booking requests and confirmations."
         />
         <div className="flex items-center gap-3 shrink-0">
-<ExportVisibleRows />
+
 <Button asChild variant="outline"><Link href="/business/bookings/calendar">Calendar view</Link></Button>
         </div>
       </div>
@@ -123,43 +128,23 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
         <StatCard label="Confirmed booking value" value={formatUGX(totalRevenue)} description="Confirmed and completed bookings · all time" icon={Banknote} help="Sum of booking totals for confirmed, completed and reviewed bookings. This is booking value, not a settled-payment or payout total." />
       </StatGrid>
 
-      {/* Tabs & Filters */}
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-4 border-b border-border pb-4 mt-8">
-        <FilterTabs
-          activeValue={activeTab ?? "ALL"}
-          tabs={TABS.map((tab) => ({
-            value: tab.value,
-            label: tab.label,
-            count: tab.count,
-            href: `/business/bookings?${new URLSearchParams({ ...(tab.value !== "ALL" ? { status: tab.value.toLowerCase() } : {}), ...(searchParams.q ? { q: searchParams.q } : {}) })}`
-          }))}
-        />
+      {/* One status control and one search; counts follow the current search. */}
+      <PortalToolbar tableId="business-bookings" search={<PortalSearch label="Search bookings" placeholder="Reference, listing or customer…" />} filters={<><RecordFilter label="Booking status" name="status" value={activeTab ?? "ALL"} options={filterOptions} />
+<RecordDateFilter label="Booking created" /></>} />
 
-        <div className="flex items-center gap-3 w-full lg:w-auto">
-<PortalFilter />
-          <PortalSearch label="Search bookings" placeholder="Search bookings…" />
-        </div>
-      </div>
 
       {/* Main Table */}
       {bookings.length === 0 ? (
-        <EmptyState title="No bookings found" description="You don't have any bookings in this category yet." />
+        <EmptyState title="No bookings found" description="No bookings match your search and status. Try another status or clear the search." />
       ) : (
         <div>
-          <Table>
+          <Table externalTools tableId="business-bookings" aria-label="Bookings" density="compact">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[120px]"><TableColumnLabel help="The unique reference for this booking. Open it to view booking details.">Reference</TableColumnLabel></TableHead>
-                <TableHead className="w-[350px]">Listing</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>
-                  <div className="flex items-center gap-2">Date</div>
-                </TableHead>
-                <TableHead><TableColumnLabel help="The current booking stage. Payment and booking confirmation are tracked separately.">Status</TableColumnLabel></TableHead>
-                <TableHead className="text-right">
-                  <div className="flex items-center justify-end gap-2">Total</div>
-                </TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Reference</TableHead><TableHead>Listing</TableHead><TableHead>Customer</TableHead><TableHead>Email</TableHead><TableHead>Phone</TableHead>
+                <TableHead>Service date</TableHead><TableHead>Service time</TableHead>
+                <TableHead>Booking status</TableHead><TableHead>Payment status</TableHead>
+                <TableHead className="text-right">Total</TableHead><TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -167,54 +152,16 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
 
                 
                 return (
-                  <TableRow key={booking.id} className="group">
-                    <TableCell className="font-normal">
-                      <Link href={`/business/bookings/${booking.id}`}>{booking.bookingRef}</Link>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 shrink-0 rounded-lg bg-slate-100 overflow-hidden shadow-sm border border-border/60">
-                          {booking.listing.coverImageUrl ? (
-                            <RemoteImage src={booking.listing.coverImageUrl} alt="" className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="h-full w-full bg-slate-100" />
-                          )}
-                        </div>
-                        <div className="min-w-0 flex flex-col">
-                          <p className="font-normal text-slate-700 truncate">{booking.listing.title}</p>
-                          <p className="text-xs text-slate-500 font-normal truncate">{booking.bookingRef}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-normal text-slate-700 truncate">{booking.customer.name ?? booking.customer.email}</span>
-                        <span className="text-xs text-slate-500 font-normal truncate">{booking.customer.phone ?? "No phone provided"}</span>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-normal text-slate-700">
-                          {booking.startDate ? new Date(booking.startDate).toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric" }) : "—"}
-                        </span>
-                        <span className="text-xs text-slate-500 font-normal">
-                          {booking.startDate ? new Date(booking.startDate).toLocaleTimeString("en-UG", { hour: "numeric", minute: "2-digit" }) : ""}
-                        </span>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <BookingStatusBadge status={toBookingStatus(booking.status)} perspective="staff" />
-                    </TableCell>
-
-                    <TableCell className="text-right font-normal">
-                      {formatUGX(booking.totalMinor)}
-                    </TableCell>
-
-                    <TableCell className="text-right">
+                  <TableRow key={booking.id}>
+                    <TableCell><Link href={`/business/bookings/${booking.id}`}>{booking.bookingRef}</Link></TableCell>
+                    <TableCell>{booking.listing.title}</TableCell>
+                    <TableCell>{booking.customer.name ?? "Guest"}</TableCell><TableCell>{booking.customer.email}</TableCell><TableCell>{booking.customer.phone ?? "—"}</TableCell>
+                    <TableCell>{booking.startDate ? booking.startDate.toLocaleDateString("en-UG", { day: "numeric", month: "short", year: "numeric", timeZone: "Africa/Kampala" }) : "—"}</TableCell>
+                    <TableCell>{booking.startDate ? booking.startDate.toLocaleTimeString("en-UG", { hour: "numeric", minute: "2-digit", timeZone: "Africa/Kampala" }) : "—"}</TableCell>
+                    <TableCell><BookingStatusBadge status={toBookingStatus(booking.status)} perspective="staff" /></TableCell>
+                    <TableCell>{booking.totalMinor === 0 ? <span className="text-xs text-muted-foreground">No payment required</span> : <PaymentStatusBadge status={toPaymentStatus(bookingPaymentSummary(booking).status)} />}</TableCell>
+                    <TableCell className="text-right tabular-nums">{formatUGX(booking.totalMinor)}</TableCell>
+                    <TableCell><div className="flex items-center gap-3"><Link href={`/business/bookings/${booking.id}#payments`}>Manage payment</Link>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button aria-label={`Actions for booking ${booking.bookingRef}`} title="Booking actions" variant="outline" size="icon" className="h-8 w-8 text-slate-400 border-border ml-auto">
@@ -232,7 +179,7 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </TableCell>
+                    </div></TableCell>
                   </TableRow>
                 );
               })}
@@ -247,7 +194,7 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
             <Pagination
               currentPage={page}
               totalPages={totalPages}
-              buildHref={(p) => `/business/bookings?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), ...(searchParams.q ? { q: searchParams.q } : {}), page: String(p) }).toString()}`}
+              buildHref={(p) => `/business/bookings?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), ...(searchParams.q ? { q: searchParams.q } : {}), ...(searchParams.period ? {period:searchParams.period} : {}), page: String(p) }).toString()}`}
             />
           </div>
         </div>
@@ -255,4 +202,3 @@ export default async function BusinessBookingsPage({ searchParams }: { searchPar
     </div>
   );
 }
-import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

@@ -11,7 +11,7 @@ import { toBookingStatus } from "@/lib/status";
 import { AccountLayout } from "@/components/customer/account-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Pagination } from "@/components/ui/pagination";
+import { Pagination } from "@/components/page-pagination";
 import { BookingStatusBadge } from "@/components/ui/status-badge";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 

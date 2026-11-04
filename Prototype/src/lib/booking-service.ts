@@ -1,4 +1,3 @@
-import { isDemoMode } from "@/lib/dev-mode";
 import { Prisma } from "@prisma/client";
 
 import { db } from "@/lib/db";
@@ -19,7 +18,7 @@ export async function releaseAvailabilityForBooking(tx: Prisma.TransactionClient
     include: { listing: { select: { type: true } } }
   });
   if (!booking || !booking.startDate) return;
-  const nonBlocking = ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN", "REFUNDED", "PAYMENT_FAILED"] as const;
+  const nonBlocking = ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN", "REFUNDED"] as const;
 
   if (booking.listing.type === "ACCOMMODATION" && booking.roomTypeId && booking.endDate) {
     const start = new Date(Date.UTC(booking.startDate.getUTCFullYear(), booking.startDate.getUTCMonth(), booking.startDate.getUTCDate()));
@@ -31,7 +30,7 @@ export async function releaseAvailabilityForBooking(tx: Prisma.TransactionClient
       night.setUTCDate(night.getUTCDate() + i);
       const row = await tx.availability.findFirst({where:{listingId:booking.listingId,roomTypeId:booking.roomTypeId,date:night}});
       if (row) {
-        const occupied = await tx.booking.count({where:{roomTypeId:booking.roomTypeId,status:{notIn:[...nonBlocking]},startDate:{lte:night},endDate:{gt:night}}});
+        const occupied = await tx.booking.count({where:{roomTypeId:booking.roomTypeId,cancelledAt:null,status:{notIn:[...nonBlocking]},startDate:{lte:night},endDate:{gt:night}}});
         await tx.availability.update({where:{id:row.id},data:{remaining:Math.max(0,row.capacity-occupied)}});
       }
     }
@@ -40,7 +39,7 @@ export async function releaseAvailabilityForBooking(tx: Prisma.TransactionClient
     const row = await tx.availability.findFirst({where:{listingId:booking.listingId,roomTypeId:null,date}});
     if(row){
       const tomorrow=new Date(date);tomorrow.setUTCDate(tomorrow.getUTCDate()+1);
-      const occupied=await tx.booking.aggregate({where:{listingId:booking.listingId,status:{notIn:[...nonBlocking]},startDate:{gte:date,lt:tomorrow}},_sum:{participantsCount:true}});
+      const occupied=await tx.booking.aggregate({where:{listingId:booking.listingId,cancelledAt:null,status:{notIn:[...nonBlocking]},startDate:{gte:date,lt:tomorrow}},_sum:{participantsCount:true}});
       await tx.availability.update({where:{id:row.id},data:{remaining:Math.max(0,row.capacity-(occupied._sum.participantsCount??0))}});
     }
   }
@@ -64,7 +63,7 @@ export async function validateAndReserveBookings(
   const reserve = async (tx:Prisma.TransactionClient) => {
     const resolvedBookings = [];
     const reserved = new Map<string, number>();
-    const nonBlocking = ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN", "REFUNDED", "PAYMENT_FAILED"] as const;
+    const nonBlocking = ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN", "REFUNDED"] as const;
 
     for (const item of items) {
       const listing = await tx.listing.findUnique({
@@ -85,7 +84,7 @@ export async function validateAndReserveBookings(
       const type = (item.type || listing.type).toUpperCase();
       if (listing.type !== type) throw new Error(`Listing type mismatch for "${listing.title}".`);
       const fulfilment = parseFulfilment(item.fulfilment, type);
-      const bookingMode = type === "RESTAURANT" ? "RESERVATION" : isDemoMode() ? "INSTANT" : listing.bookingMode ?? "INSTANT";
+      const bookingMode = type === "RESTAURANT" ? "RESERVATION" : listing.bookingMode ?? "REQUEST";
       let policySnapshot: Record<string, string | boolean | null> = {listingTitle:listing.title,type,bookingMode,cancellationPolicy:listing.accommodation?.cancellationPolicy ?? "Cancellation is subject to the terms agreed with the business. Contact support for assistance."};
 
       const participantsCount = item.participants ?? 1;
@@ -136,7 +135,7 @@ export async function validateAndReserveBookings(
           const key = `${room.id}:${dateKeyUTC(currentNight)}`;
           const existing = await tx.availability.findUnique({ where: { listingId_roomTypeId_date: { listingId: listing.id, roomTypeId: room.id, date: currentNight } } });
           const occupied = await tx.booking.count({ where: {
-            roomTypeId: room.id, status: { notIn: [...nonBlocking] },
+            roomTypeId: room.id, cancelledAt: null, status: { notIn: [...nonBlocking] },
             startDate: { lte: currentNight }, endDate: { gt: currentNight }
           } });
           const capacity = Math.min(room.totalRooms, existing?.capacity ?? room.totalRooms);
@@ -187,7 +186,7 @@ export async function validateAndReserveBookings(
         const resourceId = `tour:${listing.id}:${dateKeyUTC(normalizedStart)}`;
         const existing = await tx.availability.findUnique({ where: { id: resourceId } });
         const tomorrow = new Date(normalizedStart); tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-        const occupied = await tx.booking.aggregate({ where: { listingId: listing.id, status: { notIn: [...nonBlocking] }, startDate: { gte: normalizedStart, lt: tomorrow } }, _sum: { participantsCount: true } });
+        const occupied = await tx.booking.aggregate({ where: { listingId: listing.id, cancelledAt: null, status: { notIn: [...nonBlocking] }, startDate: { gte: normalizedStart, lt: tomorrow } }, _sum: { participantsCount: true } });
         const quantity = (reserved.get(resourceId) ?? 0) + participantsCount;
         reserved.set(resourceId, quantity);
         const effectiveCapacity = Math.min(capacity, existing?.capacity ?? capacity);
@@ -215,7 +214,7 @@ export async function validateAndReserveBookings(
         const duration = listing.transport?.estimatedDurationMinutes ?? 60;
         endDate = new Date(startDate.getTime() + duration * 60 * 1000);
         const perPerson = transportIsPerPerson(listing.transport?.pricingModel);
-        const occupied = await tx.booking.findMany({where:{listingId:listing.id,status:{notIn:[...nonBlocking]},startDate:{lt:endDate},OR:[{endDate:{gt:startDate}},{endDate:null,startDate:{gt:new Date(startDate.getTime()-duration*60000)}}]}});
+        const occupied = await tx.booking.findMany({where:{listingId:listing.id,cancelledAt:null,status:{notIn:[...nonBlocking]},startDate:{lt:endDate},OR:[{endDate:{gt:startDate}},{endDate:null,startDate:{gt:new Date(startDate.getTime()-duration*60000)}}]}});
         const localKey = `transport:${listing.id}:${startDate.toISOString()}`;
         const inCart = resolvedBookings.filter(b => b.listingId === listing.id && b.startDate && b.endDate && b.startDate < endDate! && b.endDate > startDate!).reduce((sum,b) => sum+b.participantsCount,0);
         if ((!perPerson && (occupied.length || inCart)) || perPerson && occupied.reduce((sum,b)=>sum+b.participantsCount,0)+inCart+participantsCount>(listing.transport?.capacity??1)) throw new Error("This vehicle is unavailable for the selected time.");
@@ -240,7 +239,7 @@ export async function validateAndReserveBookings(
         const duration = hours.reservationDurationMinutes ?? 90;
         if (minutes + duration > window.close) throw new Error("Choose an earlier time so your reservation ends before closing.");
         endDate = new Date(startDate.getTime()+duration*60000);
-        const occupied = await tx.booking.findMany({where:{listingId:listing.id,status:{notIn:[...nonBlocking]},startDate:{lt:endDate},OR:[{endDate:{gt:startDate}},{endDate:null,startDate:{gt:new Date(startDate.getTime()-duration*60000)}}]}});
+        const occupied = await tx.booking.findMany({where:{listingId:listing.id,cancelledAt:null,status:{notIn:[...nonBlocking]},startDate:{lt:endDate},OR:[{endDate:{gt:startDate}},{endDate:null,startDate:{gt:new Date(startDate.getTime()-duration*60000)}}]}});
         const localKey = `restaurant:${listing.id}:${startDate.toISOString()}`;
         const inCart = resolvedBookings.filter(b => b.listingId === listing.id && b.startDate && b.endDate && b.startDate < endDate! && b.endDate > startDate!).reduce((sum,b) => sum+b.participantsCount,0);
         if (!listing.restaurant.seatingCapacity || occupied.reduce((sum,b)=>sum+b.participantsCount,0)+inCart+participantsCount>listing.restaurant.seatingCapacity) throw new Error("This restaurant does not have enough seats for the selected time.");

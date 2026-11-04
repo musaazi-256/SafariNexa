@@ -1,4 +1,5 @@
 "use client";
+import { PageTitle } from "@/components/page-header";
 
 import * as React from "react";
 import Link from "next/link";
@@ -40,7 +41,7 @@ export function CreateAccountForm({ returnTo }: { returnTo: string }) {
     <Card className="w-full max-w-md">
       <CardHeader>
         <p className="text-xs font-medium uppercase tracking-wide text-primary">Customer account</p>
-        <CardTitle className="text-3xl">Create your account</CardTitle>
+        <PageTitle>Create your account</PageTitle>
         <CardDescription>Only needed when you book, pay, save, message, or review — browsing stays open.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

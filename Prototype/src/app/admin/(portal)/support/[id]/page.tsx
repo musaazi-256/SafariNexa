@@ -1,17 +1,18 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { PageHero } from "@/components/page-hero";
 import { ConfirmSubmit } from "@/components/admin/confirm-submit";
 import { ConversationMessages } from "@/components/messages/conversation";
 import { notFound } from "next/navigation";
 import type { SupportCaseStatus as PrismaSupportCaseStatus } from "@prisma/client";
 
-import { Breadcrumbs } from "@/components/breadcrumbs";
 import { SupportReplyForm } from "@/components/forms/support-reply-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SupportCaseStatusBadge } from "@/components/ui/status-badge";
 import { requireAdminSession } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { toSupportCaseStatus } from "@/lib/status";
-import { cn } from "@/lib/utils";
 
 const STATUS_OPTIONS: Array<{ status: PrismaSupportCaseStatus; label: string }> = [
   { status: "OPEN", label: "Reopen" },
@@ -27,7 +28,8 @@ export default async function AdminSupportCaseDetailPage({ params }: { params: {
   const supportCase = await db.supportCase.findUnique({
     where: { id: params.id },
     include: {
-      openedBy: { select: { name: true, email: true } },
+      openedBy: { select: { name: true, email: true, businessUsers: { select: { business: { select: { name: true } } } } } },
+      relatedBooking: { select: { id: true, bookingRef: true } },
       messages: { orderBy: { createdAt: "asc" }, include: { author: { select: { name: true } } } }
     }
   });
@@ -77,50 +79,82 @@ export default async function AdminSupportCaseDetailPage({ params }: { params: {
     });
   }
 
+  const opener = supportCase.openedBy.name ?? supportCase.openedBy.email;
+  const fmt = (date: Date) => date.toLocaleString("en-UG", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", timeZone: "Africa/Kampala" });
+  const details: Array<[string, React.ReactNode]> = [
+    ["Case reference", supportCase.caseRef],
+    ["Category", supportCase.category],
+    ["Raised from", supportCase.surface.charAt(0) + supportCase.surface.slice(1).toLowerCase() + " portal"],
+    ["Opened by", <span key="opener" className="flex flex-col"><span>{opener}</span>{supportCase.openedBy.name ? <span className="text-xs font-normal text-muted-foreground">{supportCase.openedBy.email}</span> : null}</span>],
+    ...(supportCase.surface === "BUSINESS" && supportCase.openedBy.businessUsers.length ? [["Opener's businesses", supportCase.openedBy.businessUsers.map((m) => m.business.name).join(", ")] as [string, React.ReactNode]] : []),
+    ["Opened", fmt(supportCase.createdAt)],
+    ["Last updated", fmt(supportCase.updatedAt)],
+    ...(supportCase.closedAt ? [["Closed", fmt(supportCase.closedAt)] as [string, React.ReactNode]] : []),
+    ["Related booking", supportCase.relatedBooking ? <Link key="booking" href={`/admin/bookings/${supportCase.relatedBooking.id}`} className="text-primary underline underline-offset-4">{supportCase.relatedBooking.bookingRef}</Link> : "None"]
+  ];
+
   return (
-    <div className="mx-auto max-w-3xl">
-      <Breadcrumbs items={[{ label: "Support", href: "/admin/support" }, { label: supportCase.caseRef }]} />
+    <div className="mx-auto max-w-6xl space-y-6 pb-16">
+      <Button asChild variant="ghost" size="sm" className="-ml-3"><Link href="/admin/support"><ArrowLeft />Back to support</Link></Button>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <PageHero variant="portal" eyebrow={`${supportCase.caseRef} · ${supportCase.category}`} title={supportCase.subject} description={`Opened by ${opener}. Reply to the customer and keep the case status current.`} />
+        <SupportCaseStatusBadge status={status} perspective="staff" />
+      </div>
 
-          <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {supportCase.caseRef} · {supportCase.category}
-              </p>
-              <h1 className="type-page ">{supportCase.subject}</h1>
-              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                Opened by {supportCase.openedBy.name ?? supportCase.openedBy.email}
-              </p>
-            </div>
-            <SupportCaseStatusBadge status={status}  perspective="staff" />
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <Card className="min-w-0 overflow-hidden">
+          <CardHeader>
+            <CardTitle>Conversation</CardTitle>
+            <CardDescription>{supportCase.messages.length} {supportCase.messages.length === 1 ? "message" : "messages"}. Replies notify the customer.</CardDescription>
+          </CardHeader>
+          <div className="max-h-[560px] min-h-[260px] overflow-y-auto border-y border-border bg-[#FAFBFA] p-4 sm:p-6">
+            <ConversationMessages outgoingSenderIds={supportCase.messages.filter(message => message.authorRole === "ADMIN").map(message => message.authorUserId)} currentUserId={session.user.id} messages={supportCase.messages.map(message => ({ id: message.id, content: message.body, senderId: message.authorUserId, senderName: message.author.name ?? (message.authorRole === "ADMIN" ? "SafariNexa support" : message.authorRole === "BUSINESS" ? "Business" : "Customer"), createdAt: message.createdAt }))} />
           </div>
+          <SupportReplyForm caseId={supportCase.id} action={postAdminReply} />
+        </Card>
 
-          <div className="mb-6 mt-4 flex flex-wrap gap-2">
-            {STATUS_OPTIONS.filter((option) => option.status !== supportCase.status).map((option) => (
-              <form key={option.status} action={setCaseStatus}>
-                <input type="hidden" name="caseId" value={supportCase.id} />
-                <input type="hidden" name="status" value={option.status} />
-                {option.status === "CLOSED" ? (
-                  <ConfirmSubmit
-                    title="Close this case?"
-                    description="The case will be closed and the customer will no longer be able to reply to it. You can reopen it later."
-                    confirmLabel="Close case"
-                    trigger={<Button size="sm" variant="secondary">{option.label}</Button>}
-                  />
-                ) : (
-                  <Button type="submit" size="sm" variant="secondary">
-                    {option.label}
-                  </Button>
-                )}
-              </form>
-            ))}
-          </div>
-
-          <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-            <div className="max-h-[560px] min-h-[260px] overflow-y-auto bg-[#FAFBFA] p-4 sm:p-6"><ConversationMessages outgoingSenderIds={supportCase.messages.filter(message => message.authorRole === "ADMIN").map(message => message.authorUserId)} currentUserId={session.user.id} messages={supportCase.messages.map(message => ({ id: message.id, content: message.body, senderId: message.authorUserId, senderName: message.author.name ?? (message.authorRole === "ADMIN" ? "SafariNexa support" : "Customer"), createdAt: message.createdAt }))} /></div>
-            <SupportReplyForm caseId={supportCase.id} action={postAdminReply} />
-          </div>
-
-
+        <aside className="min-w-0 space-y-6">
+          <Card>
+            <CardHeader><CardTitle>Case details</CardTitle></CardHeader>
+            <CardContent>
+              <dl className="grid gap-4 text-sm">
+                {details.map(([label, value]) => (
+                  <div key={label}>
+                    <dt className="text-muted-foreground">{label}</dt>
+                    <dd className="mt-1 break-words font-medium text-foreground">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Update case status</CardTitle>
+              <CardDescription>The customer is notified when the status changes.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-2">
+              {STATUS_OPTIONS.filter((option) => option.status !== supportCase.status).map((option) => (
+                <form key={option.status} action={setCaseStatus}>
+                  <input type="hidden" name="caseId" value={supportCase.id} />
+                  <input type="hidden" name="status" value={option.status} />
+                  {option.status === "CLOSED" ? (
+                    <ConfirmSubmit
+                      title="Close this case?"
+                      description="The case will be closed and the customer will no longer be able to reply to it. You can reopen it later."
+                      confirmLabel="Close case"
+                      trigger={<Button variant="outline" className="w-full">{option.label}</Button>}
+                    />
+                  ) : (
+                    <Button type="submit" variant={option.status === "RESOLVED" ? "default" : "outline"} className="w-full">
+                      {option.label}
+                    </Button>
+                  )}
+                </form>
+              ))}
+            </CardContent>
+          </Card>
+        </aside>
+      </div>
     </div>
   );
 }

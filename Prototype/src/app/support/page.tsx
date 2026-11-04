@@ -20,7 +20,7 @@ export default async function SupportPage() {
   if (!session?.user) redirect("/auth/sign-in?returnTo=%2Fsupport");
 
   const cases = await db.supportCase.findMany({
-    where: { openedByUserId: session.user.id },
+    where: { openedByUserId: session.user.id, surface: { not: "BUSINESS" } },
     orderBy: { createdAt: "desc" }
   });
 

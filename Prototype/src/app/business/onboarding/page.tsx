@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/page-header";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,9 +40,9 @@ export default function OnboardingIntroPage() {
     <div className="mx-auto flex max-w-6xl flex-col gap-12 lg:flex-row lg:items-center lg:gap-24 py-10 lg:py-20">
       {/* Left side content */}
       <div className="flex-1 space-y-8">
-        <h1 className="type-display leading-tight text-slate-900">
+        <PageTitle size="display" className="text-slate-900">
           Set up your SafariNexa business profile
-        </h1>
+        </PageTitle>
         <p className="text-lg text-slate-600 leading-relaxed max-w-lg">
           Create your provider account, add business details, and prepare verification so travelers can book with confidence.
         </p>

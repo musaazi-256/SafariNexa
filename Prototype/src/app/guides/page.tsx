@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { TripPlannerBanner } from "@/components/trip-planner-banner";
 import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Pagination } from "@/components/ui/pagination";
+import { Pagination } from "@/components/page-pagination";
 import { db } from "@/lib/db";
 import { formatListingPrice, guideRatingSummary, ratingSummary } from "@/lib/listings";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";

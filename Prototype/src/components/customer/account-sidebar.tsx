@@ -36,12 +36,7 @@ export function AccountSidebar() {
             key={item.href}
             href={item.href}
             aria-current={isActive(item.href) ? "page" : undefined}
-            className={cn(
-              "flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-              isActive(item.href)
-                ? "border-transparent bg-primary text-primary-foreground shadow-sm"
-                : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
-            )}
+            className="selection-control"
           >
             <item.icon className="h-4 w-4" />
             {item.label}

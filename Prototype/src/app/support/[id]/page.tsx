@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/page-header";
 import { adminNotificationData } from "@/lib/admin-notifications";
 import { ConversationMessages } from "@/components/messages/conversation";
 import { notFound, redirect } from "next/navigation";
@@ -24,6 +25,7 @@ export default async function SupportCaseDetailPage({ params }: { params: { id: 
     include: { messages: { orderBy: { createdAt: "asc" }, include: { author: { select: { name: true } } } } }
   });
   if (!supportCase || supportCase.openedByUserId !== session.user.id) notFound();
+  if (supportCase.surface === "BUSINESS") redirect(`/business/support/${supportCase.id}`);
 
   const status = toSupportCaseStatus(supportCase.status);
   const isClosed = status === "resolved" || status === "closed";
@@ -60,7 +62,7 @@ export default async function SupportCaseDetailPage({ params }: { params: { id: 
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {supportCase.caseRef} · {supportCase.category}
               </p>
-              <h1 className="text-2xl font-semibold">{supportCase.subject}</h1>
+              <PageTitle>{supportCase.subject}</PageTitle>
             </div>
             <SupportCaseStatusBadge status={status} />
           </div>

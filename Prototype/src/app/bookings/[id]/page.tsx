@@ -1,3 +1,7 @@
+import { PageHeader } from "@/components/page-header";
+import { bookingPaymentSummary } from "@/lib/booking-payment-summary";
+import { PaymentStatusBadge, RefundStatusBadge } from "@/components/ui/status-badge";
+import { toPaymentStatus, toRefundStatus } from "@/lib/status";
 import Link from "next/link";
 import { BookingTravellerSummary } from "@/components/booking-traveller-summary";
 import { BookingOperationsSummary } from "@/components/booking-operations-summary";
@@ -30,8 +34,8 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
       listing: true,
       business: true,
       participants: true,
-      order: { include: { payments: { orderBy: { createdAt: "desc" } } } },
-      payments: { orderBy: { createdAt: "desc" } },
+      order: { include: { payments: { include:{refunds:true}, orderBy: { createdAt: "desc" } } } },
+      payments: { include:{refunds:true}, orderBy: { createdAt: "desc" } },
       review: true,
       roomType: true,
       addOns: true
@@ -39,7 +43,7 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
   });
   if (!booking || booking.customerId !== session.user.id) notFound();
 
-  const paymentHistory = booking.payments.length ? booking.payments : (booking.order?.payments ?? []).map(payment => ({...payment, amountMinor: booking.totalMinor}));
+  const paymentSummary = bookingPaymentSummary(booking);
 
   const thread = await db.messageThread.findFirst({
     where: { bookingId: params.id },
@@ -83,8 +87,7 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
           <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
             <div>
               <BookingStatusBadge status={toBookingStatus(booking.status)} />
-              <h1 className="type-page mt-2">{booking.listing.title}</h1>
-              <p className="mt-1 text-muted-foreground">Booked with {booking.business.name}</p>
+              <PageHeader title={<>{booking.listing.title}</>} description={<>Booked with {booking.business.name}</>} />
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <div>
@@ -155,23 +158,13 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
                 </>
               ) : null}
 
-              {paymentHistory.length > 0 ? (
-                <>
-                  <h2 className="mb-2 mt-8 text-lg font-semibold">Payment history</h2>
-                  <div className="flex flex-col gap-2">
-                    {paymentHistory.map((payment) => (
-                      <Card key={payment.id}>
-                        <CardContent className="flex items-center justify-between pt-6 text-sm">
-                          <span>
-                            {payment.provider.replaceAll("_", " ")} · {payment.status.replaceAll("_", " ").toLowerCase()}
-                          </span>
-                          <strong>{formatUGX(payment.amountMinor)}</strong>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </>
-              ) : null}
+              <Card className="mt-6"><CardHeader><CardTitle>Payments & refunds</CardTitle></CardHeader><CardContent className="space-y-3">
+                {booking.totalMinor===0?<p className="text-sm text-muted-foreground">No payment required</p>:<PaymentStatusBadge status={toPaymentStatus(paymentSummary.status)}/>}
+                <dl className="grid grid-cols-2 gap-3 text-sm">{[["Paid",paymentSummary.paidMinor],["Outstanding",paymentSummary.outstandingMinor],["Refunded",paymentSummary.refundedMinor],["Refunds pending",paymentSummary.heldMinor]].map(([label,amount])=><div key={String(label)}><dt className="text-xs text-muted-foreground">{label}</dt><dd className="font-semibold">{formatUGX(Number(amount))}</dd></div>)}</dl>
+                {booking.orderId&&<p className="text-xs text-muted-foreground">These amounts are this booking’s share of your combined order.</p>}
+                {paymentSummary.history.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Payment attempts</summary><ul className="mt-2 space-y-2">{paymentSummary.history.map(payment=><li key={payment.id} className="rounded-lg border p-3 text-xs"><p>{payment.provider.replaceAll("_"," ")} · {payment.status.replaceAll("_"," ")} · {formatUGX(Math.min(payment.amountMinor,booking.totalMinor))}</p><p className="mt-1 text-muted-foreground">{payment.createdAt.toLocaleString("en-GB",{timeZone:"Africa/Kampala"})} EAT</p>{payment.failureReason && <p className="mt-1">{payment.failureReason}</p>}</li>)}</ul></details>}
+                {paymentSummary.refunds.map(refund=><div key={refund.id} className="space-y-2 rounded-lg border p-3"><div className="flex flex-wrap justify-between gap-2"><RefundStatusBadge status={toRefundStatus(refund.status)}/><strong className="text-sm">{formatUGX(refund.amountMinor)}</strong></div><p className="text-sm">{refund.reason}</p></div>)}
+              </CardContent></Card>
 
               <BookingTravellerSummary participants={booking.participants}/>
               <BookingOperationsSummary booking={booking}/>

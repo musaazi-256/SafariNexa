@@ -1,5 +1,6 @@
-import { PrismaClient, type TransportCategory, type GuideSpecialization } from "@prisma/client";
+import { Prisma, PrismaClient, type TransportCategory, type GuideSpecialization } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { listingSnapshot, reviewInclude } from "../src/lib/listing-review";
 
 const db = new PrismaClient();
 
@@ -1946,6 +1947,41 @@ async function main() {
       update: {},
       create: { id, userId: customerUser.id, ...data }
     });
+  }
+
+  // --- Listing review queue (/admin/listings) ---------------------------------
+  // One submission per status so every queue tab has demo rows. Snapshots are
+  // taken from the current listing content, so an admin can really approve,
+  // reject or request changes on them. Re-running the seed resets this demo set.
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const listingReviewFixtures: Array<{ id: string; listingId: string; status: string; daysAgo: number; notes?: string }> = [
+    { id: "lsub-riverside-glamping", listingId: "riverside-glamping-draft", status: "SUBMITTED", daysAgo: 0 },
+    { id: "lsub-nile-view-terrace", listingId: "nile-view-terrace", status: "SUBMITTED", daysAgo: 1 },
+    { id: "lsub-entebbe-transfer", listingId: "entebbe-airport-transfer", status: "SUBMITTED", daysAgo: 2 },
+    { id: "lsub-chimp-trek", listingId: "chimp-trek-kibale", status: "UNDER_REVIEW", daysAgo: 3, notes: "Review started. Checking permit wording and guide assignment." },
+    { id: "lsub-kampala-city-tour", listingId: "kampala-city-tour", status: "UNDER_REVIEW", daysAgo: 4, notes: "Review started." },
+    { id: "lsub-bunyonyi-eco", listingId: "bunyonyi-eco-lodge", status: "NEEDS_CHANGES", daysAgo: 6, notes: "The cover photo shows a different property. Replace it and confirm the Lake View Banda sleeps 3." },
+    { id: "lsub-kampala-boutique", listingId: "kampala-boutique", status: "APPROVED", daysAgo: 9, notes: "Photos, pricing and cancellation terms checked. Approved." },
+    { id: "lsub-fort-portal-bites", listingId: "fort-portal-bites", status: "REJECTED", daysAgo: 11, notes: "Menu and opening hours could not be verified. Resubmit with a current menu link." },
+    { id: "lsub-garden-dining", listingId: "kampala-garden-dining", status: "WITHDRAWN", daysAgo: 13 }
+  ];
+  for (const fixture of listingReviewFixtures) {
+    const listing = await db.listing.findUnique({ where: { id: fixture.listingId }, include: reviewInclude });
+    if (!listing) continue;
+    const submittedAt = new Date(Date.now() - fixture.daysAgo * DAY_MS - 2 * 60 * 60 * 1000);
+    const reviewed = fixture.status !== "SUBMITTED" && fixture.status !== "WITHDRAWN";
+    const data = {
+      status: fixture.status,
+      snapshot: listingSnapshot(listing),
+      submittedAt,
+      submittedBy: multiBusinessTester.id,
+      notes: fixture.notes ?? null,
+      reviewedBy: reviewed ? adminUser.id : null,
+      reviewedAt: reviewed ? new Date(submittedAt.getTime() + 6 * 60 * 60 * 1000) : null,
+      draftForm: Prisma.DbNull,
+      baselineDigest: null
+    };
+    await db.listingSubmission.upsert({ where: { id: fixture.id }, update: data, create: { id: fixture.id, listingId: fixture.listingId, ...data } });
   }
 
   console.log("Seed complete. Demo accounts (password for all: %s):", DEMO_PASSWORD);

@@ -35,5 +35,7 @@ export async function requireBusinessSession() {
       : []
   ]);
 
-  return { session, businessId, business, businesses };
+  // Reuse the fresh account lookup for profile/header details without exposing credentials.
+  const account = dbUser ? { id: dbUser.id, name: dbUser.name, email: dbUser.email, phone: dbUser.phone, image: dbUser.image } : null;
+  return { session, businessId, business, businesses, account };
 }

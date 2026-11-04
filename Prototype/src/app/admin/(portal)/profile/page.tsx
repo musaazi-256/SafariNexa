@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { PageHero } from "@/components/page-hero";
 import { updateAdminProfile } from "@/lib/actions/admin";
 
@@ -85,13 +86,7 @@ export default async function AdminProfilePage() {
               <Label htmlFor="phone" className="font-medium text-slate-700 flex items-center gap-2">
                 <Phone className="h-4 w-4 text-slate-400" /> Phone number
               </Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                defaultValue={user.adminUser.phone ?? ""}
-                placeholder="+256 7XX XXX XXX"
-              />
+              <PhoneInput id="phone" name="phone" autoComplete="tel" defaultValue={user.adminUser.phone ?? ""} />
             </div>
 
             <div className="pt-4">

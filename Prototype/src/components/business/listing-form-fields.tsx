@@ -1,6 +1,8 @@
+import { ListingLocationFields } from "./listing-location-fields";
 import type { ListingType } from "@prisma/client";
 import { FileText, Utensils, Bed, Tent, Car, Eye, Upload } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +16,7 @@ export type ListingBaseInitial = {
   description?: string;
   city?: string;
   address?: string;
+  locationDirections?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   basePriceMinor?: number;
@@ -24,11 +27,9 @@ export type ListingBaseInitial = {
 
 export function ListingBaseFields({
   initial,
-  destinations = [],
   previewHref
 }: {
   initial?: ListingBaseInitial;
-  destinations?: { id: string; name: string }[];
   /** Only known once a listing exists (edit mode) — omitted on create, so the
    * button doesn't render for a listing that has no page to preview yet. */
   previewHref?: string;
@@ -77,54 +78,8 @@ export function ListingBaseFields({
           </div>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="city" className="font-medium text-slate-700">City <span className="text-red-500">*</span></Label>
-          <select
-            id="city"
-            name="city"
-            defaultValue={initial?.city ?? "Kampala"}
-            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <ExistingOption value={initial?.city} known={["Kampala","Entebbe","Jinja","Mbarara","Gulu","Fort Portal"]}/>
-            <option value="Kampala">Kampala</option>
-            <option value="Entebbe">Entebbe</option>
-            <option value="Jinja">Jinja</option>
-            <option value="Mbarara">Mbarara</option>
-            <option value="Gulu">Gulu</option>
-            <option value="Fort Portal">Fort Portal</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="destinationId" className="font-medium text-slate-700">Destination (optional)</Label>
-          <select
-            id="destinationId"
-            name="destinationId"
-            defaultValue={initial?.destinationId ?? ""}
-            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <option value="">None / Unassigned</option>
-            {destinations.map(d => (
-              <option key={d.id} value={d.id}>{d.name}</option>
-            ))}
-          </select>
-          <p className="text-xs text-slate-500 font-medium">Link this listing to a curated destination page.</p>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="address" className="font-medium text-slate-700">Address <span className="text-red-500">*</span></Label>
-          <Input id="address" name="address" defaultValue={initial?.address ?? ""} required />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="latitude" className="font-medium text-slate-700">Latitude (optional)</Label>
-          <Input id="latitude" name="latitude" type="number" step="any" defaultValue={initial?.latitude ?? ""} />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="longitude" className="font-medium text-slate-700">Longitude (optional)</Label>
-          <Input id="longitude" name="longitude" type="number" step="any" defaultValue={initial?.longitude ?? ""} />
-        </div>
+        <ListingLocationFields initial={initial} />
+        {initial?.destinationId ? <input type="hidden" name="destinationId" value={initial.destinationId} /> : null}
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="basePriceMinor" className="font-medium text-slate-700">Base price (UGX) <span className="text-red-500">*</span></Label>
@@ -366,36 +321,30 @@ export function RestaurantTypeFields({
         </div>
       </CardHeader>
       <CardContent className="grid gap-6 sm:grid-cols-2 pt-6">
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="cuisineType" className="font-medium text-slate-700">Cuisine type <span className="text-red-500">*</span></Label>
-          <select
-            id="cuisineType"
-            name="cuisineType"
-            defaultValue={initial?.cuisineType ?? "Ugandan home cooking"}
-            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <ExistingOption value={initial?.cuisineType} known={["local","continental","indian","cafe"]}/>
-            <option value="local">Local Ugandan</option>
-            <option value="continental">Continental</option>
-            <option value="indian">Indian</option>
-            <option value="cafe">Café & Bakery</option>
-          </select>
+        <fieldset className="flex flex-col gap-2 sm:col-span-2">
+          <legend className="type-label mb-2 font-medium text-slate-700">Cuisine types <span className="text-red-500">*</span></legend>
+          <input type="hidden" name="restaurantCuisineRequired" value="true" />
+          <p className="text-xs text-muted-foreground">Select all cuisines you serve.</p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {[
+              {value: "local", label: "Local Ugandan"},
+              {value: "continental", label: "Continental"},
+              {value: "indian", label: "Indian"},
+              {value: "cafe", label: "Café & Bakery"},
+              ...(initial?.cuisineType?.split(",").map(value => value.trim()).filter(value => value && !["local", "continental", "indian", "cafe"].includes(value)) || []).map(value => ({value, label: value}))
+            ].map(option => <label key={option.value} className="flex cursor-pointer items-center gap-3 rounded-md border border-border p-3 text-sm hover:bg-muted/30">
+              <Checkbox name="cuisineType" value={option.value} defaultChecked={initial?.cuisineType?.split(",").map(value => value.trim()).includes(option.value) || false} />
+              {option.label}
+            </label>)}
+          </div>
+        </fieldset>
+
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <Label htmlFor="priceRange" className="font-medium text-slate-700">Price / price range (UGX) <span className="text-red-500">*</span></Label>
+          <Input id="priceRange" name="priceRange" defaultValue={initial?.priceRange ?? ""} required maxLength={200} placeholder="e.g. UGX 25,000 per person or UGX 20,000–60,000 per meal" />
+          <p className="text-xs text-muted-foreground">Enter your own price or range and state what it covers.</p>
         </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="priceRange" className="font-medium text-slate-700">Price range <span className="text-red-500">*</span></Label>
-          <select
-            id="priceRange"
-            name="priceRange"
-            defaultValue={initial?.priceRange ?? "UGX 45,000 - 85,000 per person"}
-            className="form-control flex w-full ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <ExistingOption value={initial?.priceRange} known={["Under UGX 20,000 per person","UGX 20,000 - 45,000 per person","UGX 45,000 - 85,000 per person","Over UGX 85,000 per person"]}/>
-            <option value="Under UGX 20,000 per person">Under UGX 20,000 per person</option>
-            <option value="UGX 20,000 - 45,000 per person">UGX 20,000 - 45,000 per person</option>
-            <option value="UGX 45,000 - 85,000 per person">UGX 45,000 - 85,000 per person</option>
-            <option value="Over UGX 85,000 per person">Over UGX 85,000 per person</option>
-          </select>
-        </div>
+
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="openingHours" className="font-medium text-slate-700">Opening hours <span className="text-red-500">*</span></Label>
           <p className="text-xs text-muted-foreground">Online reservations currently support daily hours, for example Daily · 08:00 - 22:00. Times are East Africa Time.</p>

@@ -46,7 +46,7 @@ export function VerificationWelcomeModal({ verificationStatus }: VerificationWel
             Explore platform
           </Button>
           <Button asChild className="w-full sm:w-auto">
-            <Link href="/business/verification">
+            <Link href="/business/settings/verification">
               Check verification status
             </Link>
           </Button>
@@ -88,7 +88,7 @@ export function VerificationActionModal({
               Cancel
             </Button>
             <Button asChild>
-              <Link href="/business/verification">
+              <Link href="/business/settings/verification">
                 Go to Verification <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

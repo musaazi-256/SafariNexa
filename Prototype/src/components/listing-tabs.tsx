@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
 
 export type ListingTab = {
   id: string;
@@ -31,29 +30,23 @@ export function ListingTabs({
   return (
     <div className="sticky top-[64px] z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 hidden md:block">
       <div className="container mx-auto flex h-14 items-center justify-between">
-        <nav className="flex h-full items-center gap-6 text-sm font-medium">
+        <nav className="selection-group">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               aria-pressed={activeTab === tab.id}
               onClick={() => scrollTo(tab.id)}
-              className={cn(
-                "relative h-full flex items-center px-1 text-muted-foreground hover:text-foreground transition-colors",
-                activeTab === tab.id && "text-blue-600 font-medium"
-              )}
+              className="selection-control"
             >
               {tab.label}
-              {activeTab === tab.id ? (
-                <span className="absolute bottom-0 left-0 right-0 h-1 rounded-t-md bg-blue-600" />
-              ) : null}
             </button>
           ))}
         </nav>
         {actionLabel && actionTargetId && (
           <button
             onClick={() => scrollTo(actionTargetId)}
-            className="rounded-full bg-blue-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="rounded-full bg-primary px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
           >
             {actionLabel}
           </button>

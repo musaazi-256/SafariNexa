@@ -1,5 +1,9 @@
 "use client";
 
+import { PageHeader } from "@/components/page-header";
+
+import { FilterControl } from "@/components/ui/filter-control";
+
 import { StatCard } from "@/components/ui/stat-card";
 import { useConversationSync } from "@/components/messages/use-conversation-sync";
 import { ConversationMessages, MessageComposer } from "@/components/messages/conversation";
@@ -238,11 +242,7 @@ export function MessageInbox({
     <div className="space-y-6">
       {/* Header bar with New Message CTA */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-[#0B4928] mb-1">BUSINESS PORTAL</p>
-          <h1 className="type-page text-slate-900 mb-1">Messages</h1>
-          <p className="text-sm text-slate-500 leading-relaxed">Communicate directly with your customers regarding their bookings and inquiries.</p>
-        </div>
+        <PageHeader title={<>Messages</>} description={<>Communicate directly with your customers regarding their bookings and inquiries.</>} />
         
         <Dialog open={newMsgOpen} onOpenChange={setNewMsgOpen}>
           <DialogTrigger asChild>
@@ -350,43 +350,9 @@ export function MessageInbox({
                 )}
               </div>
               
-              <div className="flex flex-wrap items-center gap-1.5">
-                <button 
-                  type="button" aria-pressed={activeFilterTab === "all"} onClick={() => setActiveFilterTab("all")}
-                  className={cn(
-                    "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-all",
-                    activeFilterTab === "all"
-                      ? "border-slate-900 bg-slate-900 text-white shadow-xs"
-                      : "border-border bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-                  )}
-                >
-                  All <span className={cn("rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums leading-none", activeFilterTab === "all" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600")}>{threads.length}</span>
-                </button>
-
-                <button 
-                  type="button" aria-pressed={activeFilterTab === "unread"} onClick={() => setActiveFilterTab("unread")}
-                  className={cn(
-                    "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-all",
-                    activeFilterTab === "unread"
-                      ? "border-slate-900 bg-slate-900 text-white shadow-xs"
-                      : "border-border bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-                  )}
-                >
-                  Unread <span className={cn("rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums leading-none", activeFilterTab === "unread" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600")}>{totalUnreadCount}</span>
-                </button>
-
-                <button 
-                  type="button" aria-pressed={activeFilterTab === "bookings"} onClick={() => setActiveFilterTab("bookings")}
-                  className={cn(
-                    "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-all",
-                    activeFilterTab === "bookings"
-                      ? "border-slate-900 bg-slate-900 text-white shadow-xs"
-                      : "border-border bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-                  )}
-                >
-                  Bookings
-                </button>
-              </div>
+              <FilterControl label="Conversations" value={activeFilterTab} defaultValue="all"
+                onValueChange={value => setActiveFilterTab(value as "all" | "unread" | "bookings")}
+                options={[{value:"all",label:"All conversations",count:threads.length},{value:"unread",label:"Unread",count:threads.filter(thread=>getUnreadCount(thread)>0).length},{value:"bookings",label:"With bookings"}]} />
             </div>
             
             {/* Thread List */}

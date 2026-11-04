@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/ui/stat-card";
 import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
@@ -56,8 +57,7 @@ export default async function AdminBusinessProfilePage({ params }: { params: { i
         </div>
         
         <div className="flex-1">
-          <h1 className="type-page text-slate-900">{business.name}</h1>
-          <p className="text-sm font-semibold text-slate-500 mt-1 capitalize leading-relaxed">{business.type.replace("_", " ")}</p>
+          <PageHeader title={<>{business.name}</>} description={<>{business.type.replace("_", " ")}</>} />
           
           <div className="flex flex-wrap items-center gap-6 mt-6">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">

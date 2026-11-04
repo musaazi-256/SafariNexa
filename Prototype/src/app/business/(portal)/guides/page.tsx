@@ -22,7 +22,6 @@ export default async function GuidesPage() {
       <div className="flex items-start justify-between gap-4">
         <PageHero
           variant="portal"
-          eyebrow="Business portal"
           title="Guides"
           description="Manage guides that can be assigned to your tours."
         />

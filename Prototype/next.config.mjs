@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Keep parallel verification servers from overwriting the app server's manifests.
+  distDir: process.env.SAFARINEXA_NEXT_DIST_DIR || ".next",
   async headers() {
     return [{source:"/:path*",headers:[
       {key:"X-Content-Type-Options",value:"nosniff"},

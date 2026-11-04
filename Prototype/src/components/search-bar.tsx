@@ -18,6 +18,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 type CategoryId = "accommodation" | "tours" | "restaurants" | "transport" | "guides";
@@ -84,21 +85,12 @@ function SelectField({
 }) {
   return (
     <Field label={label} className={className}>
-      <div className="relative w-full">
-        <select
-          aria-label={label}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className="w-full appearance-none bg-transparent pr-5 text-sm font-normal text-slate-700 outline-none"
-        >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-      </div>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger aria-label={label} className="h-auto w-full rounded-none border-0 bg-transparent p-0 text-base font-normal shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 md:text-sm"><SelectValue /></SelectTrigger>
+        <SelectContent className="rounded-md">
+          {options.map(option=><SelectItem className="rounded-sm" key={option.value} value={option.value}>{option.label}</SelectItem>)}
+        </SelectContent>
+      </Select>
     </Field>
   );
 }
@@ -134,6 +126,7 @@ export function SearchBar({ className }: { className?: string }) {
       const filtersToRemove = [
         "propertyType",
         "tourType",
+        "tourDuration",
         "duration",
         "vehicleType",
         "cuisine",
@@ -220,21 +213,18 @@ export function SearchBar({ className }: { className?: string }) {
     <>
       <div className="-mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 no-scrollbar flex gap-1.5 overflow-x-auto pb-2">
         {CATEGORIES.map((item) => (
-          <button
+          <Button
+            variant={category === item.id ? "secondary" : "ghost"}
+            size="sm"
             key={item.id}
             type="button"
             aria-pressed={category === item.id}
             onClick={() => handleTabClick(item.id)}
-            className={cn(
-              "inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-all",
-              category === item.id
-                ? "border-slate-900 bg-slate-900 text-white shadow-xs"
-                : "border-border bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-            )}
+            className="h-9 rounded-md px-3"
           >
             <item.icon className="h-3.5 w-3.5" />
             {item.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -247,20 +237,17 @@ export function SearchBar({ className }: { className?: string }) {
                 { id: "special", label: "Special hire (hourly)" }
               ] as const
             ).map((option) => (
-              <button
+              <Button
+                variant={transportSubcategory === option.id ? "secondary" : "ghost"}
+                size="sm"
                 key={option.id}
                 type="button"
                 aria-pressed={transportSubcategory === option.id}
                 onClick={() => setTransportSubcategory(option.id)}
-                className={cn(
-                  "inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition-all",
-                  transportSubcategory === option.id
-                    ? "border-slate-900 bg-slate-900 text-white shadow-xs"
-                    : "border-border bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-                )}
+                className="h-9 rounded-md px-3"
               >
                 {option.label}
-              </button>
+              </Button>
             ))}
           </div>
         ) : null}

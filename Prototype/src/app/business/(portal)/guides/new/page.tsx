@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { redirect } from "next/navigation";
 import { type GuideSpecialization } from "@prisma/client";
 
@@ -68,7 +69,7 @@ export default async function NewGuidePage() {
           { label: "Add guide", href: "/business/guides/new" }
         ]}
       />
-      <h1 className="type-page mb-6">Add a new guide</h1>
+      <PageHeader className="mb-6" title={<>Add a new guide</>} />
 
       <form action={createGuide} className="flex flex-col gap-6">
         <Card>

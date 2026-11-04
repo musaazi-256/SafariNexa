@@ -237,6 +237,37 @@ const ICONS = {
   "loader": '<path d="M21 12a9 9 0 1 1-6.219-8.56"/>',
   "alert-triangle": '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
   "image": '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+  "plus": '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  "minus": '<path d="M5 12h14"/>',
+  "clock": '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  "message-circle": '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  "message-square": '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  "clipboard-list": '<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',
+  "calendar-clock": '<path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/>',
+  "calendar-days": CAL + '<path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/>',
+  "database": '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>',
+  "upload": '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/>',
+  "headphones": '<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
+  "user-plus": '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/>',
+  "chevrons-up-down": '<path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>',
+  "pencil": '<path d="M21.17 6.81a1 1 0 0 0-3.99-3.99L3.84 16.17a2 2 0 0 0-.5.83l-1.32 4.35a.5.5 0 0 0 .62.62l4.35-1.32a2 2 0 0 0 .83-.5z"/><path d="m15 5 4 4"/>',
+  "trash-2": '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/>',
+  "eye": '<path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/>',
+  "more-horizontal": '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  "archive": '<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
+  "bar-chart-3": '<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
+  "alert-circle": '<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  "bed": '<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/>',
+  "reply": '<path d="m9 17-5-5 5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>',
+  "car": '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+  "utensils": '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+  "compass": '<circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/>',
+  "copy": '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  "list": '<path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/>',
+  "grid": '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  "paperclip": '<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
+  "globe": '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+  "wallet": '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
   "google": '<circle cx="12" cy="12" r="9"/><path d="M12 12h8"/>'
 };
 const ICON_COMPS = {};
@@ -450,7 +481,7 @@ function inputBox(o) {
   if (o.focus) kids.push(F({ name: "caret", w: 1, h: 18, fill: C.fg }));
   return H({
     name: o.select ? "Select" : "Input", gap: 8, h: o.h || 44, px: 12, radius: 12,
-    fill: o.disabled ? C.s50 : C.white, stroke: o.error ? C.destructive : o.focus ? C.primary : C.input,
+    fill: o.disabled || o.readonly ? C.s50 : C.white, stroke: o.error ? C.destructive : o.focus ? C.primary : C.input,
     sw: 1, opacity: o.disabled ? 0.6 : null, fillW: o.w ? false : true, w: o.w
   }, kids);
 }
@@ -793,22 +824,19 @@ function authCard(o) {
     V({ name: "CardHeader", gap: 6, pad: 24, fillW: true }, [
       type.eyebrow("admin authentication"),
       T("Sign in to your admin account", { size: 30, w: 600, lh: 36, ls: -2.5, fillW: true }),
-      type.body(demo ? "Choose an account below or sign in with your email." : "Continue with Google or your SafariNexa email.", { fillW: true })
+      type.body(demo ? "This is a demo. The details below are filled in for you, so just continue." : "Continue with Google or your SafariNexa email.", { fillW: true })
     ]),
     cardContent([
       o.error ? alertBox(o.error, "destructive") : null,
-      o.hideGoogle ? null : btn("Continue with Google", { variant: "secondary", fillW: true }),
-      H({ gap: 12, fillW: true }, [hr(), T("OR", { size: 12, w: 500, color: C.muted }), hr()]),
+      o.hideGoogle || demo ? null : btn("Continue with Google", { variant: "secondary", fillW: true }),
+      o.hideGoogle || demo ? null : H({ gap: 12, fillW: true }, [hr(), T("OR", { size: 12, w: 500, color: C.muted }), hr()]),
       V({ gap: 12, fillW: true }, [
-        V({ gap: 6, fillW: true }, [fieldLabel("Email"), inputBox({ placeholder: "you@example.com", value: o.email, error: o.fieldError, focus: o.focus === "email" })]),
-        V({ gap: 6, fillW: true }, [fieldLabel("Password"), inputBox({ placeholder: "Your password", value: o.email ? "••••••••••" : "", error: o.fieldError })]),
-        V({ pt: 4, fillW: true }, [o.loading ? btnRaw("Sign in with email", { loading: true, fillW: true, disabled: true }) : btn("Sign in with email", { fillW: true })])
+        V({ gap: 6, fillW: true }, [fieldLabel("Email"), inputBox({ placeholder: "you@example.com", value: demo ? "admin@safarinexa.test" : o.email, readonly: demo, error: o.fieldError, focus: o.focus === "email" })]),
+        V({ gap: 6, fillW: true }, [fieldLabel("Password"), inputBox({ placeholder: "Your password", value: demo || o.email ? "••••••••••" : "", readonly: demo, error: o.fieldError })]),
+        V({ pt: 4, fillW: true }, [o.loading ? btnRaw(demo ? "Continue as admin" : "Sign in with email", { loading: true, fillW: true, disabled: true }) : btn(demo ? "Continue as admin" : "Sign in with email", { fillW: true })])
       ]),
       T("Admin accounts are provisioned by SafariNexa super admins only — there is no self-service sign-up.", { size: 12, color: C.muted, align: "center", fillW: true }),
-      demo ? V({ name: "Quick access", pad: 12, radius: 12, stroke: C.border, fill: C.secondary, fo: 0.3, gap: 8, fillW: true }, [
-        T("Quick access", { size: 12, w: 500, upper: true, ls: 2.5, color: C.muted }),
-        btnRaw("Continue as admin", { variant: "outline", stroke: C.border, fillW: true })
-      ]) : null
+      null
     ], { gap: 16 })
   ], { w: 448 });
 }
@@ -819,7 +847,7 @@ function authPage(name, cardNode) {
 function flowAuth() {
   return [
     { section: "Admin sign in · /admin/login", screens: [
-      { title: "Sign in — demo mode", note: "AuthCard surface=admin. Demo builds show Quick access with the seeded admin account.", build: function () { return authPage("Sign in — demo mode", authCard({})); } },
+      { title: "Sign in — demo mode", note: "AuthCard surface=admin, demo mode (default). Email and password are prefilled read-only with the seeded admin; one click signs in via the passwordless demo provider. No Google button.", build: function () { return authPage("Sign in — demo mode", authCard({})); } },
       { title: "Sign in — live mode", note: "Production: Google + email/password only. No sign-up link for admins.", build: function () { return authPage("Sign in — live mode", authCard({ demo: false })); } },
       { title: "Sign in — filled & submitting", note: "useFormStatus pending: button shows spinner and is disabled.", build: function () { return authPage("Sign in — submitting", authCard({ demo: false, email: "grace.aciro@safarinexa.com", loading: true })); } },
       { title: "Error — admin_denied", note: "?error=admin_denied after AuthError on the admin surface. Attempt is logged to the audit trail.", build: function () { return authPage("Sign in — error admin_denied", authCard({ demo: false, error: "This account is not an active admin. Access has been logged." })); } },
@@ -839,7 +867,7 @@ function flowAuth() {
           H({ gap: 12, wrap: true, w: 1180 }, decisions.map(function (d) { return card([V({ pad: 20, gap: 6, fillW: true }, [T(d[0], { size: 14, w: 500 }), T(d[1], { size: 14, color: C.muted, relaxed: true, fillW: true })])], { w: 584, stroke: C.border, dash: true }); }))
         ])]);
       } },
-      { title: "Google — demo mode fallback", note: "In demo builds /admin/auth/google renders AuthCard without the Google button.", build: function () { return bareScreen("Google — demo fallback", [V({ w: 1180, pad: 32, cross: "center" }, [authCard({ hideGoogle: true })])]); } }
+      { title: "Google — demo mode fallback", note: "In demo builds /admin/auth/google renders the same prefilled demo AuthCard.", build: function () { return bareScreen("Google — demo fallback", [V({ w: 1180, pad: 32, cross: "center" }, [authCard({ hideGoogle: true })])]); } }
     ] },
     { section: "Access control", screens: [
       { title: "Access denied · /admin/auth/access-denied", note: "Shown when the Google callback or requireAdminSession() rejects the account or permission.", build: function () {
@@ -886,26 +914,27 @@ function flowShell() {
 }
 
 // ================= DASHBOARD =================
-function statCard(s, w, h) {
+function statCard(s, w, h, compact) {
+  const link = s.action ? H({ gap: 4 }, [T(s.action, { size: 12, w: 500, color: C.primary, underline: true }), I("arrow-up-right", 14, C.primary)]) : null;
   return card([
-    V({ pad: 20, gap: 0, fillW: true, minH: h ? null : 160, fillH: !!h }, [
+    V({ name: compact ? "StatCard · compact" : "StatCard", pad: compact ? 12 : 20, gap: 0, fillW: true, minH: h || compact ? null : 160, fillH: !!h }, [
       H({ fillW: true, cross: "start", main: "between", gap: 12 }, [
         s.help ? helpLabel(s.label) : T(s.label, { size: 12, w: 500, color: C.s500, lh: 20 }),
-        s.icon ? F({ w: 32, h: 32, radius: 8, fill: C.s50, stroke: C.s100, main: "center", cross: "center" }, [I(s.icon, 16, C.s500)]) : null
+        s.icon ? F({ w: compact ? 24 : 32, h: compact ? 24 : 32, radius: 8, fill: C.s50, stroke: C.s100, main: "center", cross: "center" }, [I(s.icon, compact ? 14 : 16, C.s500)]) : null
       ]),
-      spacer(1, 12),
-      T(s.value, { size: 24, w: 600, color: C.s800, lh: 30, ls: -2.5 }),
-      spacer(1, 8),
-      T(s.desc, { size: 12, color: C.s500, lh: 20, fillW: true }),
+      spacer(1, compact ? 4 : 12),
+      T(s.value, { size: compact ? 18 : 24, w: 600, color: C.s800, lh: compact ? 24 : 30, ls: -2.5 }),
+      spacer(1, compact ? 4 : 8),
+      T(s.desc, { size: 12, color: C.s500, lh: compact ? 16 : 20, fillW: true }),
       s.action && h ? grow({ fillH: true }) : null,
-      s.action ? V({ pt: 16, fillW: true }, [V({ pt: 12, stroke: C.s100, sides: { t: 1 }, fillW: true }, [H({ gap: 4 }, [T(s.action, { size: 12, w: 500, color: C.primary, underline: true }), I("arrow-up-right", 14, C.primary)])])]) : null
+      link ? (compact ? V({ pt: 8, fillW: true }, [link]) : V({ pt: 16, fillW: true }, [V({ pt: 12, stroke: C.s100, sides: { t: 1 }, fillW: true }, [link])])) : null
     ])
   ], { w: w, h: h });
 }
-function statGrid(stats, cw, cols, h) {
+function statGrid(stats, cw, cols, h, compact) {
   cols = cols || 4;
   const w = Math.floor((cw - 16 * (cols - 1)) / cols);
-  return H({ name: "StatGrid", gap: 16, wrap: true, w: cw, rowGap: 16, cross: "start" }, stats.map(function (s) { return statCard(s, w, h); }));
+  return H({ name: "StatGrid", gap: 16, wrap: true, w: cw, rowGap: 16, cross: "start" }, stats.map(function (s) { return statCard(s, w, h, compact); }));
 }
 function dashStats(empty) {
   const z = empty;
@@ -976,7 +1005,7 @@ function dashboard(empty) {
       .map(function (r, i) { return listRow(r[0], r[1], H({ gap: 6 }, [H({ px: 6, py: 2, radius: 2, fill: C.emerald100 }, [T("SUCCESS", { size: 12, w: 500, color: C.emerald800 })]), T(r[2], { size: 12, w: 500, color: C.s500 })]), { last: i === 3 }); });
     return [
       pageHero("Admin portal", "Dashboard", "Platform overview: bookings, revenue, verification, and support at a glance."),
-      statGrid(dashStats(empty), cw, 4, 224),
+      statGrid(dashStats(empty), cw, 4, null, true),
       H({ gap: 24, fillW: true, cross: "start" }, [
         panel("Featured Businesses", "View all businesses", featured, { w: leftW, pad: 24, titleSize: 16, noRule: true, arrow: true }),
         panel("Recent Platform Activity", "View all activity", activity, { w: rightW, pad: 24, titleSize: 16, noRule: true })
@@ -1855,8 +1884,16 @@ function pageHeader(flow, sections, totalScreens) {
   return f;
 }
 
+const GEN_KEY = "safarinexa-generated";
+function markGenerated(page) { page.setPluginData(GEN_KEY, "1"); return page; }
+// Pages from earlier runs: marked ones, plus unmarked pages from runs before marking existed (matched by exact generated name).
+function previousGeneratedPages() {
+  const names = new Set(["00 · Cover & flow map", "00 · Design system"].concat(FLOWS.map(function (f) { return f.id + " · " + f.name; })));
+  return figma.root.children.filter(function (p) { return p.getPluginData(GEN_KEY) === "1" || names.has(p.name); });
+}
+
 async function buildFlowPage(flow) {
-  const page = figma.createPage();
+  const page = markGenerated(figma.createPage());
   page.name = flow.id + " · " + flow.name;
   let sections;
   try { sections = flow.build(); } catch (e) { sections = [{ section: "Error", screens: [{ title: "Flow failed", note: String(e.message), build: function () { throw e; } }] }]; }
@@ -1997,9 +2034,12 @@ async function run() {
   await Promise.all(["Regular", "Medium", "Semi Bold", "Bold", "Italic", "Medium Italic", "Semi Bold Italic"].map(function (s) { return figma.loadFontAsync({ family: "Inter", style: s }); }));
   try { await figma.loadFontAsync({ family: "Roboto Mono", style: "Regular" }); MONO = { family: "Roboto Mono", style: "Regular" }; } catch (e) {}
 
-  figma.notify("SafariNexa: building design system…", { timeout: 2500 });
-  const coverPage = figma.createPage(); coverPage.name = "00 · Cover & flow map";
-  const dsPage = figma.createPage(); dsPage.name = "00 · Design system";
+  const oldPages = previousGeneratedPages();
+  figma.notify("SafariNexa: building design system…" + (oldPages.length ? " (" + oldPages.length + " old pages will be replaced)" : ""), { timeout: 2500 });
+  const coverPage = markGenerated(figma.createPage()); coverPage.name = "00 · Cover & flow map";
+  const dsPage = markGenerated(figma.createPage()); dsPage.name = "00 · Design system";
+  // New pages go where the old set started, so ordering stays the same.
+  const firstOld = oldPages.length ? figma.root.children.indexOf(oldPages[0]) : -1;
   buildDesignSystem(dsPage);
 
   const results = [];
@@ -2010,9 +2050,15 @@ async function run() {
   }
   const cover = buildCover(coverPage, results);
   await figma.setCurrentPageAsync(coverPage);
+  // Delete the old set only after the new one built, so a failed run never leaves the file empty.
+  for (const p of oldPages) { if (!p.removed) p.remove(); }
+  if (firstOld >= 0) {
+    const fresh = [coverPage, dsPage].concat(figma.root.children.filter(function (p) { return p.getPluginData(GEN_KEY) === "1" && p !== coverPage && p !== dsPage; }));
+    fresh.forEach(function (p, i) { figma.root.insertChild(Math.min(firstOld + i, figma.root.children.length - 1), p); });
+  }
   figma.viewport.scrollAndZoomIntoView([cover]);
   const total = results.reduce(function (s, r) { return s + r.total; }, 0);
-  const msg = "SafariNexa admin portal: " + total + " frames on " + (FLOWS.length + 2) + " pages." + (ERRORS.length ? " " + ERRORS.length + " frame(s) failed — see the red placeholders." : "");
+  const msg = "SafariNexa admin portal: " + total + " frames on " + (FLOWS.length + 2) + " pages" + (oldPages.length ? " (replaced " + oldPages.length + " old pages)." : ".") + (ERRORS.length ? " " + ERRORS.length + " frame(s) failed — see the red placeholders." : "");
   figma.closePlugin(msg);
 }
 

@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { ShieldAlert } from "lucide-react";
@@ -65,8 +66,7 @@ export default async function DestinationDetailPage({ params }: { params: { slug
           <Badge variant="secondary" className="mb-2">
             {destination.region}
           </Badge>
-          <h1 className="text-3xl font-semibold sm:text-4xl">{destination.name}</h1>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">{destination.description}</p>
+          <PageHeader title={<>{destination.name}</>} description={<>{destination.description}</>} />
 
           {destination.safetyNotes ? (
             <div className="mt-6 flex items-start gap-2 rounded-xl border border-warning/30 bg-warning/10 p-3.5 text-sm text-warning-foreground">

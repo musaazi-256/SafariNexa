@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/page-header";
+
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ChevronRight, MapPin, Upload, User, Building2, Tent, TrendingUp, HeadphonesIcon, Settings } from "lucide-react";
@@ -8,6 +10,7 @@ import { submitBusinessOnboarding } from "@/lib/actions/onboarding";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Textarea } from "@/components/ui/textarea";
 import { Logo } from "@/components/logo";
 
@@ -94,14 +97,11 @@ export function OnboardingWizard() {
             <Logo size="lg" />
           </div>
 
-          <div className="pt-10">
-            <h1 className="type-page leading-tight">
+          <PageHeader tone="inverse" title={<>
               Join the SafariNexa Partner Programme today
-            </h1>
-            <p className="mt-4 text-lg text-white/80">
+            </>} description={<>
               Start earning revenue by promoting your travel offerings—register today to reach thousands of global travelers.
-            </p>
-          </div>
+            </>} className="pt-10" />
 
           <div className="space-y-6 pt-10">
             <div className="flex gap-4">
@@ -262,13 +262,11 @@ export function OnboardingWizard() {
 
               <div className="space-y-2">
                 <Label htmlFor="contactPhone" className="text-slate-900">Phone Number</Label>
-                <Input
+                <PhoneInput
                   id="contactPhone"
+                  autoComplete="tel"
                   value={formData.contactPhone}
-                  onChange={(e) => updateForm("contactPhone", e.target.value)}
-                  type="tel"
-                  placeholder="+256 700 000000"
-                  className="bg-slate-50 focus:bg-white"
+                  onChange={(value) => updateForm("contactPhone", value)}
                 />
               </div>
 

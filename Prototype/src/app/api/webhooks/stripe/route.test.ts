@@ -13,7 +13,7 @@ describe("Signed payment webhook regressions",()=>{
   booking={id:"booking-1",orderId:"order-1",businessId:"business-1",customerId:"customer-1",bookingRef:"BK-TEST",status:"PENDING_PAYMENT",totalMinor:420000};
   event={id:"evt_test",type:"checkout.session.completed",data:{object:{id:"cs_test",metadata:{paymentId:"payment-1"},currency:"ugx",amount_total:42000000,payment_status:"paid"}}};
   (stripe.webhooks.constructEvent as jest.Mock).mockImplementation(()=>event);
-  tx={payment:{findUnique:jest.fn(async()=>payment),update:jest.fn(async({data})=>{Object.assign(payment,data);return payment;})},
+  tx={payment:{findFirst:jest.fn(async()=>payment),findUnique:jest.fn(async()=>payment),update:jest.fn(async({data})=>{Object.assign(payment,data);return payment;})},
       booking:{findMany:jest.fn(async()=>[booking]),update:jest.fn(async({data})=>{Object.assign(booking,data);return booking;})},
       order:{update:jest.fn()},businessUser:{findMany:jest.fn(async()=>[{userId:"business-owner-user"}])},notification:{createMany:jest.fn()}};
   (db.$transaction as jest.Mock).mockImplementation(fn=>fn(tx));
@@ -33,4 +33,6 @@ describe("Signed payment webhook regressions",()=>{
  it("cannot resurrect cancelled bookings",async()=>{booking.status="CANCELLED_BY_CUSTOMER";expect((await POST(request())).status).toBe(500);expect(tx.booking.update).not.toHaveBeenCalled();});
  it("does not confirm an unknown payment",async()=>{payment=null;expect((await POST(request())).status).toBe(500);expect(tx.booking.update).not.toHaveBeenCalled();});
  it("ignores unrelated event types",async()=>{event.type="customer.created";expect((await POST(request())).status).toBe(200);expect(db.$transaction).not.toHaveBeenCalled();});
+ it("records failed provider payments on the booking and notifies the business",async()=>{event.type="checkout.session.async_payment_failed";event.data.object.payment_status="unpaid";expect((await POST(request())).status).toBe(200);expect(booking.status).toBe("PAYMENT_FAILED");expect(payment.status).toBe("FAILED");expect(tx.notification.createMany).toHaveBeenCalledWith({data:expect.arrayContaining([expect.objectContaining({userId:"business-owner-user",title:"Payment not completed"})])});});
+
 });

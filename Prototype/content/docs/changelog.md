@@ -376,3 +376,85 @@ The Vercel deploy of `9ca40bc` built cleanly but every database-backed page show
 | Admin dashboard stat cards | The 12-metric grid uses a new `compact` StatCard variant (smaller icon, tighter spacing, no divider above links). |
 
 **Verified:** tsc, lint, Jest 206 tests passing.
+
+---
+
+## 4 November 2026 — demo data for the admin listing review queue
+
+`/admin/listings` was always empty on a fresh database because the seed created no `ListingSubmission` rows. `prisma/seed.ts` now seeds 9 submissions across every queue tab: 3 Submitted (Riverside Glamping draft, Nile View Terrace, Entebbe Airport Transfer), 2 Under review, 1 Needs changes, 1 Approved, 1 Rejected, 1 Withdrawn, with reviewer notes on the decided ones. Snapshots are taken from the current listing content, so the approve / request changes / reject actions work on them. Fixed IDs (`lsub-*`) make the block idempotent; re-running the seed resets the demo queue to these states.
+
+**Verified:** tsc clean; seeded the local database and checked every queue tab and a submission detail page render as the demo admin.
+
+---
+
+## 4 November 2026 — pagination redesigned on the ReUI "c-pagination-15" pattern
+
+Every paginated list (21 pages: public catalogues, customer bookings, notifications, admin and business tables) now uses the ReUI c-pagination-15 layout: "Page X of Y" on the left, Previous / numbered pages with ellipses / Next in the middle, and an optional "N / page" select on the right.
+
+- `npx shadcn add @reui/c-pagination-15` can't install into this project: `components.json` uses the legacy `default` style, which has no `native-select`. The two shadcn primitives it depends on were added by hand in their standard shape: `src/components/ui/pagination.tsx` (links use `next/link`) and `src/components/ui/native-select.tsx` (styled with the existing `filter-select` class).
+- The app's `Pagination` component (same props: `currentPage`, `totalPages`, `buildHref`) moved to `src/components/page-pagination.tsx`; all imports were updated.
+- New optional `pageSize` prop shows the "N / page" select (options from `PAGE_SIZE_OPTIONS`: 9, 20, 50, 100) and keeps `?perPage` in every page link. A page must read `parsePageSize(searchParams.perPage)` for its skip/take before passing `pageSize`; **no page does yet**, so the select is hidden everywhere for now rather than shown as a control that does nothing.
+
+**Verified:** tsc, lint, Jest 307 tests (4 new in `page-pagination.test.tsx`); `/accommodation?page=2` renders the new bar in a dev build.
+
+---
+
+## 4 November 2026 — ReUI / shadcn component library (library only, no page changes)
+
+Requested ReUI items (`c-phone-input-8`, `c-progress-4/7`, `c-rating-6/8/9`, `c-select-6/13`, `c-spinner-3/5`, `c-stepper-7`, `c-table-6`) and five shadcn examples (checkbox fields, chat messages, skeleton, toast, validated form) were added as **building blocks only**; no existing component or page changed. The shadcn CLI can't install them here (legacy `default` style, Tailwind 3, Radix not Base UI) and would have overwritten the branded button/card/badge/input/select/table, so each primitive was ported by hand keeping the upstream API:
+
+| New in `src/components/ui` | Notes |
+|---|---|
+| `field.tsx`, `item.tsx`, `empty.tsx`, `input-group.tsx` | shadcn layouts, Tailwind 3 syntax |
+| `spinner.tsx`, `progress.tsx` | progress supports `ProgressLabel` / `ProgressValue` header |
+| `message.tsx`, `bubble.tsx`, `marker.tsx` | chat bubbles; default bubble uses the brand green |
+| `stepper.tsx` | ReUI API without `@base-ui/react`; read-only unless `onValueChange` is passed |
+| `frame.tsx` | ReUI tray + panels; `flush` panels for tables |
+| `star-rating.tsx` | ReUI Rating (partial stars); editable mode is a keyboard radio group, `name` submits with forms. Existing `Rating`/`ScoreBadge` untouched |
+| `phone-input.tsx` | new dependency `react-phone-number-input`; native country select, default UG, `name` submits E.164 |
+| `toast.tsx` | `toast.add()` / `toast.close()` on Radix Toast; needs `<Toaster />` mounted |
+
+Examples adapted to SafariNexa content live in `src/components/examples/`, previewed at **`/ui-kit`** (demo mode only, `noindex`, not linked). Forms keep server actions: the pasted react-hook-form/zod/sonner form was rebuilt with Field + InputGroup and native validation — no form libraries added. Wiring these into real pages (phone fields, onboarding stepper, review form, staff tables, chat, loading states) is the next step.
+
+**Verified:** tsc, lint, Jest 312 tests (5 new in `ui/reui-components.test.tsx`); `/ui-kit` renders all 17 sections in a dev build.
+
+---
+
+## 4 November 2026 — phone fields use the new PhoneInput; admin support case page restructured
+
+**Phone fields.** All seven real phone fields now use `ui/phone-input` (country picker, default Uganda, submits E.164 such as `+256772123456` under the same field name, so no server action changed): checkout, multi-business checkout, customer profile, business personal profile (`/business/profile?edit=profile`), business settings (`?edit=profile`), business onboarding contact step, admin profile and admin settings. The demo-only mobile-money preview field in payment method selection was left as a local-format hint on purpose (it is never submitted).
+- Saved numbers in other formats (`0772 123 456`, `256…`, spaces/dashes) are normalised to E.164 when the form loads (`toE164`); unreadable values load empty.
+- Fixed during verification: in international mode the box always shows `+256`, which satisfied `required` with no number. Required phone inputs now stay invalid until a real number is entered.
+
+**`/admin/support/[id]`** now follows the admin detail pattern used by bookings and verification: `max-w-6xl`, "Back to support", portal `PageHero` with the status badge, a Conversation card (messages + reply) and a 340px side column with Case details (reference, category, portal, opener, opened/updated/closed times, linked booking) and Update case status. Server actions and the close-case confirmation are unchanged.
+
+**Verified:** tsc, lint, Jest 315 tests; production build; rendered every phone page as the demo customer, business and admin (new input present, saved number shown and submitted in E.164) and the support case page as admin.
+
+---
+
+## 4 November 2026 — business portal gets its own support centre
+
+**Bug:** "Contact support" in the business portal (verification page, review menu, user menu) sent business users to the customer `/support` page, which created customer cases inside the customer account layout.
+
+**Fix:**
+- New `/business/support` (case list + "Open a new case") and `/business/support/[id]` (conversation + case details), inside the business portal shell. Cases are created with `surface: BUSINESS`, business categories (`BUSINESS_SUPPORT_CATEGORIES`), an optional related booking limited to the active business, and `authorRole: BUSINESS` messages. Admins are notified as before.
+- Business links now point there (`?new=1` opens the form); "Support" added to the business sidebar; the user menu's Support link follows the portal.
+- Customer `/support` lists only non-business cases; opening a business case at `/support/[id]` redirects to `/business/support/[id]`. Support notifications route by the case's surface.
+- Admin case page labels business senders and lists the opener's businesses (cases have no `businessId` column — adding one would need a schema change, so it was left out).
+
+**Verified:** tsc, lint, Jest 316 tests (new routing test in `notification-policy.test.ts`); in a dev build as the demo business user: list, new-case form (categories + 29 bookings offered), case detail, sidebar and verification links, customer list exclusion and redirect; admin case view shows the portal and businesses. Test case removed afterwards.
+
+---
+
+## 4 November 2026 — admin reviews moderation: compact list layout
+
+`/admin/reviews` showed each review as a tall card in a two-column grid, every card titled "Latest reviews" with a label/value grid (Reviewer, Date, Listing, Review) and full-size action buttons — roughly a screen per four reviews. Reviews are now rows in one card:
+
+- Line 1: star rating (`ui/star-rating`, partial stars), status badge, listing title.
+- Line 2: reviewer · business · date. Line 3: the review, clamped to two lines (full text on hover). Business reply, if any, on one clamped line.
+- Compact Publish / Flag / Hide buttons on the right (Hide keeps its confirmation), with accessible names that include the reviewer.
+- Footer inside the card: "Showing X–Y of Z reviews" + pagination. `Pagination` gained optional `summary` and `className` props for footers like this.
+
+Moderation logic, notifications and audit logging are unchanged.
+
+**Verified:** tsc, lint, pagination tests; rendered as the demo admin (9 rows per page, filters work, no old cards).

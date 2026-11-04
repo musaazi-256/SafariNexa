@@ -1,3 +1,4 @@
+import { TablePreferencesProvider } from "@/components/ui/table-column-visibility";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { getUnreadNotificationCount } from "@/lib/notifications";
 import { DemoToolbar } from "@/components/demo-toolbar";
@@ -16,13 +17,13 @@ export default async function AdminPortalLayout({ children }: { children: ReactN
     <SidebarProvider>
       <LiveRefresh />
       <AdminSidebar />
-      <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
+      <SidebarInset className="bg-white">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-white px-4 sm:px-6">
           <SidebarTrigger />
           <span className="text-sm font-semibold text-muted-foreground">Admin portal</span>
           <div className="ml-auto flex items-center gap-2"><DemoToolbar surfaces={["customer", "business"]} /><NotificationBell surface="admin" unreadCount={unreadCount}/></div>
         </header>
-        <div className="flex-1 min-w-0 space-y-6 p-4 sm:p-6">{children}</div>
+        <div className="portal-content flex-1 min-w-0 p-4 sm:p-6"><TablePreferencesProvider userId={session.user.id}>{children}</TablePreferencesProvider></div>
       </SidebarInset>
     </SidebarProvider>
   );

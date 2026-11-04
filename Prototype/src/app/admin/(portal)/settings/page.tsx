@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { requireAdminSession } from "@/lib/admin";
 
@@ -43,7 +44,7 @@ export default async function AdminSettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="contactPhone">Global Support Phone</Label>
-                  <Input id="contactPhone" type="tel" defaultValue="+256 800 000000" />
+                  <PhoneInput id="contactPhone" defaultValue="+256 800 000000" />
                 </div>
               </div>
             </CardContent>

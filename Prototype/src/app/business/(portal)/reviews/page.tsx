@@ -1,3 +1,4 @@
+import { PortalToolbar } from "@/components/portal-toolbar";
 import { StatCard, StatGrid } from "@/components/ui/stat-card";
 import { PortalSearch } from "@/components/portal-search";
 import { ReviewStatusBadge } from "@/components/ui/status-badge";
@@ -12,8 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Pagination } from "@/components/ui/pagination";
-import { FilterTabs } from "@/components/ui/filter-tabs";
+import { Pagination } from "@/components/page-pagination";
+import { RecordFilter } from "@/components/record-filter";
 import { PageHero } from "@/components/page-hero";
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
@@ -36,17 +37,17 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
   const activeTab = requestedStatus && ["PENDING","PUBLISHED","HIDDEN","FLAGGED"].includes(requestedStatus) ? requestedStatus : "ALL";
   const page = parsePage(searchParams.page);
   const sort = ["highest", "lowest"].includes(searchParams.sort ?? "") ? searchParams.sort! : "newest";
-  
-  const where = { 
+
+  const where = {
     businessId,
     ...(searchParams.q ? { OR: [{ body: { contains: searchParams.q.trim(), mode: "insensitive" as const } }, { listing: { title: { contains: searchParams.q.trim(), mode: "insensitive" as const } } }] } : {}),
-    ...(activeTab !== "ALL" ? { status: activeTab as any } : {}) 
+    ...(activeTab !== "ALL" ? { status: activeTab as any } : {})
   };
 
   // Fetch data
   const [
-    reviews, 
-    totalFilteredCount, 
+    reviews,
+    totalFilteredCount,
     statusCountsResult,
     ratingResult
   ] = await Promise.all([
@@ -116,12 +117,12 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
     return (
       <div className="flex items-center gap-0.5">
         {[1, 2, 3, 4, 5].map((star) => (
-          <Star 
-            key={star} 
+          <Star
+            key={star}
             className={cn(
-              "h-3.5 w-3.5", 
+              "h-3.5 w-3.5",
               star <= rating ? "fill-yellow-400 text-yellow-400" : "fill-slate-200 text-slate-200"
-            )} 
+            )}
           />
         ))}
       </div>
@@ -130,20 +131,16 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 pb-20">
-      
+
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <PageHero
           variant="portal"
-          eyebrow="Business portal"
           title="Reviews"
           description="View verified customer reviews and reply where allowed."
         />
 
-        <div className="flex items-center gap-3 w-full lg:w-auto shrink-0">
-<PortalFilter />
-          <PortalSearch label="Search reviews" placeholder="Search reviews…" />
-        </div>
+
       </div>
 
       {/* Stat Cards */}
@@ -156,22 +153,16 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
       </StatGrid>
 
       {/* Tabs & Sorting */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border pb-4 mt-8">
-        <FilterTabs
-          activeValue={activeTab}
-          tabs={TABS.map((tab) => ({
+      <PortalToolbar search={<PortalSearch label="Search reviews" placeholder="Search reviews…" />} filters={<><RecordFilter label="Review status" name="status" defaultValue="ALL"
+          value={activeTab}
+          options={TABS.map((tab) => ({
             value: tab.value,
             label: tab.label,
             count: tab.count,
-            href: `/business/reviews?${new URLSearchParams({ ...(tab.value !== "ALL" ? { status: tab.value.toLowerCase() } : {}), ...(searchParams.q ? { q: searchParams.q } : {}), sort })}`
           }))}
         />
+<ReviewSort /></>} />
 
-        <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-          Sort by: 
-          <ReviewSort />
-        </div>
-      </div>
 
       {/* Main Reviews List */}
       {reviews.length === 0 ? (
@@ -181,13 +172,13 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
           {reviews.map((review) => {
             const customerName = review.author.name || review.author.email || "Verified Guest";
             const initials = customerName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-            
+
             // Status styling
 
 
             return (
               <div key={review.id} className="bg-white rounded-2xl border border-border p-6 flex flex-col md:flex-row gap-6 hover:border-slate-300 transition-colors">
-                
+
                 {/* Left Column: Customer */}
                 <div className="w-full md:w-48 shrink-0 flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-semibold flex items-center justify-center shrink-0">
@@ -212,7 +203,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                       <span>{new Date(review.createdAt).toLocaleDateString("en-UG", { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                     </div>
                   </div>
-                  
+
                   {review.title && <h4 className="font-semibold text-slate-900 mb-1">{review.title}</h4>}
                   <p className="text-slate-700 text-sm leading-relaxed mb-6">
                     {review.body}
@@ -232,11 +223,11 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                   ) : (
                     <form id={`reply-${review.id}`} action={replyToReview} className="flex flex-col gap-2 relative">
                       <input type="hidden" name="reviewId" value={review.id} />
-                      <Textarea 
+                      <Textarea
                         name="businessReplyBody"
                         aria-label={`Public reply to ${customerName}`}
                         maxLength={5000}
-                        required 
+                        required
                         placeholder={`Write a public reply to ${customerName.split(' ')[0]}...`}
                         className="resize-none min-h-[80px] bg-white text-sm"
                       />
@@ -258,7 +249,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex items-center gap-2 md:mt-4">
 <Button asChild variant="outline" size="sm"><a href={`#reply-${review.id}`}>Reply</a></Button>
                     <DropdownMenu>
@@ -268,7 +259,7 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40 font-medium text-sm">
-                        <DropdownMenuItem asChild><Link href="/support">Report to support</Link></DropdownMenuItem>
+                        <DropdownMenuItem asChild><Link href="/business/support?new=1">Report to support</Link></DropdownMenuItem>
                         <DropdownMenuItem asChild><Link href="/business/messages">Open customer messages</Link></DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -297,4 +288,4 @@ export default async function BusinessReviewsPage({ searchParams }: { searchPara
     </div>
   );
 }
-import { ExportVisibleRows, PortalFilter, ReviewSort } from "@/components/portal-tools";
+import { ExportVisibleRows, ReviewSort } from "@/components/portal-tools";

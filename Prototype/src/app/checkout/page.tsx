@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { notFound, redirect } from "next/navigation";
 
 import { auth } from "@/auth";
@@ -13,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Separator } from "@/components/ui/separator";
 import { TravellerDefaultFields } from "@/components/checkout/traveller-default-fields";
 import { ServiceDetailsFields } from "@/components/checkout/service-details-fields";
@@ -141,7 +143,7 @@ export default async function CheckoutPage({
             ]}
           />
 
-          <h1 className="type-page mb-6">Checkout</h1>
+          <PageHeader className="mb-6" title={<>Checkout</>} />
 
           {searchParams.error ? (
             <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm font-medium text-destructive">
@@ -249,7 +251,7 @@ export default async function CheckoutPage({
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" name="phone" type="tel" defaultValue={traveller?.phone || ""} placeholder="+256 7XX XXX XXX" required />
+                    <PhoneInput id="phone" name="phone" autoComplete="tel" defaultValue={traveller?.phone || ""} required />
                   </div>
                   <TravellerDefaultFields nationality={traveller?.customerProfile?.nationality} emergencyContact={traveller?.customerProfile?.emergencyContact}/>
                   <div className="sm:col-span-2"><ServiceDetailsFields prefix="single-item" type={type}/></div>
@@ -289,7 +291,7 @@ export default async function CheckoutPage({
                 )}
                 <Separator />
                 <Button type="submit" size="lg" className="w-full">
-                  {type === "restaurant" ? "Request a table" : "Continue to payment"}
+                  {type === "restaurant" ? "Request a table" : listing.bookingMode === "INSTANT" ? "Continue to payment" : "Send booking request"}
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
                   Booked by {session.user.name ?? session.user.email}

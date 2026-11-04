@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/page-header";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarCheck, CalendarX, CheckCircle2, MapPin, ShieldCheck, Users } from "lucide-react";
@@ -63,7 +64,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
       })
     : null;
 
-  const mapQuery = listing.latitude && listing.longitude 
+  const mapQuery = listing.latitude != null && listing.longitude != null
     ? `${listing.latitude},${listing.longitude}` 
     : listing.address || listing.city || "Uganda";
   const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
@@ -138,7 +139,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
                       {accommodation.propertyType}
                     </Badge>
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{listing.title}</h1>
+                      <PageTitle>{listing.title}</PageTitle>
                       <SaveButton listingId={listing.id} initialSaved={Boolean(savedItem)} isSignedIn={Boolean(session?.user)} showLabel />
                       <InquiryDialog listingId={listing.id} listingTitle={listing.title} businessName={listing.business.name} isSignedIn={Boolean(session?.user)} />
                     </div>
@@ -278,6 +279,7 @@ export default async function AccommodationDetailPage({ params }: { params: { id
                       <MapPin className="h-4 w-4 shrink-0 text-muted-foreground mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-foreground leading-relaxed">{listing.address || listing.city}</p>
+                        {listing.locationDirections ? <p className="text-sm text-muted-foreground">{listing.locationDirections}</p> : null}
                         <a href={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}`} target="_blank" rel="noreferrer" className="mt-0.5 inline-block text-xs font-semibold text-blue-600 hover:underline">
                           View in map
                         </a>

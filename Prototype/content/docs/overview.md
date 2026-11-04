@@ -190,6 +190,7 @@ Entry: `/admin` → `requireAdminSession()`, gated on `session.user.isAdmin` in 
 ### 4.8 Support
 **Status: Working.**
 - `/admin/support`, `/admin/support/[id]` — real case list and threaded reply, shared with the customer-side support system.
+- **Business support (added 4 Nov 2026):** `/business/support` and `/business/support/[id]` — business users open and follow cases inside the business portal (`SupportCase.surface = BUSINESS`, optional related booking). Customer `/support` shows only customer cases.
 
 ### 4.9 Settings
 **Status: Placeholder.**

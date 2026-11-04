@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/page-header";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ShieldCheck, Lock, MapPin, Wallet } from "lucide-react";
@@ -82,9 +83,9 @@ export default async function HomePage() {
             <Badge variant="accent" className="mb-4">
               See it all first
             </Badge>
-            <h1 className="max-w-3xl text-4xl font-semibold leading-[1.03] tracking-tight sm:text-6xl">
+            <PageTitle size="display" className="max-w-3xl leading-[1.03]">
               See it all first. Book only when <span className="text-accent">you&apos;re ready</span>.
-            </h1>
+            </PageTitle>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/90 sm:text-xl">
               Browse verified stays, restaurants, and rides across Uganda. Compare freely — you only need an account
               when you&apos;re ready to book.

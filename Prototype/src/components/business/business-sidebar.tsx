@@ -6,14 +6,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Banknote,
+  LifeBuoy,
+  CreditCard,
   CalendarClock,
   ClipboardList,
   LayoutDashboard,
   LogOut,
   MessageCircle,
-  ShieldCheck,
   Star,
   Users,
+  UserCircle,
   BarChart3,
   Settings as SettingsIcon
 } from "lucide-react";
@@ -39,8 +41,9 @@ const GROUPS = [
       { href: "/business/dashboard", label: "Overview", icon: LayoutDashboard },
       { href: "/business/listings", label: "Listings", icon: ClipboardList },
       { href: "/business/guides", label: "Guides", icon: Users },
-      { href: "/business/verification", label: "Verification", icon: ShieldCheck },
       { href: "/business/bookings", label: "Bookings", icon: CalendarClock },
+      { href: "/business/customers", label: "Customers", icon: Users },
+      { href: "/business/payments", label: "Payments & refunds", icon: CreditCard },
       { href: "/business/messages", label: "Messages", icon: MessageCircle },
       { href: "/business/reviews", label: "Reviews", icon: Star },
       { href: "/business/revenue", label: "Earnings", icon: Banknote }
@@ -50,7 +53,8 @@ const GROUPS = [
     label: "Settings",
     items: [
       { href: "/business/notifications", label: "Notifications", icon: Bell },
-      { href: "/business/settings", label: "Settings", icon: SettingsIcon }
+      { href: "/business/settings", label: "Settings", icon: SettingsIcon },
+      { href: "/business/support", label: "Support", icon: LifeBuoy }
     ]
   }
 ];
@@ -101,6 +105,9 @@ export function BusinessSidebar({
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem><SidebarMenuButton asChild isActive={pathname === "/business/profile"}>
+            <Link href="/business/profile" onClick={() => setOpenMobile(false)}><UserCircle />My profile</Link>
+          </SidebarMenuButton></SidebarMenuItem>
           <SidebarMenuItem>
             <form action={signOutAction}>
               <SidebarMenuButton type="submit" className="text-destructive hover:bg-destructive/10">

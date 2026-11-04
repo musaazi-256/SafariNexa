@@ -1,16 +1,17 @@
+import { redirect } from "next/navigation";
+import { RemoteImage } from "@/components/remote-image";
 import { NotificationPreferencesForm } from "@/components/notifications/notification-preferences-form";
 import { parsePreferences } from "@/lib/preferences";
 import { TableColumnLabel } from "@/components/ui/table-column-label";
 import { ImageUploader } from "@/components/ui/image-uploader";
 import { isDemoMode } from "@/lib/dev-mode";
 import Link from "next/link";
-import { PageHero } from "@/components/page-hero";
-import { Store, Trash2, Bell, CalendarDays, XCircle, BarChart2, Info, Save, Users, UserPlus, ShieldCheck, MoreVertical, FileText } from "lucide-react";
+import { ImageIcon, Store, Trash2, Bell, CalendarDays, XCircle, BarChart2, Info, Save, Users, UserPlus, ShieldCheck, MoreVertical, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { requireBusinessSession } from "@/lib/business";
@@ -18,13 +19,14 @@ import { updateBusinessProfile } from "@/lib/actions/business-settings";
 import { inviteTeamMember, cancelInvitation, removeTeamMember } from "@/lib/actions/team";
 import { db } from "@/lib/db";
 
-export default async function BusinessSettingsPage({ searchParams }: { searchParams?: { tab?: string } }) {
+export default async function BusinessSettingsPage({ searchParams }: { searchParams?: { tab?: string; edit?: string } }) {
   const { business, businessId, session } = await requireBusinessSession();
   const accountProfile=await db.customerProfile.findUnique({where:{userId:session.user.id},select:{preferences:true}});
 
   if (!business || !businessId) return null;
 
   const rawTab = searchParams?.tab?.toLowerCase();
+  if (rawTab === "verification") redirect("/business/settings/verification");
   const defaultTab = rawTab === "team" || rawTab === "staff" ? "team" : rawTab === "notifications" ? "notifications" : "profile";
 
   const [teamMembers, invitations] = await Promise.all([
@@ -39,31 +41,41 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
     })
   ]);
 
+  const canEditProfile = teamMembers.some(member => member.userId === session.user.id && ["OWNER", "MANAGER"].includes(member.role));
+  const isEditingProfile = defaultTab === "profile" && canEditProfile && searchParams?.edit === "profile";
+  const profileDetails = [
+    ["Business name", business.name], ["Support email", business.contactEmail],
+    ["Phone number", business.contactPhone], ["Physical address", business.address],
+    ["City", business.city], ["Country", business.country],
+    ["Registration number", business.registrationNumber], ["Contact name", business.contactName],
+    ["Contact role", business.contactRole]
+  ];
+
+  async function saveBusinessProfile(formData: FormData) {
+    "use server";
+    await updateBusinessProfile(formData);
+    redirect("/business/settings");
+  }
+
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-20 pt-4">
-      <PageHero variant="portal" eyebrow="Business portal" title="Settings" description="Manage your business profile, staff access, and preferences." />
-
-      <Tabs defaultValue={defaultTab} key={defaultTab} className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="profile">Business Profile</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="team">Staff Access</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="profile" className="space-y-6">
+    <div className="space-y-6">
+        {defaultTab === "profile" && <div className="space-y-6">
           <div className="rounded-2xl border border-border bg-white p-8 shadow-sm">
 
-            <div className="flex items-start gap-4 mb-8">
+            <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+              <div className="flex items-start gap-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
                 <Store className="h-5 w-5 text-primary" />
               </div>
               <div className="flex flex-col">
-                <h3 className="text-lg font-semibold text-slate-900">Business Information</h3>
-                <p className="text-sm font-medium text-slate-500 leading-relaxed">Update your registered business details.</p>
+                <h2 className="text-lg font-semibold text-slate-900">Business information</h2>
+                <p className="text-sm font-medium text-slate-500 leading-relaxed">{isEditingProfile ? "Update your registered business details." : "Your registered business details and contact information."}</p>
               </div>
+              </div>
+              {!isEditingProfile && canEditProfile && <Button asChild variant="outline"><Link href="/business/settings?edit=profile">Edit business profile</Link></Button>}
             </div>
 
-            <form action={updateBusinessProfile}>
+            {isEditingProfile ? <form action={saveBusinessProfile}>
               <div className="mb-8 grid gap-6 sm:grid-cols-2">
                 <div className="space-y-3"><Label>Business logo</Label><p className="text-xs text-muted-foreground">Shown in your business profile and customer conversations.</p><ImageUploader name="logoUrl" label="Upload business logo" defaultValue={business.logoUrl ?? ""} /></div>
                 <div className="space-y-3"><Label>Cover photo</Label><p className="text-xs text-muted-foreground">Shown at the top of your business overview.</p><ImageUploader name="coverImageUrl" label="Upload business cover photo" defaultValue={business.coverImageUrl ?? ""} /></div>
@@ -81,8 +93,8 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
 
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-sm font-medium text-slate-700">Phone Number <span className="text-red-500">*</span></Label>
-                <Input id="phone" name="phone" type="tel" required defaultValue={business.contactPhone || ""} placeholder="+256 700 000000" className="h-11 rounded-xl font-medium focus-visible:ring-primary shadow-none" />
-                <p className="text-xs font-medium text-slate-500">Include country code</p>
+                <PhoneInput id="phone" name="phone" autoComplete="tel" required defaultValue={business.contactPhone || ""} />
+                <p className="text-xs font-medium text-slate-500">Choose the country, then enter the number.</p>
               </div>
 
 
@@ -120,44 +132,45 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
               </div>
             </div>
 
-            <div className="mt-8 pt-8 border-t border-border">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50">
-                  <FileText className="h-5 w-5 text-orange-600" />
-                </div>
-                <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold text-slate-900">Verification & Documents</h3>
-                  <p className="text-sm font-medium text-slate-500 leading-relaxed">Manage your business registration and compliance documents.</p>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-border p-5 flex items-center justify-between">
-                <div>
-                  <h4 className="text-base font-semibold text-slate-900">Verification Status</h4>
-                  <p className="text-sm font-semibold text-slate-500 mt-1 uppercase leading-relaxed">Status: {business.verificationStatus.replace("_", " ")}</p>
-                </div>
-                <Button asChild variant="outline" className="font-medium border-border"><Link href="/business/verification">View Documents</Link></Button>
-              </div>
-            </div>
-
             <div className="mt-10 pt-6 border-t border-border flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <Button type="submit" className="bg-primary hover:bg-primary/90 text-white font-medium h-11 px-6 rounded-lg shadow-sm">
                   Save changes
                 </Button>
+                <Button asChild variant="outline"><Link href="/business/settings">Cancel</Link></Button>
               </div>
             </div>
-            </form>
+            </form> : <div className="space-y-8">
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2"><h3 className="text-sm font-medium text-muted-foreground">Business logo</h3>
+                  {business.logoUrl ? <RemoteImage src={business.logoUrl} alt={`${business.name} logo`} className="h-24 w-24 rounded-xl border object-contain" /> : <div role="img" aria-label="Business logo not submitted" className="flex h-24 w-24 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/30 p-2 text-center text-muted-foreground">
+                    <Store aria-hidden="true" className="h-6 w-6" /><span className="text-xs">No logo yet</span>
+                  </div>}
+                </div>
+                <div className="space-y-2"><h3 className="text-sm font-medium text-muted-foreground">Cover photo</h3>
+                  {business.coverImageUrl ? <RemoteImage src={business.coverImageUrl} alt={`${business.name} cover`} className="h-32 w-full rounded-xl border object-cover" /> : <div role="img" aria-label="Business cover photo not submitted" className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/30 p-4 text-center text-muted-foreground">
+                    <ImageIcon aria-hidden="true" className="h-6 w-6" /><span className="text-xs">Cover photo not submitted</span>
+                  </div>}
+                </div>
+              </div>
+              <dl className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+                {profileDetails.map(([label, value]) => <div key={label} className={label === "Physical address" ? "sm:col-span-2" : ""}>
+                  <dt className="text-sm text-muted-foreground">{label}</dt>
+                  <dd className="mt-1 break-words text-sm font-medium text-foreground">{value?.trim() || "Not provided"}</dd>
+                </div>)}
+                <div className="sm:col-span-2"><dt className="text-sm text-muted-foreground">About the business</dt><dd className="mt-1 whitespace-pre-wrap break-words text-sm leading-relaxed">{business.description?.trim() || "Not provided"}</dd></div>
+              </dl>
+            </div>}
 
           </div>
-        </TabsContent>
+        </div>}
 
-        <TabsContent value="notifications" className="space-y-6">
+        {defaultTab === "notifications" && <div className="space-y-6">
           <Card><CardHeader><CardTitle>Notification categories</CardTitle><CardDescription>Manage the updates shown in your account’s notification centre.</CardDescription></CardHeader><CardContent><NotificationPreferencesForm notify={parsePreferences(accountProfile?.preferences).notify}/></CardContent></Card>
           <div className="flex flex-wrap gap-3"><Button asChild variant="outline"><Link href="/business/notifications">Open notifications</Link></Button><Button asChild variant="outline"><Link href="/business/messages">Open messages</Link></Button></div>
-        </TabsContent>
+        </div>}
 
-        <TabsContent value="team" className="space-y-6">
+        {defaultTab === "team" && <div className="space-y-6">
           <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden p-8">
 
             {/* Header */}
@@ -192,7 +205,7 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
             </div>
 
             <div>
-              <Table>
+              <Table tableId="business-team" aria-label="Team members">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Member</TableHead>
@@ -287,8 +300,7 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
             </div>
 
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>}
     </div>
   );
 }

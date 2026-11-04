@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/page-header";
 import { matchesSearchFacets, RATING_FILTER_MIN, type SearchFacets } from "@/lib/search-facets";
 import { Suspense } from "react";
 import { SlidersHorizontal } from "lucide-react";
@@ -15,7 +16,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
-import { Pagination } from "@/components/ui/pagination";
+import { Pagination } from "@/components/page-pagination";
 import { parseFirstUgxAmount, formatUGX } from "@/lib/booking";
 import { db } from "@/lib/db";
 import { LISTING_TYPE_TO_SERVICE_TYPE, SERVICE_TYPE_TO_LISTING_TYPE, type ServiceType } from "@/lib/listing-types";
@@ -292,9 +293,9 @@ export default async function SearchPage({
             <div className="min-w-0">
               <div className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
                 <div>
-                  <h1 className="text-2xl font-semibold text-foreground">
+                  <PageTitle>
                     {totalResults} {noun} found{query ? ` in ${query}` : ""}
-                  </h1>
+                  </PageTitle>
                   {summaryParts.length > 0 ? (
                     <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{summaryParts.join(" · ")}</p>
                   ) : null}

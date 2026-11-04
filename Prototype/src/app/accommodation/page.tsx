@@ -3,7 +3,7 @@ import { PageHero } from "@/components/page-hero";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Container } from "@/components/ui/container";
-import { Pagination } from "@/components/ui/pagination";
+import { Pagination } from "@/components/page-pagination";
 import { db } from "@/lib/db";
 import { formatListingPrice, ratingSummary } from "@/lib/listings";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";

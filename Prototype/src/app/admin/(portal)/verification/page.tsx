@@ -1,3 +1,4 @@
+import { PortalToolbar } from "@/components/portal-toolbar";
 import { ConfirmSubmit } from "@/components/admin/confirm-submit";
 import { VerificationStatusBadge } from "@/components/ui/status-badge";
 import { toVerificationStatus } from "@/lib/status";
@@ -8,22 +9,23 @@ import Link from "next/link";
 import type { VerificationStatus as PrismaVerificationStatus } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
-import { Pagination } from "@/components/ui/pagination";
-import { FilterTabs } from "@/components/ui/filter-tabs";
+import { Pagination } from "@/components/page-pagination";
+import { RecordFilter } from "@/components/record-filter";
 import { PageHero } from "@/components/page-hero";
 import { requireAdminSession } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
-import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/ui/empty-state";
 import { updateVerificationStatus } from "@/lib/actions/admin";
 
 const TABS: Array<{ value: string; label: string }> = [
   { value: "ALL", label: "All" },
   { value: "SUBMITTED", label: "Submitted" },
   { value: "UNDER_REVIEW", label: "Under review" },
-  { value: "NEEDS_CHANGES", label: "Pending docs" },
-  { value: "APPROVED", label: "Completed" },
-  { value: "SUSPENDED", label: "Fraud holds" }
+  { value: "NEEDS_CHANGES", label: "Needs changes" },
+  { value: "APPROVED", label: "Approved" },
+  { value: "REJECTED", label: "Rejected" },
+  { value: "SUSPENDED", label: "Suspended" }
 ];
 
 export default async function AdminVerificationPage({ searchParams }: { searchParams: { status?: string; page?: string } }) {
@@ -37,6 +39,7 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
   if (activeStatusParam === "under_review") activePrismaStatus = "UNDER_REVIEW";
   if (activeStatusParam === "needs_changes") activePrismaStatus = "NEEDS_CHANGES";
   if (activeStatusParam === "approved" || activeStatusParam === "completed") activePrismaStatus = "APPROVED";
+  if (activeStatusParam === "rejected") activePrismaStatus = "REJECTED";
   if (activeStatusParam === "suspended" || activeStatusParam === "fraud") activePrismaStatus = "SUSPENDED";
 
   const where = activePrismaStatus ? { status: activePrismaStatus } : undefined;
@@ -70,7 +73,7 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
 
 
   return (
-    <div className="max-w-[1450px] mx-auto space-y-6 pb-20 font-sans">
+    <div className="max-w-[1400px] mx-auto space-y-6 pb-20 font-sans">
       
       {/* Header Row */}
       <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
@@ -84,14 +87,13 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
       </div>
 
       {/* Filter Tabs (Pill Buttons) */}
-      <FilterTabs
-        activeValue={activeStatusParam === "all" ? "ALL" : activePrismaStatus ?? "ALL"}
-        tabs={TABS.map((tab) => ({
+      <PortalToolbar filters={<RecordFilter label="Verification stage" name="status" defaultValue="ALL" defaultParamValue="all"
+        value={activeStatusParam === "all" ? "ALL" : activePrismaStatus ?? "ALL"}
+        options={TABS.map((tab) => ({
           value: tab.value,
           label: tab.label,
-          href: tab.value === "ALL" ? "/admin/verification?status=all" : `/admin/verification?status=${tab.value.toLowerCase()}`
         }))}
-      />
+      />} />
 
       {/* Queue Items List */}
       <div className="space-y-4">
@@ -102,7 +104,7 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
             const dateStr = v.submittedAt.toLocaleDateString("en-UG", { day: 'numeric', month: 'short', year: 'numeric' });
 
             return (
-              <div key={v.id} className="bg-white rounded-2xl border border-border shadow-card p-6 space-y-4">
+              <div key={v.id} className="bg-white rounded-2xl border border-border shadow-card p-4 sm:p-6 space-y-4">
                 
                 {/* Header Row */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -120,7 +122,7 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
                       rows={3}
                       className="form-textarea min-h-20 w-full sm:w-72 resize-y"
                     />
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
                       <Button type="submit" name="status" value="APPROVED" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-xs rounded-lg px-4 h-8 transition-colors">
                         Approve
                       </Button>
@@ -172,7 +174,7 @@ export default async function AdminVerificationPage({ searchParams }: { searchPa
             );
           })
         ) : (
-<p className="rounded-xl border bg-white p-6 text-muted-foreground">No matching verification submissions.</p>
+<EmptyState title="No matching verification submissions" description="Try another verification status." />
         )}
       </div>
 

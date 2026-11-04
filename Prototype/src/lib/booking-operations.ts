@@ -16,6 +16,6 @@ export function parseFulfilment(input: unknown, type: string): FulfilmentDetails
 export function paymentDeadline(booking: {paymentDueAt?: Date | null;createdAt: Date}) {
   return booking.paymentDueAt ?? new Date(booking.createdAt.getTime()+PAYMENT_MINUTES*60000);
 }
-export function nextAfterAcceptance(booking: {bookingMode: string;totalMinor: number}) {
-  return booking.bookingMode === "REQUEST" && booking.totalMinor > 0 ? "PENDING_PAYMENT" as const : "CONFIRMED" as const;
+export function nextAfterAcceptance(booking: {bookingMode: string;totalMinor: number;hasConfirmedPayment?:boolean}) {
+  return booking.totalMinor > 0 && !booking.hasConfirmedPayment ? "PENDING_PAYMENT" as const : "CONFIRMED" as const;
 }

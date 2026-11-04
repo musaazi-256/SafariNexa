@@ -10,6 +10,7 @@ describe("business dashboard shortcuts", () => {
     expect(screen.getByRole("link", { name: "Booking calendar" })).toHaveAttribute("href", "/business/bookings/calendar");
     expect(screen.getByRole("link", { name: "Add a listing" })).toHaveAttribute("href", "/business/listings/new");
     expect(screen.getByRole("link", { name: "Respond to reviews" })).toHaveAttribute("href", "/business/reviews");
+    expect(screen.getByRole("link", { name: "Payments & refunds" })).toHaveAttribute("href", "/business/payments");
     expect(screen.getByRole("link", { name: "Business settings" })).toHaveAttribute("href", "/business/settings");
   });
 

@@ -14,11 +14,14 @@ export const customerRoutes = [
 ];
 
 export const businessRoutes = [
+  "/business/profile",
   "/business/dashboard",
-  "/business/verification",
+  "/business/settings/verification",
   "/business/listings",
   "/business/bookings",
-  "/business/revenue"
+  "/business/revenue",
+  "/business/payments",
+  "/business/customers"
 ];
 
 export const adminRoutes = [

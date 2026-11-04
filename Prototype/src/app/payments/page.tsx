@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { isDemoMode } from "@/lib/dev-mode";
 import { notFound, redirect } from "next/navigation";
 import { Lock, ShieldCheck, CheckCircle2 } from "lucide-react";
@@ -23,7 +24,7 @@ function ExpiredPayment({ bookingIds }: { bookingIds: string[] }) {
 }
 function WaitingForBusiness({bookings}: {bookings:{id:string;bookingRef:string;status:string;responseDueAt:Date|null;totalMinor:number}[]}) {
  const restaurantOnly = bookings.every(booking => booking.totalMinor === 0);
- return <><SiteHeader/><main className="container mx-auto max-w-3xl space-y-5 px-4 py-10"><h1 className="type-page ">{restaurantOnly ? "Table reservation requested" : "Booking status"}</h1><p>{restaurantOnly ? "Your request has been sent to the restaurant. No payment is required. You can check its status or send the restaurant a message below." : "Your requests are awaiting business acceptance. Once accepted, you can continue to payment. Table reservations do not require online payment."}</p>{bookings.map(booking=><Link key={booking.id} href={`/bookings/${booking.id}`} className="block rounded border p-4"><strong>{booking.bookingRef}</strong><div className="mt-2"><BookingStatusBadge status={toBookingStatus(booking.status)} /></div>{booking.responseDueAt && <p>Response due: {booking.responseDueAt.toLocaleString("en-GB",{timeZone:"Africa/Kampala"})} EAT</p>}<span className="underline">View booking and messages</span></Link>)}<Link className="block underline" href="/bookings">My bookings</Link></main><SiteFooter/></>;
+ return <><SiteHeader/><main className="container mx-auto max-w-3xl space-y-5 px-4 py-10"><PageHeader title={<>{restaurantOnly ? "Table reservation requested" : "Booking status"}</>} description={<>{restaurantOnly ? "Your request has been sent to the restaurant. No payment is required. You can check its status or send the restaurant a message below." : "Your requests are awaiting business acceptance. Once accepted, you can continue to payment. Table reservations do not require online payment."}</>} />{bookings.map(booking=><Link key={booking.id} href={`/bookings/${booking.id}`} className="card block space-y-3 p-4 sm:p-6"><strong>{booking.bookingRef}</strong><div className="mt-2"><BookingStatusBadge status={toBookingStatus(booking.status)} /></div>{booking.responseDueAt && <p>Response due: {booking.responseDueAt.toLocaleString("en-GB",{timeZone:"Africa/Kampala"})} EAT</p>}<span className="underline">View booking and messages</span></Link>)}<Link className="block underline" href="/bookings">My bookings</Link></main><SiteFooter/></>;
 }
 
 export default async function PaymentsPage({ searchParams }: { searchParams: { orderId?: string; bookingId?: string; error?: string } }) {
@@ -86,13 +87,13 @@ export default async function PaymentsPage({ searchParams }: { searchParams: { o
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 bg-muted/20 pb-20 pt-6">
+      <main className="flex-1 bg-white pb-20 pt-6">
         <Container className="max-w-5xl">
           <Breadcrumbs items={[{ label: "Cart", href: "/cart" }, { label: "Payment" }]} />
 
-          <h1 className="type-page mb-8 text-[#0d5932]">
-            Complete Payment
-          </h1>
+          <PageHeader className="mb-6" title={<>
+            Complete payment
+          </>} />
           {searchParams.error && <p role="alert" className="mb-6 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{searchParams.error}</p>}
 
           <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
@@ -100,7 +101,7 @@ export default async function PaymentsPage({ searchParams }: { searchParams: { o
             <div className="flex flex-col gap-6">
               <Card className="border border-border shadow-card rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="text-xl font-semibold">Select Payment Method</CardTitle>
+                  <CardTitle className="text-xl font-semibold">Select payment method</CardTitle>
                   <p className="text-sm text-slate-500 font-medium leading-relaxed">
                     {isDemoMode() ? "Choose how you would like to pay." : "Continue to the configured provider’s hosted checkout."}
                   </p>
@@ -119,11 +120,11 @@ export default async function PaymentsPage({ searchParams }: { searchParams: { o
               </Card>
             </div>
 
-            {/* Right Column: Order Summary */}
+            {/* Right Column: Order summary */}
             <div>
               <Card className="sticky top-28 border border-border shadow-card rounded-2xl">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-semibold">Order Summary</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Order summary</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
                   <div className="flex flex-col gap-3 text-sm">
@@ -143,12 +144,12 @@ export default async function PaymentsPage({ searchParams }: { searchParams: { o
                   <Separator />
 
                   <div className="flex items-center justify-between text-slate-900">
-                    <span className="font-semibold text-base">Total Due</span>
-                    <span className="text-2xl font-semibold text-[#0d5932]">{formatUGX(totalMinor)}</span>
+                    <span className="font-semibold text-base">Total due</span>
+                    <span className="text-2xl font-semibold text-primary">{formatUGX(totalMinor)}</span>
                   </div>
 
                   <div className="rounded-xl bg-slate-50 p-3 flex items-start gap-2.5 border border-slate-100 text-xs text-slate-500 font-medium mt-2">
-                    <ShieldCheck className="h-4 w-4 text-[#0d5932] shrink-0 mt-0.5" />
+                    <ShieldCheck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                     <span>{isDemoMode() ? "Your booking is confirmed once payment is successful." : "Payment status changes after provider confirmation."}</span>
                   </div>
                 </CardContent>

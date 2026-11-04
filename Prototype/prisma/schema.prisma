@@ -444,6 +444,7 @@ model Listing {
   destinationId  String?
   city           String?
   address        String?
+  locationDirections String?
   latitude       Float?
   longitude      Float?
   description    String

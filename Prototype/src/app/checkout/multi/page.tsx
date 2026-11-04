@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
@@ -20,7 +21,7 @@ export default async function MultiCheckoutPage() {
         <Container className="pb-20 pt-6">
           <Breadcrumbs items={[{ label: "Cart", href: "/cart" }, { label: "Checkout" }]} />
 
-          <h1 className="type-page mb-6">Complete your booking</h1>
+          <PageHeader className="mb-6" title={<>Complete your booking</>} />
 
           <MultiCheckoutForm defaults={{ fullName: user?.name ?? "", email: user?.email ?? "", phone: user?.phone ?? "", nationality: user?.customerProfile?.nationality, emergencyContact: user?.customerProfile?.emergencyContact }} />
         </Container>

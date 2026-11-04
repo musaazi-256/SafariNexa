@@ -1,5 +1,7 @@
 "use client";
 
+import { FilterControl } from "@/components/ui/filter-control";
+
 import { useAsyncTask } from "@/hooks/use-async-task";
 
 import { documentLink } from "@/lib/document-link";
@@ -81,29 +83,10 @@ export function VerificationDocuments({ documents, demo = false }: VerificationD
     <div className="mt-8">
       <h2 className="text-xl font-semibold text-slate-900 mb-4">Documents</h2>
 
-      {/* Tabs */}
-      <div className="flex flex-wrap items-center gap-1.5 mb-6">
-        {CATEGORIES.map(category => {
-          const isActive = activeTab === category.id;
-          return (
-            <button
-              key={category.id}
-              type="button"
-              aria-pressed={isActive}
-              disabled={isUploading}
-              onClick={() => setActiveTab(category.id)}
-              className={cn(
-                "inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-all",
-                isActive
-                  ? "border-slate-900 bg-slate-900 text-white shadow-xs"
-                  : "border-border bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-              )}
-            >
-              <category.icon className={cn("h-3.5 w-3.5", isActive ? "text-white" : "text-slate-400")} />
-              {category.label}
-            </button>
-          );
-        })}
+      <div className="mb-6">
+        <FilterControl label="Document type" value={activeTab} defaultValue="INCORPORATION"
+          disabled={isUploading} onValueChange={setActiveTab}
+          options={CATEGORIES.map(category=>({value:category.id,label:category.label,count:documents.filter(document=>document.type===category.id || (category.id==="OTHER" && !CATEGORIES.some(item=>item.id===document.type))).length}))} />
       </div>
 
       {/* Info Alert */}

@@ -89,7 +89,8 @@ export async function updateVerificationStatus(verificationId: string, status: V
 
   revalidatePath("/admin/(portal)/verification", "page");
   revalidatePath("/admin/(portal)/businesses", "page");
-  revalidatePath("/business/verification");
+  revalidatePath("/business/settings/verification");
+  revalidatePath("/business/settings");
   revalidatePath(`/admin/verification/${verificationId}`);
 }
 

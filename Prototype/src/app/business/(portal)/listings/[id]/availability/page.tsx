@@ -1,3 +1,5 @@
+import { PageHeader } from "@/components/page-header";
+import { RecordFilter } from "@/components/record-filter";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -27,9 +29,9 @@ export default async function AvailabilityPage({params, searchParams}:{params:{i
     const price=override ? Number(override) : null;
     if(isNaN(date.getTime())||date<new Date(new Date().setUTCHours(0,0,0,0))||!Number.isInteger(capacity)||capacity<0||capacity>(room?.totalRooms??listing!.tour?.groupSizeMax??0)|| (price!==null&&(!Number.isSafeInteger(price)||price<0)))throw new Error("Enter a valid future date, capacity and price.");
     await db.$transaction(async tx=>{
-      const blocked=["CANCELLED_BY_CUSTOMER","CANCELLED_BY_BUSINESS","CANCELLED_BY_ADMIN","REFUNDED","PAYMENT_FAILED"] as const;
+      const blocked=["CANCELLED_BY_CUSTOMER","CANCELLED_BY_BUSINESS","CANCELLED_BY_ADMIN","REFUNDED"] as const;
       const tomorrow=new Date(date);tomorrow.setUTCDate(tomorrow.getUTCDate()+1);
-      const bookings=await tx.booking.findMany({where:{listingId:params.id,roomTypeId:room?.id??null,status:{notIn:[...blocked]},startDate:room?{lte:date}:{gte:date,lt:tomorrow},...(room?{endDate:{gt:date}}:{})}});
+      const bookings=await tx.booking.findMany({where:{listingId:params.id,roomTypeId:room?.id??null,cancelledAt:null,status:{notIn:[...blocked]},startDate:room?{lte:date}:{gte:date,lt:tomorrow},...(room?{endDate:{gt:date}}:{})}});
       const occupied=room?bookings.length:bookings.reduce((sum,b)=>sum+b.participantsCount,0);
       if(capacity<occupied)throw new Error("Capacity cannot be lower than existing reservations. Cancel bookings through the booking workflow first.");
       const values={capacity,remaining:capacity-occupied,priceOverrideMinor:price};
@@ -39,7 +41,7 @@ export default async function AvailabilityPage({params, searchParams}:{params:{i
     revalidatePath(`/business/listings/${params.id}/availability`);
     revalidatePath(`/accommodation/${params.id}`);revalidatePath(`/tours/${params.id}`);
   }
-  return <div className="mx-auto max-w-2xl space-y-5"><Link href={`/business/listings/${listing.id}/edit`} className="underline">Back to listing</Link><h1 className="type-page break-words">Availability — {listing.title}</h1><p>Capacity includes existing bookings. Set zero to close an unbooked date. Prices are whole UGX and are confirmed at checkout.</p>
-  <div className="flex flex-wrap items-center gap-1.5">{rooms.map(r=><Link className={r.id===room?.id?"inline-flex h-9 items-center rounded-full border border-slate-900 bg-slate-900 px-3.5 text-sm font-medium text-white shadow-xs transition-all":"inline-flex h-9 items-center rounded-full border border-border bg-white px-3.5 text-sm font-medium text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"} aria-current={r.id===room?.id?"page":undefined} key={r.id} href={`?room=${r.id}`}>{r.name}</Link>)}</div>
+  return <div className="mx-auto max-w-2xl space-y-6"><PageHeader title={`Availability — ${listing.title}`} description="Capacity includes existing bookings. Set zero to close an unbooked date. Prices are whole UGX and are confirmed at checkout." back={{href:`/business/listings/${listing.id}/edit`,label:"Back to listing"}} />
+  {rooms.length > 0 && <RecordFilter label="Room type" name="room" value={room?.id ?? rooms[0].id} defaultValue={rooms[0].id} options={rooms.map(r=>({value:r.id,label:r.name}))} />}
   <AvailabilityCalendarEditor listingId={listing.id} basePriceMinor={room?.priceMinor??listing.basePriceMinor} availabilityByDate={byDate} action={update}/></div>;
 }

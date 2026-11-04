@@ -1,3 +1,4 @@
+import { PortalToolbar } from "@/components/portal-toolbar";
 import { ConfirmSubmit } from "@/components/admin/confirm-submit";
 import { PortalSearch } from "@/components/portal-search";
 import { TableColumnLabel } from "@/components/ui/table-column-label";
@@ -7,9 +8,9 @@ import type { UserRole } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Pagination } from "@/components/ui/pagination";
+import { Pagination } from "@/components/page-pagination";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { FilterTabs } from "@/components/ui/filter-tabs";
+import { RecordFilter } from "@/components/record-filter";
 import { PageHero } from "@/components/page-hero";
 import { AdminAccessStatusBadge } from "@/components/ui/status-badge";
 import { requireAdminSession } from "@/lib/admin";
@@ -23,7 +24,8 @@ const TABS: Array<{ value: UserRole | "ALL"; label: string }> = [
   { value: "CUSTOMER", label: "Customers" },
   { value: "BUSINESS_OWNER", label: "Business owners" },
   { value: "BUSINESS_STAFF", label: "Business staff" },
-  { value: "ADMIN", label: "Admins" }
+  { value: "ADMIN", label: "Admins" },
+  { value: "SUPER_ADMIN", label: "Super admins" }
 ];
 
 export default async function AdminUsersPage({ searchParams }: { searchParams: { role?: string; page?: string; q?: string } }) {
@@ -68,31 +70,25 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
       />
 
       {/* Pill Filters & Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <FilterTabs
-          activeValue={activeRole ?? "ALL"}
-          tabs={TABS.map((tab) => {
+      <PortalToolbar tableId="admin-users" search={<PortalSearch label="Search users" placeholder="Search users…" />} filters={<><RecordFilter label="Account role" name="role" defaultValue="ALL"
+          value={activeRole ?? "ALL"}
+          options={TABS.map((tab) => {
             const params = new URLSearchParams();
             if (tab.value !== "ALL") params.set("role", tab.value.toLowerCase());
             if (q) params.set("q", q);
-            return { value: tab.value, label: tab.label, href: `/admin/users?${params.toString()}` };
+            return { value: tab.value, label: tab.label, };
           })}
-        />
-        <div className="flex items-center gap-3 w-full sm:w-auto mt-4 sm:mt-0">
-          <PortalSearch label="Search users" placeholder="Search users…" />
-<PortalFilter />
-          <Button asChild className="h-9 px-4 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm rounded-full shrink-0"><Link href="/admin/users/new">
+        /></>} actions={<Button asChild className="h-9 px-4 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm rounded-full shrink-0"><Link href="/admin/users/new">
               Add user
-            </Link></Button>
-        </div>
-      </div>
+            </Link></Button>} />
+
 
       {/* Table Container */}
       {users.length === 0 ? (
         <EmptyState title="No users here" description="Nothing matches this filter right now." />
       ) : (
         <div>
-          <Table>
+          <Table externalTools tableId="admin-users" aria-label="Users">
             <TableHeader>
               <TableRow>
                 <TableHead>User</TableHead>
@@ -186,4 +182,3 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
     </div>
   );
 }
-import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

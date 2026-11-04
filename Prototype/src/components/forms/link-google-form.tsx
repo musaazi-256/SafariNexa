@@ -1,4 +1,5 @@
 "use client";
+import { PageTitle } from "@/components/page-header";
 
 import { GoogleAuthTrigger } from "@/components/google-auth-trigger";
 
@@ -44,7 +45,7 @@ export function LinkGoogleForm({ email, returnTo }: { email: string; returnTo: s
           <Link2 className="h-4 w-4" />
           <span className="text-xs font-medium uppercase tracking-wide">Confirm it&apos;s you</span>
         </div>
-        <CardTitle>Link Google to your existing account</CardTitle>
+        <PageTitle>Link Google to your existing account</PageTitle>
         <CardDescription>
           <strong>{email}</strong> already has a SafariNexa account. Enter its password once to link Google — we never
           attach a new sign-in method without confirming you own the account.

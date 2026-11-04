@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/page-header";
 import { notFound } from "next/navigation";
 import { Car, Languages, Medal, Star } from "lucide-react";
 
@@ -63,7 +64,7 @@ export default async function GuideDetailPage({ params }: { params: { id: string
             </Avatar>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-3xl font-semibold sm:text-4xl">{guide.name}</h1>
+                <PageTitle>{guide.name}</PageTitle>
                 {guide.isTopGuide ? <Badge variant="accent">Top guide</Badge> : null}
                 {isVerified ? <Badge variant="success-soft">Verified</Badge> : null}
               </div>

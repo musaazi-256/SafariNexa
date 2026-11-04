@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 export function EditProfileForm({
   name,
@@ -23,7 +24,7 @@ export function EditProfileForm({
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="phone">Phone number</Label>
-        <Input id="phone" name="phone" type="tel" defaultValue={phone} placeholder="+256 7XX XXX XXX" />
+        <PhoneInput id="phone" name="phone" autoComplete="tel" defaultValue={phone} />
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="dateOfBirth">Date of birth</Label>

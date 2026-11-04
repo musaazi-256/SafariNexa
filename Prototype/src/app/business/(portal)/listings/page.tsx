@@ -1,10 +1,12 @@
+import { PortalToolbar } from "@/components/portal-toolbar";
+import { PortalSearch } from "@/components/portal-search";
 import { StatCard, StatGrid } from "@/components/ui/stat-card";
 import { ListingStatusBadge, ListingSubmissionStatusBadge } from "@/components/ui/status-badge";
 import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
 import { submitListing } from "@/lib/actions/listing-review";
 import { redirect } from "next/navigation";
-import type { ListingType } from "@prisma/client";
+import type { ListingStatus, ListingType } from "@prisma/client";
 import { 
   Archive, List, Hourglass, Eye, Calendar, Utensils, Bed, Tent, Car,
   MapPin, Filter, ArrowUpDown, Pencil, MoreVertical, Plus 
@@ -15,8 +17,8 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Pagination } from "@/components/ui/pagination";
-import { FilterTabs } from "@/components/ui/filter-tabs";
+import { Pagination } from "@/components/page-pagination";
+import { RecordFilter } from "@/components/record-filter";
 import { PageHero } from "@/components/page-hero";
 import { formatUGX } from "@/lib/booking";
 import { requireBusinessSession } from "@/lib/business";
@@ -25,7 +27,7 @@ import { PAGE_SIZE, parsePage, totalPagesFor } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 
-export default async function BusinessListingsPage({ searchParams }: { searchParams: { type?: string; page?: string; q?: string } }) {
+export default async function BusinessListingsPage({ searchParams }: { searchParams: { type?: string; page?: string; q?: string; status?: string } }) {
   const { business, businessId } = await requireBusinessSession();
 
   if (!business || !businessId) {
@@ -38,8 +40,10 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
 
   const requestedType = searchParams.type?.toUpperCase();
   const activeType = requestedType && ["ACCOMMODATION", "TOUR", "RESTAURANT", "TRANSPORT"].includes(requestedType) ? requestedType as ListingType : undefined;
+  const publicationOptions = [{value:"ALL",label:"All publication states"},{value:"DRAFT",label:"Draft"},{value:"PUBLISHED",label:"Published"},{value:"ARCHIVED",label:"Archived"}];
+  const activeStatus = publicationOptions.some(option=>option.value===searchParams.status?.toUpperCase()) ? searchParams.status!.toUpperCase() : "ALL";
   const page = parsePage(searchParams.page);
-  const where = { ...(searchParams.q ? { title: { contains: searchParams.q.trim(), mode: "insensitive" as const } } : {}), businessId, ...(activeType ? { type: activeType } : {}) };
+  const where = { ...(searchParams.q ? { title: { contains: searchParams.q.trim(), mode: "insensitive" as const } } : {}), businessId, ...(activeStatus !== "ALL" ? { status: activeStatus as ListingStatus } : {}), ...(activeType ? { type: activeType } : {}) };
 
   // Fetch data
   const [
@@ -131,7 +135,6 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <PageHero
           variant="portal"
-          eyebrow="Business portal"
           title="Listings"
           description="Create and manage your service offerings."
         />
@@ -149,26 +152,21 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
       </StatGrid>
 
       {/* Tabs & Filters */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border pb-4 mt-8">
-        <FilterTabs
-          activeValue={activeType ?? "ALL"}
-          tabs={TABS.map((tab) => ({
+      <PortalToolbar tableId="business-listings" search={<PortalSearch label="Search listings" placeholder="Search listings…" />} filters={<><RecordFilter label="Listing type" name="type" defaultValue="ALL"
+          value={activeType ?? "ALL"}
+          options={TABS.map((tab) => ({
             value: tab.value,
             label: tab.label,
-            count: tab.count,
-            href: tab.value === "ALL" ? "/business/listings" : `/business/listings?type=${tab.value.toLowerCase()}`
           }))}
-        />
+        /><RecordFilter label="Publication" name="status" value={activeStatus} options={publicationOptions} /></>} />
 
-<PortalFilter />
-      </div>
 
       {/* Main Table */}
       {listings.length === 0 ? (
-        <EmptyState title="No listings found" description="You don't have any listings in this category yet." />
+        <EmptyState title="No listings found" description="Try another listing type or publication state, or clear your search." />
       ) : (
         <div>
-          <Table>
+          <Table externalTools tableId="business-listings" aria-label="Listings">
             <TableHeader>
               <TableRow>
                 <TableHead>
@@ -298,7 +296,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
             <Pagination
               currentPage={page}
               totalPages={totalPages}
-              buildHref={(p) => `/business/listings?${new URLSearchParams({ ...(activeType ? { type: activeType.toLowerCase() } : {}), page: String(p) }).toString()}`}
+              buildHref={(p) => `/business/listings?${new URLSearchParams({ ...(activeType ? { type: activeType.toLowerCase() } : {}), ...(searchParams.q ? { q: searchParams.q } : {}), ...(activeStatus !== "ALL" ? {status: activeStatus} : {}), page: String(p) }).toString()}`}
             />
           </div>
         </div>
@@ -306,4 +304,3 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
     </div>
   );
 }
-import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

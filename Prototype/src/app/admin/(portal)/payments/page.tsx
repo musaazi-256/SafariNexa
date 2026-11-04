@@ -1,3 +1,7 @@
+import { RecordDateFilter } from "@/components/record-date-filter";
+import { recordDateFilter } from "@/lib/record-date-filter";
+import { PortalToolbar } from "@/components/portal-toolbar";
+import { approveBookingRefund } from "@/lib/payment-management";
 import { ConfirmSubmit } from "@/components/admin/confirm-submit";
 import { StatCard, StatGrid } from "@/components/ui/stat-card";
 import { PortalSearch } from "@/components/portal-search";
@@ -8,9 +12,9 @@ import { Banknote, Percent, Landmark, Undo2, Search, Filter, Download } from "lu
 import { redirect } from "next/navigation";
 
 import { EmptyState } from "@/components/ui/empty-state";
-import { Pagination } from "@/components/ui/pagination";
+import { Pagination } from "@/components/page-pagination";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { FilterTabs } from "@/components/ui/filter-tabs";
+import { RecordFilter } from "@/components/record-filter";
 import { PageHero } from "@/components/page-hero";
 import { PaymentStatusBadge, RefundStatusBadge } from "@/components/ui/status-badge";
 import { formatUGX } from "@/lib/booking";
@@ -34,7 +38,7 @@ const TABS = [
   { value: "REFUNDED", label: "Refunded" }
 ];
 
-export default async function AdminPaymentsPage({ searchParams }: { searchParams: { page?: string; q?: string; status?: string; payout?: string } }) {
+export default async function AdminPaymentsPage({ searchParams }: { searchParams: { page?: string; q?: string; status?: string; payout?: string; period?: string } }) {
   await requireAdminSession();
 
   const page = parsePage(searchParams.page);
@@ -43,7 +47,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
   const q = searchParams.q?.trim();
 
   const statuses = paymentStatusFilter(activeTab);
-  const where: any = statuses ? { status: { in: statuses } } : {};
+  const where: any = { ...recordDateFilter(searchParams.period), ...(statuses ? { status: { in: statuses } } : {}) };
   if (q) {
     where.OR = [
       { booking: { listing: { title: { contains: q, mode: "insensitive" } } } },
@@ -88,53 +92,10 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
     const adminSession = await requireAdminSession("payments.manage");
     const refundId = String(formData.get("refundId"));
 
-    const targetRefund = await db.refund.findUnique({
-      where: { id: refundId },
-      include: { payment: true }
-    });
-
-    if (!targetRefund || targetRefund.status !== "REQUESTED") {
-      throw new Error("Invalid refund request.");
-    }
-
-    if (isDemoMode() && targetRefund.payment.providerReference?.startsWith("DEMO-")) {
-      await db.$transaction(async tx => {
-        await tx.refund.update({where:{id:refundId},data:{reviewedByAdminId:adminSession.user.id}});
-        await completeRefund(tx, refundId);
-      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
-      redirect("/admin/payments");
-    }
-    if (targetRefund.payment.provider !== "STRIPE" || !targetRefund.payment.providerReference?.startsWith("cs_") || !process.env.STRIPE_SECRET_KEY) {
-      throw new Error("This payment requires manual provider reconciliation. No refund has been recorded as completed.");
-    }
-    const checkout = await stripe.checkout.sessions.retrieve(targetRefund.payment.providerReference);
-    const intent = typeof checkout.payment_intent === "string" ? checkout.payment_intent : checkout.payment_intent?.id;
-    if (!intent) throw new Error("The provider payment is not settled.");
-    const providerRefund = await stripe.refunds.create({
-      payment_intent: intent,
-      amount: stripeAmount(targetRefund.amountMinor, targetRefund.payment.currency),
-      metadata: { refundId: targetRefund.id }
-    }, { idempotencyKey: `refund:${targetRefund.id}` });
-    if (providerRefund.status !== "succeeded") {
-      await db.refund.update({ where: { id: refundId }, data: { status: "PROCESSING", reviewedByAdminId: adminSession.user.id } });
-      redirect("/admin/payments");
-    }
-    await db.$transaction(async tx => {
-      await tx.refund.update({where:{id:refundId},data:{reviewedByAdminId:adminSession.user.id}});
-      await completeRefund(tx, refundId);
-    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
-
-    await logAuditEvent({
-      actorUserId: adminSession.user.id,
-      actorEmail: adminSession.user.email ?? undefined,
-      surface: "ADMIN",
-      action: "admin_approved_refund",
-      outcome: "SUCCESS",
-      metadata: { refundId, amount: targetRefund.amountMinor }
-    });
-
+    await approveBookingRefund({surface:"ADMIN",userId:adminSession.user.id,email:adminSession.user.email??undefined},refundId);
     redirect("/admin/payments");
   }
+
 
 
   return (
@@ -143,7 +104,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
         variant="portal"
         eyebrow="Admin portal"
         title="Payments, refunds & payouts"
-        description="Track customer payments, provider references, refunds, and platform commission — platform-wide."
+        description="Support businesses with payment issues, refunds, reconciliation, and platform payouts."
       />
 
       {isDemoMode() && <p role="status" className="text-sm text-muted-foreground leading-relaxed">{searchParams.payout === "simulated" ? "Payouts completed." : "Settle eligible payments to verified businesses. Payments with pending refunds remain on hold."}</p>}
@@ -157,33 +118,24 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
       </StatGrid>
 
       {/* Pill Filters */}
-      <FilterTabs
-        activeValue={!activeTab || activeTab === "ALL" ? "ALL" : activeTab}
-        tabs={TABS.map((tab) => ({
+      <PortalToolbar tableId="admin-payments" search={<PortalSearch label="Search payments" placeholder="Search payments…" />} filters={<><RecordFilter label="Payment status" name="status" defaultValue="ALL"
+        value={!activeTab || activeTab === "ALL" ? "ALL" : activeTab}
+        options={TABS.map((tab) => ({
           value: tab.value,
           label: tab.label,
-          href: tab.value === "ALL" ? (q ? `/admin/payments?q=${encodeURIComponent(q)}` : "/admin/payments") : `/admin/payments?status=${tab.value.toLowerCase()}${q ? `&q=${encodeURIComponent(q)}` : ""}`
         }))}
       />
-
-      {/* Table Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-          <PortalSearch label="Search payments" placeholder="Search payments…" />
-<PortalFilter />
-<ExportVisibleRows />
-          {isDemoMode() ? <form action={simulatePayouts}>
+<RecordDateFilter label="Payment date" /></>} actions={<>{isDemoMode() ? <form action={simulatePayouts}>
             <Button type="submit" disabled={demoPayoutTotal === 0} size="sm">Settle payouts ({formatUGX(demoPayoutTotal)})</Button>
-          </form> : unsettledNetMinor > 0 && <p className="text-xs text-muted-foreground">Live payouts require a configured provider.</p>}
-        </div>
-      </div>
+          </form> : unsettledNetMinor > 0 && <p className="text-xs text-muted-foreground">Live payouts require a configured provider.</p>}</>} />
+
 
       {/* Transactions Table Container */}
       {pagePayments.length === 0 ? (
         <EmptyState title="No payments yet" description="Payments across the platform will show up here." />
       ) : (
         <div>
-          <Table>
+          <Table externalTools tableId="admin-payments" aria-label="Payments" density="compact">
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
@@ -217,7 +169,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
             <span className="text-sm font-semibold text-slate-500">
               Showing {pagePayments.length > 0 ? (page - 1) * PAGE_SIZE + 1 : 0} to {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount} transactions
             </span>
-            <Pagination currentPage={page} totalPages={totalPagesFor(totalCount)} buildHref={(p) => `/admin/payments?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), ...(q ? { q } : {}), page: String(p) }).toString()}`} />
+            <Pagination currentPage={page} totalPages={totalPagesFor(totalCount)} buildHref={(p) => `/admin/payments?${new URLSearchParams({ ...(activeTab ? { status: activeTab.toLowerCase() } : {}), ...(q ? { q } : {}), ...(searchParams.period ? {period:searchParams.period} : {}), page: String(p) }).toString()}`} />
           </div>
         </div>
       )}
@@ -229,7 +181,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
           <EmptyState title="No refunds yet" description="Refund requests will show up here." />
         ) : (
           <div>
-            <Table>
+            <Table tableId="admin-refunds" aria-label="Refunds" density="compact">
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
@@ -280,4 +232,3 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
     </div>
   );
 }
-import { ExportVisibleRows, PortalFilter } from "@/components/portal-tools";

@@ -83,8 +83,16 @@ function pageHeader(flow, sections, totalScreens) {
   return f;
 }
 
+const GEN_KEY = "safarinexa-generated";
+function markGenerated(page) { page.setPluginData(GEN_KEY, "1"); return page; }
+// Pages from earlier runs: marked ones, plus unmarked pages from runs before marking existed (matched by exact generated name).
+function previousGeneratedPages() {
+  const names = new Set(["00 · Cover & flow map", "00 · Design system"].concat(FLOWS.map(function (f) { return f.id + " · " + f.name; })));
+  return figma.root.children.filter(function (p) { return p.getPluginData(GEN_KEY) === "1" || names.has(p.name); });
+}
+
 async function buildFlowPage(flow) {
-  const page = figma.createPage();
+  const page = markGenerated(figma.createPage());
   page.name = flow.id + " · " + flow.name;
   let sections;
   try { sections = flow.build(); } catch (e) { sections = [{ section: "Error", screens: [{ title: "Flow failed", note: String(e.message), build: function () { throw e; } }] }]; }
@@ -225,9 +233,12 @@ async function run() {
   await Promise.all(["Regular", "Medium", "Semi Bold", "Bold", "Italic", "Medium Italic", "Semi Bold Italic"].map(function (s) { return figma.loadFontAsync({ family: "Inter", style: s }); }));
   try { await figma.loadFontAsync({ family: "Roboto Mono", style: "Regular" }); MONO = { family: "Roboto Mono", style: "Regular" }; } catch (e) {}
 
-  figma.notify("SafariNexa: building design system…", { timeout: 2500 });
-  const coverPage = figma.createPage(); coverPage.name = "00 · Cover & flow map";
-  const dsPage = figma.createPage(); dsPage.name = "00 · Design system";
+  const oldPages = previousGeneratedPages();
+  figma.notify("SafariNexa: building design system…" + (oldPages.length ? " (" + oldPages.length + " old pages will be replaced)" : ""), { timeout: 2500 });
+  const coverPage = markGenerated(figma.createPage()); coverPage.name = "00 · Cover & flow map";
+  const dsPage = markGenerated(figma.createPage()); dsPage.name = "00 · Design system";
+  // New pages go where the old set started, so ordering stays the same.
+  const firstOld = oldPages.length ? figma.root.children.indexOf(oldPages[0]) : -1;
   buildDesignSystem(dsPage);
 
   const results = [];
@@ -238,9 +249,15 @@ async function run() {
   }
   const cover = buildCover(coverPage, results);
   await figma.setCurrentPageAsync(coverPage);
+  // Delete the old set only after the new one built, so a failed run never leaves the file empty.
+  for (const p of oldPages) { if (!p.removed) p.remove(); }
+  if (firstOld >= 0) {
+    const fresh = [coverPage, dsPage].concat(figma.root.children.filter(function (p) { return p.getPluginData(GEN_KEY) === "1" && p !== coverPage && p !== dsPage; }));
+    fresh.forEach(function (p, i) { figma.root.insertChild(Math.min(firstOld + i, figma.root.children.length - 1), p); });
+  }
   figma.viewport.scrollAndZoomIntoView([cover]);
   const total = results.reduce(function (s, r) { return s + r.total; }, 0);
-  const msg = "SafariNexa admin portal: " + total + " frames on " + (FLOWS.length + 2) + " pages." + (ERRORS.length ? " " + ERRORS.length + " frame(s) failed — see the red placeholders." : "");
+  const msg = "SafariNexa admin portal: " + total + " frames on " + (FLOWS.length + 2) + " pages" + (oldPages.length ? " (replaced " + oldPages.length + " old pages)." : ".") + (ERRORS.length ? " " + ERRORS.length + " frame(s) failed — see the red placeholders." : "");
   figma.closePlugin(msg);
 }
 

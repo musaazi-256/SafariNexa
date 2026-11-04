@@ -7,7 +7,7 @@ import { LISTING_TYPE_TO_SERVICE_TYPE } from "@/lib/listing-types";
 /** Bookings in these statuses no longer hold a room — every other status (including
  * mid-payment ones) still occupies the room, so we don't show a room as free while
  * someone else's payment is processing. */
-const NON_BLOCKING_BOOKING_STATUSES = ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN", "PAYMENT_FAILED", "REFUNDED"] as const;
+const NON_BLOCKING_BOOKING_STATUSES = ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_BUSINESS", "CANCELLED_BY_ADMIN", "REFUNDED"] as const;
 
 /** Which nights, over the next `monthsAhead` months, are fully booked for each room type —
  * real availability derived from actual Booking rows, not fabricated. A night only counts as
@@ -29,7 +29,7 @@ export async function getRoomTypeAvailability(
   const bookings = await db.booking.findMany({
     where: {
       roomTypeId: { in: roomTypes.map((room) => room.id) },
-      status: { notIn: [...NON_BLOCKING_BOOKING_STATUSES] },
+      cancelledAt: null, status: { notIn: [...NON_BLOCKING_BOOKING_STATUSES] },
       startDate: { not: null, lt: windowEnd },
       endDate: { not: null, gt: todayUtc }
     },
@@ -80,7 +80,7 @@ export async function getRoomTypeRemainingToday(
   const bookings = await db.booking.findMany({
     where: {
       roomTypeId: { in: roomTypes.map((room) => room.id) },
-      status: { notIn: [...NON_BLOCKING_BOOKING_STATUSES] },
+      cancelledAt: null, status: { notIn: [...NON_BLOCKING_BOOKING_STATUSES] },
       startDate: { not: null, lt: tomorrowUtc },
       endDate: { not: null, gt: todayUtc }
     },

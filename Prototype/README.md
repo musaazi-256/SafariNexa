@@ -46,6 +46,13 @@ Demo accounts created by the seed (password for all: `Passw0rd!`):
 
 Other useful scripts: `npm run build`, `npm run typecheck`, `npm run lint`.
 
+For browser verification while the main app is running, use `npm run dev:verify`.
+It runs on `127.0.0.1:3001` and writes to `.next-verify`; the main app keeps using
+`.next`. Running two development servers against the same output directory can
+invalidate route manifests and cause valid pages to return 404. For other isolated
+checks, set `SAFARINEXA_NEXT_DIST_DIR` to a separate generated output directory.
+
+
 ## Environment variables
 
 See `.env.example`. Google OAuth is used **twice** — once for customer/business (`google` provider id) and

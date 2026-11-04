@@ -2,7 +2,6 @@
 import { formatUGX } from "@/lib/booking";
 import { PLATFORM_COMMISSION_RATE } from "@/lib/revenue";
 
-
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info } from "lucide-react";

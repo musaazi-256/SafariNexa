@@ -21,22 +21,19 @@ function authCard(o) {
     V({ name: "CardHeader", gap: 6, pad: 24, fillW: true }, [
       type.eyebrow("admin authentication"),
       T("Sign in to your admin account", { size: 30, w: 600, lh: 36, ls: -2.5, fillW: true }),
-      type.body(demo ? "Choose an account below or sign in with your email." : "Continue with Google or your SafariNexa email.", { fillW: true })
+      type.body(demo ? "This is a demo. The details below are filled in for you, so just continue." : "Continue with Google or your SafariNexa email.", { fillW: true })
     ]),
     cardContent([
       o.error ? alertBox(o.error, "destructive") : null,
-      o.hideGoogle ? null : btn("Continue with Google", { variant: "secondary", fillW: true }),
-      H({ gap: 12, fillW: true }, [hr(), T("OR", { size: 12, w: 500, color: C.muted }), hr()]),
+      o.hideGoogle || demo ? null : btn("Continue with Google", { variant: "secondary", fillW: true }),
+      o.hideGoogle || demo ? null : H({ gap: 12, fillW: true }, [hr(), T("OR", { size: 12, w: 500, color: C.muted }), hr()]),
       V({ gap: 12, fillW: true }, [
-        V({ gap: 6, fillW: true }, [fieldLabel("Email"), inputBox({ placeholder: "you@example.com", value: o.email, error: o.fieldError, focus: o.focus === "email" })]),
-        V({ gap: 6, fillW: true }, [fieldLabel("Password"), inputBox({ placeholder: "Your password", value: o.email ? "••••••••••" : "", error: o.fieldError })]),
-        V({ pt: 4, fillW: true }, [o.loading ? btnRaw("Sign in with email", { loading: true, fillW: true, disabled: true }) : btn("Sign in with email", { fillW: true })])
+        V({ gap: 6, fillW: true }, [fieldLabel("Email"), inputBox({ placeholder: "you@example.com", value: demo ? "admin@safarinexa.test" : o.email, readonly: demo, error: o.fieldError, focus: o.focus === "email" })]),
+        V({ gap: 6, fillW: true }, [fieldLabel("Password"), inputBox({ placeholder: "Your password", value: demo || o.email ? "••••••••••" : "", readonly: demo, error: o.fieldError })]),
+        V({ pt: 4, fillW: true }, [o.loading ? btnRaw(demo ? "Continue as admin" : "Sign in with email", { loading: true, fillW: true, disabled: true }) : btn(demo ? "Continue as admin" : "Sign in with email", { fillW: true })])
       ]),
       T("Admin accounts are provisioned by SafariNexa super admins only — there is no self-service sign-up.", { size: 12, color: C.muted, align: "center", fillW: true }),
-      demo ? V({ name: "Quick access", pad: 12, radius: 12, stroke: C.border, fill: C.secondary, fo: 0.3, gap: 8, fillW: true }, [
-        T("Quick access", { size: 12, w: 500, upper: true, ls: 2.5, color: C.muted }),
-        btnRaw("Continue as admin", { variant: "outline", stroke: C.border, fillW: true })
-      ]) : null
+      null
     ], { gap: 16 })
   ], { w: 448 });
 }
@@ -47,7 +44,7 @@ function authPage(name, cardNode) {
 function flowAuth() {
   return [
     { section: "Admin sign in · /admin/login", screens: [
-      { title: "Sign in — demo mode", note: "AuthCard surface=admin. Demo builds show Quick access with the seeded admin account.", build: function () { return authPage("Sign in — demo mode", authCard({})); } },
+      { title: "Sign in — demo mode", note: "AuthCard surface=admin, demo mode (default). Email and password are prefilled read-only with the seeded admin; one click signs in via the passwordless demo provider. No Google button.", build: function () { return authPage("Sign in — demo mode", authCard({})); } },
       { title: "Sign in — live mode", note: "Production: Google + email/password only. No sign-up link for admins.", build: function () { return authPage("Sign in — live mode", authCard({ demo: false })); } },
       { title: "Sign in — filled & submitting", note: "useFormStatus pending: button shows spinner and is disabled.", build: function () { return authPage("Sign in — submitting", authCard({ demo: false, email: "grace.aciro@safarinexa.com", loading: true })); } },
       { title: "Error — admin_denied", note: "?error=admin_denied after AuthError on the admin surface. Attempt is logged to the audit trail.", build: function () { return authPage("Sign in — error admin_denied", authCard({ demo: false, error: "This account is not an active admin. Access has been logged." })); } },
@@ -67,7 +64,7 @@ function flowAuth() {
           H({ gap: 12, wrap: true, w: 1180 }, decisions.map(function (d) { return card([V({ pad: 20, gap: 6, fillW: true }, [T(d[0], { size: 14, w: 500 }), T(d[1], { size: 14, color: C.muted, relaxed: true, fillW: true })])], { w: 584, stroke: C.border, dash: true }); }))
         ])]);
       } },
-      { title: "Google — demo mode fallback", note: "In demo builds /admin/auth/google renders AuthCard without the Google button.", build: function () { return bareScreen("Google — demo fallback", [V({ w: 1180, pad: 32, cross: "center" }, [authCard({ hideGoogle: true })])]); } }
+      { title: "Google — demo mode fallback", note: "In demo builds /admin/auth/google renders the same prefilled demo AuthCard.", build: function () { return bareScreen("Google — demo fallback", [V({ w: 1180, pad: 32, cross: "center" }, [authCard({ hideGoogle: true })])]); } }
     ] },
     { section: "Access control", screens: [
       { title: "Access denied · /admin/auth/access-denied", note: "Shown when the Google callback or requireAdminSession() rejects the account or permission.", build: function () {
@@ -114,26 +111,27 @@ function flowShell() {
 }
 
 // ================= DASHBOARD =================
-function statCard(s, w, h) {
+function statCard(s, w, h, compact) {
+  const link = s.action ? H({ gap: 4 }, [T(s.action, { size: 12, w: 500, color: C.primary, underline: true }), I("arrow-up-right", 14, C.primary)]) : null;
   return card([
-    V({ pad: 20, gap: 0, fillW: true, minH: h ? null : 160, fillH: !!h }, [
+    V({ name: compact ? "StatCard · compact" : "StatCard", pad: compact ? 12 : 20, gap: 0, fillW: true, minH: h || compact ? null : 160, fillH: !!h }, [
       H({ fillW: true, cross: "start", main: "between", gap: 12 }, [
         s.help ? helpLabel(s.label) : T(s.label, { size: 12, w: 500, color: C.s500, lh: 20 }),
-        s.icon ? F({ w: 32, h: 32, radius: 8, fill: C.s50, stroke: C.s100, main: "center", cross: "center" }, [I(s.icon, 16, C.s500)]) : null
+        s.icon ? F({ w: compact ? 24 : 32, h: compact ? 24 : 32, radius: 8, fill: C.s50, stroke: C.s100, main: "center", cross: "center" }, [I(s.icon, compact ? 14 : 16, C.s500)]) : null
       ]),
-      spacer(1, 12),
-      T(s.value, { size: 24, w: 600, color: C.s800, lh: 30, ls: -2.5 }),
-      spacer(1, 8),
-      T(s.desc, { size: 12, color: C.s500, lh: 20, fillW: true }),
+      spacer(1, compact ? 4 : 12),
+      T(s.value, { size: compact ? 18 : 24, w: 600, color: C.s800, lh: compact ? 24 : 30, ls: -2.5 }),
+      spacer(1, compact ? 4 : 8),
+      T(s.desc, { size: 12, color: C.s500, lh: compact ? 16 : 20, fillW: true }),
       s.action && h ? grow({ fillH: true }) : null,
-      s.action ? V({ pt: 16, fillW: true }, [V({ pt: 12, stroke: C.s100, sides: { t: 1 }, fillW: true }, [H({ gap: 4 }, [T(s.action, { size: 12, w: 500, color: C.primary, underline: true }), I("arrow-up-right", 14, C.primary)])])]) : null
+      link ? (compact ? V({ pt: 8, fillW: true }, [link]) : V({ pt: 16, fillW: true }, [V({ pt: 12, stroke: C.s100, sides: { t: 1 }, fillW: true }, [link])])) : null
     ])
   ], { w: w, h: h });
 }
-function statGrid(stats, cw, cols, h) {
+function statGrid(stats, cw, cols, h, compact) {
   cols = cols || 4;
   const w = Math.floor((cw - 16 * (cols - 1)) / cols);
-  return H({ name: "StatGrid", gap: 16, wrap: true, w: cw, rowGap: 16, cross: "start" }, stats.map(function (s) { return statCard(s, w, h); }));
+  return H({ name: "StatGrid", gap: 16, wrap: true, w: cw, rowGap: 16, cross: "start" }, stats.map(function (s) { return statCard(s, w, h, compact); }));
 }
 function dashStats(empty) {
   const z = empty;
@@ -204,7 +202,7 @@ function dashboard(empty) {
       .map(function (r, i) { return listRow(r[0], r[1], H({ gap: 6 }, [H({ px: 6, py: 2, radius: 2, fill: C.emerald100 }, [T("SUCCESS", { size: 12, w: 500, color: C.emerald800 })]), T(r[2], { size: 12, w: 500, color: C.s500 })]), { last: i === 3 }); });
     return [
       pageHero("Admin portal", "Dashboard", "Platform overview: bookings, revenue, verification, and support at a glance."),
-      statGrid(dashStats(empty), cw, 4, 224),
+      statGrid(dashStats(empty), cw, 4, null, true),
       H({ gap: 24, fillW: true, cross: "start" }, [
         panel("Featured Businesses", "View all businesses", featured, { w: leftW, pad: 24, titleSize: 16, noRule: true, arrow: true }),
         panel("Recent Platform Activity", "View all activity", activity, { w: rightW, pad: 24, titleSize: 16, noRule: true })

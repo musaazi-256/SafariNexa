@@ -1,7 +1,8 @@
-import { filterHref } from "./filter-navigation";
-it("preserves a search and sort when changing status, but resets the page",()=>{
- expect(filterHref("/business/reviews?status=published",new URLSearchParams("q=guide&sort=highest&page=4&status=pending"))).toBe("/business/reviews?status=published&q=guide&sort=highest");
+import { updateFilterParams } from "./filter-navigation";
+
+test("switching one facet preserves search, sorting, and independent facets",()=>{
+  expect(updateFilterParams(new URLSearchParams("q=Nile&type=TOUR&status=DRAFT&sort=newest&page=4"),"status","PUBLISHED").toString()).toBe("q=Nile&type=TOUR&status=PUBLISHED&sort=newest");
 });
-it("allows All to clear the old status without clearing the search",()=>{
- expect(filterHref("/admin/bookings",new URLSearchParams("q=Nile&status=cancelled&page=2"))).toBe("/admin/bookings?q=Nile");
+test("clearing one facet keeps independent choices and resets pagination",()=>{
+  expect(updateFilterParams(new URLSearchParams("q=Nile&type=TOUR&status=DRAFT&page=4"),"status").toString()).toBe("q=Nile&type=TOUR");
 });

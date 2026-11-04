@@ -68,7 +68,8 @@ export async function submitVerificationDocument(formData: FormData) {
     metadata: { businessId, type, fileUrl }
   });
 
-  revalidatePath("/business/verification");
+  revalidatePath("/business/settings/verification");
+  revalidatePath("/business/settings");
   revalidatePath("/admin/verification");
   return { success: true };
 }
@@ -101,5 +102,6 @@ export async function deleteVerificationDocument(documentId: string) {
     metadata: { businessId, documentId }
   });
 
-  revalidatePath("/business/verification");
+  revalidatePath("/business/settings/verification");
+  revalidatePath("/business/settings");
 }

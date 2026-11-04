@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { notFound, redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
 import Link from "next/link";
@@ -53,7 +54,7 @@ export default async function EditListingPage({ params }: { params: { id: string
   if (!liveListing || liveListing.businessId !== businessId) notFound();
   const listing = liveListing.draftSnapshot && liveListing.status === "PUBLISHED" ? {...liveListing,...liveListing.draftSnapshot as object} as typeof liveListing : liveListing;
   const pendingReview = await db.listingSubmission.findFirst({where: {listingId: listing.id, status: {in: ["SUBMITTED", "UNDER_REVIEW"]}}});
-  if (pendingReview) return <div className="mx-auto max-w-2xl space-y-4 p-4"><h1 className="type-page ">Submission is locked during review</h1><p>Withdraw the pending submission before editing. The approved live version remains unchanged.</p><Link className="block underline" href={`/business/listings/${listing.id}/review`}>Submission & feedback</Link><Link className="block underline" href="/business/listings">Back to listings</Link></div>;
+  if (pendingReview) return <div className="mx-auto max-w-2xl space-y-4 p-4"><PageHeader title={<>Submission is locked during review</>} description={<>Withdraw the pending submission before editing. The approved live version remains unchanged.</>} /><Link className="block underline" href={`/business/listings/${listing.id}/review`}>Submission & feedback</Link><Link className="block underline" href="/business/listings">Back to listings</Link></div>;
 
   let guides: Array<{ id: string; name: string }> = [];
   if (listing.type === "TOUR") {
@@ -63,11 +64,6 @@ export default async function EditListingPage({ params }: { params: { id: string
       orderBy: { name: "asc" }
     });
   }
-
-  const destinations = await db.destination.findMany({
-    select: { id: true, name: true },
-    orderBy: { name: "asc" }
-  });
 
   async function updateListing(formData: FormData) {
     "use server";
@@ -180,14 +176,11 @@ export default async function EditListingPage({ params }: { params: { id: string
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
-        <div>
-          <h1 className="type-page text-slate-900 mb-1">
+        <PageHeader title={<>
             Edit {typeLabel(listing.type)} listing
-          </h1>
-          <p className="text-sm text-slate-500 font-medium leading-relaxed">
+          </>} description={<>
             Update your listing details to keep your information accurate and up to date.
-          </p>
-        </div>
+          </>} />
         
         <div className="flex items-center gap-3 shrink-0">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-100 font-medium text-xs tracking-wider uppercase text-[#0B4928]">
@@ -200,7 +193,6 @@ export default async function EditListingPage({ params }: { params: { id: string
       {["ACCOMMODATION", "TOUR"].includes(listing.type) && <Button asChild variant="outline" className="mb-5"><Link href={`/business/listings/${listing.id}/availability`}>Manage availability and date pricing</Link></Button>}
       <form action={updateListing} className="flex flex-col gap-6">
         <ListingBaseFields
-          destinations={destinations}
           previewHref={`/${PREVIEW_PATH[listing.type]}/${listing.id}`}
           initial={{
             title: listing.title,
@@ -208,6 +200,7 @@ export default async function EditListingPage({ params }: { params: { id: string
             description: listing.description,
             city: listing.city ?? undefined,
             address: listing.address ?? undefined,
+            locationDirections: listing.locationDirections,
             latitude: listing.latitude,
             longitude: listing.longitude,
             basePriceMinor: listing.basePriceMinor,

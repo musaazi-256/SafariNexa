@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Separator } from "@/components/ui/separator";
 import { TravellerDefaultFields } from "@/components/checkout/traveller-default-fields";
 import { ServiceDetailsFields } from "@/components/checkout/service-details-fields";
@@ -99,7 +100,7 @@ export function MultiCheckoutForm({ defaults }: { defaults?: { fullName: string;
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" name="phone" type="tel" defaultValue={defaults?.phone} placeholder="+256 7XX XXX XXX" required />
+              <PhoneInput id="phone" name="phone" autoComplete="tel" defaultValue={defaults?.phone} required />
             </div>
             <TravellerDefaultFields nationality={defaults?.nationality} emergencyContact={defaults?.emergencyContact}/>
           </CardContent>

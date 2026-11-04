@@ -1,8 +1,9 @@
+import { PortalToolbar } from "@/components/portal-toolbar";
 import Link from "next/link";
 import { requireAdminSession } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { PageHero } from "@/components/page-hero";
-import { FilterTabs } from "@/components/ui/filter-tabs";
+import { RecordFilter } from "@/components/record-filter";
 import { Button } from "@/components/ui/button";
 
 export default async function ListingQueue({searchParams}: {searchParams: {status?: string}}) {
@@ -10,9 +11,9 @@ export default async function ListingQueue({searchParams}: {searchParams: {statu
   const statuses = ["SUBMITTED", "UNDER_REVIEW", "APPROVED", "NEEDS_CHANGES", "REJECTED", "WITHDRAWN"];
   const status = statuses.includes(searchParams.status || "") ? searchParams.status! : "SUBMITTED";
   const submissions = await db.listingSubmission.findMany({where: {status}, include: {listing: {include: {business: true}}}, orderBy: {submittedAt: "desc"}, take: 100});
-  return <div className="max-w-[1450px] mx-auto space-y-6 pb-20 font-sans">
+  return <div className="max-w-[1400px] mx-auto space-y-6 pb-20 font-sans">
     <PageHero variant="portal" eyebrow="Admin portal" title="Listing review queue" description="Review submitted listing details, prices and photos before publication." />
-    <FilterTabs activeValue={status} tabs={statuses.map(value=>({value,label:value.toLowerCase().replaceAll("_"," ").replace(/^./,s=>s.toUpperCase()),href:`/admin/listings?status=${value}`}))}/>
+    <PortalToolbar filters={<RecordFilter label="Review stage" name="status" defaultValue="SUBMITTED" value={status} options={statuses.map(value=>({value,label:value.toLowerCase().replaceAll("_"," ").replace(/^./,s=>s.toUpperCase()),}))}/>} />
     <div className="space-y-4">{submissions.map(item=><div key={item.id} className="bg-white rounded-2xl border border-border shadow-card p-6 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4"><div><h2 className="text-base font-semibold text-slate-900">{item.listing.title}</h2><p className="text-xs font-medium text-slate-500 mt-0.5">{item.listing.business.name} · {item.listing.type.toLowerCase()} · Submitted on {item.submittedAt.toLocaleDateString("en-GB",{timeZone:"Africa/Kampala"})}</p></div><Button asChild size="sm" className="font-medium text-xs"><Link href={`/admin/listings/${item.id}`}>Review listing</Link></Button></div>
       <p className="text-sm font-medium text-slate-500 leading-relaxed">Review the submitted information and photos. Business verification is checked separately.</p>

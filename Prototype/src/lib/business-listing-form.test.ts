@@ -26,3 +26,12 @@ test("restaurant menu/capacity can be removed without retaining old values",()=>
 test("transport duration and pricing text can be removed",()=>{
  expect(parseTransportFields(form({vehicleType:"Van"}))).toEqual(expect.objectContaining({estimatedDurationMinutes:null,pricingModel:null}));
 });
+test("location directions persist and are length limited",()=>{
+ expect(parseBaseFields(form({title:"Test",locationDirections:" Opposite KFC "})).locationDirections).toBe("Opposite KFC");
+ expect(()=>parseBaseFields(form({title:"Test",locationDirections:"x".repeat(251)}))).toThrow("250");
+ expect(()=>parseBaseFields(form({title:"Test",locationSelectionRequired:"true"}))).toThrow("Select a location");
+ expect(parseBaseFields(form({title:"Test",locationSelectionRequired:"true",latitude:"0",longitude:"32"})).latitude).toBe(0);
+});
+test("multiple restaurant cuisines and custom prices round-trip",()=>{
+ expect(parseRestaurantFields(form({cuisineType:["local","indian","local"],priceRange:"UGX 17,500–92,000 per meal"}))).toEqual(expect.objectContaining({cuisineType:"local, indian",priceRange:"UGX 17,500–92,000 per meal"}));
+});

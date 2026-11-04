@@ -15,3 +15,10 @@ it("does not invent destinations for generic notifications or another person's c
  expect(notificationDestination({userId:"owner"},{userId:"owner",surface:"business",businessIds:[]})).toBeNull();
  expect(notificationDestination({userId:"owner",supportCase:{id:"case",openedByUserId:"other"}},{userId:"owner",surface:"customer",businessIds:[]})).toBeNull();
 });
+
+it("routes support-case notifications to the portal the case was opened from", () => {
+ const base = { userId: "owner", relatedBooking: null };
+ expect(notificationDestination({ ...base, supportCase: { id: "c1", openedByUserId: "owner", surface: "BUSINESS" } }, { userId: "owner", surface: "business", businessIds: ["lodge"] })?.href).toBe("/business/support/c1");
+ expect(notificationDestination({ ...base, supportCase: { id: "c2", openedByUserId: "owner", surface: "CUSTOMER" } }, { userId: "owner", surface: "customer", businessIds: [] })?.href).toBe("/support/c2");
+ expect(notificationDestination({ ...base, supportCase: { id: "c1", openedByUserId: "owner", surface: "BUSINESS" } }, { userId: "owner", surface: "admin", businessIds: [] })?.href).toBe("/admin/support/c1");
+});

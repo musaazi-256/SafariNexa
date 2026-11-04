@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/page-header";
 import Link from "next/link";
 import { ArrowRight, Building2, UserPlus } from "lucide-react";
 
@@ -14,15 +15,15 @@ export default function BusinessLandingPage() {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 bg-muted/30">
+      <main className="flex-1 bg-white">
         <Container className="flex min-h-[80vh] flex-col items-center justify-center py-16 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
             <Building2 className="h-8 w-8 text-primary" />
           </div>
           
-          <h1 className="type-display mt-6 text-foreground">
+          <PageTitle size="display" className="mt-6 text-foreground">
             Partner with SafariNexa
-          </h1>
+          </PageTitle>
           
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             Grow your business by reaching thousands of travelers. Manage your bookings, listings, and revenue all in one powerful platform.

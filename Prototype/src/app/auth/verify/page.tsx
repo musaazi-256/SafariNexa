@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { AccountEmailForm } from "@/components/account-email-form";
 import { MailCheck } from "lucide-react";
 
@@ -16,10 +17,9 @@ export default function VerifyEmailPage({searchParams}:{searchParams:{token?:str
               <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <MailCheck className="h-6 w-6" />
               </span>
-              <h1 className="text-xl font-semibold">Check your email</h1>
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              <PageHeader title={<>Check your email</>} description={<>
                 {searchParams.token ? "Confirm ownership of your email address below." : "Request a single-use email verification link."}
-              </p>
+              </>} />
               <AccountEmailForm purpose="verify" token={searchParams.token} />
             </CardContent>
           </Card>

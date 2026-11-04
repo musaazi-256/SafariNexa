@@ -50,7 +50,9 @@ class Node {
     const clone = (n, root) => { const m = new Node(root ? "INSTANCE" : n.type); Object.assign(m, { name: n.name, width: n.width, height: n.height, layoutMode: n.layoutMode, fontName: n.fontName, _chars: n._chars }); m.inInstance = !root; for (const c of n.children) { const k = clone(c, false); k.parent = m; m.children.push(k); } return m; };
     const inst = clone(this, true); inst.mainComponent = this; return inst;
   }
-  remove() { if (this.parent) this.parent.children.splice(this.parent.children.indexOf(this), 1); this.parent = null; }
+  remove() { if (this.parent) this.parent.children.splice(this.parent.children.indexOf(this), 1); this.parent = null; this.removed = true; }
+  setPluginData(k, v) { (this._pd = this._pd || {})[k] = v; }
+  getPluginData(k) { return (this._pd && this._pd[k]) || ""; }
 }
 // Props that are only valid on auto-layout frames
 for (const p of ["itemSpacing", "primaryAxisAlignItems", "counterAxisAlignItems", "layoutWrap", "counterAxisSpacing"]) {
@@ -61,15 +63,19 @@ Object.defineProperty(Node.prototype, "minHeight", { set(v) { if (!AUTO(this)) f
 Object.defineProperty(Node.prototype, "fontName", { set(v) { if (this.type === "TEXT" && !loaded.has(JSON.stringify(v))) fail("fontName not loaded " + JSON.stringify(v)); this._font = v; }, get() { return this._font; } });
 
 const pages = [];
+const root = { type: "DOCUMENT", children: pages, insertChild(i, c) { const at = pages.indexOf(c); if (at >= 0) pages.splice(at, 1); pages.splice(i, 0, c); c.parent = root; } };
+const newPage = (name) => { const p = new Node("PAGE"); p.name = name; p.parent = root; pages.push(p); return p; };
+// Simulate a file that already holds the user's own page plus an earlier (unmarked) run.
+if (process.env.MOCK_EXISTING) { newPage("00 · Start here"); newPage("00 · Cover & flow map"); newPage("00 · Design system"); newPage("03 · Dashboard"); const m = newPage("Old marked page"); m.setPluginData("safarinexa-generated", "1"); }
 const figma = {
-  root: { children: pages },
+  root,
   createFrame: () => new Node("FRAME"),
   createComponent: () => new Node("COMPONENT"),
   createRectangle: () => new Node("RECTANGLE"),
   createVector: () => new Node("VECTOR"),
   createText: () => { const t = new Node("TEXT"); t._font = { family: "Inter", style: "Regular" }; t.fontSize = 12; return t; },
   createSection: () => new Node("SECTION"),
-  createPage: () => { const p = new Node("PAGE"); pages.push(p); return p; },
+  createPage: () => newPage("Page"),
   createNodeFromSvg: (svg) => { if (!/^<svg[\s\S]*<\/svg>$/.test(svg.trim())) fail("bad svg"); const f = new Node("FRAME"); const n = (svg.match(/<(path|rect|circle|g)\b/g) || []).length; for (let i = 0; i < n; i++) f.appendChild(new Node("VECTOR")); f.resize(24, 24); return f; },
   flatten: (nodes, parent) => { if (!nodes.length) fail("flatten empty"); const v = new Node("VECTOR"); for (const n of nodes) n.remove(); (parent || nodes[0].parent).appendChild(v); return v; },
   createComponentFromNode: (n) => { const c = new Node("COMPONENT"); Object.assign(c, { name: n.name, width: n.width, height: n.height }); for (const k of [...n.children]) c.appendChild(k); const par = n.parent; if (par) { par.appendChild(c); n.remove(); } return c; },
@@ -83,7 +89,7 @@ const figma = {
 let done;
 const finished = new Promise(r => { done = r; });
 const warnings = [];
-const sandbox = { figma, console: { log: console.log, warn: (m) => warnings.push(m), error: (...a) => console.error("[error]", ...a.map(x => x && x.stack || x)) }, Promise, Math, JSON, String, Object, Array, Number, parseInt, setTimeout };
+const sandbox = { figma, console: { log: console.log, warn: (m) => warnings.push(m), error: (...a) => console.error("[error]", ...a.map(x => x && x.stack || x)) }, Promise, Math, JSON, String, Object, Array, Number, Set, parseInt, setTimeout };
 vm.createContext(sandbox);
 vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), sandbox, { filename: "code.js" });
 finished.then((m) => {

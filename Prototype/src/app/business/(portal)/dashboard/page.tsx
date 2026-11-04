@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { StatCard, StatGrid } from "@/components/ui/stat-card";
 import { DashboardCharts } from "@/components/business/dashboard-charts";
 import { RemoteImage } from "@/components/remote-image";
@@ -94,13 +95,9 @@ export default async function BusinessDashboardPage() {
         </div>}
 
         <div className="relative z-10 w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-8">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-widest text-[#FFCE06] mb-2">Welcome back</p>
-            <h1 className="type-page mb-2">{business.name}</h1>
-            <p className="text-slate-200">Here&apos;s what&apos;s happening with your business today.</p>
-          </div>
+          <PageHeader title={<>{business.name}</>} description={<>Here&apos;s what&apos;s happening with your business today.</>} eyebrow={<>Welcome back</>} tone="inverse" />
           <Button asChild variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-black mt-2 sm:mt-0 shrink-0">
-            <Link href="/business/profile">View business profile <ExternalLink className="ml-2 h-4 w-4" /></Link>
+            <Link href="/business/settings">View business profile <ExternalLink className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
       </div>
@@ -111,7 +108,7 @@ export default async function BusinessDashboardPage() {
             <AlertCircle className="h-4 w-4" />
             <h5 className="leading-none tracking-tight">Application Status: {business.verificationStatus.replace("_", " ")} - You cannot publish listings yet.</h5>
           </div>
-          <Link href="/business/verification" className="flex items-center gap-1 font-semibold text-primary hover:underline text-sm">
+          <Link href="/business/settings/verification" className="flex items-center gap-1 font-semibold text-primary hover:underline text-sm">
             Check Status <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -119,10 +116,10 @@ export default async function BusinessDashboardPage() {
 
       {/* Stat Cards */}
       <StatGrid>
-        <StatCard label="Published listings" value={publishedCount} description={String(draftCount)+" draft listings"} icon={ClipboardList} href="/business/listings" actionLabel="View listings" />
-        <StatCard label="Awaiting confirmation" value={awaitingCount} description="Booking requests needing a response" icon={Clock} href="/business/bookings?status=awaiting_business_confirmation" actionLabel="View requests" />
-        <StatCard label="Payouts this month" value={formatUGX(settledMinor)} description={formatUGX(unsettledNetMinor)+" unsettled across all dates"} icon={Database} help="Completed payout records created this month. The unsettled balance is calculated from all eligible payments after refunds and commission." href="/business/revenue" actionLabel="View earnings" />
-        <StatCard label="Average rating" value={average?.toFixed(1)} description={String(count)+" published reviews · out of 5"} icon={Star} href="/business/reviews" actionLabel="View reviews" />
+        <StatCard compact label="Published listings" value={publishedCount} description={String(draftCount)+" draft listings"} icon={ClipboardList} href="/business/listings" actionLabel="View listings" />
+        <StatCard compact label="Awaiting confirmation" value={awaitingCount} description="Booking requests needing a response" icon={Clock} href="/business/bookings?status=awaiting_business_confirmation" actionLabel="View requests" />
+        <StatCard compact label="Payouts this month" value={formatUGX(settledMinor)} description={formatUGX(unsettledNetMinor)+" unsettled across all dates"} icon={Database} help="Completed payout records created this month. The unsettled balance is calculated from all eligible payments after refunds and commission." href="/business/revenue" actionLabel="View earnings" />
+        <StatCard compact label="Average rating" value={average?.toFixed(1)} description={String(count)+" published reviews · out of 5"} icon={Star} href="/business/reviews" actionLabel="View reviews" />
       </StatGrid>
 
       {/* Quick Actions */}

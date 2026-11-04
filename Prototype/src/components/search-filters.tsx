@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 
 export const PRICE_RANGES = [
@@ -88,13 +89,8 @@ function CheckboxGroup({ title, param, options }: { title: string; param: string
       <legend className="mb-3 text-sm font-semibold text-slate-900">{title}</legend>
       <div className="flex flex-col gap-1.5">
         {options.map((option) => (
-          <label key={option.value} className="group flex min-h-8 items-center gap-2.5 rounded-lg px-1.5 py-1 text-sm text-slate-600 transition-colors hover:text-slate-900 has-[:checked]:font-medium has-[:checked]:text-slate-900 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selected.has(option.value)}
-              onChange={() => toggle(option.value)}
-              className="h-4 w-4 rounded border-slate-300 accent-slate-900 focus-visible:ring-2 focus-visible:ring-ring"
-            />
+          <label key={option.value} className="group flex min-h-9 md:min-h-8 items-center gap-2.5 rounded-lg px-1.5 py-1 text-sm text-slate-600 transition-colors hover:text-slate-900 has-[[data-state=checked]]:font-medium has-[[data-state=checked]]:text-slate-900 cursor-pointer">
+            <Checkbox checked={selected.has(option.value)} onCheckedChange={() => toggle(option.value)} aria-label={option.label} />
             {option.label}
           </label>
         ))}
@@ -156,7 +152,7 @@ export function SearchFilters({locations=LOCATIONS}:{locations?:Array<{value:str
         </>
       ) : null}
 
-      <Button variant="outline" size="sm" className="h-9 w-full rounded-full border-border bg-white text-sm font-medium text-slate-700 shadow-none hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900" onClick={clearAll}>
+      <Button variant="outline" size="sm" className="h-9 w-full rounded-[6px]" disabled={!["price","rating","propertyType","tourType","tourDuration","vehicleType","cuisine","specialty","location","amenities"].some(key=>searchParams.has(key))} onClick={clearAll}>
         Clear filters
       </Button>
     </div>

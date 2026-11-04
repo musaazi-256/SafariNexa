@@ -28,8 +28,12 @@ export function parseBaseFields(formData: FormData) {
     const raw = String(formData.get(field) ?? "").trim();
     if (raw && (!Number.isFinite(Number(raw)) || Math.abs(Number(raw)) > limit)) throw new Error(`Enter a valid ${field}.`);
   }
+  if (formData.get("locationSelectionRequired") === "true" && (!String(formData.get("latitude") ?? "").trim() || !String(formData.get("longitude") ?? "").trim())) throw new Error("Select a location from the search results or paste a valid map pin to fill both coordinates.");
+  const locationDirections = String(formData.get("locationDirections") ?? "").trim();
+  if (locationDirections.length > 250) throw new Error("Keep location directions within 250 characters.");
   return {
     title,
+    locationDirections: locationDirections || null,
     bookingMode,
     description: String(formData.get("description") ?? "").trim(),
     city: String(formData.get("city") ?? "").trim() || null,
@@ -152,11 +156,15 @@ export function parseTourFields(formData: FormData) {
 export function parseRestaurantFields(formData: FormData) {
   const openingHours = String(formData.get("openingHours") ?? "").trim();
   const duration = Number(formData.get("reservationDurationMinutes") || 90);
+  const cuisines = Array.from(new Set(formData.getAll("cuisineType").map(value => String(value).trim()).filter(Boolean)));
+  if (formData.get("restaurantCuisineRequired") === "true" && !cuisines.length) throw new Error("Select at least one cuisine type.");
+  const priceRange = String(formData.get("priceRange") ?? "").trim();
+  if (priceRange.length > 200) throw new Error("Keep the price or price range within 200 characters.");
   if (formData.get("acceptsReservationRequests") === "on" && !dailyOpeningWindow({summary:openingHours})) throw new Error("For online reservations use Daily · HH:MM - HH:MM opening hours.");
   if (!Number.isInteger(duration) || duration < 30 || duration > 240) throw new Error("Reservation duration must be between 30 and 240 minutes.");
   return {
-    cuisineType: String(formData.get("cuisineType") ?? "").trim() || null,
-    priceRange: String(formData.get("priceRange") ?? "").trim() || null,
+    cuisineType: cuisines.join(", ") || null,
+    priceRange: priceRange || null,
     menuUrl: String(formData.get("menuUrl") ?? "").trim() || null,
     seatingCapacity: formData.get("seatingCapacity") ? Number(formData.get("seatingCapacity")) : null,
     acceptsReservationRequests: formData.get("acceptsReservationRequests") === "on",

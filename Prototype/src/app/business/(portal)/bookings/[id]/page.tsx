@@ -1,3 +1,6 @@
+import { PageHeader } from "@/components/page-header";
+import { BookingPaymentManagement } from "@/components/business/booking-payment-management";
+import { ConfirmSubmit } from "@/components/admin/confirm-submit";
 import { notFound, redirect } from "next/navigation";
 import { BookingTravellerSummary } from "@/components/booking-traveller-summary";
 import { BookingOperationsSummary } from "@/components/booking-operations-summary";
@@ -18,7 +21,7 @@ import { toBookingStatus } from "@/lib/status";
 import { BookingChat } from "@/components/booking-chat";
 
 export default async function BusinessBookingDetailPage({ params }: { params: { id: string } }) {
-  const { business, businessId } = await requireBusinessSession();
+  const { business, businessId, session: businessSession } = await requireBusinessSession();
   if (!business || !businessId) redirect("/business/auth/sign-in");
 
   const booking = await db.booking.findUnique({
@@ -37,7 +40,7 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
 
   const session = await auth();
 
-  const paymentHistory = booking.payments.length ? booking.payments : (booking.order?.payments ?? []).map(payment => ({...payment, amountMinor: booking.totalMinor}));
+
 
   const thread = await db.messageThread.findFirst({
     where: { bookingId: params.id },
@@ -58,29 +61,33 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
   })) ?? [];
 
   const primaryParticipant = booking.participants.find((participant) => participant.isPrimary) ?? booking.participants[0];
-  const canRespond = booking.status === "AWAITING_BUSINESS_CONFIRMATION";
+  const manager = await db.businessUser.findFirst({where:{businessId,userId:businessSession.user.id,role:{in:["OWNER","MANAGER"]}}});
+  const canManage = !!manager;
+  const canRespond = canManage && booking.status === "AWAITING_BUSINESS_CONFIRMATION";
 
   async function respond(formData: FormData) {
     "use server";
-    const activeSession = await auth();
+    const {session: activeSession,businessId: activeBusinessId} = await requireBusinessSession();
     if (!activeSession?.user) redirect("/business/auth/sign-in");
 
     const bookingId = String(formData.get("bookingId"));
     const decision = String(formData.get("decision"));
 
     const target = await db.booking.findUnique({ where: { id: bookingId }, include: { listing: true } });
-    if (!target || !activeSession.user.businessIds.includes(target.businessId)) throw new Error("Booking not found.");
-    if (!["AWAITING_BUSINESS_CONFIRMATION", "CONFIRMED", "PENDING_PAYMENT"].includes(target.status)) return;
+    if (!target || target.businessId !== activeBusinessId) throw new Error("Booking not found.");
+    if (!["AWAITING_BUSINESS_CONFIRMATION", "CONFIRMED", "PENDING_PAYMENT", "PAYMENT_FAILED"].includes(target.status)) return;
 
     if (!["confirm", "decline", "complete"].includes(decision)) throw new Error("Invalid decision.");
     await db.$transaction(async tx => {
       const member = await tx.businessUser.findFirst({ where: { businessId: target.businessId, userId: activeSession.user.id, role: { in: ["OWNER", "MANAGER"] } } });
       if (!member) throw new Error("Only owners and managers can manage bookings.");
+      await tx.auditLog.create({data:{actorUserId:activeSession.user.id,surface:"BUSINESS",action:"business_booking_response",outcome:"SUCCESS",metadata:{bookingId:target.id,decision}}});
       if (decision === "decline") {
         await cancelReservedBooking(tx, target.id, activeSession.user.id, "business");
         return;
       }
       if (decision === "confirm") { await acceptBookingRequest(tx,target.id,activeSession.user.id); return; }
+      if (decision === "complete" && target.totalMinor > 0 && !await tx.payment.findFirst({where:{OR:[{bookingId:target.id},...(target.orderId?[{orderId:target.orderId}]:[])],status:{in:["SUCCESSFUL","PARTIALLY_REFUNDED"]},amountMinor:{gte:target.totalMinor}}})) throw new Error("Cannot complete a booking without confirmed payment.");
       const expected = decision === "complete" ? "CONFIRMED" : "AWAITING_BUSINESS_CONFIRMATION";
       if (decision === "complete" && (!target.startDate || (target.endDate ?? target.startDate) > new Date())) throw new Error("Bookings can only be completed after the service date.");
       const updated = await tx.booking.updateMany({ where: { id: target.id, status: expected }, data: decision === "complete" ? { status: "COMPLETED", completedAt: new Date() } : { status: "CONFIRMED", confirmedAt: new Date() } });
@@ -94,17 +101,16 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
 
   return (
     <>
-      {booking.status === "CONFIRMED" && booking.startDate && (booking.endDate ?? booking.startDate) <= new Date() && (
+      {canManage && booking.status === "CONFIRMED" && booking.startDate && (booking.endDate ?? booking.startDate) <= new Date() && (
         <form action={respond} className="mb-4"><input type="hidden" name="bookingId" value={booking.id} /><Button name="decision" value="complete" type="submit">Mark service completed</Button></form>
       )}
       <Breadcrumbs items={[{ label: "Bookings", href: "/business/bookings" }, { label: booking.bookingRef }]} />
-      {booking.listing.type === "TRANSPORT" && booking.status === "CONFIRMED" && <form action={assignTransfer} className="mb-6 grid gap-3 rounded border p-4 sm:grid-cols-3"><h2 className="font-semibold sm:col-span-3">Assign / update transfer driver and vehicle</h2><input type="hidden" name="bookingId" value={booking.id}/>{["driverName","driverPhone","vehicleRegistration"].map(key=><label key={key}>{key.replace(/([a-z])([A-Z])/g,"$1 $2")}<input name={key} required maxLength={key==="driverName"?120:40} defaultValue={String((booking.fulfilment as Record<string,unknown>|null)?.[key]||"")} className="form-control mt-1 w-full"/></label>)}<p className="text-sm sm:col-span-3 leading-relaxed">These details are shared with this booking’s customer.</p><Button>Save assignment and notify customer</Button></form>}
+      {canManage && booking.listing.type === "TRANSPORT" && booking.status === "CONFIRMED" && <form action={assignTransfer} className="mb-6 grid gap-3 rounded border p-4 sm:grid-cols-3"><h2 className="font-semibold sm:col-span-3">Assign / update transfer driver and vehicle</h2><input type="hidden" name="bookingId" value={booking.id}/>{["driverName","driverPhone","vehicleRegistration"].map(key=><label key={key}>{key.replace(/([a-z])([A-Z])/g,"$1 $2")}<input name={key} required maxLength={key==="driverName"?120:40} defaultValue={String((booking.fulfilment as Record<string,unknown>|null)?.[key]||"")} className="form-control mt-1 w-full"/></label>)}<p className="text-sm sm:col-span-3 leading-relaxed">These details are shared with this booking’s customer.</p><Button>Save assignment and notify customer</Button></form>}
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
             <div>
               <BookingStatusBadge status={toBookingStatus(booking.status)} perspective="staff" />
-              <h1 className="type-page mt-2">{booking.listing.title}</h1>
-              <p className="mt-1 text-muted-foreground">Booking {booking.bookingRef}</p>
+              <PageHeader title={<>{booking.listing.title}</>} description={<>Booking {booking.bookingRef}</>} />
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <div>
@@ -169,23 +175,7 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
                 </CardContent>
               </Card>
 
-              {paymentHistory.length > 0 ? (
-                <>
-                  <h2 className="mb-2 mt-8 text-lg font-semibold">Payment history</h2>
-                  <div className="flex flex-col gap-2">
-                    {paymentHistory.map((payment) => (
-                      <Card key={payment.id}>
-                        <CardContent className="flex items-center justify-between pt-6 text-sm">
-                          <span>
-                            {payment.provider.replaceAll("_", " ")} · {payment.status.replaceAll("_", " ").toLowerCase()}
-                          </span>
-                          <strong>{formatUGX(payment.amountMinor)}</strong>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </>
-              ) : null}
+              <div className="mt-6"><BookingPaymentManagement bookingId={booking.id} surface="BUSINESS" canManage={canManage}/></div>
 
               {/* Customer Messages & Inquiries attached to this booking */}
               <BookingChat
@@ -208,7 +198,8 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
                   <strong className="text-lg">{formatUGX(booking.totalMinor)}</strong>
                 </div>
                 <Separator />
-                {booking.status === "PENDING_PAYMENT" && booking.bookingMode === "REQUEST" && <form action={respond}><input type="hidden" name="bookingId" value={booking.id}/><input type="hidden" name="decision" value="decline"/><Button type="submit" variant="outline" className="w-full">Withdraw accepted request</Button></form>}
+                {canManage && ["PENDING_PAYMENT","PAYMENT_FAILED"].includes(booking.status) && <form action={respond}><input type="hidden" name="bookingId" value={booking.id}/><input type="hidden" name="decision" value="decline"/><Button type="submit" variant="outline" className="w-full">Cancel unpaid booking</Button></form>}
+                {canManage && booking.status === "CONFIRMED" && <form action={respond}><input type="hidden" name="bookingId" value={booking.id}/><ConfirmSubmit name="decision" value="decline" title="Cancel this booking?" description="The customer will be notified. If paid, a refund request will be created for you to review." confirmLabel="Cancel booking" trigger={<Button variant="destructive" className="w-full">Cancel booking</Button>}/></form>}
                 {canRespond ? (
                   <>
                     <form action={respond}>

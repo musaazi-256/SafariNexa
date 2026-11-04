@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/page-header";
 import { useAsyncTask } from "@/hooks/use-async-task";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -40,6 +41,7 @@ export function TripPlanEditor({ initial }: { initial: { id?: string; title: str
     </div>
     <main className="container py-8 max-w-4xl">
       <div className="space-y-8">
+        <PageHeader title="Trip itinerary" description="Organize your itinerary, dates, and notes." />
         {days.map((date,day)=><div key={date} className="space-y-4">
           <div className="flex items-center justify-between"><h2 className="text-xl font-semibold">Day {day+1}</h2><Button type="button" variant="ghost" size="sm" disabled={items.length>=100} onClick={()=>add(date)}><Plus className="mr-2 h-4 w-4"/>Add Item</Button></div>
           <div className="space-y-3">{items.map((item,index)=>item.date!==date?null:<Card key={index} className="group"><CardContent className="p-4">

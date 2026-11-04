@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import * as React from "react";
 import { LiveRefresh } from "@/components/live-refresh";
 
@@ -18,26 +19,14 @@ export function AccountLayout({ children, eyebrow, title, description }: Account
     <>
       <LiveRefresh />
       <SiteHeader />
-      <main className="bg-muted/10 min-h-screen pb-24 pt-8">
+      <main className="bg-white min-h-screen pb-24 pt-8">
         <Container>
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-10">
             <aside className="w-full shrink-0 md:sticky md:top-24 md:w-64">
               <AccountSidebar />
             </aside>
             <div className="flex-1 min-w-0">
-              <div className="mb-8">
-                {eyebrow && (
-                  <p className="mb-2 type-eyebrow text-brand-green leading-relaxed">
-                    {eyebrow}
-                  </p>
-                )}
-                <h1 className="type-page">{title}</h1>
-                {description && (
-                  <p className="mt-2 text-base text-muted-foreground max-w-2xl leading-relaxed">
-                    {description}
-                  </p>
-                )}
-              </div>
+              <PageHeader className="mb-6 pt-0" title={title} description={description} eyebrow={eyebrow} />
               <div className="w-full">
                 {children}
               </div>

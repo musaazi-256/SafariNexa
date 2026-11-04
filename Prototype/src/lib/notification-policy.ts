@@ -5,7 +5,7 @@ export const NOTIFICATION_PATHS: Record<NotificationSurface, string> = {
 export function notificationDestination(notification: {
   userId: string;
   relatedBooking?: { id: string; customerId: string; businessId: string } | null;
-  supportCase?: { id: string; openedByUserId: string } | null;
+  supportCase?: { id: string; openedByUserId: string; surface?: string } | null;
 }, context: { userId: string; surface: NotificationSurface; businessIds: string[] }) {
   if (notification.userId !== context.userId) return null;
   const booking = notification.relatedBooking;
@@ -17,7 +17,7 @@ export function notificationDestination(notification: {
   const support = notification.supportCase;
   if (support) {
     if (context.surface === "admin") return { href: `/admin/support/${support.id}`, label: "View support case" };
-    if (support.openedByUserId === context.userId) return { href: `/support/${support.id}`, label: "View support case" };
+    if (support.openedByUserId === context.userId) return { href: support.surface === "BUSINESS" ? `/business/support/${support.id}` : `/support/${support.id}`, label: "View support case" };
   }
   return null;
 }

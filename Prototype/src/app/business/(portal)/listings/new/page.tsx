@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Building2, Car, Compass, UtensilsCrossed } from "lucide-react";
@@ -50,11 +51,6 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
       orderBy: { name: "asc" }
     });
   }
-
-  const destinations = await db.destination.findMany({
-    select: { id: true, name: true },
-    orderBy: { name: "asc" }
-  });
 
   async function createListing(formData: FormData) {
     "use server";
@@ -116,10 +112,9 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
           <div className="h-16 w-16 bg-orange-100 rounded-full flex items-center justify-center mb-2">
             <Building2 className="h-8 w-8 text-orange-600" />
           </div>
-          <h1 className="type-page text-slate-900">Your account is under review</h1>
-          <p className="text-slate-500 font-medium">
+          <PageHeader title={<>Your account is under review</>} description={<>
             You cannot create listings yet. Our admins are currently reviewing your submitted verification documents. Once you are fully approved, you will be able to start adding your services here.
-          </p>
+          </>} />
           <Button asChild variant="outline" className="mt-4">
             <Link href="/business/dashboard">Return to Dashboard</Link>
           </Button>
@@ -130,7 +125,7 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
     return (
       <>
         <Breadcrumbs items={[{ label: "Listings", href: "/business/listings" }, { label: "Create listing" }]} />
-        <h1 className="type-page mb-6">What are you listing?</h1>
+        <PageHeader className="mb-6" title={<>What are you listing?</>} />
         <div className="grid gap-5 sm:grid-cols-2">
           {TYPE_OPTIONS.map((option) => (
             <Link key={option.value} href={`/business/listings/new?type=${option.value.toLowerCase()}`}>
@@ -159,11 +154,11 @@ export default async function NewListingPage({ searchParams }: { searchParams: {
           { label: TYPE_OPTIONS.find((option) => option.value === type)?.label ?? "" }
         ]}
       />
-      <h1 className="type-page mb-6">New {TYPE_OPTIONS.find((option) => option.value === type)?.label.toLowerCase()} listing</h1>
+      <PageHeader className="mb-6" title={<>New {TYPE_OPTIONS.find((option) => option.value === type)?.label.toLowerCase()} listing</>} />
 
       <form action={createListing} className="flex flex-col gap-6">
         <input type="hidden" name="listingType" value={type} />
-        <ListingBaseFields destinations={destinations} />
+        <ListingBaseFields />
 
         {type === "ACCOMMODATION" ? (
           <>

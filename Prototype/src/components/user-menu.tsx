@@ -58,11 +58,12 @@ export function UserMenu({
         <DropdownMenuLabel>{name ?? email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={isBusiness ? "/business/settings" : "/profile"}>
+          <Link href={isBusiness ? "/business/profile" : "/profile"}>
             <User className="h-4 w-4" />
-            {isBusiness ? "Business profile" : "Profile"}
+            {isBusiness ? "My profile" : "Profile"}
           </Link>
         </DropdownMenuItem>
+        {isBusiness && <DropdownMenuItem asChild><Link href="/business/settings"><Building2 className="h-4 w-4" />Business profile</Link></DropdownMenuItem>}
         <DropdownMenuItem asChild>
           <Link href="/bookings">
             <LayoutDashboard className="h-4 w-4" />
@@ -95,7 +96,7 @@ export function UserMenu({
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/support">
+          <Link href={isBusiness ? "/business/support" : "/support"}>
             <LifeBuoy className="h-4 w-4" />
             Support
           </Link>

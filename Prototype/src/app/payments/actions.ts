@@ -49,10 +49,10 @@ export async function processPaymentAction(formData: FormData) {
       for (const booking of payable) {
         await tx.booking.update({where:{id:booking.id},data:{status:failed ? "PAYMENT_FAILED" : "CONFIRMED", ...(failed ? {} : {confirmedAt:new Date(),paymentDueAt:null,responseDueAt:null})}});
         await tx.notification.create({data:{userId:session.user.id,type:"PAYMENT_UPDATE",title:failed ? "Payment failed" : "Payment successful",body:`Booking ${booking.bookingRef}: ${failed ? "payment declined; you can retry" : "payment successful and booking confirmed"}.`,relatedBookingId:booking.id}});
-        if(!failed){
+        {
           const members=await tx.businessUser.findMany({where:{businessId:booking.businessId},select:{userId:true}});
           const recipients=[...new Set(members.map(member=>member.userId))].filter(id=>id!==session.user.id);
-          if(recipients.length) await tx.notification.createMany({data:recipients.map(userId=>({userId,type:"PAYMENT_UPDATE" as const,title:"Payment received — booking confirmed",body:`Payment for booking ${booking.bookingRef} was successful. The booking is confirmed.`,relatedBookingId:booking.id}))});
+          if(recipients.length) await tx.notification.createMany({data:recipients.map(userId=>({userId,type:"PAYMENT_UPDATE" as const,title:failed?"Customer payment failed":"Payment received — booking confirmed",body:failed?`Payment for booking ${booking.bookingRef} failed. The customer can retry within the payment window.`:`Payment for booking ${booking.bookingRef} was successful. The booking is confirmed.`,relatedBookingId:booking.id}))});
         }
       }
       if(orderId) await tx.order.update({where:{id:orderId},data:{status:failed ? "PAYMENT_FAILED" : "bookings" in target && target.bookings.some(b=>b.totalMinor === 0 && b.status === "AWAITING_BUSINESS_CONFIRMATION") ? "AWAITING_BUSINESS_CONFIRMATION" : "CONFIRMED"}});

@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/page-header";
+
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -51,9 +53,9 @@ export function CartView() {
         </div>
 
         {/* Page Title */}
-        <h1 className="type-page mb-8 text-[#0d5932]">
+        <PageHeader className="mb-6" title={<>
           Cart
-        </h1>
+        </>} />
 
         {totalItems === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-white p-16 text-center shadow-sm">
