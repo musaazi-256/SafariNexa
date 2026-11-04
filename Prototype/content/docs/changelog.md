@@ -364,3 +364,15 @@ The Vercel deploy of `9ca40bc` built cleanly but every database-backed page show
 **Demo sign-in UI:** in demo mode the customer, business and admin sign-in cards show the email and password fields prefilled (read-only) with the seeded account, and the main button ("Continue as customer/business/admin") signs straight in through the passwordless `demo` provider. Google sign-in and the separate "Quick access" box are hidden in demo mode. Live mode is unchanged.
 
 **Verified:** tsc, lint, Jest 206 tests / 42 suites; local run with `AUTH_SECRET` unset: `/api/auth/session` no longer errors, demo admin sign-in returns a Super Admin session and `/admin/dashboard` loads.
+
+---
+
+## 4 November 2026 — Nile & Crater Lodges demo dataset, inbox and dashboard layout fixes
+
+| Item | What / why |
+|---|---|
+| `npm run db:demo:nile` (`scripts/seed-nile-crater.ts`, `docs/nile-crater-demo.md`) | Additive demo dataset for the Nile & Crater Lodges business: 12 more properties, 36 fictional guests, ~336 bookings across every booking/payment/refund status, payouts and 82 reviews. Refuses to run unless the database host is localhost, so it can't touch the hosted database. |
+| Business inbox (`message-inbox.tsx`) | The customer/booking details panel moved beside the chat as its own card and only sticks when it fits the viewport, so the bottom of a tall panel stays reachable; thread list and messages scroll independently. |
+| Admin dashboard stat cards | The 12-metric grid uses a new `compact` StatCard variant (smaller icon, tighter spacing, no divider above links). |
+
+**Verified:** tsc, lint, Jest 206 tests passing.

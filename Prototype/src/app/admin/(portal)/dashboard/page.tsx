@@ -134,7 +134,7 @@ export default async function AdminDashboardPage() {
       />
 
       {/* 12 KPI Metrics Grid (4 columns x 3 rows) */}
-      <StatGrid>{stats.map(stat=><StatCard key={stat.label} {...stat}/>)}</StatGrid>
+      <StatGrid>{stats.map(stat=><StatCard key={stat.label} {...stat} compact/>)}</StatGrid>
 
       {/* Middle Section: Featured Businesses + Recent Platform Activity */}
       <div className="grid lg:grid-cols-12 gap-6">

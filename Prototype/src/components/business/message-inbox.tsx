@@ -109,7 +109,25 @@ export function MessageInbox({
   const [isCreatingThread, setIsCreatingThread] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const detailsRef = useRef<HTMLElement>(null);
+  const [detailsFitViewport, setDetailsFitViewport] = useState(false);
   const activeThread = threads.find(t => t.id === activeThreadId);
+  const hasThreads = threads.length > 0;
+
+  // Tall context panels must remain in page flow so their bottom stays reachable.
+  useEffect(() => {
+    const details = detailsRef.current;
+    if (!details) return;
+    const update = () => setDetailsFitViewport(details.offsetHeight <= window.innerHeight - 96);
+    const observer = new ResizeObserver(update);
+    observer.observe(details);
+    window.addEventListener("resize", update);
+    update();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [hasThreads]);
 
   // Auto-scroll to bottom of chat
   useEffect(() => {
@@ -309,7 +327,8 @@ export function MessageInbox({
           <EmptyState title="No messages yet" description="When customers message you about bookings, they will appear here." />
         </div>
       ) : (
-        <div className="flex h-[min(75svh,680px)] min-h-[440px] overflow-hidden rounded-2xl border border-border bg-white shadow-sm font-sans">
+        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="flex h-[min(75svh,680px)] min-h-[440px] min-w-0 overflow-hidden rounded-2xl border border-border bg-white shadow-sm font-sans">
           
           {/* Left Pane: Thread List */}
           <div className={cn("w-full md:w-[300px] lg:w-[350px] min-w-0 flex-col border-r border-border bg-white shrink-0", activeThread ? "hidden md:flex" : "flex")}>
@@ -371,7 +390,7 @@ export function MessageInbox({
             </div>
             
             {/* Thread List */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
               {filteredThreads.length === 0 ? (
                 <div className="p-8 text-center text-slate-500 text-xs font-medium">
                   No conversations match your filter.
@@ -445,7 +464,7 @@ export function MessageInbox({
           </div>
 
           {/* Middle Pane: Chat Area */}
-          <div className={cn("min-w-0 flex-1 flex-col bg-white border-r border-border", activeThread ? "flex" : "hidden md:flex")}>
+          <div className={cn("min-h-0 min-w-0 flex-1 flex-col bg-white", activeThread ? "flex" : "hidden md:flex")}>
             {activeThread ? (
               <>
                 {/* Chat Header */}
@@ -485,14 +504,16 @@ export function MessageInbox({
                 {/* Messages Area */}
                 <div 
                   ref={scrollRef}
-                  className="flex-1 overflow-y-auto p-6 bg-[#FAFBFA]"
+                  className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-6 bg-[#FAFBFA]"
                 >
                   <div className="flex flex-col min-h-full space-y-4">
   <ConversationMessages messages={activeThread.messages.map(message => ({...message, senderName: message.sender.name}))} currentUserId={businessUserId} outgoingSenderIds={activeThread.messages.filter(message => message.senderId !== activeThread.customer.id).map(message => message.senderId)} />
                   </div>
                 </div>
 
-                <MessageComposer draft={draft} onDraftChange={setDraft} onSubmit={handleSend} pending={isSending} error={sendError} />
+                <div className="shrink-0">
+                  <MessageComposer draft={draft} onDraftChange={setDraft} onSubmit={handleSend} pending={isSending} error={sendError} />
+                </div>
               </>
             ) : (
               <div className="flex-1 flex items-center justify-center bg-slate-50">
@@ -500,9 +521,10 @@ export function MessageInbox({
               </div>
             )}
           </div>
+        </div>
 
           {/* Right Pane: Customer & Booking Context */}
-          <div className="hidden xl:flex w-[320px] flex-col bg-[#FCFDFD] shrink-0 overflow-y-auto border-l border-slate-100">
+          <aside ref={detailsRef} aria-label="Customer and booking details" className={cn("hidden xl:flex min-w-0 flex-col rounded-2xl border border-border bg-[#FCFDFD] shadow-sm", detailsFitViewport && "sticky top-20")}>
             {activeThread ? (
               <div className="p-6 space-y-6">
                 
@@ -586,7 +608,7 @@ export function MessageInbox({
                 <p className="text-xs text-slate-500 font-medium">Select a conversation to view customer context.</p>
               </div>
             )}
-          </div>
+          </aside>
 
         </div>
       )}
