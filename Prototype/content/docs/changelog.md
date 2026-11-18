@@ -458,3 +458,16 @@ Examples adapted to SafariNexa content live in `src/components/examples/`, previ
 Moderation logic, notifications and audit logging are unchanged.
 
 **Verified:** tsc, lint, pagination tests; rendered as the demo admin (9 rows per page, filters work, no old cards).
+
+---
+
+## 18 November 2026 — Figma designs captured from the running app
+
+The hand-built Figma plugins (`design/figma-admin-portal`, `design/figma-business-portal`) redraw each screen in code and drift from the app. Three new plugins rebuild the real screens instead:
+
+- `npm run capture` (in `Prototype`, `scripts/capture/`) opens the running app in Chrome as the demo customer, business and admin, and records every page at full length, plus every tab and every dialog or menu a page can open. New pages are found from `src/app` automatically; `[id]` routes use the first matching link on their list page. It also replays the booking journey (customer requests a stay → business accepts → customer pays with simulated MTN → admin sees the payment), capturing each step.
+- The captures are bundled per portal into `design/handoff/<portal>/<portal>-captured.json` (repeated images stored once). Pages are grouped and numbered exactly like the hand-built plugins (`scripts/capture/groups.mjs`; the customer website gets its own groups), with each page's own heading and intro line as its description.
+- `design/figma-captured/{admin,business,customer}` are Figma development plugins that load that bundle from GitHub `main` and build the cover & flow map, one page per group (sections `07.1 …`, captions `07.1.2 — …`), and the journeys, in the hand-built plugins' layout, colours and type. Each run replaces the pages it made before and the hand-built plugin's cover and screen pages (matched by name); the hand-built `00 · Design system` page and any other page are kept.
+- `src/capture-fresh.test.ts` fails when UI code (`src`, `public`, `tailwind.config.ts`) changed since the last capture.
+
+Capturing creates demo bookings and a demo payment in the local database. `playwright` was added as a dev dependency (it drives the installed Chrome; no browser download).

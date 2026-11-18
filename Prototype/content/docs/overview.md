@@ -28,6 +28,8 @@
 
 **Images:** the shared `ImageUploader` (`src/components/ui/image-uploader.tsx`) base64-encodes photos client-side and stores them as text directly in Postgres — there is no object storage integration. It does enforce a 10MB/file, image-type-only, and a photo-count cap as of 9 September 2026, but the storage mechanism itself is still base64-in-DB.
 
+**Figma designs (18 Nov 2026):** the Figma files are generated from the running app, not drawn by hand. `npm run capture` (`scripts/capture/`) records every page, tab, dialog and menu of the three surfaces plus the booking journey into `design/handoff/`, and the plugins in `design/figma-captured/` rebuild them in Figma from GitHub `main`. `src/capture-fresh.test.ts` fails until UI changes are recaptured.
+
 **This document, and the companion changelog, are themselves a module:** `/docs`, `/docs/changelog`, `/docs/overview` (`src/app/docs/**`), rendering markdown from `content/docs/*.md` via `src/lib/docs.ts`, linked from the public `SiteFooter`. **Public** — no auth gate. Kept up to date as part of every code change per the standing rule in `CLAUDE.md`.
 
 ---

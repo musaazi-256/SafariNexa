@@ -1,0 +1,16 @@
+{
+  "name": "SafariNexa Admin · captured designs",
+  "id": "safarinexa-admin-captured",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": [
+    "figma"
+  ],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://raw.githubusercontent.com"
+    ],
+    "reasoning": "Loads the captured designs committed to the SafariNexa repository on GitHub."
+  }
+}

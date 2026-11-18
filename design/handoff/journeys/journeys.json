@@ -1,0 +1,113 @@
+[
+ {
+  "id": "j-booking-loop",
+  "title": "A customer books a stay, the business accepts and the customer pays",
+  "summary": "Grace finds a lodge on the customer website, picks a room and dates, and sends a booking request with her traveller details. The lodge accepts it in the business portal, which asks her to pay; she pays with mobile money (simulated) and the booking is confirmed. Operations sees the payment in the admin portal, where it waits to be settled to the business.",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Accommodation: verified stays with location, rating, availability and price per night. Next: open Murchison River Lodge.",
+    "screen": "j-booking-loop-01",
+    "route": "/accommodation"
+   },
+   {
+    "lane": "customer",
+    "label": "Listing page: photos, rooms with price and cancellation terms, amenities, policies and reviews. Next: Reserve a room.",
+    "screen": "j-booking-loop-02",
+    "route": "/accommodation/demo-lodge"
+   },
+   {
+    "lane": "customer",
+    "label": "Reserve selects that room in the booking panel beside the listing: room type, guests, an availability calendar (booked nights are disabled) and add-ons. Next: choose check-in and check-out.",
+    "screen": "j-booking-loop-03",
+    "route": "/accommodation/demo-lodge"
+   },
+   {
+    "lane": "customer",
+    "label": "Dates chosen: the panel shows the stay and total, with Add to cart, Save to favourites and Continue to checkout. Next: Continue to checkout.",
+    "screen": "j-booking-loop-04",
+    "route": "/accommodation/demo-lodge"
+   },
+   {
+    "lane": "customer",
+    "label": "Checkout · Complete your booking: special requests and traveller details (prefilled from the profile; phone required), with the estimated total. Next: Continue to payment.",
+    "screen": "j-booking-loop-05",
+    "route": "/checkout/multi"
+   },
+   {
+    "lane": "customer",
+    "label": "Booking status: the request is sent and awaits the business (with a response deadline). No payment is taken yet. Next: the business responds.",
+    "screen": "j-booking-loop-06",
+    "route": "/payments"
+   },
+   {
+    "lane": "system",
+    "label": "Booking created as Awaiting confirmation; the business is notified and has until the response deadline to accept or decline."
+   },
+   {
+    "lane": "business",
+    "label": "Business · Bookings: BK-01FE7C9C is listed as Awaiting confirmation, payment Not started. Next: open it.",
+    "screen": "j-booking-loop-07",
+    "route": "/business/bookings"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Booking page: dates, room, traveller and customer details, the response deadline, Accept request — ask customer to pay, and Decline booking. Next: accept.",
+    "screen": "j-booking-loop-08",
+    "route": "/business/bookings/cmwm6to8d003gj16gz2tvhat2"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Accepted: the booking now shows Payment required with a payment deadline; the customer is asked to pay.",
+    "screen": "j-booking-loop-09",
+    "route": "/business/bookings/cmwm6to8d003gj16gz2tvhat2"
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Payment required, the outstanding amount, Complete payment and Cancel booking. Next: Complete payment.",
+    "screen": "j-booking-loop-10",
+    "route": "/bookings/cmwm6to8d003gj16gz2tvhat2"
+   },
+   {
+    "lane": "customer",
+    "label": "Complete payment: MTN Mobile Money, Airtel Money, Visa / Mastercard or international card, an optional number for the prompt preview, the simulation result and the total due. MTN and Payment succeeds are selected. Next: Pay.",
+    "screen": "j-booking-loop-11",
+    "route": "/payments"
+   },
+   {
+    "lane": "customer",
+    "label": "Payment successful: confirmation with a DEMO- payment reference; the booking is confirmed.",
+    "screen": "j-booking-loop-12",
+    "route": "/payments/receipt"
+   },
+   {
+    "lane": "system",
+    "label": "Payment recorded as Successful; the booking moves to Confirmed and the business's share becomes unsettled earnings."
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: confirmed and paid, with the payment in Payments & refunds.",
+    "screen": "j-booking-loop-13",
+    "route": "/bookings/cmwm6to8d003gj16gz2tvhat2"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Booking page: confirmed and paid; refunds can be issued from Payments & refunds.",
+    "screen": "j-booking-loop-14",
+    "route": "/business/bookings/cmwm6to8d003gj16gz2tvhat2"
+   },
+   {
+    "lane": "admin",
+    "label": "Admin · Payments, refunds & payouts: the new payment at the top, and Settle payouts for eligible payments to verified businesses.",
+    "screen": "j-booking-loop-15",
+    "route": "/admin/payments"
+   },
+   {
+    "lane": "admin",
+    "label": "Admin · Booking page for BK-01FE7C9C: customer, business, dates, traveller details, status, and the payment with its DEMO- reference.",
+    "screen": "j-booking-loop-16",
+    "route": "/admin/bookings/cmwm6to8d003gj16gz2tvhat2"
+   }
+  ]
+ }
+]

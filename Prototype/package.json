@@ -15,7 +15,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:demo:nile": "tsx scripts/seed-nile-crater.ts",
     "dev:verify": "SAFARINEXA_NEXT_DIST_DIR=.next-verify next dev --hostname 127.0.0.1 --port 3001",
-    "audit:headings": "node scripts/audit-page-headings.cjs"
+    "audit:headings": "node scripts/audit-page-headings.cjs",
+    "capture": "node scripts/capture/all.mjs",
+    "capture:plugins": "node ../design/figma-captured/build.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
@@ -65,6 +67,7 @@
     "eslint-config-next": "^14.2.15",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
+    "playwright": "^1.49.1",
     "postcss": "^8.4.47",
     "prisma": "^5.22.0",
     "tailwindcss": "^3.4.13",
