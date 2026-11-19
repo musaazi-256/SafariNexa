@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 
-export type DocSlug = "changelog" | "overview";
+export type DocSlug = "changelog" | "overview" | "verification";
 
 export const DOC_META: Record<DocSlug, { title: string; description: string }> = {
   changelog: {
@@ -11,6 +11,10 @@ export const DOC_META: Record<DocSlug, { title: string; description: string }> =
   overview: {
     title: "Project documentation",
     description: "Every module, by portal — customer, business, and admin — with what's real versus simulated."
+  },
+  verification: {
+    title: "Verification & review flows",
+    description: "Business verification, listing approval and customer reviews: every page, every action, who can take it and what it changes."
   }
 };
 

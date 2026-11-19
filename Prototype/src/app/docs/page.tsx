@@ -13,7 +13,7 @@ export const metadata = {
   description: "Internal engineering documentation: recent changes and a module-by-module project reference."
 };
 
-const SLUGS: DocSlug[] = ["changelog", "overview"];
+const SLUGS: DocSlug[] = ["changelog", "overview", "verification"];
 
 export default function DocsIndexPage() {
   return (

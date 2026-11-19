@@ -3,35 +3,35 @@
   "id": "business-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/business/bookings/cmwm5rgfi002tj16gr75ne5s4",
+  "route": "/business/bookings/cmwo5fe7a00cgj16g9yxyzvd8",
   "pattern": "/business/bookings/[id]",
   "kind": "page",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-0A8A07FE"
+  "purpose": "Booking BK-E71FC62E"
  },
  {
   "id": "business-bookings-id--menu-nile-crater-lodges4-businesses",
   "section": "Bookings",
   "name": "Bookings · details · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/bookings/cmwm5rgfi002tj16gr75ne5s4",
+  "route": "/business/bookings/cmwo5fe7a00cgj16g9yxyzvd8",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-0A8A07FE",
+  "purpose": "Booking BK-E71FC62E",
   "parent": "business-bookings-id"
  },
  {
   "id": "business-bookings-id--menu-account-menu",
   "section": "Bookings",
   "name": "Account menu menu",
-  "route": "/business/bookings/cmwm5rgfi002tj16gr75ne5s4",
+  "route": "/business/bookings/cmwo5fe7a00cgj16g9yxyzvd8",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-0A8A07FE",
+  "purpose": "Booking BK-E71FC62E",
   "parent": "business-bookings-id",
   "chrome": true
  },
@@ -130,6 +130,54 @@
   "parent": "business-bookings"
  },
  {
+  "id": "business-bookings--menu-actions-for-booking-bk-e71fc62e",
+  "section": "Bookings",
+  "name": "Bookings · Actions for booking BK-E71FC62E menu",
+  "route": "/business/bookings",
+  "pattern": "/business/bookings",
+  "kind": "menu",
+  "signedOut": false,
+  "heading": "Bookings",
+  "purpose": "Handle booking requests and confirmations.",
+  "parent": "business-bookings"
+ },
+ {
+  "id": "business-bookings--menu-actions-for-booking-bk-8c6d2af4",
+  "section": "Bookings",
+  "name": "Bookings · Actions for booking BK-8C6D2AF4 menu",
+  "route": "/business/bookings",
+  "pattern": "/business/bookings",
+  "kind": "menu",
+  "signedOut": false,
+  "heading": "Bookings",
+  "purpose": "Handle booking requests and confirmations.",
+  "parent": "business-bookings"
+ },
+ {
+  "id": "business-bookings--menu-actions-for-booking-bk-87b2cf13",
+  "section": "Bookings",
+  "name": "Bookings · Actions for booking BK-87B2CF13 menu",
+  "route": "/business/bookings",
+  "pattern": "/business/bookings",
+  "kind": "menu",
+  "signedOut": false,
+  "heading": "Bookings",
+  "purpose": "Handle booking requests and confirmations.",
+  "parent": "business-bookings"
+ },
+ {
+  "id": "business-bookings--menu-actions-for-booking-bk-01fe7c9c",
+  "section": "Bookings",
+  "name": "Bookings · Actions for booking BK-01FE7C9C menu",
+  "route": "/business/bookings",
+  "pattern": "/business/bookings",
+  "kind": "menu",
+  "signedOut": false,
+  "heading": "Bookings",
+  "purpose": "Handle booking requests and confirmations.",
+  "parent": "business-bookings"
+ },
+ {
   "id": "business-bookings--menu-actions-for-booking-bk-0a8a07fe",
   "section": "Bookings",
   "name": "Bookings · Actions for booking BK-0A8A07FE menu",
@@ -169,54 +217,6 @@
   "id": "business-bookings--menu-actions-for-booking-bk-f6797764",
   "section": "Bookings",
   "name": "Bookings · Actions for booking BK-F6797764 menu",
-  "route": "/business/bookings",
-  "pattern": "/business/bookings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
-  "parent": "business-bookings"
- },
- {
-  "id": "business-bookings--menu-actions-for-booking-bk-517b5003",
-  "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-517B5003 menu",
-  "route": "/business/bookings",
-  "pattern": "/business/bookings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
-  "parent": "business-bookings"
- },
- {
-  "id": "business-bookings--menu-actions-for-booking-bk-8771f184",
-  "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-8771F184 menu",
-  "route": "/business/bookings",
-  "pattern": "/business/bookings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
-  "parent": "business-bookings"
- },
- {
-  "id": "business-bookings--menu-actions-for-booking-bk-6f3868ce",
-  "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-6F3868CE menu",
-  "route": "/business/bookings",
-  "pattern": "/business/bookings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
-  "parent": "business-bookings"
- },
- {
-  "id": "business-bookings--menu-actions-for-booking-bk-6b9e3d07",
-  "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-6B9E3D07 menu",
   "route": "/business/bookings",
   "pattern": "/business/bookings",
   "kind": "menu",
@@ -282,6 +282,29 @@
   "heading": "Nile & Crater Lodges",
   "purpose": "Here's what's happening with your business today.",
   "parent": "business-dashboard"
+ },
+ {
+  "id": "business-getting-started",
+  "section": "Getting started",
+  "name": "Getting started",
+  "route": "/business/getting-started",
+  "pattern": "/business/getting-started",
+  "kind": "page",
+  "signedOut": false,
+  "heading": "Getting started",
+  "purpose": "Follow these steps to get Nile & Crater Lodges verified and taking bookings on SafariNexa. Each step updates as you go."
+ },
+ {
+  "id": "business-getting-started--menu-nile-crater-lodges4-businesses",
+  "section": "Getting started",
+  "name": "Getting started · Nile & Crater Lodges4 businesses menu",
+  "route": "/business/getting-started",
+  "pattern": "/business/getting-started",
+  "kind": "menu",
+  "signedOut": false,
+  "heading": "Getting started",
+  "purpose": "Follow these steps to get Nile & Crater Lodges verified and taking bookings on SafariNexa. Each step updates as you go.",
+  "parent": "business-getting-started"
  },
  {
   "id": "business-guides-new",
@@ -384,6 +407,29 @@
   "heading": "Edit Accommodation listing",
   "purpose": "Update your listing details to keep your information accurate and up to date.",
   "parent": "business-listings-id-edit"
+ },
+ {
+  "id": "business-listings-id-preview",
+  "section": "Listings",
+  "name": "Listings › Preview",
+  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/preview",
+  "pattern": "/business/listings/[id]/preview",
+  "kind": "page",
+  "signedOut": false,
+  "heading": "[TEST] Payment workflow fixture",
+  "purpose": "Location not added"
+ },
+ {
+  "id": "business-listings-id-preview--menu-nile-crater-lodges4-businesses",
+  "section": "Listings",
+  "name": "Listings › Preview · Nile & Crater Lodges4 businesses menu",
+  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/preview",
+  "pattern": "/business/listings/[id]/preview",
+  "kind": "menu",
+  "signedOut": false,
+  "heading": "[TEST] Payment workflow fixture",
+  "purpose": "Location not added",
+  "parent": "business-listings-id-preview"
  },
  {
   "id": "business-listings-id-review",
@@ -1009,6 +1055,18 @@
   "parent": "business-settings-verification"
  },
  {
+  "id": "business-settings-verification--menu-actions-for-incorporation",
+  "section": "Settings",
+  "name": "Settings › Verification · Actions for INCORPORATION menu",
+  "route": "/business/settings/verification",
+  "pattern": "/business/settings/verification",
+  "kind": "menu",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "Manage your business profile, verification documents, staff access, and preferences.",
+  "parent": "business-settings-verification"
+ },
+ {
   "id": "business-support",
   "section": "Support",
   "name": "Support",
@@ -1063,9 +1121,20 @@
   "pattern": "/business/verification",
   "kind": "page",
   "signedOut": false,
-  "redirect": "/business/settings/verification",
-  "heading": "Settings",
-  "purpose": "Manage your business profile, verification documents, staff access, and preferences."
+  "heading": "Verification outcomes",
+  "purpose": "See the review decisions for your business and each of your listings, with the reviewer's notes."
+ },
+ {
+  "id": "business-verification--menu-nile-crater-lodges4-businesses",
+  "section": "Verification",
+  "name": "Verification · Nile & Crater Lodges4 businesses menu",
+  "route": "/business/verification",
+  "pattern": "/business/verification",
+  "kind": "menu",
+  "signedOut": false,
+  "heading": "Verification outcomes",
+  "purpose": "See the review decisions for your business and each of your listings, with the reviewer's notes.",
+  "parent": "business-verification"
  },
  {
   "id": "business-auth-accept",

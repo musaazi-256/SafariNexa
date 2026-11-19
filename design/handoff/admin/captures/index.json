@@ -26,7 +26,7 @@
   "id": "admin-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/admin/bookings/cmwm5rgfi002tj16gr75ne5s4",
+  "route": "/admin/bookings/cmwo5fe7a00cgj16g9yxyzvd8",
   "pattern": "/admin/bookings/[id]",
   "kind": "page",
   "signedOut": false,
@@ -79,6 +79,29 @@
   "heading": "Bookings oversight",
   "purpose": "Monitor bookings across every business on the platform.",
   "parent": "admin-bookings"
+ },
+ {
+  "id": "admin-businesses-id-listings-listingId",
+  "section": "Businesses",
+  "name": "Listings · details",
+  "route": "/admin/businesses/cmw1llagf0019yydz4wwd5i9e/listings/transport-bulk-15",
+  "pattern": "/admin/businesses/[id]/listings/[listingId]",
+  "kind": "page",
+  "signedOut": false,
+  "heading": "Kampala Special Hire — Sedan or SUV",
+  "purpose": "The listing's current saved content, review history and booking activity."
+ },
+ {
+  "id": "admin-businesses-id-listings-listingId--tab-all-fields",
+  "section": "Businesses",
+  "name": "Listings · details · All fields tab",
+  "route": "/admin/businesses/cmw1llagf0019yydz4wwd5i9e/listings/transport-bulk-15",
+  "pattern": "/admin/businesses/[id]/listings/[listingId]",
+  "kind": "tab",
+  "signedOut": false,
+  "heading": "Kampala Special Hire — Sedan or SUV",
+  "purpose": "The listing's current saved content, review history and booking activity.",
+  "parent": "admin-businesses-id-listings-listingId"
  },
  {
   "id": "admin-businesses-id",
@@ -145,8 +168,8 @@
   "pattern": "/admin/listings/[id]",
   "kind": "page",
   "signedOut": false,
-  "heading": "Review listing submission",
-  "purpose": "Check submitted details and photos, then record your review decision."
+  "heading": "Riverside Glamping (draft)",
+  "purpose": "Open every photo and document, check the details, then record your decision. Approval publishes exactly this content."
  },
  {
   "id": "admin-listings",

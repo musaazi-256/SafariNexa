@@ -67,7 +67,7 @@
 
 ### 2.6 Reviews
 **Status: Working.**
-- `/reviews/new` — a review can only be written against a real completed booking with no existing review (`findEligibleReviewBooking` in `src/lib/listings.ts`); the previous synthetic-booking bypass is gone.
+- `/reviews/new` — a review can only be written against a real completed booking with no existing review (`findEligibleReviewBooking` in `src/lib/listings.ts`); the previous synthetic-booking bypass is gone. **As of 19 Nov 2026**: star rating input, 20-character minimum, booking summary card; a missing rating is rejected instead of saved as 1 star. The direct-review forms on listing pages share the star input but keep their own looser server checks.
 
 ### 2.7 Messaging
 **Status: Working**, built 31 Aug–1 Sept 2026.
@@ -104,6 +104,7 @@ Entry: `/business` → `requireBusinessSession()`. A business owner first has a 
 
 ### 3.1 Onboarding
 **Status: Working**, real persistence as of 9 Sept.
+- **Added 19 Nov 2026**: `/business/getting-started` — an eight-step setup guide whose progress is computed from real records (`src/lib/business-getting-started.ts`); a progress card on the dashboard links to it until every step is done.
 - `/business/onboarding` (intro) → `/business/onboarding/setup` (the `OnboardingWizard` component, `src/components/business/onboarding-wizard.tsx`).
 - All three steps' fields (business basics, contact person, documents) are now actually sent and persisted (fixed 9 Sept — previously silently dropped description, registration number, and contact name/role). Document upload writes to the local filesystem (`fs.writeFile` to `public/uploads`) — **this will not reliably persist on typical serverless hosting**; flagged as a pre-deployment blocker, not yet fixed.
 
@@ -119,6 +120,7 @@ Entry: `/business` → `requireBusinessSession()`. A business owner first has a 
 - Accommodation rooms/add-ons use a repeatable-row pattern (`RoomTypeEditor`/`AddOnEditor`). **Editing now correctly diffs by ID** (update existing, create new, only delete rows with zero bookings) — this used to blanket delete-and-recreate every room on every edit, corrupting bed type/features/refund settings; fixed 9 Sept.
 - `destinationId` assignment works correctly (fixed in an earlier session); `Destination` itself remains seed-only (see §2.1).
 - "Preview listing" now opens the real listing page in edit mode (fixed 9 Sept; intentionally absent on the create form, since there's no page to preview yet).
+- **Added 19 Nov 2026**: `/business/listings/[id]/preview` shows the saved listing (or pending draft revision) in the traveller layout, with Edit and Submit for approval. It is a separate layout (`components/business/listing-preview.tsx`), not the public detail page, so changes to the public pages need mirroring there.
 
 ### 3.4 Bookings management
 **Status: Working.**
@@ -140,8 +142,9 @@ Entry: `/business` → `requireBusinessSession()`. A business owner first has a 
 - `/business/revenue` — the headline stat totals (gross/commission/net/refunded) are real, computed from actual `Payment` rows. **As of 1 Nov 2026**, these now derive from real booking-level payment allocations including multi-business orders, replacing some of the previously simulated revenue-chart data. The comparison percentages, date-range picker, and some line items may still be hardcoded/non-functional — not fully re-audited item-by-item since the 1 Nov remediation; verify against `SAFARINEXA_FIXES_AND_VERIFICATION_2026-11-01.md` before trusting anything beyond the headline totals.
 
 ### 3.9 Verification
-**Status: Working**, business side.
-- `/business/verification` — document upload (real file write, same serverless caveat as onboarding) and a status banner that now shows real, status-specific copy plus the admin's actual reviewer notes when present (fixed 9 Sept — previously a static "under review" regardless of real status). Document deletion now works via a real dropdown action (added 9 Sept).
+**Status: Working**, business side. Every page and action in the verification and listing-approval flows is documented in `/docs/verification` (`content/docs/verification.md`), and captured step by step as Figma journeys.
+- **As of 19 Nov 2026**, `/business/verification` is the verification outcomes page: the business decision plus every listing's latest review outcome and reviewer notes. Document upload lives at `/business/settings/verification`.
+- `/business/settings/verification` — document upload (real file write, same serverless caveat as onboarding) and a status banner that now shows real, status-specific copy plus the admin's actual reviewer notes when present (fixed 9 Sept — previously a static "under review" regardless of real status). Document deletion now works via a real dropdown action (added 9 Sept).
 
 ### 3.10 Settings
 **Status: Working for Business Profile and Staff Access, placeholder for Notifications.**
@@ -164,11 +167,13 @@ Entry: `/admin` → `requireAdminSession()`, gated on `session.user.isAdmin` in 
 - `/admin/dashboard` — a substantial rewrite (25 Aug) added many real database queries; as of 1 Nov 2026, admin dashboard activity/health metrics that were previously hardcoded/simulated were replaced with real queries as part of the same remediation that fixed business revenue (§3.8). Not every literal panel has been individually re-verified since — if a specific number looks suspiciously round, check it against the database before relying on it. Empty-state mock rows in the verification/support panels no longer look clickable (fixed 9 Sept). The dashboard also now links to a real `/admin/audit` route (added 1 Nov 2026 — previously linked twice but 404'd).
 
 ### 4.2 Verification queue
-**Status: Working.**
+**Status: Working.** Per-page actions, rules and outcomes for business verification and listing approval: `/docs/verification`.
 - `/admin/verification` — approve/request-changes/flag actions correctly sync `BusinessProfile.verificationStatus` in one transaction, and now carry a real reviewer-notes textarea that reaches the business owner's notification (fixed 9 Sept — previously hardcoded to a generic string). **Added 1 Nov 2026**: `/admin/verification/[id]` detail route (the dashboard linked to it before this date, but only the collection route existed — a reproduced 404). Verification documents now live in private storage with content/type/size validation; old public `/uploads` URLs are intercepted and require admin authorization (`src/lib/private-documents.ts`).
 
 ### 4.3 Businesses
 **Status: Working.**
+- **As of 20 Nov 2026**: the listing review (`/admin/listings/[id]`) keeps the reviewer's progress (opened photos and documents) per submission for the browser tab, and the portal's background refresh pauses while a review or any unsaved form is in progress (`src/components/live-refresh.tsx`). Before this, the minute-by-minute refresh cleared typed notes and review progress on every admin and business page.
+- **Added 19 Nov 2026**: listing rows on `/admin/businesses/[id]` open `/admin/businesses/[id]/listings/[listingId]`, a read-only listing record (traveller view / all fields, booking and rating stats, review history). `/admin/listings/[id]` (listing verification) was rebuilt in the business-verification layout with the same decision rules.
 - `/admin/businesses`, `/admin/businesses/[id]` — search and status-tab filtering are real. **As of 1 Nov 2026**, "Filter" submits a real URL-backed search and "Export" downloads the visible rows as CSV, replacing the previously decorative toolbar pattern described here before that date. The row's dead "⋮" overflow menu was removed (11 Sept) — a working "View" link/button already sat next to it in the same row, so the menu offered no real destination of its own.
 
 ### 4.4 Users & access
@@ -241,3 +246,5 @@ One list, so nothing here is repeated-but-inconsistent across the sections above
 Everything else described in this document as "Working" was verified — by direct code trace, by a passing `tsc`/`eslint`/`jest` run, and in the highest-risk cases by an actual browser session — during the sessions covered in the companion changelog document. For the 1 Nov 2026 batch specifically, see `SAFARINEXA_FULL_PRODUCT_ENGINEERING_AUDIT_2026-11-01.md` and `SAFARINEXA_FIXES_AND_VERIFICATION_2026-11-01.md` (repo root) for full line-level detail — this document summarizes, it doesn't replace them.
 
 11. **Structural/naming debt** (found 9 Sept 2026) — the mechanical issues were fixed same day: `src/lib/actions.ts` split into `src/lib/actions/{session,customer,business}.ts`, the dead duplicate `use-mobile` hook removed, root-level scripts consolidated into `scripts/`, and portal-shell components (sidebars, switchers, `AccountLayout`) reorganized into `src/components/{business,admin,customer}/` consistently. **Still open, deliberately deferred**: a few route shapes diverge between portals — admin's sign-in path breaks the pattern customer/business use, the business portal's "list→edit" and admin's "list→view" shapes differ for the same underlying concept, admin bookings has no detail route (customer and business both do), and `/reviews` has no index page. These change real URLs/behavior rather than just renaming files, so they weren't fixed silently — see `SAFARINEXA_STRUCTURE_NAMING_AUDIT_2026-09-09.md` (repo root) for the full original findings.
+
+12. **Re-verification hides listings** (found 20 Nov 2026) — an Approved business that uploads another verification document goes back to Submitted, and every public page requires an Approved business, so all its listings disappear from the marketplace until an admin approves it again. The upload form doesn't warn about this. Needs a product decision (e.g. keep listings live during re-verification, or warn before submitting). See `/docs/verification` §2.3.

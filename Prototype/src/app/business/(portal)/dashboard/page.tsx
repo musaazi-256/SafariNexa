@@ -17,6 +17,8 @@ import { RevenueOverviewChart } from "@/components/business/revenue-charts";
 import { DashboardQuickActions } from "@/components/business/dashboard-quick-actions";
 import { VerificationWelcomeModal } from "@/components/business/verification-modals";
 import { EmptyState } from "@/components/ui/empty-state";
+import { GettingStartedCard } from "@/components/business/getting-started";
+import { gettingStartedSteps } from "@/lib/business-getting-started";
 
 export default async function BusinessDashboardPage() {
   const { business, businessId } = await requireBusinessSession();
@@ -74,6 +76,7 @@ export default async function BusinessDashboardPage() {
   const settledMinor = monthPayouts.reduce((sum, p) => sum + p.amountMinor, 0);
   const { average, count } = ratingSummary(publishedReviews);
 
+  const setupSteps = await gettingStartedSteps(businessId);
   const recentBookings = await db.booking.findMany({where:{businessId,status:"AWAITING_BUSINESS_CONFIRMATION"},include:{listing:true},orderBy:{createdAt:"desc"},take:5});
   const chartBookings = await db.booking.findMany({where:{businessId,createdAt:{gte:startOfMonth}},select:{createdAt:true,status:true}});
   const bookingDays = new Map<string,{name:string;completed:number;upcoming:number;cancelled:number}>();
@@ -108,11 +111,13 @@ export default async function BusinessDashboardPage() {
             <AlertCircle className="h-4 w-4" />
             <h5 className="leading-none tracking-tight">Application Status: {business.verificationStatus.replace("_", " ")} - You cannot publish listings yet.</h5>
           </div>
-          <Link href="/business/settings/verification" className="flex items-center gap-1 font-semibold text-primary hover:underline text-sm">
+          <Link href="/business/verification" className="flex items-center gap-1 font-semibold text-primary hover:underline text-sm">
             Check Status <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       )}
+
+      <GettingStartedCard steps={setupSteps} />
 
       {/* Stat Cards */}
       <StatGrid>

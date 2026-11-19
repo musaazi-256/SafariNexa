@@ -19,5 +19,6 @@ Figma screens and journeys are captured from the running app, not drawn by hand.
 - `npm test` fails with "UI code changed since the last capture" until you do.
 - New pages are picked up automatically. Give a new route a group in `scripts/capture/groups.mjs`, or it appears in Figma under "Detected automatically · not yet grouped".
 - A feature that adds a new user flow should add a journey to `scripts/capture/journeys.mjs`: steps are real actions, and each label says what the screen shows, then "Next:" and the action.
+- A journey that changes records (submits, approves, rejects, reviews) should act on demo data from `scripts/capture/fixtures.mjs` (`fixture: "<setup name>"`), which resets it before the journey and deletes it after the run, rather than on the shared seed data. Document each flow's pages and actions in `content/docs/verification.md` or a sibling doc.
 - The plugins in `design/figma-captured/` load the bundles from GitHub `main`; rebuild them with `npm run capture:plugins` only when `design/figma-captured/src/plugin.ts` changes, then re-import the manifest in Figma.
 - Capturing creates demo bookings and payments in the local database.

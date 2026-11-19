@@ -10,12 +10,17 @@ export const HIDE = "nextjs-portal, [data-nextjs-toast], #__next-build-watcher, 
 export async function signIn(context, account) {
   const p = await context.newPage();
   await p.goto(BASE + "/", { waitUntil: "networkidle", timeout: 180000 });
-  await p.locator(`button[title="Switch to the ${account} account"]`).first().click();
   const home = PORTALS[account].home;
-  await p.waitForURL((u) => home === "/" || u.pathname.startsWith(home), { timeout: 180000 });
-  await p.waitForLoadState("networkidle", { timeout: 180000 }).catch(() => undefined);
-  // The customer's home is "/", where the switch starts: wait until the header shows them signed in.
-  if (home === "/") await p.getByRole("link", { name: "Log in", exact: true }).waitFor({ state: "detached", timeout: 120000 }).catch(() => undefined);
+  // Wait for the switch request itself to finish (it sets the session cookie): moving on
+  // earlier cancels it, which a slow dev server makes likely (the customer's home is "/",
+  // where the switch starts, so there is no URL change to wait for).
+  for (let tries = 0; tries < 3; tries++) {
+    const switched = p.waitForResponse((r) => r.request().method() === "POST" && r.status() === 303, { timeout: 180000 }).catch(() => null);
+    await p.locator(`button[title="Switch to the ${account} account"]`).first().click();
+    await switched;
+    if ((await context.cookies()).some((c) => c.name.endsWith("session-token"))) break;
+  }
+  await p.goto(BASE + home, { waitUntil: "networkidle", timeout: 180000 });
   return p;
 }
 

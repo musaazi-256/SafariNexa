@@ -24,32 +24,47 @@ async function session(signedOut) {
   return (sessions[key] = page);
 }
 
-// "/admin/bookings/[id]" → a real id from the first matching link on "/admin/bookings".
+// "/admin/bookings/[id]" → a real id from a matching link on "/admin/bookings".
+// Nested params resolve one at a time; when the parent has no page of its own
+// ("/admin/businesses/x/listings"), the links are looked for one level up. If a
+// candidate has no example for a deeper param, the next candidate is tried.
 const ids = {};
+async function idsOn(page, at, prefix) {
+  await page.goto(BASE + (at || "/"), { timeout: 180000 });
+  await settle(page);
+  return page.evaluate(
+    ([prefix, bad]) => {
+      const out = [];
+      for (const a of document.querySelectorAll("a[href]")) {
+        const u = new URL(a.href, location.href);
+        if (u.origin !== location.origin || !u.pathname.startsWith(prefix + "/")) continue;
+        const seg = u.pathname.slice(prefix.length + 1).split("/")[0];
+        if (seg && !bad.includes(seg) && !out.includes(seg)) out.push(seg);
+      }
+      return out;
+    },
+    [prefix, [...NOT_IDS]],
+  );
+}
 async function resolve(page, pattern) {
   if (!pattern.includes("[")) return pattern;
   const segs = pattern.split("/");
   const at = segs.findIndex((s) => s.startsWith("["));
   const parent = segs.slice(0, at).join("/") || "/";
   if (!(parent in ids)) {
-    await page.goto(BASE + parent, { timeout: 180000 });
-    await settle(page);
-    ids[parent] = await page.evaluate(
-      ([prefix, bad]) => {
-        for (const a of document.querySelectorAll("a[href]")) {
-          const u = new URL(a.href, location.href);
-          if (u.origin !== location.origin || !u.pathname.startsWith(prefix + "/")) continue;
-          const seg = u.pathname.slice(prefix.length + 1).split("/")[0];
-          if (seg && !bad.includes(seg)) return seg;
-        }
-        return null;
-      },
-      [parent === "/" ? "" : parent, [...NOT_IDS]],
-    );
+    const prefix = parent === "/" ? "" : parent;
+    let found = await idsOn(page, parent, prefix);
+    if (!found.length && at > 1) found = await idsOn(page, segs.slice(0, at - 1).join("/"), prefix);
+    ids[parent] = found;
   }
-  if (!ids[parent]) return null;
-  segs[at] = ids[parent];
-  return segs.join("/");
+  const nested = segs.slice(at + 1).some((s) => s.startsWith("["));
+  for (const id of ids[parent].slice(0, nested ? 8 : 1)) {
+    const next = [...segs];
+    next[at] = id;
+    const resolved = await resolve(page, next.join("/"));
+    if (resolved) return resolved;
+  }
+  return null;
 }
 
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);

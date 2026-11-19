@@ -179,7 +179,7 @@
   "id": "customer-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/bookings/cmwm5rgfi002tj16gr75ne5s4",
+  "route": "/bookings/cmwo5fe7a00cgj16g9yxyzvd8",
   "pattern": "/bookings/[id]",
   "kind": "page",
   "signedOut": false,

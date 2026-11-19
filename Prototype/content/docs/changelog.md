@@ -471,3 +471,74 @@ The hand-built Figma plugins (`design/figma-admin-portal`, `design/figma-busines
 - `src/capture-fresh.test.ts` fails when UI code (`src`, `public`, `tailwind.config.ts`) changed since the last capture.
 
 Capturing creates demo bookings and a demo payment in the local database. `playwright` was added as a dev dependency (it drives the installed Chrome; no browser download).
+
+---
+
+## 19 November 2026 — verification, listing preview, setup guide and review screens
+
+Requested screens for the admin, business and customer portals. Built in the app, so the Figma capture picks them up.
+
+| Portal | Screen | What changed |
+|---|---|---|
+| Business | **Getting started** `/business/getting-started` (new) | Eight-step setup guide for new businesses: profile, verification, first listing, photos & prices, availability, preview & submit, go live, invite team. Each step works out done / in progress / to do from the business's real records (`src/lib/business-getting-started.ts`) and expands to a short how-to with a link. A progress card (`GettingStartedCard`) shows on the dashboard until every step is done. New sidebar item. |
+| Business | **Verification outcomes** `/business/verification` (was a redirect) | The business verification decision (status, dates, reviewer notes, next action) and every listing's latest review outcome with the reviewer's notes, sorted so listings needing action come first. Listings published before reviews existed count as live. The document upload page stays at `/business/settings/verification`. New sidebar item; the dashboard's "Check status" link points here. |
+| Business | **Listing preview** `/business/listings/[id]/preview` (new) | The listing laid out the way travellers see it (`components/business/listing-preview.tsx`): gallery, details, rooms, amenities, policies, location and price card, with booking turned off. Previews the draft revision when a published listing has one. A sticky bar shows status, Edit and Submit for approval, plus what's missing before submitting. Linked from the listings menu and the listing review page. |
+| Admin | **Listing verification** `/admin/listings/[id]` | Rebuilt as a two-column review screen like business verification: cover photo and submitted content on the left; submission details (business and its verification status, new vs revision, submitter, readable dates), feedback, the decision form (styled checklist) and earlier submissions on the right. "Mark as under review" no longer requires notes. Approve is disabled while the business is unverified. Same form fields and `decideListing` rules. Queue rows gained a thumbnail and status badges. |
+| Admin | **Business listings** `/admin/businesses/[id]` + `/admin/businesses/[id]/listings/[listingId]` (new) | Listing rows on the business page show photo, city, price, bookings and status, and open a new listing record page: traveller view or all fields, price/bookings/rating/published stats, review history, and links to the pending submission and public page. |
+| Customer | **Write a review** `/reviews/new` | Star rating with labels (shared `ReviewForm`, also used on listing pages), a 20-character minimum with counter, guidelines, and a booking summary card. The server action no longer turns a missing rating into 1 star. |
+
+Capture: new routes grouped in `scripts/capture/groups.mjs`; `run.mjs` now resolves routes with more than one `[param]`.
+
+**Verified:** tsc and the jest suite pass; every screen rendered as the demo business, admin and customer with no browser errors.
+
+### Follow-up, same day — admin sees every photo and document before deciding; design-system pass
+
+**Listing verification (`/admin/listings/[id]`):** reviewers now open everything before the decision.
+
+- **Photos** card: every submitted photo grouped as Cover, Gallery and each room, opened full size in the existing lightbox (arrow keys move between photos). Each tile shows Viewed once opened, with a progress bar.
+- **Documents** card: the business's verification documents (latest verification with files) plus a restaurant's menu link. Each opens in an in-page viewer with an "Open in new tab" fallback. `/api/documents/[filename]` accepts `?view=inline` so the file can show in the same-origin frame; access checks are unchanged and the default is still a download.
+- **Approval checklist** (`components/admin/listing-evidence-review.tsx`) uses the shared `Checkbox`. "I inspected every photo" stays locked until every photo has been opened; "business evidence reviewed" stays locked until every document has been opened. Server rules in `decideListing` are unchanged (all four checks still required to approve).
+- **Listing details** card shows every field; photos are summarised there instead of repeated (`ListingSubmissionContent` gained `hideImages`).
+- Demo data: the four approved seed businesses now have three verification documents each (`prisma/seed.ts`), matching their "Trading license and ownership ID verified" notes.
+
+**Design-system pass on the new screens** (against `DESIGN_SYSTEM_PLAN.md` and the 2 Nov consistency rules):
+
+| Screen | Fix |
+|---|---|
+| Admin business detail | Listing rows overflowed at 390px (truncated titles in a grid column without `min-w-0`); status badges were hidden on phones. Both fixed; slate/white colours in the rows replaced with tokens; rows get a focus ring. |
+| Admin listing record | Pill segmented control replaced by shared `Tabs` (quiet inset style); embedded preview no longer renders a second `<h1>`. |
+| Listing preview | Hand-made disabled button replaced by `Button`; section headings use `type-section`, matching the public listing pages. |
+| Getting started | Expandable steps get the 2px focus ring; cards use `shadow-card` like `Card`; headings use `type-card`. |
+| Verification outcomes | `shadow-card`, `type-*` headings; "Full review history" text link is now a ghost button target. |
+| Write a review | Booking summary uses `Card` and the `type-eyebrow` role instead of hand-rolled all caps. |
+
+**Verified:** tsc, lint and tests pass; in Chrome as the demo admin, the photo and evidence checks start locked, unlock after all 5 photos and 3 documents are opened, and the form posts all four checks; Escape closes the document viewer. All new screens fit 390px without horizontal scroll.
+
+---
+
+## 20 November 2026 — verification flows captured as journeys, documented per page; background refresh no longer wipes work
+
+**Journeys (Figma "Journeys" pages):** six new journeys in `scripts/capture/journeys.mjs`, each performed for real across the portals with a caption per step that says what the screen shows and the next action:
+
+| Journey | Steps | Covers |
+|---|---|---|
+| `business-verification` | 21 | Setup guide → upload → admin requests changes → business sees notes, uploads more → admin starts review → approves → guide step done |
+| `business-verification-rejected` | 9 | Fraud-hold confirmation from the queue (not confirmed), rejection with reasons, what the business sees |
+| `listing-verification` | 24 | Preview as traveller → submit → admin opens every photo (viewer) and document (viewer), checks unlock → under review → changes requested → business sees feedback, edits, resubmits → approve and publish → live on the marketplace |
+| `listing-withdraw-reject` | 9 | Submit → withdraw → resubmit → reject → outcome and history |
+| `customer-review` | 10 | Completed booking → write a review (validation, then five stars) → on the listing → business replies → admin Hide confirmation |
+| `admin-business-listings` | 5 | Businesses → business → listing record (traveller view, all fields) → the approval that published it |
+
+They act on a demo business, Kidepo Ridge Lodge, from the new `scripts/capture/fixtures.mjs`: each journey resets it to its starting state (with real PDF evidence the admin can open) and the run deletes it afterwards, including its uploaded files and the notifications about it. Audit log entries from the run remain.
+
+**Documentation:** new in-app page `/docs/verification` (`content/docs/verification.md`): every page in the business verification, listing approval, admin listing browsing and review flows, each action, who can take it, its rules and what it changes, plus known gaps.
+
+**Bug fix — portal background refresh wiped unsaved work:** `LiveRefresh` (admin, business and customer account pages) calls `router.refresh()` every 60 seconds, which re-rendered the page and cleared typed reviewer notes, other unsaved form fields and the listing review's viewed/ticked state. Found while recording the journeys; reproduced on the existing business verification review as well. The refresh now skips while any field differs from its saved value, or while an element asks it to pause (`data-live-refresh="pause"`, used by a listing review in progress). Listing review progress (opened photos and documents) is also kept per submission in session storage, so a reload keeps it.
+
+**Accessibility:** the cover photo tile was announced as "Open cover photo photo 1"; now "Open cover photo 1".
+
+**Found, not changed:** an approved business that uploads another verification document goes back to Submitted, which hides all its listings from travellers until it is approved again. Documented in `/docs/verification` §6; needs a product decision.
+
+**Capture fix:** the capture's demo sign-in (`scripts/capture/lib.mjs`) moved on before the account-switch request had finished, which cancelled it on a slow dev server; the customer, whose home is the page the switch starts on, then stayed signed out and the booking-loop journey failed at checkout. It now waits for the switch response and checks the session cookie, retrying up to three times.
+
+**Verified:** the six journeys complete; in Chrome, review progress, ticked checks and typed notes survive 70 seconds on the page and progress survives a reload.

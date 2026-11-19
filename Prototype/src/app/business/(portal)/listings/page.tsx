@@ -271,7 +271,7 @@ export default async function BusinessListingsPage({ searchParams }: { searchPar
                               </DropdownMenuItem>
                             </form>
                           )}
-                          <DropdownMenuItem asChild><Link href={`/business/listings/${listing.id}/review`}>Submission & feedback</Link></DropdownMenuItem>
+                          <DropdownMenuItem asChild><Link href={`/business/listings/${listing.id}/preview`}>Preview as traveller</Link></DropdownMenuItem><DropdownMenuItem asChild><Link href={`/business/listings/${listing.id}/review`}>Submission & feedback</Link></DropdownMenuItem>
                           <form action={setListingStatus}>
                             <input type="hidden" name="listingId" value={listing.id} />
                             <input type="hidden" name="status" value="DELETED" />

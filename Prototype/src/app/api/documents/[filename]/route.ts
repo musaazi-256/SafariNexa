@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { DOCUMENT_DIRECTORY } from "@/lib/private-documents";
 export const runtime = "nodejs";
-export async function GET(_req: Request, { params }: { params: { filename: string } }) {
+export async function GET(req: Request, { params }: { params: { filename: string } }) {
   const session = await auth();
   if (!session?.user) return new Response("Unauthorized", { status: 401 });
   const legacy = /^doc_[a-z0-9_]+\.(pdf|jpg|png)$/.test(params.filename);
@@ -21,7 +21,8 @@ export async function GET(_req: Request, { params }: { params: { filename: strin
     const ext = path.extname(params.filename);
     return new Response(data, { headers: {
       "Content-Type": ext === ".pdf" ? "application/pdf" : ext === ".jpg" ? "image/jpeg" : "image/png",
-      "Content-Disposition": `attachment; filename="verification${ext}"`,
+      // ?view=inline lets the admin review screen show the file in-page (same-origin frame); default stays a download.
+      "Content-Disposition": `${new URL(req.url).searchParams.get("view") === "inline" ? "inline" : "attachment"}; filename="verification${ext}"`,
       "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"
     } });
   } catch { return new Response("Not found", { status: 404 }); }

@@ -3,10 +3,10 @@ import { StatCard } from "@/components/ui/stat-card";
 import { RemoteImage } from "@/components/remote-image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Building2, ChevronLeft, MapPin, Mail, Phone, Users, FileText, CheckCircle2 } from "lucide-react";
+import { Building2, ChevronLeft, ChevronRight, MapPin, Mail, Phone, Users, FileText, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { VerificationStatusBadge } from "@/components/ui/status-badge";
+import { ListingStatusBadge, ListingSubmissionStatusBadge, VerificationStatusBadge } from "@/components/ui/status-badge";
 import { requireAdminSession } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { toVerificationStatus } from "@/lib/status";
@@ -20,7 +20,7 @@ export default async function AdminBusinessProfilePage({ params }: { params: { i
     include: {
       users: { include: { user: true } },
       verifications: { orderBy: { createdAt: "desc" } },
-      listings: true,
+      listings: { orderBy: { updatedAt: "desc" }, include: { submissions: { orderBy: { submittedAt: "desc" }, take: 1, select: { status: true } }, _count: { select: { bookings: true } } } },
       bookings: true,
     }
   });
@@ -81,7 +81,7 @@ export default async function AdminBusinessProfilePage({ params }: { params: { i
       <div className="grid lg:grid-cols-3 gap-8">
         
         {/* Left Column */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="min-w-0 lg:col-span-2 space-y-8">
           {/* Description */}
           <div className="bg-white rounded-2xl border border-border shadow-card p-6">
             <h2 className="text-lg font-semibold text-slate-900 mb-4">About this business</h2>
@@ -100,13 +100,19 @@ export default async function AdminBusinessProfilePage({ params }: { params: { i
                 <div className="p-6 text-center text-sm font-semibold text-slate-500">No listings created yet.</div>
               ) : (
                 business.listings.map((l) => (
-                  <div key={l.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <div className="flex flex-col">
-                      <span className="font-medium text-sm text-slate-900">{l.title}</span>
-                      <span className="text-xs font-medium text-slate-500 capitalize">{l.type.replace("_", " ")}</span>
+                  <Link key={l.id} href={`/admin/businesses/${business.id}/listings/${l.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
+                    <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">{l.coverImageUrl && <RemoteImage src={l.coverImageUrl} alt="" width={128} height={96} className="h-full w-full object-cover" />}</div>
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <span className="font-medium text-sm text-foreground line-clamp-2 sm:truncate">{l.title}</span>
+                      <span className="text-xs font-medium text-muted-foreground capitalize">{l.type.toLowerCase()}{l.city ? ` · ${l.city}` : ""} · {formatUGX(l.basePriceMinor)} · {l._count.bookings} {l._count.bookings === 1 ? "booking" : "bookings"}</span>
+                      <span className="mt-1.5 flex flex-wrap gap-1 sm:hidden"><ListingStatusBadge status={l.status} />{(l.submissions[0] || l.status !== "PUBLISHED") && <ListingSubmissionStatusBadge status={l.submissions[0]?.status ?? "NOT_SUBMITTED"} />}</span>
                     </div>
-                    <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium uppercase tracking-wider">{l.status}</span>
-                  </div>
+                    <div className="hidden shrink-0 flex-col items-end gap-1 sm:flex">
+                      <ListingStatusBadge status={l.status} />
+                      {(l.submissions[0] || l.status !== "PUBLISHED") && <ListingSubmissionStatusBadge status={l.submissions[0]?.status ?? "NOT_SUBMITTED"} />}
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  </Link>
                 ))
               )}
             </div>

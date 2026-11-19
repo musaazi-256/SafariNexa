@@ -937,6 +937,15 @@ async function main() {
       }
     });
 
+    // The evidence the review notes refer to, so listing reviewers can open it (demo URLs open /demo/document).
+    for (const [n, type] of [[1, "INCORPORATION"], [2, "LICENSES"], [3, "IDENTITY"]] as const) {
+      await db.businessDocument.upsert({
+        where: { id: `${business.id}-verification-doc-${n}` },
+        update: {},
+        create: { id: `${business.id}-verification-doc-${n}`, businessVerificationId: `${business.id}-verification`, type, fileUrl: `https://example.com/documents/${type.toLowerCase()}.pdf` }
+      });
+    }
+
     return business;
   }
 

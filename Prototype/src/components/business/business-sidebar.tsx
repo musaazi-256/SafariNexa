@@ -17,7 +17,9 @@ import {
   Users,
   UserCircle,
   BarChart3,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Rocket,
+  ShieldCheck
 } from "lucide-react";
 
 import { BusinessSwitcher } from "@/components/business/business-switcher";
@@ -39,6 +41,7 @@ const GROUPS = [
   {
     items: [
       { href: "/business/dashboard", label: "Overview", icon: LayoutDashboard },
+      { href: "/business/getting-started", label: "Getting started", icon: Rocket },
       { href: "/business/listings", label: "Listings", icon: ClipboardList },
       { href: "/business/guides", label: "Guides", icon: Users },
       { href: "/business/bookings", label: "Bookings", icon: CalendarClock },
@@ -52,6 +55,7 @@ const GROUPS = [
   {
     label: "Settings",
     items: [
+      { href: "/business/verification", label: "Verification", icon: ShieldCheck },
       { href: "/business/notifications", label: "Notifications", icon: Bell },
       { href: "/business/settings", label: "Settings", icon: SettingsIcon },
       { href: "/business/support", label: "Support", icon: LifeBuoy }
