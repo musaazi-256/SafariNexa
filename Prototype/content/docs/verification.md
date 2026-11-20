@@ -273,3 +273,201 @@ All reviews by moderation status.
 - **Notifications are in-app only.** Business owners (verification) and owners/managers (listings) get in-app notifications; email isn't sent for these decisions.
 - **Demo documents.** Seeded demo businesses have placeholder documents that open a "Document unavailable" page; real uploads (and the journey's Kidepo documents) display.
 - **Review edits.** Customers can't edit or delete a review once posted; moderation is the only way to remove it.
+
+## 7. Figma capture coverage audit · 20 November 2026
+
+Run `node scripts/capture/audit.mjs` from `Prototype` to compare the app's page inventory, capture indexes, and plugin bundles. Add `--strict` to fail on a detected gap. The audit reads existing files and does not open a browser or change demo records. The UI fingerprint checks freshness of source files. Coverage of states and actions requires explicit scenarios.
+
+| Surface | Indexed page patterns | Page and state frames | Journeys shown in plugin |
+|---|---:|---:|---:|
+| Customer | 42 of 43 | 55 | 3 |
+| Business | 29 of 30 | 92 | 7 |
+| Admin | 25 of 25 | 47 | 7 |
+
+These counts describe the checked-in bundles, generated on 20 November 2026. The same journey can appear in several plugins. There are eight distinct journeys with 114 steps, including 105 UI frames and nine system steps described in text. The captured branches are stay booking and simulated payment success, first-time business guides, business verification approval and rejection, listing approval and withdrawal/rejection, customer review and business reply with the admin hide confirmation open, and admin inspection of a business listing.
+
+### Coverage gaps and fixture progress
+
+| Screen or feature | Baseline or newer fixture capture | Additional coverage needed |
+|---|---|---|
+| Trip planner | List and itinerary detail with three items (capture fixture) | Add/reorder/remove items, delete and failure states |
+| Business support | Queue, open-case dialog, and case detail with a two-message conversation (capture fixture) | Reply, status transitions, empty queue, and access denied |
+| Checkout and payments | Checkout for a stay, Complete payment for a booking awaiting payment, and the receipt for a paid booking; Payment success passes through to that receipt. The stay journey covers a successful single-item path. | Cart-to-checkout cases, failed, cancelled, retry, refund, and payout outcomes |
+| Cart | Empty cart | Populated cart, multi-item combinations, quantity or add-on changes where supported, and invalid or unavailable items |
+| Customer review | Write a review for a completed, unreviewed stay. The review journey covers validation, writing, submitting, business reply, and opening the admin hide confirmation. | Entry from My bookings and from each listing type, already reviewed, ineligible booking, completed moderation, and republication |
+| Authentication and invitations | Basic account pages; the reset-password and both invitation forms with a token in the URL (the pages check the token only on submit) | Valid, expired, and invalid links, wrong account, accepted invitations, and password reset completion |
+| Business team and saved items | Team and saved-item aliases land on settings and profile saved items | Record aliases as redirects while capturing their destination states under the canonical route |
+| Booking, verification, listing, and moderation queues | One example record per dynamic route and selected overlay frames | Separate empty and populated fixtures, zero matching filters, each status that changes available actions, role permissions, and confirm/cancel/result states |
+| Shared states | A desktop snapshot after the page settles | Mobile, tablet, loading, recoverable error, permission variants, and long or scrollable sections |
+
+The runner resolves dynamic routes from links in one demo account per portal. It opens visible ARIA tabs and first-level menus and dialogs, with caps of 10 tabs and 12 overlays per page. Similar row menus and shared header/sidebar controls are deduplicated. That approach cannot establish coverage of differing row actions, menu items that open a second dialog, non-ARIA controls, disabled controls, form submissions, or data and permission variants. The route scan explicitly excludes 12 page patterns for OAuth, demo tools, docs, and the UI kit. Shared loading, error, and not-found files are outside the page scan.
+
+The Figma plugins fetch the committed bundles from GitHub main. They render static editable frames, with journey previews clipped to the captured desktop viewport. The plugin can omit content below the viewport or unsupported SVG elements even when the route has a frame. A route, state, or journey only appears in Figma if its frame is in the published bundle.
+
+### Capture runner changes on 20 November 2026
+
+The runner addresses the original route-context gaps by creating records the affected pages need (`setupScreens` in `scripts/capture/fixtures.mjs`: a booking awaiting payment, a paid booking with its payment, a completed unreviewed stay, a trip plan with items, a business and a customer support case with replies), passes the URL each page expects (`SCREEN_QUERY`), and removes the records afterwards. The two remaining redirects (`/saved`, `/business/team`) are aliases by design. The checked-in bundles still predate those changes. The strict audit reports 17 findings against the bundles and current indexes, including four indexed frames absent from the bundles.
+
+### Coverage required for a complete handoff
+
+Maintain a scenario inventory with a stable ID, actor and permission, fixture, start route, action, expected result, viewport, and frame IDs. Give each route its applicable empty, populated, loading, failure, and access states. For each available action, record the state before it, any nested menu or confirmation, validation, the outcome, and the next action. Cover equivalent inputs with representative cases and treat distinct UI outcomes as separate cases. Exercise cross-portal flows on isolated fixtures so results are reproducible.
+
+Expand first through account and invitation flows, each bookable listing type, single and multi-item checkout, the booking/payment/refund lifecycle, business onboarding and verification, listing and availability management, staff and admin role management, messaging and support, review moderation, notifications, and trip planning. Then make missing required frames, mismatched landings, skipped steps, and stale fallbacks fail publication. Compare scenario results against the actual bundles the plugin reads and mark intentional exclusions by name.
+
+### Live Figma file check · 20 November 2026
+
+- [New customer SafariNexa](https://www.figma.com/design/tWZEUdZ2nYqvhDRrENS8x3) is the customer target documented by the capture plugin. It contains only an empty Page 1. Customer frames in the repository bundle do not establish coverage in this file.
+- [Business Support](https://www.figma.com/design/BCRiYfkzt8djvVAXAvPj1h?node-id=44-214120) lists both support routes in its header but contains two frames, the support queue and the new-case dialog. There is no case detail or reply frame on that page.
+- [Business Bookings](https://www.figma.com/design/BCRiYfkzt8djvVAXAvPj1h?node-id=44-196998) contains 11 frames. They include one status menu, one row-action menu, three guide steps, one booking detail, and one calendar. There are no separate frames on that page for empty or filtered results, alternative booking statuses, or action outcomes.
+- [Business Journeys](https://www.figma.com/design/BCRiYfkzt8djvVAXAvPj1h?node-id=44-214531) contains seven boards. The booking board follows one successful stay and simulated payment. The review board ends at the admin hide confirmation.
+- The [Admin portal](https://www.figma.com/design/OBOzr94yZV2n0egJ3jx3IY) has no Journeys page in its live page inventory, despite the admin bundle containing seven journeys. Its existing [review moderation page](https://www.figma.com/design/OBOzr94yZV2n0egJ3jx3IY?node-id=148-17299) has All, Flagged, empty, and hide-confirmation frames. Its [payments page](https://www.figma.com/design/OBOzr94yZV2n0egJ3jx3IY?node-id=148-11609) includes demo, simulated payout, live, and empty views. Retain those variants in the scenario inventory when replacing legacy pages with plugin-generated captures.
+- The separate [Customer App design](https://www.figma.com/design/NNar1EsoBEKuH93WLUV5HF/Customer-App) contains seven pages, including responsive screens at 390, 768, and 1440 widths and a demo journeys page. It is a reference for variants to preserve when populating the documented customer target.
+
+## 8. Route-by-route Figma coverage checklist
+
+This is the inventory of cases to verify or add. A row can contain both an existing frame and additional capture requirements. Mark a case covered only after locating the frame or journey step and checking that it shows the stated outcome. Record the fixture, role, viewport, and frame ID alongside each verified case. The live file observations in §7 are a separate snapshot. New captures in a working tree become visible in Figma only after bundling, publishing, and importing them.
+
+### Checks that apply across routes
+
+- **Lists and queues.** Capture the populated baseline, genuinely empty data, zero matches, reset to results, first and later pages, sort and column controls, and each row status that changes the available actions.
+- **Details and forms.** Capture a valid record or default form, edited values, required and invalid fields, submission in progress where visible, success, recoverable error, stale or missing record, and unauthorized access where implemented. Include nested dialogs, back and cancel paths, and confirm and dismiss outcomes.
+- **Layout and shell.** Record 390px, 768px, and 1440px layouts where materially different, including mobile menus, account and business switchers, collapsed sidebar, long content, and overflowing tables. Show focus, selected and disabled controls, and toast or inline feedback where the app renders them. Include long pages or scrolled frames when an action falls below a journey thumbnail.
+- **Actors and data.** Exercise visitors, signed-in customers, business staff with different grants or workspaces, and admins with and without the relevant permission. Use separate fixtures for UI-changing statuses and controller outcomes. Use demo records and mock external providers where supported.
+
+### Customer · 43 route patterns
+
+| Route | States and actions to verify in Figma |
+|---|---|
+| `/` | Signed-out and signed-in shell, search entry and suggestions, category and destination navigation, featured results and links. |
+| `/explore` | Populated discovery, category and filter changes, search entry, listing navigation, no matches. |
+| `/search` | Keyword and category searches, applied and reset filters, no matches, pagination, quick-view open and close, listing selection. |
+| `/destinations` | Destination list and detail navigation, empty data where supported. |
+| `/destinations/[slug]` | Destination with listings, sparse destination, listing quick view and navigation, invalid slug. |
+| `/accommodation` | Stay results, filters and no matches, listing selection. |
+| `/accommodation/[id]` | Photo and room details, room and date selection, unavailable dates, guest count, add-ons, cart and checkout, save, inquiry, reviews and eligible review entry. |
+| `/tours` | Tour results, filters and no matches, listing selection. |
+| `/tours/[id]` | Gallery, itinerary, inclusions and guide, date and party size, availability, cart and checkout, save, inquiry, reviews and eligible review entry. |
+| `/restaurants` | Restaurant results, filters and no matches, listing selection. |
+| `/restaurants/[id]` | Gallery and restaurant details, date, time and party size, reservation and checkout, save, inquiry, reviews and eligible review entry. |
+| `/transport` | Transport results, filters and no matches, listing selection. |
+| `/transport/[id]` | Gallery and vehicle details, booking inputs, availability and checkout, save, inquiry, reviews and eligible review entry. |
+| `/guides` | Guide results, no results, guide and tour navigation. |
+| `/guides/[id]` | Guide details and linked published tours, tour selection, sparse or unavailable record. |
+| `/auth/sign-in` | Valid credentials, invalid credentials, Google handoff, password reset and registration links, return to protected destination. |
+| `/auth/create-account` | Empty, invalid and valid form, duplicate account, submission, verification handoff. |
+| `/auth/verify` | Check-email instructions, resend where available, valid, expired and invalid verification link outcomes. |
+| `/auth/success` | Signed-in confirmation and continuation to the intended destination. |
+| `/auth/forgot-password` | Email entry, invalid input, request result and reset-email handoff. |
+| `/auth/reset-password` | Email request form without a token, valid token form, mismatched password, expired or invalid token, successful reset and sign-in. |
+| `/cart` | Empty, single item, multiple items or listing types, removal and resulting totals, unavailable items, proceed to checkout. |
+| `/checkout` | Valid listing inputs for each checkout variant, traveller data and add-ons where applicable, validation, submission and next screen, unavailable or missing context. |
+| `/checkout/multi` | Empty and populated cart, mixed items, traveller details, costs, validation, submission, partial failure where implemented and order payment handoff. |
+| `/payments` | Booking and order context, awaiting confirmation, payable, no charge, provider or method selection, successful, pending, failed, cancelled and retry paths where supported. |
+| `/payments/cancelled` | Cancellation, return to the originating booking or order, retry and abandonment. |
+| `/payments/success` | Booking or order context forwarding to the receipt, missing context forwarding to bookings. Record the redirect as a flow step. |
+| `/payments/receipt` | Booking and order receipts, amount and status details, links back, missing or inaccessible record. |
+| `/bookings` | Empty and populated history, pagination, different statuses, open details, eligible **Write a review**, already-reviewed booking. |
+| `/bookings/[id]` | Request, payment due or failed, confirmed, cancelled, completed and reviewed views, payment and refund history, cancel and pay actions, chat, review entry. |
+| `/reviews/new` | Eligible form for each bookable listing type, missing rating, short text, filled form, submission and published result, already reviewed, incomplete or inaccessible booking. |
+| `/profile` | Populated and sparse profile, edit and save, validation, change password and errors, sign-in method differences where visible. |
+| `/profile/preferences` | Default and configured preferences, notification toggles, save result and persistence. |
+| `/profile/payment-settings` | Empty and configured preferences where supported, control changes and save states, unavailable or informational controls. |
+| `/profile/messages` | Empty inbox, selected conversation, unread and read, write and send, validation or failure, navigation to booking or listing where linked. |
+| `/profile/saved` | Empty and populated lists, open listing, remove and last-item empty transition. |
+| `/saved` | Alias to `/profile/saved`. Record the redirect and link to the canonical frames. |
+| `/notifications` | New and read notifications, categories and status filters, zero matches, mark read and follow links to related records. |
+| `/support` | Empty and populated cases, new-case dialog, category and booking selection, validation, submit, newly created case. |
+| `/support/[id]` | Open, in-progress and resolved cases where applicable, history, reply submission and failure, inaccessible case. |
+| `/trip-planner` | Empty and populated plans, create, open plan and post-create result. |
+| `/trip-planner/[id]` | Empty and populated itinerary, edit plan or items, reorder and remove where supported, save and delete outcomes, invalid plan. |
+| `/safety` | Support and advisory tabs, emergency and support links, advisory detail and empty data where applicable. |
+
+### Business · 30 route patterns
+
+| Route | States and actions to verify in Figma |
+|---|---|
+| `/business` | Partner landing, onboarding and sign-in entries, signed-in continuation. |
+| `/business/auth/sign-in` | Valid and invalid credentials, Google handoff, signed-in account with and without workspace access. |
+| `/business/auth/accept` | Signed-out entry, signed-in invitation form, valid, expired, invalid and wrong-recipient outcomes. |
+| `/business/onboarding` | Initial business profile, required fields and validation, submission, existing membership or profile continuation. |
+| `/business/onboarding/setup` | Partner setup entry and completion, next steps, already-onboarded or restricted states where applicable. |
+| `/business/dashboard` | New, populated and restricted workspaces, business switch, quick actions, first-time guide, dismiss and reopen guidance and tips. |
+| `/business/listings` | Empty and populated, filters by type and publication state, row menus per status, create, edit, preview and publication actions with their results. |
+| `/business/listings/new` | Type picker and forms for accommodation, tour, restaurant and transport, media and repeatable fields, validation, saved draft and next step, verification gate. |
+| `/business/listings/[id]/edit` | Each listing type, draft and published revision, field and image edits, room and add-on changes where applicable, validation, saved changes and protected access. |
+| `/business/listings/[id]/preview` | Saved draft and pending revision, listing type variants, edit and submit controls, unavailable preview. |
+| `/business/listings/[id]/review` | Draft, submitted, changes requested, withdrawn, rejected and approved, decision history, submit, withdraw and resubmit outcomes. |
+| `/business/listings/[id]/availability` | Room selection, available and sold-out dates, edits and save result, invalid values, no rooms or listing without availability controls. |
+| `/business/guides` | Empty and populated guide list and add-guide entry. |
+| `/business/guides/new` | Blank and filled profile, validation, submit and return to populated list. |
+| `/business/bookings` | Empty and populated, dates and status filters with results or zero matches, different row menus, open details, guide states. |
+| `/business/bookings/[id]` | Awaiting response, accepted, declined, payment due, paid, cancelled, completed and reviewed where applicable. Capture accept, decline, complete, chat and refund actions and their outcomes. |
+| `/business/bookings/calendar` | Empty and populated time ranges, calendar navigation and upcoming-booking selection. |
+| `/business/customers` | Empty and populated, filters and columns, customer or message actions currently offered. |
+| `/business/messages` | Empty, unread and selected thread, new-message dialog, customer selection, write and send, resulting conversation. |
+| `/business/reviews` | Empty and populated, review filters, action menu, reply entered, posted and visible on listing, permission or failure outcomes where supported. |
+| `/business/payments` | Empty and populated booking payments and refunds, filters, pending and completed outcomes, booking links and supported actions. |
+| `/business/revenue` | Empty and populated earnings, outcome filters, settlement and payout indicators, available navigation and actions. |
+| `/business/notifications` | Empty and populated, unread and read, category filters, follow related action links. |
+| `/business/profile` | Profile and account settings, editable values and save or validation states where available. |
+| `/business/settings` | Main and team settings tabs, save workspace profile, staff invitation, permission assignments, removal and restrictions where implemented. |
+| `/business/team` | Alias to the team settings tab. Record the redirect and verify team states in settings. |
+| `/business/settings/verification` | No documents, upload, view and manage documents, invalid upload, submit, changes requested, resubmission, approval and rejection. |
+| `/business/verification` | Verification outcomes and history, outstanding requirements, notices and return to documents, guide and tip states. |
+| `/business/support` | Empty queue and new-case dialog already visible in Figma. Add populated queue, category and related-booking selection, validation, submit and case link. |
+| `/business/support/[id]` | Case detail, message history, reply, closed case, access from another workspace and missing record. |
+
+### Admin · 25 route patterns
+
+| Route | States and actions to verify in Figma |
+|---|---|
+| `/admin/login` | Signed-out entry, invalid and valid credentials, Google handoff, unauthorized account, redirect to permitted destination. |
+| `/admin/auth/accept` | Signed-out and signed-in invitation, valid, expired, invalid and wrong-recipient outcomes and new role access. |
+| `/admin/auth/access-denied` | Denied entry, navigation back, restricted role with and without a permitted destination. |
+| `/admin/dashboard` | Populated and sparse overview, permission-dependent navigation, drill-down into each linked queue. |
+| `/admin/businesses` | Empty and populated directory, filters and statuses, restricted access, open business. |
+| `/admin/businesses/[id]` | Different verification and business statuses, empty and populated listings, navigate to listing record and available business actions. |
+| `/admin/businesses/[id]/listings/[listingId]` | Listing details and all-fields tab, submissions and history, listing type variants and missing record. |
+| `/admin/verification` | Empty and populated queue, status filters, start review, flag or hold confirmation, cancel and committed result where implemented. |
+| `/admin/verification/[id]` | Documents and evidence, review notes, request changes, approve, reject, confirmation, submit results and gated access. |
+| `/admin/listings` | Empty and populated review queue, status filters and navigate to submission. |
+| `/admin/listings/[id]` | Existing and revised content, evidence and checklist, request changes, reject, approve and publish, confirm and cancel, final history. |
+| `/admin/bookings` | Empty and populated, filters by status and date, columns and pagination, different rows and detail navigation. |
+| `/admin/bookings/[id]` | Status variants, travellers, payment attempts, refund history and available operations, inaccessible or missing records. |
+| `/admin/payments` | Payments, refunds and payouts. Retain empty, demo, simulated payout and live views. Add filtered states, refund approval and results, permission restrictions and failure cases. |
+| `/admin/users` | Users and invitations, pending and active states, filters, suspension and reactivation with feedback and permission boundaries. |
+| `/admin/users/new` | Choose permission level, invite with valid or invalid data, duplicate or pending invitation, success and return. |
+| `/admin/roles` | Existing permission levels, grant details, access restrictions and supported management actions. |
+| `/admin/roles/new` | Create permission level, select grants, required fields, duplicate and submission result. |
+| `/admin/reviews` | Retain All, Flagged, empty and hide confirmation. Add publication, flag and hide outcomes, cancel, republication and customer-visible effect. |
+| `/admin/support` | Empty and populated queues, status filters, columns and pagination, case selection. |
+| `/admin/support/[id]` | Open, pending and resolved cases where applicable, reply history, reply submission, change status, result and permission denial. |
+| `/admin/audit` | Empty and populated events, filters, pagination and column changes, audit records created by admin actions. |
+| `/admin/notifications` | Empty and populated categories, unread and read, follow related record links. |
+| `/admin/settings` | Current configuration, permission-dependent controls, save and validation where exposed. |
+| `/admin/profile` | View profile, edit and save, validation, sign out and resulting login screen. |
+
+### Routes and states outside the automatic scan
+
+| Routes or files | Document separately |
+|---|---|
+| `/auth/google`, `/auth/google/callback`, `/auth/google/link` | Customer redirect to provider, return, cancelled or failed authorization, account-link prompt and outcomes. Use redacted or simulated provider screens. |
+| `/business/auth/google`, `/business/auth/google/callback` | Business provider handoff and return, authorized workspace and no-access branches. |
+| `/admin/auth/google`, `/admin/auth/google/callback` | Admin provider handoff and return, permission allowed and denied. |
+| `/demo/document`, `/demo/inbox` | Demo document preview and message list where relevant to recorded demo journeys. |
+| `/docs`, `/docs/[slug]`, `/ui-kit` | Engineering docs index and article, UI kit component states. These remain explicitly excluded from the automated portal capture. |
+| `loading.tsx`, `error.tsx`, `not-found.tsx` | Shared loading UI, error boundary with retry and recovery, missing or invalid resource with escape route. |
+| API and system transitions | Label the visible before and after states. Include callbacks, notifications, expiry, and other background effects as system steps when they change a flow. |
+
+### End-to-end flow coverage
+
+| Flow | Branches to document in addition to existing cards |
+|---|---|
+| Customer access | Registration and verification, reset, invitation handoffs, OAuth success and cancellation, return to a protected entry point. |
+| Discovery and booking | Each listing type from search to selection, availability and form validation, saved-item and inquiry paths, single item and populated multi-item cart. |
+| Booking and payment lifecycle | Request and response, decline and expiry, success, pending, failure, cancel and retry, receipt, refund and payout, with customer, business and admin views. |
+| Business and listing lifecycle | First-time and returning onboarding, switch workspace, upload and resubmit verification, reject and hold outcomes, draft, preview, revision, approval, withdrawal and rejection. |
+| Reviews | From My bookings, booking detail and eligible listing, validation and submit, business reply, flag or hide with cancel and confirm, republication and effect on listing feedback. |
+| Messaging and support | Customer inquiry, booking chat, business-initiated message, notifications, open case, reply, resolve and follow-up across the applicable surfaces. |
+| Staff and admin access | Invite, accept, wrong recipient, expire, sign in with assigned access, deny a restricted action, suspend and reactivate where implemented. |
+| Personal tools | Save and remove listing, edit profile and preferences, create and manage a trip itinerary, open safety resources and follow notification links. |

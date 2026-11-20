@@ -7,6 +7,7 @@ import { BASE, HANDOFF, PORTALS, VIEW, NOT_IDS } from "./config.mjs";
 import { signIn, settle, snap } from "./lib.mjs";
 import { routes } from "./routes.mjs";
 import { GROUPS } from "./groups.mjs";
+import { SCREEN_QUERY, cleanupScreens, disconnect, setupScreens } from "./fixtures.mjs";
 
 // Groups that are captured as a particular business (see `business` in groups.mjs).
 const businessFor = (pattern) => (GROUPS[process.argv[2]]?.groups ?? []).find((g) => g.business && g.routes.includes(pattern))?.business;
@@ -204,12 +205,16 @@ async function states(page, base, url) {
   }
 }
 
+// Records some pages need (a booking to pay, a trip plan, a support case…); removed after the run.
+await setupScreens();
+try {
 for (const r of routes().filter((r) => r.portal === portal)) {
   if (only && !only.has(r.id)) continue;
   try {
     const page = await session(r.signedOut);
     if (!r.signedOut) await useBusiness(page, businessFor(r.pattern));
-    const route = await resolve(page, r.pattern);
+    const resolved = await resolve(page, r.pattern);
+    const route = resolved && resolved + (SCREEN_QUERY[r.pattern] ?? "");
     if (!route) {
       console.log("–", r.id, "(no example to open: the list is empty)");
       continue;
@@ -218,7 +223,8 @@ for (const r of routes().filter((r) => r.portal === portal)) {
     await settle(page);
     const landed = new URL(page.url()).pathname;
     const base = { id: r.id, section: r.section, name: r.name, route, pattern: r.pattern, kind: "page", signedOut: r.signedOut };
-    if (landed !== route) base.redirect = landed;
+    const path = route.split("?")[0];
+    if (landed !== path) base.redirect = landed;
     // The page's own heading and intro line document what it is for.
     Object.assign(
       base,
@@ -233,7 +239,7 @@ for (const r of routes().filter((r) => r.portal === portal)) {
       }),
     );
     save(base, await snap(page));
-    if (!r.signedOut && landed === route) await states(page, base, BASE + route);
+    if (!r.signedOut && landed === path) await states(page, base, BASE + route);
   } catch (e) {
     failed.push(r.id);
     console.log("✗", r.id, String(e.message || e).split("\n").slice(0, 16).join(" | "));
@@ -241,6 +247,11 @@ for (const r of routes().filter((r) => r.portal === portal)) {
     await sessions[key]?.context().close().catch(() => undefined);
     delete sessions[key];
   }
+}
+
+} finally {
+  await cleanupScreens();
+  await disconnect();
 }
 
 // Partial runs update their entries in the existing index.

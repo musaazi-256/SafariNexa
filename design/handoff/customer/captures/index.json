@@ -80,7 +80,7 @@
   "id": "customer-auth-reset-password",
   "section": "Access",
   "name": "Reset password",
-  "route": "/auth/reset-password",
+  "route": "/auth/reset-password?token=capture-demo-token",
   "pattern": "/auth/reset-password",
   "kind": "page",
   "signedOut": true,
@@ -124,7 +124,7 @@
   "id": "customer-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/bookings/cmwotw71x0006ewzpps6t2cei",
+  "route": "/bookings/capture-stay",
   "pattern": "/bookings/[id]",
   "kind": "page",
   "signedOut": false,
@@ -166,12 +166,22 @@
   "id": "customer-checkout",
   "section": "Checkout",
   "name": "Checkout",
-  "route": "/checkout",
+  "route": "/checkout?listingId=demo-lodge&type=accommodation",
   "pattern": "/checkout",
   "kind": "page",
   "signedOut": false,
-  "heading": "Page or record not found",
-  "purpose": "The link may be outdated, or this record isn’t available to your account."
+  "heading": "Checkout"
+ },
+ {
+  "id": "customer-checkout--dialog-more-details",
+  "section": "Checkout",
+  "name": "Checkout · More details > dialog",
+  "route": "/checkout?listingId=demo-lodge&type=accommodation",
+  "pattern": "/checkout",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Checkout",
+  "parent": "customer-checkout"
  },
  {
   "id": "customer-destinations-slug",
@@ -301,35 +311,34 @@
   "id": "customer-payments",
   "section": "Payments",
   "name": "Payments",
-  "route": "/payments",
+  "route": "/payments?bookingId=capture-pay",
   "pattern": "/payments",
   "kind": "page",
   "signedOut": false,
-  "heading": "Page or record not found",
-  "purpose": "The link may be outdated, or this record isn’t available to your account."
+  "heading": "Complete payment"
  },
  {
   "id": "customer-payments-receipt",
   "section": "Payments",
   "name": "Payments › Receipt",
-  "route": "/payments/receipt",
+  "route": "/payments/receipt?bookingId=capture-paid",
   "pattern": "/payments/receipt",
   "kind": "page",
   "signedOut": false,
-  "heading": "Page or record not found",
-  "purpose": "The link may be outdated, or this record isn’t available to your account."
+  "heading": "Payment received",
+  "purpose": "Your payment status and booking details are shown below."
  },
  {
   "id": "customer-payments-success",
   "section": "Payments",
   "name": "Payments › Success",
-  "route": "/payments/success",
+  "route": "/payments/success?bookingId=capture-paid",
   "pattern": "/payments/success",
   "kind": "page",
   "signedOut": false,
-  "redirect": "/bookings",
-  "heading": "My bookings",
-  "purpose": "Every booking you've started or confirmed, in one place."
+  "redirect": "/payments/receipt",
+  "heading": "Payment received",
+  "purpose": "Your payment status and booking details are shown below."
  },
  {
   "id": "customer-profile-messages",
@@ -422,7 +431,7 @@
   "id": "customer-reviews-new",
   "section": "Reviews",
   "name": "Reviews › New",
-  "route": "/reviews/new",
+  "route": "/reviews/new?bookingId=capture-stay",
   "pattern": "/reviews/new",
   "kind": "page",
   "signedOut": false,
@@ -502,11 +511,11 @@
   "id": "customer-support-id",
   "section": "Support",
   "name": "Support · details",
-  "route": "/support/cmw1uun1q000c904dss6vfyio",
+  "route": "/support/capture-help",
   "pattern": "/support/[id]",
   "kind": "page",
   "signedOut": false,
-  "heading": "sacsacsa",
+  "heading": "Can I add a third guest to my stay?",
   "purpose": "You"
  },
  {
@@ -597,6 +606,17 @@
   "signedOut": false,
   "heading": "Airport transfers and special hire",
   "purpose": "Phase 1 covers airport transfers and Kampala special hire — compare fixed fares before creating an account."
+ },
+ {
+  "id": "customer-trip-planner-id",
+  "section": "Trip planner",
+  "name": "Trip planner · details",
+  "route": "/trip-planner/capture-trip",
+  "pattern": "/trip-planner/[id]",
+  "kind": "page",
+  "signedOut": false,
+  "heading": "Trip itinerary",
+  "purpose": "Organize your itinerary, dates, and notes."
  },
  {
   "id": "customer-trip-planner",

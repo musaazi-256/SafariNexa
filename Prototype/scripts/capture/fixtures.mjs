@@ -209,4 +209,92 @@ export const setup = {
   },
 };
 
+// Screen fixtures ----------------------------------------------------------------
+// Records the screen capture (run.mjs) needs so pages that take a record from the URL,
+// or that are empty in the demo data, are captured with real content. Fixed ids, so
+// setupScreens() replaces them and cleanupScreens() removes them after the run.
+const SCREEN = { pay: "capture-pay", paid: "capture-paid", stay: "capture-stay", trip: "capture-trip", support: "capture-support", help: "capture-help" };
+
+/** Query strings for pages that need a record or token in the URL to show their real screen.
+ * The token pages only check the token when the form is submitted. */
+export const SCREEN_QUERY = {
+  "/checkout": "?listingId=demo-lodge&type=accommodation",
+  "/payments": `?bookingId=${SCREEN.pay}`,
+  "/payments/receipt": `?bookingId=${SCREEN.paid}`,
+  "/payments/success": `?bookingId=${SCREEN.paid}`,
+  "/reviews/new": `?bookingId=${SCREEN.stay}`,
+  "/auth/reset-password": "?token=capture-demo-token",
+  "/business/auth/accept": "?token=capture-demo-token",
+  "/admin/auth/accept": "?token=capture-demo-token",
+};
+
+export async function cleanupScreens() {
+  await db.supportCase.deleteMany({ where: { id: { in: [SCREEN.support, SCREEN.help] } } });
+  await db.tripPlan.deleteMany({ where: { id: SCREEN.trip } });
+  const ids = [SCREEN.pay, SCREEN.paid, SCREEN.stay];
+  await db.review.deleteMany({ where: { bookingId: { in: ids } } });
+  await db.booking.deleteMany({ where: { id: { in: ids } } });
+}
+
+export async function setupScreens() {
+  await cleanupScreens();
+  const customer = await db.user.findUniqueOrThrow({ where: { email: "customer@safarinexa.test" } });
+  const owner = await db.user.findUniqueOrThrow({ where: { email: "business@dev.test" } });
+  const admin = await db.user.findUniqueOrThrow({ where: { email: "admin@safarinexa.test" } });
+  const lodge = await db.listing.findUniqueOrThrow({ where: { id: "demo-lodge" }, include: { accommodation: { include: { roomTypes: { orderBy: { priceMinor: "asc" } } } } } });
+  const room = lodge.accommodation?.roomTypes[0];
+  const day = 86400000;
+  const now = Date.now();
+  const booking = (id, ref, status, start, extra = {}) => ({
+    id, bookingRef: ref, customerId: customer.id, listingId: lodge.id, businessId: lodge.businessId,
+    roomTypeId: room?.id, roomTypeName: room?.name, startDate: new Date(start), endDate: new Date(start + 2 * day),
+    participantsCount: 2, totalMinor: (room?.priceMinor ?? lodge.basePriceMinor) * 2, status, ...extra,
+  });
+  // Accepted by the lodge, waiting for the traveller to pay.
+  await db.booking.create({ data: booking(SCREEN.pay, "BK-CAPPAY01", "PENDING_PAYMENT", now + 40 * day, { paymentDueAt: new Date(now + 2 * day), confirmedAt: null }) });
+  // Paid and confirmed, with its successful payment.
+  await db.booking.create({
+    data: booking(SCREEN.paid, "BK-CAPPAID1", "CONFIRMED", now + 60 * day, {
+      confirmedAt: new Date(now - day),
+      payments: { create: { provider: "MTN_MOBILE_MONEY", status: "SUCCESSFUL", amountMinor: (room?.priceMinor ?? lodge.basePriceMinor) * 2, providerReference: "DEMO-CAPTURE01", completedAt: new Date(now - day) } },
+    }),
+  });
+  // A finished stay that hasn't been reviewed yet.
+  await db.booking.create({ data: booking(SCREEN.stay, "BK-CAPSTAY1", "COMPLETED", now - 14 * day, { confirmedAt: new Date(now - 30 * day), completedAt: new Date(now - 12 * day) }) });
+  // A planned trip with a stay and two plans of the traveller's own.
+  await db.tripPlan.create({
+    data: {
+      id: SCREEN.trip, userId: customer.id, title: "Murchison and the Nile, long weekend", notes: "Pack binoculars and a rain jacket.",
+      startDate: new Date(now + 40 * day), endDate: new Date(now + 43 * day),
+      items: { create: [
+        { listingId: lodge.id, date: new Date(now + 40 * day), notes: "Two nights, river view", position: 0 },
+        { customLabel: "Boat launch to the bottom of the falls", date: new Date(now + 41 * day), notes: "Morning departure", position: 1 },
+        { customLabel: "Hike to the top of Murchison Falls", date: new Date(now + 42 * day), position: 2 },
+      ] },
+    },
+  });
+  // A business support case with a reply from SafariNexa support.
+  await db.supportCase.create({
+    data: {
+      id: SCREEN.support, caseRef: "SUP-CAPTURE1", openedByUserId: owner.id, surface: "BUSINESS", subject: "Payout for October hasn't arrived",
+      category: "Payments", status: "WAITING_ON_CUSTOMER",
+      messages: { create: [
+        { authorUserId: owner.id, authorRole: "BUSINESS", body: "Our October payout was due on the 5th but hasn't reached our account. Can you check?", createdAt: new Date(now - 2 * day) },
+        { authorUserId: admin.id, authorRole: "ADMIN", body: "Thanks for flagging this. The payout was held because the bank account name doesn't match your registration. Please confirm the account name in Settings.", createdAt: new Date(now - day) },
+      ] },
+    },
+  });
+  // A traveller's support case about a booking (newest, so it's the one captured).
+  await db.supportCase.create({
+    data: {
+      id: SCREEN.help, caseRef: "SUP-CAPTURE2", openedByUserId: customer.id, surface: "CUSTOMER", subject: "Can I add a third guest to my stay?",
+      category: "Bookings", status: "IN_PROGRESS", relatedBookingId: SCREEN.paid,
+      messages: { create: [
+        { authorUserId: customer.id, authorRole: "CUSTOMER", body: "We'd like to bring my sister along. Can the room take a third guest, and what would it cost?", createdAt: new Date(now - 3 * day) },
+        { authorUserId: admin.id, authorRole: "ADMIN", body: "We've asked Murchison River Lodge. The Garden View Room sleeps two, but they can move you to a family room. We'll reply here with the price.", createdAt: new Date(now - 2 * day) },
+      ] },
+    },
+  });
+}
+
 export const disconnect = () => db.$disconnect();

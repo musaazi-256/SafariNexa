@@ -577,3 +577,16 @@ Feedback: on top of the general guides, new users need prompts next to the actio
 ## 20 November 2026 — Customer review entry point
 
 - **My bookings** now links directly to the verified review form for completed and review-pending bookings that the customer has yet to review.
+
+## 20 November 2026 — Figma capture coverage audit
+
+- Added a read-only audit of route, frame, and journey coverage in the Figma bundles. The verification docs record the missing pages, fallback frames, and scenario gaps.
+
+### Follow-up, same day — capture coverage audit: detectable gaps closed
+
+An audit (`node scripts/capture/audit.mjs [--strict]`, added with this change; `routes()` can now include excluded patterns) compared the app's routes with the Figma bundles and found 13 gaps: no frame for `/trip-planner/[id]` or `/business/support/[id]`; not-found frames for `/checkout`, `/payments` and `/payments/receipt`; and eight pages captured without the record or token in the URL that they need. All closed:
+
+- **Screen fixtures** (`setupScreens`/`cleanupScreens` in `scripts/capture/fixtures.mjs`, run around each portal's screen capture): a booking awaiting payment, a paid booking with a successful payment, a completed unreviewed stay, a trip plan with three items, a business support case and a customer support case with replies. Fixed ids; removed after the run.
+- **URL scenarios** (`SCREEN_QUERY`): checkout for a stay, payment, receipt and success for those bookings, write-a-review for the completed stay, and a capture token for reset-password and both invitation pages (they check the token on submit).
+- `run.mjs` compares landing paths without the query string, so these pages still get their tabs, menus, guides and tips captured.
+- The plugin cover no longer claims every page, tab, dialog and menu is captured. `/docs/verification` §7 records what's covered and what remains (states, actions and outcomes need a scenario inventory).

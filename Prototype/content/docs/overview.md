@@ -28,7 +28,7 @@
 
 **Images:** the shared `ImageUploader` (`src/components/ui/image-uploader.tsx`) base64-encodes photos client-side and stores them as text directly in Postgres — there is no object storage integration. It does enforce a 10MB/file, image-type-only, and a photo-count cap as of 9 September 2026, but the storage mechanism itself is still base64-in-DB.
 
-**Figma designs (18 Nov 2026):** the Figma files are generated from the running app, not drawn by hand. `npm run capture` (`scripts/capture/`) records every page, tab, dialog and menu of the three surfaces plus the booking journey into `design/handoff/`, and the plugins in `design/figma-captured/` rebuild them in Figma from GitHub `main`. `src/capture-fresh.test.ts` fails until UI changes are recaptured.
+**Figma designs.** `npm run capture` records demo screens, discovered overlays, and scripted journeys into `design/handoff/`. The plugins in `design/figma-captured/` rebuild those bundles in Figma from GitHub `main`. The freshness test checks the UI fingerprint. Run `node scripts/capture/audit.mjs` to check route and bundle coverage. The [capture coverage audit](/docs/verification#7-figma-capture-coverage-audit-20-november-2026) documents the missing states and actions.
 
 **This document, and the companion changelog, are themselves a module:** `/docs`, `/docs/changelog`, `/docs/overview` (`src/app/docs/**`), rendering markdown from `content/docs/*.md` via `src/lib/docs.ts`, linked from the public `SiteFooter`. **Public** — no auth gate. Kept up to date as part of every code change per the standing rule in `CLAUDE.md`.
 

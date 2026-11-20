@@ -18,9 +18,9 @@ function pages(dir, rel = "") {
   return out;
 }
 
-export function routes() {
+export function routes({ includeExcluded = false } = {}) {
   return pages(APP + "src/app")
-    .filter((r) => !SKIP.some((re) => re.test(r)))
+    .filter((r) => includeExcluded || !SKIP.some((re) => re.test(r)))
     .map((pattern) => {
       const portal = portalOf(pattern);
       const rest = pattern.slice(PORTALS[portal].prefix.length).split("/").filter(Boolean);

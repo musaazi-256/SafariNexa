@@ -462,7 +462,7 @@ async function buildCover(bundle: any, page: PageNode, rows: { id: string; name:
     logo(56),
     await T(bundle.cover, 80, 700, C.s900, undefined, 88),
     await T(
-      "Every page, tab, dialog and menu, captured from the running SafariNexa app and rebuilt as editable layers. " + total + (total === 1 ? " frame" : " frames") + " across " + rows.length + (rows.length === 1 ? " page." : " pages.") + " Run `npm run capture` in Prototype and push to main, then run this plugin again to refresh; it replaces the pages it made and leaves your own pages alone.",
+      "Captured SafariNexa screens, states and scripted journeys rebuilt as editable layers. " + total + (total === 1 ? " frame" : " frames") + " across " + rows.length + (rows.length === 1 ? " page." : " pages.") + " Run `npm run capture` in Prototype and push to main, then run this plugin again to refresh; it replaces the pages it made and leaves your own pages alone.",
       24,
       400,
       C.s600,

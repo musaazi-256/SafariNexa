@@ -486,7 +486,7 @@ async function buildCover(bundle, page, rows) {
     const cover = V({ name: "Cover", w: 1920, pad: 96, gap: 24, fill: C.white, radius: 32, stroke: C.border }, [
         logo(56),
         await T(bundle.cover, 80, 700, C.s900, undefined, 88),
-        await T("Every page, tab, dialog and menu, captured from the running SafariNexa app and rebuilt as editable layers. " + total + (total === 1 ? " frame" : " frames") + " across " + rows.length + (rows.length === 1 ? " page." : " pages.") + " Run `npm run capture` in Prototype and push to main, then run this plugin again to refresh; it replaces the pages it made and leaves your own pages alone.", 24, 400, C.s600, 1500),
+        await T("Captured SafariNexa screens, states and scripted journeys rebuilt as editable layers. " + total + (total === 1 ? " frame" : " frames") + " across " + rows.length + (rows.length === 1 ? " page." : " pages.") + " Run `npm run capture` in Prototype and push to main, then run this plugin again to refresh; it replaces the pages it made and leaves your own pages alone.", 24, 400, C.s600, 1500),
         H({ gap: 16 }, [
             H({ px: 16, py: 10, radius: 999, fill: C.s900 }, [await T("1440 × full-length desktop frames", 16, 500, C.white)]),
             H({ px: 16, py: 10, radius: 999, fill: C.primary }, [await T("Captured " + new Date(bundle.generatedAt).toLocaleString() + (bundle.commit ? " · commit " + bundle.commit : ""), 16, 500, C.white)]),
