@@ -329,3 +329,18 @@ button:disabled { cursor: not-allowed; }
     @apply bg-background text-slate-600 transition-colors hover:bg-slate-50 hover:text-foreground;
   }
 }
+
+/* The control a feature tip points at (src/components/business/feature-tips.tsx). */
+@layer components {
+  [data-feature-tip-target] {
+    @apply outline outline-2 outline-offset-4 outline-primary;
+    animation: feature-tip-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes feature-tip-pulse {
+    0%, 100% { outline-color: hsl(var(--primary)); }
+    50% { outline-color: hsl(var(--primary) / 0.35); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-feature-tip-target] { animation: none; }
+  }
+}

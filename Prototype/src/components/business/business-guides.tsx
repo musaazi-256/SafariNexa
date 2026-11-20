@@ -22,6 +22,8 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { REPLAY_TIPS, pageHasTips } from "@/components/business/feature-tips";
 import { cn } from "@/lib/utils";
 
 type Step = { icon: LucideIcon; title: string; body: string; points?: string[]; action?: { label: string; href: string } };
@@ -114,7 +116,24 @@ export function BusinessGuides({ userId, verified }: { userId: string; verified:
     setOpen(!seen);
   }, [guide, userId]);
 
-  if (!guide) return null;
+  const hasTips = pageHasTips(pathname);
+  if (!guide && !hasTips) return null;
+  const help = (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button type="button" variant="ghost" size="icon" className="h-9 w-9" title="Help for this page" aria-label="Help for this page">
+          <CircleHelp className="h-5 w-5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-60">
+        <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">Help for this page</DropdownMenuLabel>
+        {/* Opened after the menu has closed, so focus moves cleanly into the guide. */}
+        {guide && <DropdownMenuItem onSelect={() => setTimeout(() => { setStep(0); setOpen(true); }, 0)}>{guide.name} · {guide.steps.length} steps</DropdownMenuItem>}
+        {hasTips && <DropdownMenuItem onSelect={() => window.dispatchEvent(new Event(REPLAY_TIPS))}>Show tips on this page</DropdownMenuItem>}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+  if (!guide) return help;
   const current = guide.steps[step];
   const last = step === guide.steps.length - 1;
   const Icon = current.icon;
@@ -128,9 +147,7 @@ export function BusinessGuides({ userId, verified }: { userId: string; verified:
 
   return (
     <>
-      <Button type="button" variant="ghost" size="icon" className="h-9 w-9" title={`${guide.name}: how to use this page`} aria-label={`Show the ${guide.name.toLowerCase()}`} onClick={() => { setStep(0); setOpen(true); }}>
-        <CircleHelp className="h-5 w-5" />
-      </Button>
+      {help}
       <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : done())}>
         <DialogContent className="max-w-md" data-live-refresh={open ? "pause" : undefined}>
           <div className="flex items-center justify-between pr-8">

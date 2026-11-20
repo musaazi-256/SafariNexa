@@ -46,7 +46,7 @@
    },
    {
     "lane": "business",
-    "label": "Business · Bookings: BK-A3373144 is listed as Awaiting confirmation, payment Not started. Next: open it.",
+    "label": "Business · Bookings: BK-276F2BCC is listed as Awaiting confirmation, payment Not started. Next: open it.",
     "screen": "j-booking-loop-07",
     "route": "/business/bookings"
    },
@@ -54,19 +54,19 @@
     "lane": "business",
     "label": "Business · Booking page: dates, room, traveller and customer details, the response deadline, Accept request — ask customer to pay, and Decline booking. Next: accept.",
     "screen": "j-booking-loop-08",
-    "route": "/business/bookings/cmwotw71x0006ewzpps6t2cei"
+    "route": "/business/bookings/cmwoyctn20006f66n53gcn14y"
    },
    {
     "lane": "business",
     "label": "Business · Accepted: the booking now shows Payment required with a payment deadline; the customer is asked to pay.",
     "screen": "j-booking-loop-09",
-    "route": "/business/bookings/cmwotw71x0006ewzpps6t2cei"
+    "route": "/business/bookings/cmwoyctn20006f66n53gcn14y"
    },
    {
     "lane": "customer",
     "label": "Customer · My booking: Payment required, the outstanding amount, Complete payment and Cancel booking. Next: Complete payment.",
     "screen": "j-booking-loop-10",
-    "route": "/bookings/cmwotw71x0006ewzpps6t2cei"
+    "route": "/bookings/cmwoyctn20006f66n53gcn14y"
    },
    {
     "lane": "customer",
@@ -88,13 +88,13 @@
     "lane": "customer",
     "label": "Customer · My booking: confirmed and paid, with the payment in Payments & refunds.",
     "screen": "j-booking-loop-13",
-    "route": "/bookings/cmwotw71x0006ewzpps6t2cei"
+    "route": "/bookings/cmwoyctn20006f66n53gcn14y"
    },
    {
     "lane": "business",
     "label": "Business · Booking page: confirmed and paid; refunds can be issued from Payments & refunds.",
     "screen": "j-booking-loop-14",
-    "route": "/business/bookings/cmwotw71x0006ewzpps6t2cei"
+    "route": "/business/bookings/cmwoyctn20006f66n53gcn14y"
    },
    {
     "lane": "admin",
@@ -104,16 +104,16 @@
    },
    {
     "lane": "admin",
-    "label": "Admin · Booking page for BK-A3373144: customer, business, dates, traveller details, status, and the payment with its DEMO- reference.",
+    "label": "Admin · Booking page for BK-276F2BCC: customer, business, dates, traveller details, status, and the payment with its DEMO- reference.",
     "screen": "j-booking-loop-16",
-    "route": "/admin/bookings/cmwotw71x0006ewzpps6t2cei"
+    "route": "/admin/bookings/cmwoyctn20006f66n53gcn14y"
    }
   ]
  },
  {
   "id": "j-first-time-guides",
-  "title": "A new business is guided through the portal: welcome tour and screen guides",
-  "summary": "The first time Kidepo Ridge Lodge's owner opens the business portal, a welcome tour explains verification, listings, bookings, messages and payments, one step at a time, and ends with the next thing to do. Key screens (Verification, Listings, the listing form, Bookings) have their own short guide the first time they are opened. Every guide can be skipped or closed at any step, and replayed from the ? button in the header.",
+  "title": "A new business is guided through the portal: welcome tour, screen guides and feature tips",
+  "summary": "The first time Kidepo Ridge Lodge's owner opens the business portal, a welcome tour explains verification, listings, bookings, messages and payments, one step at a time, and ends with the next thing to do. Key screens (Verification, Listings, the listing form, Bookings) have their own short guide the first time they are opened. After a guide, feature tips appear one at a time beside the controls to use next. Guides and tips can be skipped, dismissed or turned off, and replayed from the ? help menu in the header.",
   "steps": [
    {
     "lane": "business",
@@ -165,32 +165,62 @@
    },
    {
     "lane": "business",
-    "label": "Guide skipped: the page as it is. A skipped or finished guide doesn't open again.",
+    "label": "Guide skipped. A feature tip now appears beside Document type: \"1. Pick the document type\", with Got it and Turn off tips; the field is highlighted. Next: Got it.",
     "screen": "j-first-time-guides-09",
     "route": "/business/settings/verification"
    },
    {
     "lane": "business",
-    "label": "Listings, with its guide opening for the first time: statuses and the row menu. Next: close it with ×.",
+    "label": "Tip 2 of 3 beside the file field: what to attach. Next: Got it.",
     "screen": "j-first-time-guides-10",
-    "route": "/business/listings"
+    "route": "/business/settings/verification"
    },
    {
     "lane": "business",
-    "label": "Closed: closing also counts as seen. Next: the ? button in the header.",
+    "label": "Tip 3 of 3 beside Submit for review: what happens after sending. Next: Got it.",
     "screen": "j-first-time-guides-11",
-    "route": "/business/listings"
+    "route": "/business/settings/verification"
    },
    {
     "lane": "business",
-    "label": "The ? button replays this screen's guide from step 1, any time.",
+    "label": "All of this page's tips seen: the page as it is. Tips don't come back once dismissed.",
     "screen": "j-first-time-guides-12",
+    "route": "/business/settings/verification"
+   },
+   {
+    "lane": "business",
+    "label": "Listings, with its guide opening for the first time: statuses and the row menu. Next: close it with ×.",
+    "screen": "j-first-time-guides-13",
     "route": "/business/listings"
    },
    {
     "lane": "business",
-    "label": "Back on the Overview: the welcome tour doesn't open again once finished or skipped.",
-    "screen": "j-first-time-guides-13",
+    "label": "Guide closed (closing counts as seen). A tip points at Create listing. Next: Turn off tips.",
+    "screen": "j-first-time-guides-14",
+    "route": "/business/listings"
+   },
+   {
+    "lane": "business",
+    "label": "Tips turned off: no more tips on any page. Next: the ? help menu in the header.",
+    "screen": "j-first-time-guides-15",
+    "route": "/business/listings"
+   },
+   {
+    "lane": "business",
+    "label": "Help menu: replay this page's guide (Listings guide · 3 steps), or Show tips on this page. Next: Show tips on this page.",
+    "screen": "j-first-time-guides-16",
+    "route": "/business/listings"
+   },
+   {
+    "lane": "business",
+    "label": "Tips are back on, starting again from Create listing.",
+    "screen": "j-first-time-guides-17",
+    "route": "/business/listings"
+   },
+   {
+    "lane": "business",
+    "label": "Back on the Overview: the welcome tour doesn't open again; this page's tips point at the verification status and Add a listing.",
+    "screen": "j-first-time-guides-18",
     "route": "/business/dashboard"
    }
   ]
@@ -244,19 +274,19 @@
     "lane": "admin",
     "label": "Admin · Verification review: the business information saved with the submission, each supporting document (View document), submission details and the decision form. Next: write notes and Request changes.",
     "screen": "j-business-verification-07",
-    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
+    "route": "/admin/verification/cmwoyejv2000of66nz5zyprvv"
    },
    {
     "lane": "admin",
     "label": "Reviewer notes filled in. Notes are required for every decision and are shown to the business. Next: Request changes.",
     "screen": "j-business-verification-08",
-    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
+    "route": "/admin/verification/cmwoyejv2000of66nz5zyprvv"
    },
    {
     "lane": "admin",
     "label": "Needs changes: the status badge updates and the notes stay on the record.",
     "screen": "j-business-verification-09",
-    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
+    "route": "/admin/verification/cmwoyejv2000of66nz5zyprvv"
    },
    {
     "lane": "system",
@@ -284,25 +314,25 @@
     "lane": "admin",
     "label": "Admin · Verification review: both documents, the earlier notes replaced with new ones. Next: Start review.",
     "screen": "j-business-verification-13",
-    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
+    "route": "/admin/verification/cmwoyejv2000of66nz5zyprvv"
    },
    {
     "lane": "admin",
     "label": "Under review: the business sees that someone is checking it. Next: approve.",
     "screen": "j-business-verification-14",
-    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
+    "route": "/admin/verification/cmwoyejv2000of66nz5zyprvv"
    },
    {
     "lane": "admin",
     "label": "Approval notes written. Approving is refused if the business profile changed after it submitted. Next: Approve business.",
     "screen": "j-business-verification-15",
-    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
+    "route": "/admin/verification/cmwoyejv2000of66nz5zyprvv"
    },
    {
     "lane": "admin",
     "label": "Approved: the business is verified.",
     "screen": "j-business-verification-16",
-    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
+    "route": "/admin/verification/cmwoyejv2000of66nz5zyprvv"
    },
    {
     "lane": "system",
@@ -349,19 +379,19 @@
     "lane": "admin",
     "label": "Admin · Verification review with the reasons written. Next: Reject submission.",
     "screen": "j-business-verification-rejected-04",
-    "route": "/admin/verification/cmwotygyr001eewzps8v4nr1o"
+    "route": "/admin/verification/cmwoyfdpz001ef66n6zv4vebr"
    },
    {
     "lane": "admin",
     "label": "Reject this submission? Confirms the business name and shows the notes that will be sent. Next: Reject submission.",
     "screen": "j-business-verification-rejected-05",
-    "route": "/admin/verification/cmwotygyr001eewzps8v4nr1o"
+    "route": "/admin/verification/cmwoyfdpz001ef66n6zv4vebr"
    },
    {
     "lane": "admin",
     "label": "Rejected: the status badge shows Rejected.",
     "screen": "j-business-verification-rejected-06",
-    "route": "/admin/verification/cmwotygyr001eewzps8v4nr1o"
+    "route": "/admin/verification/cmwoyfdpz001ef66n6zv4vebr"
    },
    {
     "lane": "system",
@@ -418,49 +448,49 @@
     "lane": "admin",
     "label": "Admin · Review listing: every photo (cover, gallery, each room) and the business's documents, then all listing details. The decision panel's photo and evidence checks are locked: Open the remaining photos first. Next: open the cover photo.",
     "screen": "j-listing-verification-05",
-    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
+    "route": "/admin/listings/cmwoyfvus001qf66njbdv894t"
    },
    {
     "lane": "admin",
     "label": "Photo viewer: the photo full size, with arrows through every photo of the listing. Opening a photo marks it Viewed. Next: close and open the rest.",
     "screen": "j-listing-verification-06",
-    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
+    "route": "/admin/listings/cmwoyfvus001qf66njbdv894t"
    },
    {
     "lane": "admin",
     "label": "Every photo Viewed (progress full); the photo check is now unlocked. Next: open the documents.",
     "screen": "j-listing-verification-07",
-    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
+    "route": "/admin/listings/cmwoyfvus001qf66njbdv894t"
    },
    {
     "lane": "admin",
     "label": "Document viewer: the business's certificate shown inside the page, with Open in new tab. Next: close and open the others.",
     "screen": "j-listing-verification-08",
-    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
+    "route": "/admin/listings/cmwoyfvus001qf66njbdv894t"
    },
    {
     "lane": "admin",
     "label": "Every document Opened; all four approval checks are now available. Next: Mark as under review.",
     "screen": "j-listing-verification-09",
-    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
+    "route": "/admin/listings/cmwoyfvus001qf66njbdv894t"
    },
    {
     "lane": "admin",
     "label": "Under review: the business sees someone is checking its listing. Next: ask for changes.",
     "screen": "j-listing-verification-10",
-    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
+    "route": "/admin/listings/cmwoyfvus001qf66njbdv894t"
    },
    {
     "lane": "admin",
     "label": "Reasons written; they are sent to the business. Next: Request changes.",
     "screen": "j-listing-verification-11",
-    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
+    "route": "/admin/listings/cmwoyfvus001qf66njbdv894t"
    },
    {
     "lane": "admin",
     "label": "Needs changes: the decision and reasons are recorded on the submission.",
     "screen": "j-listing-verification-12",
-    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
+    "route": "/admin/listings/cmwoyfvus001qf66njbdv894t"
    },
    {
     "lane": "system",
@@ -494,19 +524,19 @@
     "lane": "admin",
     "label": "Admin · Review listing (new submission): every photo and document opened, all four checks ticked and approval notes written. Next: Approve and publish.",
     "screen": "j-listing-verification-17",
-    "route": "/admin/listings/cmwou9zwu0022ewzppyf9u5vp"
+    "route": "/admin/listings/cmwoyqwbb0022f66nfseouve7"
    },
    {
     "lane": "admin",
     "label": "Approve and publish? The listing goes live and can be booked straight away; the notes are shown. Next: Approve and publish.",
     "screen": "j-listing-verification-18",
-    "route": "/admin/listings/cmwou9zwu0022ewzppyf9u5vp"
+    "route": "/admin/listings/cmwoyqwbb0022f66nfseouve7"
    },
    {
     "lane": "admin",
     "label": "Approved: the listing is published.",
     "screen": "j-listing-verification-19",
-    "route": "/admin/listings/cmwou9zwu0022ewzppyf9u5vp"
+    "route": "/admin/listings/cmwoyqwbb0022f66nfseouve7"
    },
    {
     "lane": "system",
@@ -559,19 +589,19 @@
     "lane": "admin",
     "label": "Admin · Review listing: reasons written. Rejecting doesn't need the checks. Next: Reject.",
     "screen": "j-listing-withdraw-reject-05",
-    "route": "/admin/listings/cmwounz96002fewzpefx2d4j3"
+    "route": "/admin/listings/cmwoz1gto002ff66nl2p1ok7q"
    },
    {
     "lane": "admin",
     "label": "Reject this listing? It will not be published and the business will see the reasons shown. Next: Reject listing.",
     "screen": "j-listing-withdraw-reject-06",
-    "route": "/admin/listings/cmwounz96002fewzpefx2d4j3"
+    "route": "/admin/listings/cmwoz1gto002ff66nl2p1ok7q"
    },
    {
     "lane": "admin",
     "label": "Rejected: the decision and reasons are recorded.",
     "screen": "j-listing-withdraw-reject-07",
-    "route": "/admin/listings/cmwounz96002fewzpefx2d4j3"
+    "route": "/admin/listings/cmwoz1gto002ff66nl2p1ok7q"
    },
    {
     "lane": "business",
@@ -687,7 +717,7 @@
     "lane": "admin",
     "label": "Admin · Review listing: the approved submission that published it, with the decision, notes and the checks recorded.",
     "screen": "j-admin-business-listings-05",
-    "route": "/admin/listings/cmwoup8js001973a7qozsfaxz"
+    "route": "/admin/listings/cmwoz2q5a0019yrj3qb4ot095"
    }
   ]
  }

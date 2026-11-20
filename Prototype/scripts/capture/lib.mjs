@@ -7,11 +7,11 @@ export const extract = readFileSync(new URL("./extract.js", import.meta.url), "u
 // Next.js dev tools and route announcer are not part of the design.
 export const HIDE = "nextjs-portal, [data-nextjs-toast], #__next-build-watcher, next-route-announcer { display: none !important; }";
 
-// First-time guides (business portal) open by themselves on a fresh browser; screen
-// captures turn that off so pages are captured without a modal over them. The guides are
+// First-time guides and feature tips (business portal) open by themselves on a fresh
+// browser; screen captures turn them off so pages are captured without a modal over them. The guides are
 // still captured as dialogs from the header's ? button, and in the first-time journey.
 export async function signIn(context, account, { guides = false } = {}) {
-  if (!guides) await context.addInitScript(() => { try { localStorage.setItem("safarinexa:guides:off", "1"); } catch {} });
+  if (!guides) await context.addInitScript(() => { try { localStorage.setItem("safarinexa:guides:off", "1"); localStorage.setItem("safarinexa:tips:off", "1"); } catch {} });
   const p = await context.newPage();
   await p.goto(BASE + "/", { waitUntil: "networkidle", timeout: 180000 });
   const home = PORTALS[account].home;

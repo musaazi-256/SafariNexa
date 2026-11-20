@@ -73,9 +73,31 @@ New businesses are guided by step-by-step modals, not a separate page (`src/comp
 | Next / Back | Moves between steps; dots and "Step n of N" show progress |
 | Skip guide, Done, ×, Escape | Closes the guide and marks it seen: it won't open by itself again |
 | A step's action link (e.g. Upload documents) | Marks the guide seen and opens that page (whose own guide then opens, if unseen) |
-| ? button in the header | Replays the current page's guide from step 1 (shown on pages that have one) |
+| Help menu (? in the header) → *[Page] guide · n steps* | Replays the current page's guide from step 1 |
 
-"Seen" is remembered per person in the browser (`localStorage`), so a new browser or device shows the guides again. While a guide is open, the portal's background refresh pauses. The earlier dashboard pop-up "Welcome to SafariNexa!", which opened on every visit while unverified, was replaced by the welcome tour; the dashboard's status banner remains.
+**Feature tips** (`src/components/business/feature-tips.tsx`): after a page's guide is closed, small cards appear one at a time beside the control a new user should use next, with that control outlined.
+
+| Page | Tips, in order (each shown only when its control is on screen and enabled) |
+|---|---|
+| Overview | Verification status (unverified only) · Add a listing |
+| Listings | Create listing · the row's Listing actions menu |
+| Create listing | Choose the listing type · Create draft listing |
+| Listing preview | Submit for approval |
+| Submission & feedback | Submit listing and photos for approval · Withdraw to make changes |
+| Verification & documents | 1. Document type · 2. File · 3. Submit for review |
+| Verification outcomes | Upload/Update documents · Edit and resubmit |
+| Booking (detail) | Accept request · Decline booking |
+| Reviews | The reply box |
+| Guides | Add guide |
+
+| Action on a tip | Result |
+|---|---|
+| Got it, or × | That tip is marked seen; the next one on the page appears |
+| Turn off tips | No tips on any page until turned back on |
+| Help menu (? in the header) → Show tips on this page | Turns tips back on and replays this page's tips from the first |
+| Help menu → *[Page] guide · n steps* | Replays the page's step-by-step guide |
+
+"Seen" is remembered per person in the browser (`localStorage`), so a new browser or device shows the guides again. While a guide or tip is open, the portal's background refresh pauses. The earlier dashboard pop-up "Welcome to SafariNexa!", which opened on every visit while unverified, was replaced by the welcome tour; the dashboard's status banner remains.
 
 ### 2.2 Business · Verification outcomes — `/business/verification`
 One place for every review decision: the business verification (status, dates, document count, the reviewer's notes) and each listing's latest review outcome with its feedback, plus counts of approved / awaiting review / needing action. Listings are sorted so the ones needing action come first.

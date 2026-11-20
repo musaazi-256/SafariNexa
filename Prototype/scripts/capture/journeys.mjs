@@ -96,15 +96,20 @@ const guideButton = (name) => async (p) => {
   await p.waitForTimeout(700);
 };
 const guideNext = guideButton("Next");
+// Feature tips: buttons on the tip beside a control.
+const tipButton = (name) => async (p) => {
+  await p.locator("[data-feature-tip]").getByRole("button", { name, exact: true }).click();
+  await p.waitForTimeout(1200);
+};
 
 const VERIFICATION_JOURNEYS = [
   {
     id: "first-time-guides",
     fixture: "newBusiness",
     guides: true,
-    title: "A new business is guided through the portal: welcome tour and screen guides",
+    title: "A new business is guided through the portal: welcome tour, screen guides and feature tips",
     summary:
-      "The first time Kidepo Ridge Lodge's owner opens the business portal, a welcome tour explains verification, listings, bookings, messages and payments, one step at a time, and ends with the next thing to do. Key screens (Verification, Listings, the listing form, Bookings) have their own short guide the first time they are opened. Every guide can be skipped or closed at any step, and replayed from the ? button in the header.",
+      "The first time Kidepo Ridge Lodge's owner opens the business portal, a welcome tour explains verification, listings, bookings, messages and payments, one step at a time, and ends with the next thing to do. Key screens (Verification, Listings, the listing form, Bookings) have their own short guide the first time they are opened. After a guide, feature tips appear one at a time beside the controls to use next. Guides and tips can be skipped, dismissed or turned off, and replayed from the ? help menu in the header.",
     steps: [
       { lane: "business", act: go("/business/dashboard"), label: "Welcome tour, step 1 of 6: opens by itself on the first visit, over the Overview. Skip guide, Next, and close (× or Escape) are on every step. Next: Next." },
       { lane: "business", act: guideNext, label: "Step 2: Get your business verified first, and where the decision and notes appear. Next: Next." },
@@ -114,11 +119,16 @@ const VERIFICATION_JOURNEYS = [
       { lane: "business", act: guideNext, label: "Step 6: You're ready. For an unverified business the next step is Upload documents (a verified one gets Create a listing). Done closes the tour. Next: Upload documents." },
       { lane: "business", act: async (p) => { await p.getByRole("dialog").getByRole("link", { name: "Upload documents" }).click(); await p.waitForURL(/\/business\/settings\/verification/, { timeout: 120000 }); await settle(p); await p.getByRole("dialog").waitFor({ timeout: 30000 }); }, label: "Verification & documents, with its guide opening for the first time: what to upload. Next: Next." },
       { lane: "business", act: guideNext, label: "Verification guide, step 2: what happens after uploading, and Needs changes. Next: Skip guide." },
-      { lane: "business", act: guideButton("Skip guide"), label: "Guide skipped: the page as it is. A skipped or finished guide doesn't open again." },
+      { lane: "business", act: guideButton("Skip guide"), label: "Guide skipped. A feature tip now appears beside Document type: \"1. Pick the document type\", with Got it and Turn off tips; the field is highlighted. Next: Got it." },
+      { lane: "business", act: tipButton("Got it"), label: "Tip 2 of 3 beside the file field: what to attach. Next: Got it." },
+      { lane: "business", act: tipButton("Got it"), label: "Tip 3 of 3 beside Submit for review: what happens after sending. Next: Got it." },
+      { lane: "business", act: tipButton("Got it"), label: "All of this page's tips seen: the page as it is. Tips don't come back once dismissed." },
       { lane: "business", act: go("/business/listings"), label: "Listings, with its guide opening for the first time: statuses and the row menu. Next: close it with ×." },
-      { lane: "business", act: async (p) => { await p.keyboard.press("Escape"); await p.waitForTimeout(600); }, label: "Closed: closing also counts as seen. Next: the ? button in the header." },
-      { lane: "business", act: async (p) => { await p.locator("header button[aria-label^='Show the']").click(); await p.waitForTimeout(800); }, label: "The ? button replays this screen's guide from step 1, any time." },
-      { lane: "business", act: seq(async (p) => p.keyboard.press("Escape"), go("/business/dashboard")), label: "Back on the Overview: the welcome tour doesn't open again once finished or skipped." },
+      { lane: "business", act: async (p) => { await p.keyboard.press("Escape"); await p.locator("[data-feature-tip]").waitFor({ timeout: 15000 }); await p.waitForTimeout(500); }, label: "Guide closed (closing counts as seen). A tip points at Create listing. Next: Turn off tips." },
+      { lane: "business", act: tipButton("Turn off tips"), label: "Tips turned off: no more tips on any page. Next: the ? help menu in the header." },
+      { lane: "business", act: async (p) => { await p.locator("header button[aria-label='Help for this page']").click(); await p.getByRole("menu").waitFor(); await p.waitForTimeout(400); }, label: "Help menu: replay this page's guide (Listings guide · 3 steps), or Show tips on this page. Next: Show tips on this page." },
+      { lane: "business", act: async (p) => { await p.getByRole("menuitem", { name: "Show tips on this page" }).click(); await p.locator("[data-feature-tip]").waitFor({ timeout: 15000 }); await p.waitForTimeout(500); }, label: "Tips are back on, starting again from Create listing." },
+      { lane: "business", act: seq(tipButton("Got it"), go("/business/dashboard"), async (p) => { await p.locator("[data-feature-tip]").waitFor({ timeout: 15000 }).catch(() => undefined); await p.waitForTimeout(500); }), label: "Back on the Overview: the welcome tour doesn't open again; this page's tips point at the verification status and Add a listing." },
     ],
   },
   {

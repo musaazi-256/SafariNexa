@@ -3,23 +3,36 @@
   "id": "business-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/business/bookings/cmwoqfvag00fqj16grmciqc3g",
+  "route": "/business/bookings/cmwotw71x0006ewzpps6t2cei",
   "pattern": "/business/bookings/[id]",
   "kind": "page",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-BF19C859"
+  "purpose": "Booking BK-A3373144"
  },
  {
   "id": "business-bookings-id--menu-nile-crater-lodges-4-businesses",
   "section": "Bookings",
   "name": "Nile & Crater Lodges 4 businesses menu",
-  "route": "/business/bookings/cmwoqfvag00fqj16grmciqc3g",
+  "route": "/business/bookings/cmwotw71x0006ewzpps6t2cei",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-BF19C859",
+  "purpose": "Booking BK-A3373144",
+  "parent": "business-bookings-id",
+  "chrome": true
+ },
+ {
+  "id": "business-bookings-id--menu-help-for-this-page",
+  "section": "Bookings",
+  "name": "Help for this page menu",
+  "route": "/business/bookings/cmwotw71x0006ewzpps6t2cei",
+  "pattern": "/business/bookings/[id]",
+  "kind": "menu",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Booking BK-A3373144",
   "parent": "business-bookings-id",
   "chrome": true
  },
@@ -27,12 +40,12 @@
   "id": "business-bookings-id--menu-account-menu",
   "section": "Bookings",
   "name": "Account menu menu",
-  "route": "/business/bookings/cmwoqfvag00fqj16grmciqc3g",
+  "route": "/business/bookings/cmwotw71x0006ewzpps6t2cei",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-BF19C859",
+  "purpose": "Booking BK-A3373144",
   "parent": "business-bookings-id",
   "chrome": true
  },
@@ -107,9 +120,9 @@
   "parent": "business-bookings"
  },
  {
-  "id": "business-bookings--menu-actions-for-booking-bk-bf19c859",
+  "id": "business-bookings--menu-actions-for-booking-bk-a3373144",
   "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-BF19C859 menu",
+  "name": "Bookings · Actions for booking BK-A3373144 menu",
   "route": "/business/bookings",
   "pattern": "/business/bookings",
   "kind": "menu",
@@ -261,6 +274,18 @@
   "parent": "business-dashboard"
  },
  {
+  "id": "business-dashboard--tip-1",
+  "section": "Dashboard",
+  "name": "Dashboard · Tip 2 of 2: Add your first listing",
+  "route": "/business/dashboard",
+  "pattern": "/business/dashboard",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Nile & Crater Lodges",
+  "purpose": "Create a stay, tour, restaurant or transport listing. It's saved as a draft until you submit it.",
+  "parent": "business-dashboard"
+ },
+ {
   "id": "business-guides-new",
   "section": "Guides",
   "name": "Guides › New",
@@ -280,6 +305,18 @@
   "signedOut": false,
   "heading": "Guides",
   "purpose": "Manage guides that can be assigned to your tours."
+ },
+ {
+  "id": "business-guides--tip-1",
+  "section": "Guides",
+  "name": "Guides · Tip 1 of 1: Add your guides",
+  "route": "/business/guides",
+  "pattern": "/business/guides",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Guides",
+  "purpose": "Add the guides who lead your tours, so you can assign them to tour listings.",
+  "parent": "business-guides"
  },
  {
   "id": "business-listings-id-availability",
@@ -420,6 +457,18 @@
   "parent": "business-listings-new"
  },
  {
+  "id": "business-listings-new--tip-1",
+  "section": "Listings",
+  "name": "Listings › New · Tip 1 of 2: Choose what you offer",
+  "route": "/business/listings/new",
+  "pattern": "/business/listings/new",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "What are you listing?",
+  "purpose": "Pick the kind of listing. The form shows the fields that type needs, like rooms for stays or itineraries for tours.",
+  "parent": "business-listings-new"
+ },
+ {
   "id": "business-listings",
   "section": "Listings",
   "name": "Listings",
@@ -512,6 +561,30 @@
   "signedOut": false,
   "heading": "Listings",
   "purpose": "Get it approved",
+  "parent": "business-listings"
+ },
+ {
+  "id": "business-listings--tip-1",
+  "section": "Listings",
+  "name": "Listings · Tip 1 of 2: Create a listing",
+  "route": "/business/listings",
+  "pattern": "/business/listings",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Listings",
+  "purpose": "Start a new listing here. Nobody sees it until an admin approves it.",
+  "parent": "business-listings"
+ },
+ {
+  "id": "business-listings--tip-2",
+  "section": "Listings",
+  "name": "Listings · Tip 2 of 2: Preview and submit",
+  "route": "/business/listings",
+  "pattern": "/business/listings",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Listings",
+  "purpose": "Open this menu to edit a listing, preview it as travellers will see it, or check its approval and feedback.",
   "parent": "business-listings"
  },
  {
@@ -713,6 +786,18 @@
   "parent": "business-reviews"
  },
  {
+  "id": "business-reviews--tip-1",
+  "section": "Reviews",
+  "name": "Reviews · Tip 1 of 1: Reply to reviews",
+  "route": "/business/reviews",
+  "pattern": "/business/reviews",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Reviews",
+  "purpose": "Thank guests and answer concerns. Your reply shows under their review on your listing.",
+  "parent": "business-reviews"
+ },
+ {
   "id": "business-settings",
   "section": "Settings",
   "name": "Settings",
@@ -795,6 +880,42 @@
   "parent": "business-settings-verification"
  },
  {
+  "id": "business-settings-verification--tip-1",
+  "section": "Settings",
+  "name": "Settings › Verification · Tip 1 of 3: 1. Pick the document type",
+  "route": "/business/settings/verification",
+  "pattern": "/business/settings/verification",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "Choose what you're uploading: registration, licences and permits, tax documents or an ID.",
+  "parent": "business-settings-verification"
+ },
+ {
+  "id": "business-settings-verification--tip-2",
+  "section": "Settings",
+  "name": "Settings › Verification · Tip 2 of 3: 2. Attach the file",
+  "route": "/business/settings/verification",
+  "pattern": "/business/settings/verification",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "A PDF, JPEG or PNG up to 5 MB. Make sure it's readable and shows your business name.",
+  "parent": "business-settings-verification"
+ },
+ {
+  "id": "business-settings-verification--tip-3",
+  "section": "Settings",
+  "name": "Settings › Verification · Tip 3 of 3: 3. Send it for review",
+  "route": "/business/settings/verification",
+  "pattern": "/business/settings/verification",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "An admin checks it and records a decision. You'll see it, with any notes, under Verification.",
+  "parent": "business-settings-verification"
+ },
+ {
   "id": "business-support",
   "section": "Support",
   "name": "Support",
@@ -874,6 +995,30 @@
   "signedOut": false,
   "heading": "Verification outcomes",
   "purpose": "Track every decision",
+  "parent": "business-verification"
+ },
+ {
+  "id": "business-verification--tip-1",
+  "section": "Verification",
+  "name": "Verification · Tip 1 of 2: Your next step",
+  "route": "/business/verification",
+  "pattern": "/business/verification",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Verification outcomes",
+  "purpose": "Upload or update your documents here. The decision on your business appears on this page.",
+  "parent": "business-verification"
+ },
+ {
+  "id": "business-verification--tip-2",
+  "section": "Verification",
+  "name": "Verification · Tip 2 of 2: Changes requested",
+  "route": "/business/verification",
+  "pattern": "/business/verification",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Verification outcomes",
+  "purpose": "Read the reviewer's notes, edit the listing, and submit it again.",
   "parent": "business-verification"
  },
  {

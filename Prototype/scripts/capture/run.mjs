@@ -150,25 +150,54 @@ async function states(page, base, url) {
       await settle(page);
     }
   }
-  // First-time guides (business portal): each step of this page's guide, opened from the
-  // header's ? button (guides don't open by themselves during captures; see signIn).
-  const guide = page.locator("header button[aria-label^='Show the']");
-  if (await guide.count()) {
+  // First-time guides and feature tips (business portal), opened from the header's help
+  // menu: each guide step, then each tip beside its control (neither opens by itself
+  // during captures; see signIn).
+  const help = page.locator("header button[aria-label='Help for this page']");
+  // Opens the help menu and picks an item; false if the page's menu doesn't have it.
+  const openHelp = async (item) => {
+    await help.first().click();
+    const entry = page.getByRole("menuitem", { name: item }).first();
+    if (!(await entry.waitFor({ timeout: 4000 }).then(() => true, () => false))) {
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(400);
+      return false;
+    }
+    await page.waitForTimeout(300);
+    await entry.click();
+    await page.waitForTimeout(500);
+    return true;
+  };
+  if (await help.count()) {
     try {
-      await guide.first().click();
-      const dialog = page.getByRole("dialog");
-      await dialog.waitFor({ timeout: 5000 });
-      for (let i = 1; i <= 12; i++) {
-        await page.waitForTimeout(600);
-        const where = ((await dialog.locator("p").first().textContent()) || "").trim(); // "Welcome tour · Step 1 of 6"
-        const title = ((await dialog.getByRole("heading").first().textContent().catch(() => "")) || "").trim();
-        save({ ...base, id: base.id + "--guide-" + i, kind: "dialog", name: base.name + " · " + where, purpose: title, parent: base.id }, await snap(page, false));
-        const next = dialog.getByRole("button", { name: "Next", exact: true });
-        if (!(await next.count())) break;
-        await next.click();
+      if (await openHelp(/steps$/)) {
+        const dialog = page.getByRole("dialog");
+        await dialog.waitFor({ timeout: 5000 });
+        for (let i = 1; i <= 12; i++) {
+          await page.waitForTimeout(600);
+          const where = ((await dialog.locator("p").first().textContent()) || "").trim(); // "Welcome tour · Step 1 of 6"
+          const title = ((await dialog.getByRole("heading").first().textContent().catch(() => "")) || "").trim();
+          save({ ...base, id: base.id + "--guide-" + i, kind: "dialog", name: base.name + " · " + where, purpose: title, parent: base.id }, await snap(page, false));
+          const next = dialog.getByRole("button", { name: "Next", exact: true });
+          if (!(await next.count())) break;
+          await next.click();
+        }
+        await page.keyboard.press("Escape");
+        await page.waitForTimeout(500);
+      }
+      await openHelp("Show tips on this page");
+      const tip = page.locator("[data-feature-tip]");
+      for (let i = 1; i <= 8; i++) {
+        if (!(await tip.waitFor({ timeout: 2500 }).then(() => true, () => false))) break;
+        await page.waitForTimeout(500);
+        const where = ((await tip.locator("p").first().textContent()) || "").trim(); // "Tip 1 of 3"
+        const title = ((await tip.locator("h2").first().textContent()) || "").trim();
+        save({ ...base, id: base.id + "--tip-" + i, kind: "dialog", name: base.name + " · " + where + ": " + title, purpose: ((await tip.locator("p").nth(1).textContent()) || "").trim(), parent: base.id }, await snap(page, false));
+        await tip.getByRole("button", { name: "Got it" }).click();
+        await page.waitForTimeout(400);
       }
     } catch (e) {
-      console.log("  ✗ guide", String(e.message || e).split("\n")[0]);
+      console.log("  ✗ guide/tips", String(e.message || e).split("\n")[0]);
     }
     await page.keyboard.press("Escape").catch(() => undefined);
     await page.waitForTimeout(400);

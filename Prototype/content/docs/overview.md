@@ -66,6 +66,8 @@
 - `/bookings` (list), `/bookings/[id]` (detail) — real, shows payment history, room/add-on detail (now snapshotted so it survives a later room edit), booking-scoped chat, and cancel/refund-request actions. Cancelling an unpaid booking now correctly restores room availability (fixed 9 Sept); cancelling a paid booking creates a `Refund` request that an admin must action.
 
 ### 2.6 Reviews
+
+- **Added 20 Nov 2026**. My bookings shows a **Write a review** link for completed and review-pending bookings with no existing review. The link opens the verified review form for that booking.
 **Status: Working.**
 - `/reviews/new` — a review can only be written against a real completed booking with no existing review (`findEligibleReviewBooking` in `src/lib/listings.ts`); the previous synthetic-booking bypass is gone. **As of 19 Nov 2026**: star rating input, 20-character minimum, booking summary card; a missing rating is rejected instead of saved as 1 star. The direct-review forms on listing pages share the star input but keep their own looser server checks.
 
@@ -104,7 +106,7 @@ Entry: `/business` → `requireBusinessSession()`. A business owner first has a 
 
 ### 3.1 Onboarding
 **Status: Working**, real persistence as of 9 Sept.
-- **As of 20 Nov 2026**: first-time guides — a six-step welcome tour on the Overview and short step-by-step guides on Verification, Listings, the listing form and Bookings (`src/components/business/business-guides.tsx`). Each opens by itself on a person's first visit, can be skipped or closed at any step, and is replayed from the ? button in the header; "seen" is stored in the browser. They replace the 19 Nov `/business/getting-started` page, its sidebar tab and dashboard card, and the dashboard's "Welcome to SafariNexa!" pop-up. Details: `/docs/verification` §2.1.
+- **As of 20 Nov 2026**: first-time guides — a six-step welcome tour on the Overview and short step-by-step guides on Verification, Listings, the listing form and Bookings (`src/components/business/business-guides.tsx`). Each opens by itself on a person's first visit, can be skipped or closed at any step, and is replayed from the ? button in the header; "seen" is stored in the browser. Feature tips then point, one at a time, at the control to use next on each key page (`src/components/business/feature-tips.tsx`); the ? help menu replays a page's guide or tips. They replace the 19 Nov `/business/getting-started` page, its sidebar tab and dashboard card, and the dashboard's "Welcome to SafariNexa!" pop-up. Details: `/docs/verification` §2.1.
 - `/business/onboarding` (intro) → `/business/onboarding/setup` (the `OnboardingWizard` component, `src/components/business/onboarding-wizard.tsx`).
 - All three steps' fields (business basics, contact person, documents) are now actually sent and persisted (fixed 9 Sept — previously silently dropped description, registration number, and contact name/role). Document upload writes to the local filesystem (`fs.writeFile` to `public/uploads`) — **this will not reliably persist on typical serverless hosting**; flagged as a pre-deployment blocker, not yet fixed.
 

@@ -124,7 +124,7 @@
   "id": "customer-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/bookings/cmwoqfvag00fqj16grmciqc3g",
+  "route": "/bookings/cmwotw71x0006ewzpps6t2cei",
   "pattern": "/bookings/[id]",
   "kind": "page",
   "signedOut": false,

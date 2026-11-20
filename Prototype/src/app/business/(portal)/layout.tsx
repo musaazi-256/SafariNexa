@@ -11,6 +11,7 @@ import { UserMenu } from "@/components/user-menu";
 import { SignOutMenuItem } from "@/components/sign-out-button";
 import { getUnreadNotificationCount } from "@/lib/notifications";
 import { BusinessGuides } from "@/components/business/business-guides";
+import { FeatureTips } from "@/components/business/feature-tips";
 
 export default async function BusinessPortalLayout({ children }: { children: ReactNode }) {
   const { businessId, business, businesses, session, account } = await requireBusinessSession();
@@ -44,6 +45,7 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
           </div>
         </header>
         <div className="portal-content flex-1 min-w-0 p-4 sm:p-6"><TablePreferencesProvider userId={session.user.id}>{children}</TablePreferencesProvider></div>
+        {session?.user && <FeatureTips userId={session.user.id} />}
       </SidebarInset>
     </SidebarProvider>
   );

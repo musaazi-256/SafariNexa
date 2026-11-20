@@ -565,3 +565,15 @@ Reported from Figma ("06 · Guides" looked incomplete). Capture fixes, no app ch
 | First-time guides only in the Journeys page | Screen captures turn auto-open off, and the ? button wasn't treated as a dialog trigger | Each page with a guide gets every step captured beside it, opened from the ? button (`--guide-1…n`) |
 | The same row menu captured once per row (nine "Listing actions", one "Actions for booking BK-…" per booking) | Every trigger on a page was captured | One capture per kind of menu per page (booking references and numbers ignored when comparing) |
 | Page title unreadable on a dark canvas | The plugin drew the page header straight on the canvas | The header is a white card like the cover and journey boards (`design/figma-captured/src/plugin.ts`; plugins rebuilt) |
+
+### Follow-up, same day — feature tips beside the actions to take
+
+Feedback: on top of the general guides, new users need prompts next to the actions they're expected to take.
+
+- **Added** `src/components/business/feature-tips.tsx`: a card beside a specific control (with an arrow, and the control outlined) saying what to do there, on Overview, Listings, Create listing, Listing preview, Submission & feedback, Verification & documents, Verification outcomes, booking detail, Reviews and Guides (§2.1 of `/docs/verification`). One tip at a time, only after the page's guide is closed and while no dialog or menu is open; tips find their control by link target or label and skip ones that aren't on screen or are disabled. "Got it"/× marks a tip seen; "Turn off tips" stops all; the control is scrolled to the middle of the screen if needed. Works at phone width.
+- **Changed** the header ? button into a help menu: "[Page] guide · n steps" and "Show tips on this page" (which turns tips back on for that page).
+- **Capture:** screen captures turn tips off too, then capture every guide step and every tip of a page from the help menu (`--guide-n`, `--tip-n`). The `first-time-guides` journey (18 steps) now shows tips after a guide, Got it, Turn off tips, and turning them back on from the help menu.
+
+## 20 November 2026 — Customer review entry point
+
+- **My bookings** now links directly to the verified review form for completed and review-pending bookings that the customer has yet to review.
