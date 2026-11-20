@@ -15,10 +15,7 @@ import { ratingSummary } from "@/lib/listings";
 import { summarizePayments } from "@/lib/revenue";
 import { RevenueOverviewChart } from "@/components/business/revenue-charts";
 import { DashboardQuickActions } from "@/components/business/dashboard-quick-actions";
-import { VerificationWelcomeModal } from "@/components/business/verification-modals";
 import { EmptyState } from "@/components/ui/empty-state";
-import { GettingStartedCard } from "@/components/business/getting-started";
-import { gettingStartedSteps } from "@/lib/business-getting-started";
 
 export default async function BusinessDashboardPage() {
   const { business, businessId } = await requireBusinessSession();
@@ -76,7 +73,6 @@ export default async function BusinessDashboardPage() {
   const settledMinor = monthPayouts.reduce((sum, p) => sum + p.amountMinor, 0);
   const { average, count } = ratingSummary(publishedReviews);
 
-  const setupSteps = await gettingStartedSteps(businessId);
   const recentBookings = await db.booking.findMany({where:{businessId,status:"AWAITING_BUSINESS_CONFIRMATION"},include:{listing:true},orderBy:{createdAt:"desc"},take:5});
   const chartBookings = await db.booking.findMany({where:{businessId,createdAt:{gte:startOfMonth}},select:{createdAt:true,status:true}});
   const bookingDays = new Map<string,{name:string;completed:number;upcoming:number;cancelled:number}>();
@@ -84,7 +80,6 @@ export default async function BusinessDashboardPage() {
   const bookingChartData=[...bookingDays.values()].sort((a,b)=>a.name.localeCompare(b.name));
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
-      <VerificationWelcomeModal verificationStatus={business.verificationStatus} />
 
       {/* Hero Section */}
       <div className="relative overflow-hidden rounded-2xl bg-slate-900 text-white min-h-[180px] flex items-center">
@@ -117,7 +112,6 @@ export default async function BusinessDashboardPage() {
         </div>
       )}
 
-      <GettingStartedCard steps={setupSteps} />
 
       {/* Stat Cards */}
       <StatGrid>

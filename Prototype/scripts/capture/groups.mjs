@@ -58,7 +58,6 @@ export const GROUPS = {
       { id: "14", name: "Payments & refunds", routes: ["/business/payments"] },
       { id: "15", name: "Customers", routes: ["/business/customers"] },
       { id: "16", name: "Support", routes: ["/business/support", "/business/support/[id]"] },
-      { id: "17", name: "Getting started", routes: ["/business/getting-started"] },
     ],
   },
   customer: {

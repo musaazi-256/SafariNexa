@@ -542,3 +542,12 @@ They act on a demo business, Kidepo Ridge Lodge, from the new `scripts/capture/f
 **Capture fix:** the capture's demo sign-in (`scripts/capture/lib.mjs`) moved on before the account-switch request had finished, which cancelled it on a slow dev server; the customer, whose home is the page the switch starts on, then stayed signed out and the booking-loop journey failed at checkout. It now waits for the switch response and checks the session cookie, retrying up to three times.
 
 **Verified:** the six journeys complete; in Chrome, review progress, ticked checks and typed notes survive 70 seconds on the page and progress survives a reload.
+
+### Follow-up, same day — first-time guides are step-by-step modals, not a page
+
+Feedback: the guides for new businesses should be skippable step-by-step modals over the app, not a sidebar tab.
+
+- **Added** `src/components/business/business-guides.tsx`, mounted in the business portal header: a six-step welcome tour on the Overview, and three-step guides on Verification (both pages), Listings, the listing form (new and edit) and Bookings. Each opens by itself the first time a person visits that page; Back / Next, "Skip guide", Done, × and Escape on every step; finished, skipped or closed guides don't reopen (remembered per user in `localStorage`). The header's ? button replays the current page's guide. The welcome tour's last step points to Upload documents (unverified) or Create a listing (verified).
+- **Removed** `/business/getting-started`, its sidebar tab, the dashboard "Finish setting up" card and `src/lib/business-getting-started.ts` (`publicListingHref` moved to `src/lib/listing-links.ts`). **Removed** the dashboard's "Welcome to SafariNexa!" pop-up, which reopened on every visit while unverified and would have stacked on the tour; the status banner stays.
+- **Bug fixed before release:** moving from the six-step tour to a page with a shorter guide (via the tour's Upload documents link) kept the step number and crashed the page; the step now belongs to the guide on screen.
+- **Capture:** screen captures turn auto-opening off (`signIn` in `scripts/capture/lib.mjs`) so pages aren't captured under a modal; each guide is still captured as a dialog from the ? button. New journey `first-time-guides` (13 steps) records the tour and guides as a new business meets them. The `business-verification` journey's first and last steps, which used the removed page, now show the Overview and the listing form.

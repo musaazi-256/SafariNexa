@@ -10,9 +10,10 @@ import { requireBusinessSession } from "@/lib/business";
 import { UserMenu } from "@/components/user-menu";
 import { SignOutMenuItem } from "@/components/sign-out-button";
 import { getUnreadNotificationCount } from "@/lib/notifications";
+import { BusinessGuides } from "@/components/business/business-guides";
 
 export default async function BusinessPortalLayout({ children }: { children: ReactNode }) {
-  const { businessId, businesses, session, account } = await requireBusinessSession();
+  const { businessId, business, businesses, session, account } = await requireBusinessSession();
   const unreadCount = session?.user ? await getUnreadNotificationCount(session.user.id) : 0;
 
   return (
@@ -27,6 +28,7 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <DemoToolbar surfaces={["customer", "admin"]} />
+            {session?.user && <BusinessGuides userId={session.user.id} verified={business?.verificationStatus === "APPROVED"} />}
             <NotificationBell surface="business" unreadCount={unreadCount}/>
             {session?.user && (
               <UserMenu

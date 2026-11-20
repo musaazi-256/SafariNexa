@@ -104,7 +104,7 @@ Entry: `/business` → `requireBusinessSession()`. A business owner first has a 
 
 ### 3.1 Onboarding
 **Status: Working**, real persistence as of 9 Sept.
-- **Added 19 Nov 2026**: `/business/getting-started` — an eight-step setup guide whose progress is computed from real records (`src/lib/business-getting-started.ts`); a progress card on the dashboard links to it until every step is done.
+- **As of 20 Nov 2026**: first-time guides — a six-step welcome tour on the Overview and short step-by-step guides on Verification, Listings, the listing form and Bookings (`src/components/business/business-guides.tsx`). Each opens by itself on a person's first visit, can be skipped or closed at any step, and is replayed from the ? button in the header; "seen" is stored in the browser. They replace the 19 Nov `/business/getting-started` page, its sidebar tab and dashboard card, and the dashboard's "Welcome to SafariNexa!" pop-up. Details: `/docs/verification` §2.1.
 - `/business/onboarding` (intro) → `/business/onboarding/setup` (the `OnboardingWizard` component, `src/components/business/onboarding-wizard.tsx`).
 - All three steps' fields (business basics, contact person, documents) are now actually sent and persisted (fixed 9 Sept — previously silently dropped description, registration number, and contact name/role). Document upload writes to the local filesystem (`fs.writeFile` to `public/uploads`) — **this will not reliably persist on typical serverless hosting**; flagged as a pre-deployment blocker, not yet fixed.
 

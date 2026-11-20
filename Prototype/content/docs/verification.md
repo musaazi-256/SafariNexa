@@ -56,14 +56,26 @@ Business uploads documents ─► Submitted ─► (admin) Under review ─► A
                                    └─► (admin, from queue) Suspended (fraud hold)
 ```
 
-### 2.1 Business · Getting started — `/business/getting-started`
-The setup guide for a new business: eight steps (profile, verification, first listing, photos, availability, submit for approval, go live, invite team), each worked out from the business's real records, with a progress bar and the next step open. Also shown as a card on the dashboard until every step is done.
+### 2.1 Business · First-time guides (all business portal pages)
+New businesses are guided by step-by-step modals, not a separate page (`src/components/business/business-guides.tsx`). Journey: `first-time-guides`.
 
-| Action | Who | Result |
+| Guide | Opens on | Steps |
 |---|---|---|
-| Open a step | Any member | Expands the how-to for that step |
-| Step button (Edit profile, Upload documents, Create listing, …) | Any member | Goes to the page where that step is done |
-| Contact support | Any member | Opens a new support request |
+| Welcome tour | Overview (`/business/dashboard`) | 6: welcome; get verified first; create listings and submit them; respond to booking requests; messages, reviews and payments; you're ready (Upload documents if unverified, Create a listing if verified) |
+| Verification guide | `/business/verification`, `/business/settings/verification` | 3: what to upload; what happens next (Needs changes); track every decision |
+| Listings guide | `/business/listings` | 3: statuses and row menu; create a listing; get it approved |
+| Listing form guide | `/business/listings/new`, `/business/listings/[id]/edit` | 3: the basics; photos and prices; save, preview, submit |
+| Bookings guide | `/business/bookings` | 3: booking requests; accept or decline; after payment |
+
+| Action | Result |
+|---|---|
+| (first visit to the page) | The page's guide opens by itself at step 1 |
+| Next / Back | Moves between steps; dots and "Step n of N" show progress |
+| Skip guide, Done, ×, Escape | Closes the guide and marks it seen: it won't open by itself again |
+| A step's action link (e.g. Upload documents) | Marks the guide seen and opens that page (whose own guide then opens, if unseen) |
+| ? button in the header | Replays the current page's guide from step 1 (shown on pages that have one) |
+
+"Seen" is remembered per person in the browser (`localStorage`), so a new browser or device shows the guides again. While a guide is open, the portal's background refresh pauses. The earlier dashboard pop-up "Welcome to SafariNexa!", which opened on every visit while unverified, was replaced by the welcome tour; the dashboard's status banner remains.
 
 ### 2.2 Business · Verification outcomes — `/business/verification`
 One place for every review decision: the business verification (status, dates, document count, the reviewer's notes) and each listing's latest review outcome with its feedback, plus counts of approved / awaiting review / needing action. Listings are sorted so the ones needing action come first.

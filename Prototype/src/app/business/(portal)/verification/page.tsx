@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { StatCard, StatGrid } from "@/components/ui/stat-card";
 import { ListingStatusBadge, ListingSubmissionStatusBadge, VerificationStatusBadge } from "@/components/ui/status-badge";
 import { requireBusinessSession } from "@/lib/business";
-import { publicListingHref } from "@/lib/business-getting-started";
+import { publicListingHref } from "@/lib/listing-links";
 import { db } from "@/lib/db";
 import { toVerificationStatus } from "@/lib/status";
 

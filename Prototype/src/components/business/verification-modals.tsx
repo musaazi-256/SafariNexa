@@ -14,48 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-interface VerificationWelcomeModalProps {
-  verificationStatus: string;
-}
-
-export function VerificationWelcomeModal({ verificationStatus }: VerificationWelcomeModalProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    if (verificationStatus !== "APPROVED") {
-      setIsOpen(true);
-    }
-  }, [verificationStatus]);
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-w-md text-center sm:text-left">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-warning/10 sm:mx-0">
-          <AlertCircle className="h-6 w-6 text-warning" />
-        </div>
-        <DialogHeader className="mt-4">
-          <DialogTitle className="text-xl">Welcome to SafariNexa!</DialogTitle>
-          <DialogDescription className="mt-2 text-base">
-            Your account is currently <strong className="text-slate-900">{verificationStatus.replace("_", " ")}</strong>.
-            <br /><br />
-            You can explore the platform and set up your profile, but you won&apos;t be able to publish listings or receive bookings until your business is verified.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={() => setIsOpen(false)} className="w-full sm:w-auto">
-            Explore platform
-          </Button>
-          <Button asChild className="w-full sm:w-auto">
-            <Link href="/business/settings/verification">
-              Check verification status
-            </Link>
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 interface VerificationActionModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;

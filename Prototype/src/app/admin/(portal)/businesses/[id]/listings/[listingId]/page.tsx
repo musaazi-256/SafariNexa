@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListingStatusBadge, ListingSubmissionStatusBadge } from "@/components/ui/status-badge";
 import { requireAdminSession } from "@/lib/admin";
 import { formatUGX } from "@/lib/booking";
-import { publicListingHref } from "@/lib/business-getting-started";
+import { publicListingHref } from "@/lib/listing-links";
 import { db } from "@/lib/db";
 import { listingSnapshot, reviewInclude } from "@/lib/listing-review";
 import { ratingSummary } from "@/lib/listings";

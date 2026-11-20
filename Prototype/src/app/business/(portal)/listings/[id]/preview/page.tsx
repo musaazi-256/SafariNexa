@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ListingStatusBadge, ListingSubmissionStatusBadge } from "@/components/ui/status-badge";
 import { submitListing } from "@/lib/actions/listing-review";
 import { requireBusinessSession } from "@/lib/business";
-import { publicListingHref } from "@/lib/business-getting-started";
+import { publicListingHref } from "@/lib/listing-links";
 import { db } from "@/lib/db";
 import { reviewInclude, submissionErrors } from "@/lib/listing-review";
 

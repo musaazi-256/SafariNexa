@@ -18,7 +18,6 @@ import {
   UserCircle,
   BarChart3,
   Settings as SettingsIcon,
-  Rocket,
   ShieldCheck
 } from "lucide-react";
 
@@ -41,7 +40,6 @@ const GROUPS = [
   {
     items: [
       { href: "/business/dashboard", label: "Overview", icon: LayoutDashboard },
-      { href: "/business/getting-started", label: "Getting started", icon: Rocket },
       { href: "/business/listings", label: "Listings", icon: ClipboardList },
       { href: "/business/guides", label: "Guides", icon: Users },
       { href: "/business/bookings", label: "Bookings", icon: CalendarClock },

@@ -3,35 +3,35 @@
   "id": "business-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/business/bookings/cmwo5fe7a00cgj16g9yxyzvd8",
+  "route": "/business/bookings/cmwo6bchr00d3j16gh3obgdwf",
   "pattern": "/business/bookings/[id]",
   "kind": "page",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-E71FC62E"
+  "purpose": "Booking BK-9A507570"
  },
  {
   "id": "business-bookings-id--menu-nile-crater-lodges4-businesses",
   "section": "Bookings",
   "name": "Bookings · details · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/bookings/cmwo5fe7a00cgj16g9yxyzvd8",
+  "route": "/business/bookings/cmwo6bchr00d3j16gh3obgdwf",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-E71FC62E",
+  "purpose": "Booking BK-9A507570",
   "parent": "business-bookings-id"
  },
  {
   "id": "business-bookings-id--menu-account-menu",
   "section": "Bookings",
   "name": "Account menu menu",
-  "route": "/business/bookings/cmwo5fe7a00cgj16g9yxyzvd8",
+  "route": "/business/bookings/cmwo6bchr00d3j16gh3obgdwf",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-E71FC62E",
+  "purpose": "Booking BK-9A507570",
   "parent": "business-bookings-id",
   "chrome": true
  },
@@ -130,6 +130,18 @@
   "parent": "business-bookings"
  },
  {
+  "id": "business-bookings--menu-actions-for-booking-bk-9a507570",
+  "section": "Bookings",
+  "name": "Bookings · Actions for booking BK-9A507570 menu",
+  "route": "/business/bookings",
+  "pattern": "/business/bookings",
+  "kind": "menu",
+  "signedOut": false,
+  "heading": "Bookings",
+  "purpose": "Handle booking requests and confirmations.",
+  "parent": "business-bookings"
+ },
+ {
   "id": "business-bookings--menu-actions-for-booking-bk-e71fc62e",
   "section": "Bookings",
   "name": "Bookings · Actions for booking BK-E71FC62E menu",
@@ -214,18 +226,6 @@
   "parent": "business-bookings"
  },
  {
-  "id": "business-bookings--menu-actions-for-booking-bk-f6797764",
-  "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-F6797764 menu",
-  "route": "/business/bookings",
-  "pattern": "/business/bookings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
-  "parent": "business-bookings"
- },
- {
   "id": "business-customers",
   "section": "Customers",
   "name": "Customers",
@@ -282,29 +282,6 @@
   "heading": "Nile & Crater Lodges",
   "purpose": "Here's what's happening with your business today.",
   "parent": "business-dashboard"
- },
- {
-  "id": "business-getting-started",
-  "section": "Getting started",
-  "name": "Getting started",
-  "route": "/business/getting-started",
-  "pattern": "/business/getting-started",
-  "kind": "page",
-  "signedOut": false,
-  "heading": "Getting started",
-  "purpose": "Follow these steps to get Nile & Crater Lodges verified and taking bookings on SafariNexa. Each step updates as you go."
- },
- {
-  "id": "business-getting-started--menu-nile-crater-lodges4-businesses",
-  "section": "Getting started",
-  "name": "Getting started · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/getting-started",
-  "pattern": "/business/getting-started",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Getting started",
-  "purpose": "Follow these steps to get Nile & Crater Lodges verified and taking bookings on SafariNexa. Each step updates as you go.",
-  "parent": "business-getting-started"
  },
  {
   "id": "business-guides-new",

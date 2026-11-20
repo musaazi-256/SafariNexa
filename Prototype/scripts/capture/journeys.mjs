@@ -90,16 +90,45 @@ const tick = (...keys) => async (p) => {
   for (const k of keys) await p.locator(`#check-${k}`).click();
 };
 const LISTING = `/business/listings/${KIDEPO.listing}`;
+// First-time guides: step through the open guide dialog.
+const guideButton = (name) => async (p) => {
+  await p.getByRole("dialog").getByRole("button", { name, exact: true }).click();
+  await p.waitForTimeout(700);
+};
+const guideNext = guideButton("Next");
 
 const VERIFICATION_JOURNEYS = [
+  {
+    id: "first-time-guides",
+    fixture: "newBusiness",
+    guides: true,
+    title: "A new business is guided through the portal: welcome tour and screen guides",
+    summary:
+      "The first time Kidepo Ridge Lodge's owner opens the business portal, a welcome tour explains verification, listings, bookings, messages and payments, one step at a time, and ends with the next thing to do. Key screens (Verification, Listings, the listing form, Bookings) have their own short guide the first time they are opened. Every guide can be skipped or closed at any step, and replayed from the ? button in the header.",
+    steps: [
+      { lane: "business", act: go("/business/dashboard"), label: "Welcome tour, step 1 of 6: opens by itself on the first visit, over the Overview. Skip guide, Next, and close (× or Escape) are on every step. Next: Next." },
+      { lane: "business", act: guideNext, label: "Step 2: Get your business verified first, and where the decision and notes appear. Next: Next." },
+      { lane: "business", act: guideNext, label: "Step 3: Create listings, preview them, submit them for approval. Next: Next." },
+      { lane: "business", act: guideNext, label: "Step 4: Respond to booking requests before the deadline; accepting asks the traveller to pay. Next: Next." },
+      { lane: "business", act: guideNext, label: "Step 5: Messages, Reviews, Earnings and Payments & refunds. Next: Next." },
+      { lane: "business", act: guideNext, label: "Step 6: You're ready. For an unverified business the next step is Upload documents (a verified one gets Create a listing). Done closes the tour. Next: Upload documents." },
+      { lane: "business", act: async (p) => { await p.getByRole("dialog").getByRole("link", { name: "Upload documents" }).click(); await p.waitForURL(/\/business\/settings\/verification/, { timeout: 120000 }); await settle(p); await p.getByRole("dialog").waitFor({ timeout: 30000 }); }, label: "Verification & documents, with its guide opening for the first time: what to upload. Next: Next." },
+      { lane: "business", act: guideNext, label: "Verification guide, step 2: what happens after uploading, and Needs changes. Next: Skip guide." },
+      { lane: "business", act: guideButton("Skip guide"), label: "Guide skipped: the page as it is. A skipped or finished guide doesn't open again." },
+      { lane: "business", act: go("/business/listings"), label: "Listings, with its guide opening for the first time: statuses and the row menu. Next: close it with ×." },
+      { lane: "business", act: async (p) => { await p.keyboard.press("Escape"); await p.waitForTimeout(600); }, label: "Closed: closing also counts as seen. Next: the ? button in the header." },
+      { lane: "business", act: async (p) => { await p.locator("header button[aria-label^='Show the']").click(); await p.waitForTimeout(800); }, label: "The ? button replays this screen's guide from step 1, any time." },
+      { lane: "business", act: seq(async (p) => p.keyboard.press("Escape"), go("/business/dashboard")), label: "Back on the Overview: the welcome tour doesn't open again once finished or skipped." },
+    ],
+  },
   {
     id: "business-verification",
     fixture: "newBusiness",
     title: "A new business gets verified: upload, changes requested, resubmit, approval",
     summary:
-      "Kidepo Ridge Lodge has just joined. The setup guide points it to verification; the owner uploads a registration certificate. An admin reviews it and asks for the tourism licence too. The owner sees the request on Verification, uploads the licence, and the admin starts the review and approves the business, which can then submit listings.",
+      "Kidepo Ridge Lodge has just joined; the owner uploads a registration certificate. An admin reviews it and asks for the tourism licence too. The owner sees the request on Verification, uploads the licence, and the admin starts the review and approves the business, which can then submit listings.",
     steps: [
-      { lane: "business", act: go("/business/getting-started"), label: "Business · Getting started: eight setup steps with progress. Complete your business profile is done; Verify your business is next and is open, with what to upload. Next: Verification." },
+      { lane: "business", act: go("/business/dashboard"), label: "Business · Overview: a new business with no bookings yet. The welcome tour (see the first-time guides journey) points it to Verification first. Next: Verification." },
       { lane: "business", act: go("/business/verification"), label: "Business · Verification outcomes: the business decision (Not submitted yet, Upload documents), counts of listing outcomes and every listing's review status. Next: Upload documents." },
       { lane: "business", act: go("/business/settings/verification"), label: "Business · Verification & documents: status Not started, the review timeline, documents on file (none) and Add a document. Next: choose a document type and file." },
       { lane: "business", act: upload("INCORPORATION", "certificate-of-incorporation.pdf", "Certificate of Incorporation", ["Kidepo Ridge Lodge Ltd", "Registration number 80020001234567"]), label: "Add a document: type Incorporation and a PDF chosen (PDF, JPEG or PNG up to 5 MB). Next: Submit for review." },
@@ -119,7 +148,7 @@ const VERIFICATION_JOURNEYS = [
       { lane: "admin", act: press("Approve business"), label: "Approved: the business is verified." },
       { lane: "system", label: "The business is Approved: its owners are notified, and it can now submit listings for approval and receive payouts." },
       { lane: "business", act: go("/business/verification"), label: "Business · Verification outcomes: Verified, with the approval notes. Listings can now be submitted." },
-      { lane: "business", act: go("/business/getting-started"), label: "Business · Getting started: Verify your business is done; the next step is Create your first listing." },
+      { lane: "business", act: go("/business/listings/new"), label: "Business · Create listing: now verified, the business can create listings and submit them for approval." },
     ],
   },
   {
@@ -350,7 +379,7 @@ async function run(j) {
       const context = await browser.newContext({ viewport: VIEW, deviceScaleFactor: 1 });
       // Journeys on the Kidepo fixture show that business in the business portal.
       if (j.fixture) await context.addCookies(kidepoCookie(BASE));
-      pages[lane] = await signIn(context, lane);
+      pages[lane] = await signIn(context, lane, { guides: Boolean(j.guides) });
     }
     return pages[lane];
   };
