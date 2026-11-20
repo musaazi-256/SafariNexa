@@ -551,3 +551,17 @@ Feedback: the guides for new businesses should be skippable step-by-step modals 
 - **Removed** `/business/getting-started`, its sidebar tab, the dashboard "Finish setting up" card and `src/lib/business-getting-started.ts` (`publicListingHref` moved to `src/lib/listing-links.ts`). **Removed** the dashboard's "Welcome to SafariNexa!" pop-up, which reopened on every visit while unverified and would have stacked on the tour; the status banner stays.
 - **Bug fixed before release:** moving from the six-step tour to a page with a shorter guide (via the tour's Upload documents link) kept the step number and crashed the page; the step now belongs to the guide on screen.
 - **Capture:** screen captures turn auto-opening off (`signIn` in `scripts/capture/lib.mjs`) so pages aren't captured under a modal; each guide is still captured as a dialog from the ? button. New journey `first-time-guides` (13 steps) records the tour and guides as a new business meets them. The `business-verification` journey's first and last steps, which used the removed page, now show the Overview and the listing form.
+
+### Follow-up, same day — Figma captures: dropdowns, checkboxes, menus, Guides data, page headers
+
+Reported from Figma ("06 · Guides" looked incomplete). Capture fixes, no app change:
+
+| Problem in Figma | Cause | Fix |
+|---|---|---|
+| Dropdowns empty, no arrow | Native `<select>` paints its chosen option and arrow outside the DOM | `scripts/capture/extract.js` draws the selected option text and a chevron |
+| Checkboxes missing | Native checkboxes/radios are drawn by the browser | The extractor draws the box (checked: filled with a tick; disabled: faded) |
+| Business-switcher menu repeated on every page, cut off at window height, caption "Lodges4 businesses" | The sidebar is a `div[data-sidebar]`, not `<aside>`, so it wasn't treated as shared chrome; menus were captured at window size; labels used `textContent` | Sidebar menus captured once (keyed by place); menus captured at full page length (dialogs stay at window size); labels use `innerText` |
+| Guides list empty ("No guides yet") | Business screens are captured as Nile & Crater Lodges, a lodge with no guides | A group can name the business it's captured as (`business` in `groups.mjs`); Guides is captured as Uganda Trails Safaris, the demo account's tour company with 12 guides |
+| First-time guides only in the Journeys page | Screen captures turn auto-open off, and the ? button wasn't treated as a dialog trigger | Each page with a guide gets every step captured beside it, opened from the ? button (`--guide-1…n`) |
+| The same row menu captured once per row (nine "Listing actions", one "Actions for booking BK-…" per booking) | Every trigger on a page was captured | One capture per kind of menu per page (booking references and numbers ignored when comparing) |
+| Page title unreadable on a dark canvas | The plugin drew the page header straight on the canvas | The header is a white card like the cover and journey boards (`design/figma-captured/src/plugin.ts`; plugins rebuilt) |

@@ -122,6 +122,33 @@ async (opts) => {
         node.kids.push({ k: "text", x: left, y: top, w: r.width - px(cs.paddingLeft) - px(cs.paddingRight), h: lh, t: shown, lines: 1, st });
       }
     }
+    // Native selects paint their chosen option and an arrow, neither of which is in the DOM.
+    if (tag === "select") {
+      const t = el.selectedOptions[0]?.text || "";
+      if (t) {
+        const st = textStyle(cs);
+        const lh = st.lh || st.s * 1.2;
+        const left = r.left + px(cs.paddingLeft) + px(cs.borderLeftWidth);
+        node.kids.push({ k: "text", x: left, y: r.top + (r.height - lh) / 2, w: r.width - px(cs.paddingLeft) - 32, h: lh, t, lines: 1, st });
+      }
+      if (cs.appearance !== "none") {
+        const s = 16;
+        node.kids.push({ k: "svg", n: "chevron", x: r.right - s - 12, y: r.top + (r.height - s) / 2, w: s, h: s, o: 1, svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${cs.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>` });
+      }
+    }
+    // Native checkboxes and radios are drawn by the browser, not by CSS: draw the box.
+    const nativeCheck = tag === "input" && (el.type === "checkbox" || el.type === "radio") && cs.appearance !== "none";
+    if (nativeCheck) {
+      const accent = cs.accentColor && cs.accentColor !== "auto" ? cs.accentColor : "rgb(0, 117, 255)";
+      node.bg = el.checked ? accent : "rgb(255, 255, 255)";
+      node.bw = [1, 1, 1, 1];
+      node.bc = el.checked ? accent : "rgb(118, 118, 118)";
+      const rr = el.type === "radio" ? r.width / 2 : 3;
+      node.rad = [rr, rr, rr, rr];
+      if (el.disabled) node.o = 0.5;
+      if (el.checked) node.kids.push({ k: "svg", n: "check", x: r.left, y: r.top, w: r.width, h: r.height, o: 1, svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${r.width}" height="${r.height}" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>` });
+      return inView(r) ? node : null;
+    }
     if (op < 1) node.o = op;
     if (visibleColor(cs.backgroundColor)) node.bg = cs.backgroundColor;
     if (cs.backgroundImage && cs.backgroundImage !== "none") {
@@ -144,7 +171,7 @@ async (opts) => {
     if (cs.overflow !== "visible" || cs.overflowX !== "visible" || cs.overflowY !== "visible") node.clip = 1;
     if (cs.transform && cs.transform !== "none") node.tf = cs.transform;
 
-    for (const child of el.childNodes) {
+    for (const child of tag === "select" ? [] : el.childNodes) {
       if (child.nodeType === 3) {
         const t = child.textContent;
         if (!t || !t.trim()) continue;

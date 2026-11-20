@@ -26,7 +26,7 @@
   "id": "admin-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/admin/bookings/cmwo6bchr00d3j16gh3obgdwf",
+  "route": "/admin/bookings/cmwoqfvag00fqj16grmciqc3g",
   "pattern": "/admin/bookings/[id]",
   "kind": "page",
   "signedOut": false,

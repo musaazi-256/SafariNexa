@@ -34,10 +34,12 @@ export async function settle(page) {
   await page.waitForTimeout(600);
 }
 
-// Full-length pages; overlays at the window size they open in.
+// Full-length pages and menus; dialogs at the window size they open in.
 export async function snap(page, full = true) {
   const v = { ...VIEW };
-  const overlay = await page.evaluate(() => Boolean(document.querySelector("[role=dialog],[role=alertdialog],[role=menu],[role=listbox]")));
+  // Dialogs sit in the middle of the window, so they're captured at window size; menus
+  // open beside their trigger and are captured with the full page behind them.
+  const overlay = await page.evaluate(() => Boolean(document.querySelector("[role=dialog],[role=alertdialog]")));
   if (full && !overlay) {
     v.height = Math.min(MAX_HEIGHT, Math.max(VIEW.height, await page.evaluate(() => Math.max(document.scrollingElement.scrollHeight, ...[...document.querySelectorAll("main")].map((m) => m.scrollHeight)))));
     if (v.height > VIEW.height) {

@@ -3,35 +3,36 @@
   "id": "business-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/business/bookings/cmwo6bchr00d3j16gh3obgdwf",
+  "route": "/business/bookings/cmwoqfvag00fqj16grmciqc3g",
   "pattern": "/business/bookings/[id]",
   "kind": "page",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-9A507570"
+  "purpose": "Booking BK-BF19C859"
  },
  {
-  "id": "business-bookings-id--menu-nile-crater-lodges4-businesses",
+  "id": "business-bookings-id--menu-nile-crater-lodges-4-businesses",
   "section": "Bookings",
-  "name": "Bookings · details · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/bookings/cmwo6bchr00d3j16gh3obgdwf",
+  "name": "Nile & Crater Lodges 4 businesses menu",
+  "route": "/business/bookings/cmwoqfvag00fqj16grmciqc3g",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-9A507570",
-  "parent": "business-bookings-id"
+  "purpose": "Booking BK-BF19C859",
+  "parent": "business-bookings-id",
+  "chrome": true
  },
  {
   "id": "business-bookings-id--menu-account-menu",
   "section": "Bookings",
   "name": "Account menu menu",
-  "route": "/business/bookings/cmwo6bchr00d3j16gh3obgdwf",
+  "route": "/business/bookings/cmwoqfvag00fqj16grmciqc3g",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-9A507570",
+  "purpose": "Booking BK-BF19C859",
   "parent": "business-bookings-id",
   "chrome": true
  },
@@ -45,18 +46,6 @@
   "signedOut": false,
   "heading": "Upcoming booking calendar",
   "purpose": "Next 100 scheduled bookings, ordered by service date."
- },
- {
-  "id": "business-bookings-calendar--menu-nile-crater-lodges4-businesses",
-  "section": "Bookings",
-  "name": "Bookings › Calendar · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/bookings/calendar",
-  "pattern": "/business/bookings/calendar",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Upcoming booking calendar",
-  "purpose": "Next 100 scheduled bookings, ordered by service date.",
-  "parent": "business-bookings-calendar"
  },
  {
   "id": "business-bookings-calendar--menu-columns-for-upcoming-bookings",
@@ -80,18 +69,6 @@
   "signedOut": false,
   "heading": "Bookings",
   "purpose": "Handle booking requests and confirmations."
- },
- {
-  "id": "business-bookings--menu-nile-crater-lodges4-businesses",
-  "section": "Bookings",
-  "name": "Bookings · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/bookings",
-  "pattern": "/business/bookings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
-  "parent": "business-bookings"
  },
  {
   "id": "business-bookings--menu-booking-status-all-bookings",
@@ -130,9 +107,9 @@
   "parent": "business-bookings"
  },
  {
-  "id": "business-bookings--menu-actions-for-booking-bk-9a507570",
+  "id": "business-bookings--menu-actions-for-booking-bk-bf19c859",
   "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-9A507570 menu",
+  "name": "Bookings · Actions for booking BK-BF19C859 menu",
   "route": "/business/bookings",
   "pattern": "/business/bookings",
   "kind": "menu",
@@ -142,87 +119,39 @@
   "parent": "business-bookings"
  },
  {
-  "id": "business-bookings--menu-actions-for-booking-bk-e71fc62e",
+  "id": "business-bookings--guide-1",
   "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-E71FC62E menu",
+  "name": "Bookings · Bookings guide · Step 1 of 3",
   "route": "/business/bookings",
   "pattern": "/business/bookings",
-  "kind": "menu",
+  "kind": "dialog",
   "signedOut": false,
   "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
+  "purpose": "Booking requests",
   "parent": "business-bookings"
  },
  {
-  "id": "business-bookings--menu-actions-for-booking-bk-8c6d2af4",
+  "id": "business-bookings--guide-2",
   "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-8C6D2AF4 menu",
+  "name": "Bookings · Bookings guide · Step 2 of 3",
   "route": "/business/bookings",
   "pattern": "/business/bookings",
-  "kind": "menu",
+  "kind": "dialog",
   "signedOut": false,
   "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
+  "purpose": "Accept or decline",
   "parent": "business-bookings"
  },
  {
-  "id": "business-bookings--menu-actions-for-booking-bk-87b2cf13",
+  "id": "business-bookings--guide-3",
   "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-87B2CF13 menu",
+  "name": "Bookings · Bookings guide · Step 3 of 3",
   "route": "/business/bookings",
   "pattern": "/business/bookings",
-  "kind": "menu",
+  "kind": "dialog",
   "signedOut": false,
   "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
-  "parent": "business-bookings"
- },
- {
-  "id": "business-bookings--menu-actions-for-booking-bk-01fe7c9c",
-  "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-01FE7C9C menu",
-  "route": "/business/bookings",
-  "pattern": "/business/bookings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
-  "parent": "business-bookings"
- },
- {
-  "id": "business-bookings--menu-actions-for-booking-bk-0a8a07fe",
-  "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-0A8A07FE menu",
-  "route": "/business/bookings",
-  "pattern": "/business/bookings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
-  "parent": "business-bookings"
- },
- {
-  "id": "business-bookings--menu-actions-for-booking-bk-478223fa",
-  "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-478223FA menu",
-  "route": "/business/bookings",
-  "pattern": "/business/bookings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
-  "parent": "business-bookings"
- },
- {
-  "id": "business-bookings--menu-actions-for-booking-bk-09832eca",
-  "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-09832ECA menu",
-  "route": "/business/bookings",
-  "pattern": "/business/bookings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Bookings",
-  "purpose": "Handle booking requests and confirmations.",
+  "purpose": "After payment",
   "parent": "business-bookings"
  },
  {
@@ -235,18 +164,6 @@
   "signedOut": false,
   "heading": "Customers",
   "purpose": "Review your customers’ bookings, payment balances, and conversations."
- },
- {
-  "id": "business-customers--menu-nile-crater-lodges4-businesses",
-  "section": "Customers",
-  "name": "Customers · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/customers",
-  "pattern": "/business/customers",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Customers",
-  "purpose": "Review your customers’ bookings, payment balances, and conversations.",
-  "parent": "business-customers"
  },
  {
   "id": "business-customers--menu-columns-for-customers",
@@ -272,15 +189,75 @@
   "purpose": "Here's what's happening with your business today."
  },
  {
-  "id": "business-dashboard--menu-nile-crater-lodges4-businesses",
+  "id": "business-dashboard--guide-1",
   "section": "Dashboard",
-  "name": "Dashboard · Nile & Crater Lodges4 businesses menu",
+  "name": "Dashboard · Welcome tour · Step 1 of 6",
   "route": "/business/dashboard",
   "pattern": "/business/dashboard",
-  "kind": "menu",
+  "kind": "dialog",
   "signedOut": false,
   "heading": "Nile & Crater Lodges",
-  "purpose": "Here's what's happening with your business today.",
+  "purpose": "Welcome to SafariNexa Business",
+  "parent": "business-dashboard"
+ },
+ {
+  "id": "business-dashboard--guide-2",
+  "section": "Dashboard",
+  "name": "Dashboard · Welcome tour · Step 2 of 6",
+  "route": "/business/dashboard",
+  "pattern": "/business/dashboard",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Nile & Crater Lodges",
+  "purpose": "Get your business verified first",
+  "parent": "business-dashboard"
+ },
+ {
+  "id": "business-dashboard--guide-3",
+  "section": "Dashboard",
+  "name": "Dashboard · Welcome tour · Step 3 of 6",
+  "route": "/business/dashboard",
+  "pattern": "/business/dashboard",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Nile & Crater Lodges",
+  "purpose": "Create listings and send them for approval",
+  "parent": "business-dashboard"
+ },
+ {
+  "id": "business-dashboard--guide-4",
+  "section": "Dashboard",
+  "name": "Dashboard · Welcome tour · Step 4 of 6",
+  "route": "/business/dashboard",
+  "pattern": "/business/dashboard",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Nile & Crater Lodges",
+  "purpose": "Respond to booking requests",
+  "parent": "business-dashboard"
+ },
+ {
+  "id": "business-dashboard--guide-5",
+  "section": "Dashboard",
+  "name": "Dashboard · Welcome tour · Step 5 of 6",
+  "route": "/business/dashboard",
+  "pattern": "/business/dashboard",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Nile & Crater Lodges",
+  "purpose": "Talk to travellers and get paid",
+  "parent": "business-dashboard"
+ },
+ {
+  "id": "business-dashboard--guide-6",
+  "section": "Dashboard",
+  "name": "Dashboard · Welcome tour · Step 6 of 6",
+  "route": "/business/dashboard",
+  "pattern": "/business/dashboard",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Nile & Crater Lodges",
+  "purpose": "You're ready",
   "parent": "business-dashboard"
  },
  {
@@ -294,17 +271,6 @@
   "heading": "Add a new guide"
  },
  {
-  "id": "business-guides-new--menu-nile-crater-lodges4-businesses",
-  "section": "Guides",
-  "name": "Guides › New · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/guides/new",
-  "pattern": "/business/guides/new",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Add a new guide",
-  "parent": "business-guides-new"
- },
- {
   "id": "business-guides",
   "section": "Guides",
   "name": "Guides",
@@ -316,18 +282,6 @@
   "purpose": "Manage guides that can be assigned to your tours."
  },
  {
-  "id": "business-guides--menu-nile-crater-lodges4-businesses",
-  "section": "Guides",
-  "name": "Guides · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/guides",
-  "pattern": "/business/guides",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Guides",
-  "purpose": "Manage guides that can be assigned to your tours.",
-  "parent": "business-guides"
- },
- {
   "id": "business-listings-id-availability",
   "section": "Listings",
   "name": "Listings › Availability",
@@ -337,18 +291,6 @@
   "signedOut": false,
   "heading": "Availability — [TEST] Payment workflow fixture",
   "purpose": "Capacity includes existing bookings. Set zero to close an unbooked date. Prices are whole UGX and are confirmed at checkout."
- },
- {
-  "id": "business-listings-id-availability--menu-nile-crater-lodges4-businesses",
-  "section": "Listings",
-  "name": "Listings › Availability · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/availability",
-  "pattern": "/business/listings/[id]/availability",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Availability — [TEST] Payment workflow fixture",
-  "purpose": "Capacity includes existing bookings. Set zero to close an unbooked date. Prices are whole UGX and are confirmed at checkout.",
-  "parent": "business-listings-id-availability"
  },
  {
   "id": "business-listings-id-availability--menu-room-type-test-room",
@@ -374,15 +316,39 @@
   "purpose": "Update your listing details to keep your information accurate and up to date."
  },
  {
-  "id": "business-listings-id-edit--menu-nile-crater-lodges4-businesses",
+  "id": "business-listings-id-edit--guide-1",
   "section": "Listings",
-  "name": "Listings › Edit · Nile & Crater Lodges4 businesses menu",
+  "name": "Listings › Edit · Listing form guide · Step 1 of 3",
   "route": "/business/listings/cmw1uftbm000211mqog8q81cj/edit",
   "pattern": "/business/listings/[id]/edit",
-  "kind": "menu",
+  "kind": "dialog",
   "signedOut": false,
   "heading": "Edit Accommodation listing",
-  "purpose": "Update your listing details to keep your information accurate and up to date.",
+  "purpose": "Start with the basics",
+  "parent": "business-listings-id-edit"
+ },
+ {
+  "id": "business-listings-id-edit--guide-2",
+  "section": "Listings",
+  "name": "Listings › Edit · Listing form guide · Step 2 of 3",
+  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/edit",
+  "pattern": "/business/listings/[id]/edit",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Edit Accommodation listing",
+  "purpose": "Add real photos and prices",
+  "parent": "business-listings-id-edit"
+ },
+ {
+  "id": "business-listings-id-edit--guide-3",
+  "section": "Listings",
+  "name": "Listings › Edit · Listing form guide · Step 3 of 3",
+  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/edit",
+  "pattern": "/business/listings/[id]/edit",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Edit Accommodation listing",
+  "purpose": "Save, preview, submit",
   "parent": "business-listings-id-edit"
  },
  {
@@ -397,18 +363,6 @@
   "purpose": "Location not added"
  },
  {
-  "id": "business-listings-id-preview--menu-nile-crater-lodges4-businesses",
-  "section": "Listings",
-  "name": "Listings › Preview · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/preview",
-  "pattern": "/business/listings/[id]/preview",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "[TEST] Payment workflow fixture",
-  "purpose": "Location not added",
-  "parent": "business-listings-id-preview"
- },
- {
   "id": "business-listings-id-review",
   "section": "Listings",
   "name": "Listings › Review",
@@ -418,18 +372,6 @@
   "signedOut": false,
   "heading": "[TEST] Payment workflow fixture",
   "purpose": "Review your saved listing, photos and submission feedback."
- },
- {
-  "id": "business-listings-id-review--menu-nile-crater-lodges4-businesses",
-  "section": "Listings",
-  "name": "Listings › Review · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/review",
-  "pattern": "/business/listings/[id]/review",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "[TEST] Payment workflow fixture",
-  "purpose": "Review your saved listing, photos and submission feedback.",
-  "parent": "business-listings-id-review"
  },
  {
   "id": "business-listings-new",
@@ -442,14 +384,39 @@
   "heading": "What are you listing?"
  },
  {
-  "id": "business-listings-new--menu-nile-crater-lodges4-businesses",
+  "id": "business-listings-new--guide-1",
   "section": "Listings",
-  "name": "Listings › New · Nile & Crater Lodges4 businesses menu",
+  "name": "Listings › New · Listing form guide · Step 1 of 3",
   "route": "/business/listings/new",
   "pattern": "/business/listings/new",
-  "kind": "menu",
+  "kind": "dialog",
   "signedOut": false,
   "heading": "What are you listing?",
+  "purpose": "Start with the basics",
+  "parent": "business-listings-new"
+ },
+ {
+  "id": "business-listings-new--guide-2",
+  "section": "Listings",
+  "name": "Listings › New · Listing form guide · Step 2 of 3",
+  "route": "/business/listings/new",
+  "pattern": "/business/listings/new",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "What are you listing?",
+  "purpose": "Add real photos and prices",
+  "parent": "business-listings-new"
+ },
+ {
+  "id": "business-listings-new--guide-3",
+  "section": "Listings",
+  "name": "Listings › New · Listing form guide · Step 3 of 3",
+  "route": "/business/listings/new",
+  "pattern": "/business/listings/new",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "What are you listing?",
+  "purpose": "Save, preview, submit",
   "parent": "business-listings-new"
  },
  {
@@ -462,18 +429,6 @@
   "signedOut": false,
   "heading": "Listings",
   "purpose": "Create and manage your service offerings."
- },
- {
-  "id": "business-listings--menu-nile-crater-lodges4-businesses",
-  "section": "Listings",
-  "name": "Listings · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/listings",
-  "pattern": "/business/listings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Listings",
-  "purpose": "Create and manage your service offerings.",
-  "parent": "business-listings"
  },
  {
   "id": "business-listings--menu-listing-type-all-listings",
@@ -524,87 +479,39 @@
   "parent": "business-listings"
  },
  {
-  "id": "business-listings--menu-listing-actions",
+  "id": "business-listings--guide-1",
   "section": "Listings",
-  "name": "Listings · Listing actions menu",
+  "name": "Listings · Listings guide · Step 1 of 3",
   "route": "/business/listings",
   "pattern": "/business/listings",
-  "kind": "menu",
+  "kind": "dialog",
   "signedOut": false,
   "heading": "Listings",
-  "purpose": "Create and manage your service offerings.",
+  "purpose": "Your listings",
   "parent": "business-listings"
  },
  {
-  "id": "business-listings--menu-listing-actions",
+  "id": "business-listings--guide-2",
   "section": "Listings",
-  "name": "Listings · Listing actions menu",
+  "name": "Listings · Listings guide · Step 2 of 3",
   "route": "/business/listings",
   "pattern": "/business/listings",
-  "kind": "menu",
+  "kind": "dialog",
   "signedOut": false,
   "heading": "Listings",
-  "purpose": "Create and manage your service offerings.",
+  "purpose": "Create a listing",
   "parent": "business-listings"
  },
  {
-  "id": "business-listings--menu-listing-actions",
+  "id": "business-listings--guide-3",
   "section": "Listings",
-  "name": "Listings · Listing actions menu",
+  "name": "Listings · Listings guide · Step 3 of 3",
   "route": "/business/listings",
   "pattern": "/business/listings",
-  "kind": "menu",
+  "kind": "dialog",
   "signedOut": false,
   "heading": "Listings",
-  "purpose": "Create and manage your service offerings.",
-  "parent": "business-listings"
- },
- {
-  "id": "business-listings--menu-listing-actions",
-  "section": "Listings",
-  "name": "Listings · Listing actions menu",
-  "route": "/business/listings",
-  "pattern": "/business/listings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Listings",
-  "purpose": "Create and manage your service offerings.",
-  "parent": "business-listings"
- },
- {
-  "id": "business-listings--menu-listing-actions",
-  "section": "Listings",
-  "name": "Listings · Listing actions menu",
-  "route": "/business/listings",
-  "pattern": "/business/listings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Listings",
-  "purpose": "Create and manage your service offerings.",
-  "parent": "business-listings"
- },
- {
-  "id": "business-listings--menu-listing-actions",
-  "section": "Listings",
-  "name": "Listings · Listing actions menu",
-  "route": "/business/listings",
-  "pattern": "/business/listings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Listings",
-  "purpose": "Create and manage your service offerings.",
-  "parent": "business-listings"
- },
- {
-  "id": "business-listings--menu-listing-actions",
-  "section": "Listings",
-  "name": "Listings · Listing actions menu",
-  "route": "/business/listings",
-  "pattern": "/business/listings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Listings",
-  "purpose": "Create and manage your service offerings.",
+  "purpose": "Get it approved",
   "parent": "business-listings"
  },
  {
@@ -617,18 +524,6 @@
   "signedOut": false,
   "heading": "Messages",
   "purpose": "Communicate directly with your customers regarding their bookings and inquiries."
- },
- {
-  "id": "business-messages--menu-nile-crater-lodges4-businesses",
-  "section": "Messages",
-  "name": "Messages · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/messages",
-  "pattern": "/business/messages",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Messages",
-  "purpose": "Communicate directly with your customers regarding their bookings and inquiries.",
-  "parent": "business-messages"
  },
  {
   "id": "business-messages--dialog-new-message",
@@ -666,18 +561,6 @@
   "purpose": "Updates sent to your account across the businesses you belong to. Opening a business booking selects its business."
  },
  {
-  "id": "business-notifications--menu-nile-crater-lodges4-businesses",
-  "section": "Notifications",
-  "name": "Notifications · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/notifications",
-  "pattern": "/business/notifications",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Notifications",
-  "purpose": "Updates sent to your account across the businesses you belong to. Opening a business booking selects its business.",
-  "parent": "business-notifications"
- },
- {
   "id": "business-notifications--menu-read-status-all-updates",
   "section": "Notifications",
   "name": "Notifications · Read status: All updates menu",
@@ -711,18 +594,6 @@
   "signedOut": false,
   "heading": "Payments & refunds",
   "purpose": "Review who has paid, follow up on unpaid bookings, and manage refunds."
- },
- {
-  "id": "business-payments--menu-nile-crater-lodges4-businesses",
-  "section": "Payments",
-  "name": "Payments · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/payments",
-  "pattern": "/business/payments",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Payments & refunds",
-  "purpose": "Review who has paid, follow up on unpaid bookings, and manage refunds.",
-  "parent": "business-payments"
  },
  {
   "id": "business-payments--menu-payment-status-all-bookings",
@@ -772,18 +643,6 @@
   "purpose": "Manage your personal account details and contact information."
  },
  {
-  "id": "business-profile--menu-nile-crater-lodges4-businesses",
-  "section": "Profile",
-  "name": "Profile · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/profile",
-  "pattern": "/business/profile",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "My profile",
-  "purpose": "Manage your personal account details and contact information.",
-  "parent": "business-profile"
- },
- {
   "id": "business-revenue",
   "section": "Revenue",
   "name": "Revenue",
@@ -793,18 +652,6 @@
   "signedOut": false,
   "heading": "Revenue & payouts",
   "purpose": "Track paid bookings, commission, and net payout."
- },
- {
-  "id": "business-revenue--menu-nile-crater-lodges4-businesses",
-  "section": "Revenue",
-  "name": "Revenue · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/revenue",
-  "pattern": "/business/revenue",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Revenue & payouts",
-  "purpose": "Track paid bookings, commission, and net payout.",
-  "parent": "business-revenue"
  },
  {
   "id": "business-revenue--menu-payment-outcome-all-transactions",
@@ -842,117 +689,9 @@
   "purpose": "View verified customer reviews and reply where allowed."
  },
  {
-  "id": "business-reviews--menu-nile-crater-lodges4-businesses",
-  "section": "Reviews",
-  "name": "Reviews · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/reviews",
-  "pattern": "/business/reviews",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Reviews",
-  "purpose": "View verified customer reviews and reply where allowed.",
-  "parent": "business-reviews"
- },
- {
   "id": "business-reviews--menu-review-status-all-reviews",
   "section": "Reviews",
   "name": "Reviews · Review status: All reviews menu",
-  "route": "/business/reviews",
-  "pattern": "/business/reviews",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Reviews",
-  "purpose": "View verified customer reviews and reply where allowed.",
-  "parent": "business-reviews"
- },
- {
-  "id": "business-reviews--menu-review-actions",
-  "section": "Reviews",
-  "name": "Reviews · Review actions menu",
-  "route": "/business/reviews",
-  "pattern": "/business/reviews",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Reviews",
-  "purpose": "View verified customer reviews and reply where allowed.",
-  "parent": "business-reviews"
- },
- {
-  "id": "business-reviews--menu-review-actions",
-  "section": "Reviews",
-  "name": "Reviews · Review actions menu",
-  "route": "/business/reviews",
-  "pattern": "/business/reviews",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Reviews",
-  "purpose": "View verified customer reviews and reply where allowed.",
-  "parent": "business-reviews"
- },
- {
-  "id": "business-reviews--menu-review-actions",
-  "section": "Reviews",
-  "name": "Reviews · Review actions menu",
-  "route": "/business/reviews",
-  "pattern": "/business/reviews",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Reviews",
-  "purpose": "View verified customer reviews and reply where allowed.",
-  "parent": "business-reviews"
- },
- {
-  "id": "business-reviews--menu-review-actions",
-  "section": "Reviews",
-  "name": "Reviews · Review actions menu",
-  "route": "/business/reviews",
-  "pattern": "/business/reviews",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Reviews",
-  "purpose": "View verified customer reviews and reply where allowed.",
-  "parent": "business-reviews"
- },
- {
-  "id": "business-reviews--menu-review-actions",
-  "section": "Reviews",
-  "name": "Reviews · Review actions menu",
-  "route": "/business/reviews",
-  "pattern": "/business/reviews",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Reviews",
-  "purpose": "View verified customer reviews and reply where allowed.",
-  "parent": "business-reviews"
- },
- {
-  "id": "business-reviews--menu-review-actions",
-  "section": "Reviews",
-  "name": "Reviews · Review actions menu",
-  "route": "/business/reviews",
-  "pattern": "/business/reviews",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Reviews",
-  "purpose": "View verified customer reviews and reply where allowed.",
-  "parent": "business-reviews"
- },
- {
-  "id": "business-reviews--menu-review-actions",
-  "section": "Reviews",
-  "name": "Reviews · Review actions menu",
-  "route": "/business/reviews",
-  "pattern": "/business/reviews",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Reviews",
-  "purpose": "View verified customer reviews and reply where allowed.",
-  "parent": "business-reviews"
- },
- {
-  "id": "business-reviews--menu-review-actions",
-  "section": "Reviews",
-  "name": "Reviews · Review actions menu",
   "route": "/business/reviews",
   "pattern": "/business/reviews",
   "kind": "menu",
@@ -985,18 +724,6 @@
   "purpose": "Manage your business profile, verification documents, staff access, and preferences."
  },
  {
-  "id": "business-settings--menu-nile-crater-lodges4-businesses",
-  "section": "Settings",
-  "name": "Settings · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/settings",
-  "pattern": "/business/settings",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Settings",
-  "purpose": "Manage your business profile, verification documents, staff access, and preferences.",
-  "parent": "business-settings"
- },
- {
   "id": "business-settings-verification",
   "section": "Settings",
   "name": "Settings › Verification",
@@ -1006,18 +733,6 @@
   "signedOut": false,
   "heading": "Settings",
   "purpose": "Manage your business profile, verification documents, staff access, and preferences."
- },
- {
-  "id": "business-settings-verification--menu-nile-crater-lodges4-businesses",
-  "section": "Settings",
-  "name": "Settings › Verification · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/settings/verification",
-  "pattern": "/business/settings/verification",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Settings",
-  "purpose": "Manage your business profile, verification documents, staff access, and preferences.",
-  "parent": "business-settings-verification"
  },
  {
   "id": "business-settings-verification--menu-document-type-incorporation",
@@ -1044,6 +759,42 @@
   "parent": "business-settings-verification"
  },
  {
+  "id": "business-settings-verification--guide-1",
+  "section": "Settings",
+  "name": "Settings › Verification · Verification guide · Step 1 of 3",
+  "route": "/business/settings/verification",
+  "pattern": "/business/settings/verification",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "What to upload",
+  "parent": "business-settings-verification"
+ },
+ {
+  "id": "business-settings-verification--guide-2",
+  "section": "Settings",
+  "name": "Settings › Verification · Verification guide · Step 2 of 3",
+  "route": "/business/settings/verification",
+  "pattern": "/business/settings/verification",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "What happens next",
+  "parent": "business-settings-verification"
+ },
+ {
+  "id": "business-settings-verification--guide-3",
+  "section": "Settings",
+  "name": "Settings › Verification · Verification guide · Step 3 of 3",
+  "route": "/business/settings/verification",
+  "pattern": "/business/settings/verification",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "Track every decision",
+  "parent": "business-settings-verification"
+ },
+ {
   "id": "business-support",
   "section": "Support",
   "name": "Support",
@@ -1053,18 +804,6 @@
   "signedOut": false,
   "heading": "Support",
   "purpose": "Get help from SafariNexa with bookings, payouts, listings and verification for Nile & Crater Lodges."
- },
- {
-  "id": "business-support--menu-nile-crater-lodges4-businesses",
-  "section": "Support",
-  "name": "Support · Nile & Crater Lodges4 businesses menu",
-  "route": "/business/support",
-  "pattern": "/business/support",
-  "kind": "menu",
-  "signedOut": false,
-  "heading": "Support",
-  "purpose": "Get help from SafariNexa with bookings, payouts, listings and verification for Nile & Crater Lodges.",
-  "parent": "business-support"
  },
  {
   "id": "business-support--dialog-open-a-new-case",
@@ -1102,15 +841,39 @@
   "purpose": "See the review decisions for your business and each of your listings, with the reviewer's notes."
  },
  {
-  "id": "business-verification--menu-nile-crater-lodges4-businesses",
+  "id": "business-verification--guide-1",
   "section": "Verification",
-  "name": "Verification · Nile & Crater Lodges4 businesses menu",
+  "name": "Verification · Verification guide · Step 1 of 3",
   "route": "/business/verification",
   "pattern": "/business/verification",
-  "kind": "menu",
+  "kind": "dialog",
   "signedOut": false,
   "heading": "Verification outcomes",
-  "purpose": "See the review decisions for your business and each of your listings, with the reviewer's notes.",
+  "purpose": "What to upload",
+  "parent": "business-verification"
+ },
+ {
+  "id": "business-verification--guide-2",
+  "section": "Verification",
+  "name": "Verification · Verification guide · Step 2 of 3",
+  "route": "/business/verification",
+  "pattern": "/business/verification",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Verification outcomes",
+  "purpose": "What happens next",
+  "parent": "business-verification"
+ },
+ {
+  "id": "business-verification--guide-3",
+  "section": "Verification",
+  "name": "Verification · Verification guide · Step 3 of 3",
+  "route": "/business/verification",
+  "pattern": "/business/verification",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Verification outcomes",
+  "purpose": "Track every decision",
   "parent": "business-verification"
  },
  {

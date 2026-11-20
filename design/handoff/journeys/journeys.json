@@ -46,7 +46,7 @@
    },
    {
     "lane": "business",
-    "label": "Business · Bookings: BK-BF19C859 is listed as Awaiting confirmation, payment Not started. Next: open it.",
+    "label": "Business · Bookings: BK-A3373144 is listed as Awaiting confirmation, payment Not started. Next: open it.",
     "screen": "j-booking-loop-07",
     "route": "/business/bookings"
    },
@@ -54,19 +54,19 @@
     "lane": "business",
     "label": "Business · Booking page: dates, room, traveller and customer details, the response deadline, Accept request — ask customer to pay, and Decline booking. Next: accept.",
     "screen": "j-booking-loop-08",
-    "route": "/business/bookings/cmwoqfvag00fqj16grmciqc3g"
+    "route": "/business/bookings/cmwotw71x0006ewzpps6t2cei"
    },
    {
     "lane": "business",
     "label": "Business · Accepted: the booking now shows Payment required with a payment deadline; the customer is asked to pay.",
     "screen": "j-booking-loop-09",
-    "route": "/business/bookings/cmwoqfvag00fqj16grmciqc3g"
+    "route": "/business/bookings/cmwotw71x0006ewzpps6t2cei"
    },
    {
     "lane": "customer",
     "label": "Customer · My booking: Payment required, the outstanding amount, Complete payment and Cancel booking. Next: Complete payment.",
     "screen": "j-booking-loop-10",
-    "route": "/bookings/cmwoqfvag00fqj16grmciqc3g"
+    "route": "/bookings/cmwotw71x0006ewzpps6t2cei"
    },
    {
     "lane": "customer",
@@ -88,13 +88,13 @@
     "lane": "customer",
     "label": "Customer · My booking: confirmed and paid, with the payment in Payments & refunds.",
     "screen": "j-booking-loop-13",
-    "route": "/bookings/cmwoqfvag00fqj16grmciqc3g"
+    "route": "/bookings/cmwotw71x0006ewzpps6t2cei"
    },
    {
     "lane": "business",
     "label": "Business · Booking page: confirmed and paid; refunds can be issued from Payments & refunds.",
     "screen": "j-booking-loop-14",
-    "route": "/business/bookings/cmwoqfvag00fqj16grmciqc3g"
+    "route": "/business/bookings/cmwotw71x0006ewzpps6t2cei"
    },
    {
     "lane": "admin",
@@ -104,9 +104,9 @@
    },
    {
     "lane": "admin",
-    "label": "Admin · Booking page for BK-BF19C859: customer, business, dates, traveller details, status, and the payment with its DEMO- reference.",
+    "label": "Admin · Booking page for BK-A3373144: customer, business, dates, traveller details, status, and the payment with its DEMO- reference.",
     "screen": "j-booking-loop-16",
-    "route": "/admin/bookings/cmwoqfvag00fqj16grmciqc3g"
+    "route": "/admin/bookings/cmwotw71x0006ewzpps6t2cei"
    }
   ]
  },
@@ -244,19 +244,19 @@
     "lane": "admin",
     "label": "Admin · Verification review: the business information saved with the submission, each supporting document (View document), submission details and the decision form. Next: write notes and Request changes.",
     "screen": "j-business-verification-07",
-    "route": "/admin/verification/cmwoql5od00g8j16gxxzgwyrc"
+    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
    },
    {
     "lane": "admin",
     "label": "Reviewer notes filled in. Notes are required for every decision and are shown to the business. Next: Request changes.",
     "screen": "j-business-verification-08",
-    "route": "/admin/verification/cmwoql5od00g8j16gxxzgwyrc"
+    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
    },
    {
     "lane": "admin",
     "label": "Needs changes: the status badge updates and the notes stay on the record.",
     "screen": "j-business-verification-09",
-    "route": "/admin/verification/cmwoql5od00g8j16gxxzgwyrc"
+    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
    },
    {
     "lane": "system",
@@ -284,25 +284,25 @@
     "lane": "admin",
     "label": "Admin · Verification review: both documents, the earlier notes replaced with new ones. Next: Start review.",
     "screen": "j-business-verification-13",
-    "route": "/admin/verification/cmwoql5od00g8j16gxxzgwyrc"
+    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
    },
    {
     "lane": "admin",
     "label": "Under review: the business sees that someone is checking it. Next: approve.",
     "screen": "j-business-verification-14",
-    "route": "/admin/verification/cmwoql5od00g8j16gxxzgwyrc"
+    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
    },
    {
     "lane": "admin",
     "label": "Approval notes written. Approving is refused if the business profile changed after it submitted. Next: Approve business.",
     "screen": "j-business-verification-15",
-    "route": "/admin/verification/cmwoql5od00g8j16gxxzgwyrc"
+    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
    },
    {
     "lane": "admin",
     "label": "Approved: the business is verified.",
     "screen": "j-business-verification-16",
-    "route": "/admin/verification/cmwoql5od00g8j16gxxzgwyrc"
+    "route": "/admin/verification/cmwotxnac000oewzpxnr2d7cv"
    },
    {
     "lane": "system",
@@ -349,19 +349,19 @@
     "lane": "admin",
     "label": "Admin · Verification review with the reasons written. Next: Reject submission.",
     "screen": "j-business-verification-rejected-04",
-    "route": "/admin/verification/cmwoqnjai00gyj16gfh155gc2"
+    "route": "/admin/verification/cmwotygyr001eewzps8v4nr1o"
    },
    {
     "lane": "admin",
     "label": "Reject this submission? Confirms the business name and shows the notes that will be sent. Next: Reject submission.",
     "screen": "j-business-verification-rejected-05",
-    "route": "/admin/verification/cmwoqnjai00gyj16gfh155gc2"
+    "route": "/admin/verification/cmwotygyr001eewzps8v4nr1o"
    },
    {
     "lane": "admin",
     "label": "Rejected: the status badge shows Rejected.",
     "screen": "j-business-verification-rejected-06",
-    "route": "/admin/verification/cmwoqnjai00gyj16gfh155gc2"
+    "route": "/admin/verification/cmwotygyr001eewzps8v4nr1o"
    },
    {
     "lane": "system",
@@ -402,7 +402,7 @@
     "lane": "business",
     "label": "Business · Submission & feedback: Submitted, waiting for review, with Withdraw to make changes.",
     "screen": "j-listing-verification-03",
-    "route": "/business/listings/journey-kidepo-lodge/preview"
+    "route": "/business/listings/journey-kidepo-lodge/review"
    },
    {
     "lane": "system",
@@ -418,49 +418,49 @@
     "lane": "admin",
     "label": "Admin · Review listing: every photo (cover, gallery, each room) and the business's documents, then all listing details. The decision panel's photo and evidence checks are locked: Open the remaining photos first. Next: open the cover photo.",
     "screen": "j-listing-verification-05",
-    "route": "/admin/listings/cmwoqoz4500haj16grn3k0hla"
+    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
    },
    {
     "lane": "admin",
     "label": "Photo viewer: the photo full size, with arrows through every photo of the listing. Opening a photo marks it Viewed. Next: close and open the rest.",
     "screen": "j-listing-verification-06",
-    "route": "/admin/listings/cmwoqoz4500haj16grn3k0hla"
+    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
    },
    {
     "lane": "admin",
     "label": "Every photo Viewed (progress full); the photo check is now unlocked. Next: open the documents.",
     "screen": "j-listing-verification-07",
-    "route": "/admin/listings/cmwoqoz4500haj16grn3k0hla"
+    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
    },
    {
     "lane": "admin",
     "label": "Document viewer: the business's certificate shown inside the page, with Open in new tab. Next: close and open the others.",
     "screen": "j-listing-verification-08",
-    "route": "/admin/listings/cmwoqoz4500haj16grn3k0hla"
+    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
    },
    {
     "lane": "admin",
     "label": "Every document Opened; all four approval checks are now available. Next: Mark as under review.",
     "screen": "j-listing-verification-09",
-    "route": "/admin/listings/cmwoqoz4500haj16grn3k0hla"
+    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
    },
    {
     "lane": "admin",
     "label": "Under review: the business sees someone is checking its listing. Next: ask for changes.",
     "screen": "j-listing-verification-10",
-    "route": "/admin/listings/cmwoqoz4500haj16grn3k0hla"
+    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
    },
    {
     "lane": "admin",
     "label": "Reasons written; they are sent to the business. Next: Request changes.",
     "screen": "j-listing-verification-11",
-    "route": "/admin/listings/cmwoqoz4500haj16grn3k0hla"
+    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
    },
    {
     "lane": "admin",
     "label": "Needs changes: the decision and reasons are recorded on the submission.",
     "screen": "j-listing-verification-12",
-    "route": "/admin/listings/cmwoqoz4500haj16grn3k0hla"
+    "route": "/admin/listings/cmwotyzyc001qewzp2kr5y77h"
    },
    {
     "lane": "system",
@@ -494,19 +494,19 @@
     "lane": "admin",
     "label": "Admin · Review listing (new submission): every photo and document opened, all four checks ticked and approval notes written. Next: Approve and publish.",
     "screen": "j-listing-verification-17",
-    "route": "/admin/listings/cmwor1fmt00hmj16gvi8ilg2n"
+    "route": "/admin/listings/cmwou9zwu0022ewzppyf9u5vp"
    },
    {
     "lane": "admin",
     "label": "Approve and publish? The listing goes live and can be booked straight away; the notes are shown. Next: Approve and publish.",
     "screen": "j-listing-verification-18",
-    "route": "/admin/listings/cmwor1fmt00hmj16gvi8ilg2n"
+    "route": "/admin/listings/cmwou9zwu0022ewzppyf9u5vp"
    },
    {
     "lane": "admin",
     "label": "Approved: the listing is published.",
     "screen": "j-listing-verification-19",
-    "route": "/admin/listings/cmwor1fmt00hmj16gvi8ilg2n"
+    "route": "/admin/listings/cmwou9zwu0022ewzppyf9u5vp"
    },
    {
     "lane": "system",
@@ -559,19 +559,19 @@
     "lane": "admin",
     "label": "Admin · Review listing: reasons written. Rejecting doesn't need the checks. Next: Reject.",
     "screen": "j-listing-withdraw-reject-05",
-    "route": "/admin/listings/cmworgst900hzj16g03ekwe7s"
+    "route": "/admin/listings/cmwounz96002fewzpefx2d4j3"
    },
    {
     "lane": "admin",
     "label": "Reject this listing? It will not be published and the business will see the reasons shown. Next: Reject listing.",
     "screen": "j-listing-withdraw-reject-06",
-    "route": "/admin/listings/cmworgst900hzj16g03ekwe7s"
+    "route": "/admin/listings/cmwounz96002fewzpefx2d4j3"
    },
    {
     "lane": "admin",
     "label": "Rejected: the decision and reasons are recorded.",
     "screen": "j-listing-withdraw-reject-07",
-    "route": "/admin/listings/cmworgst900hzj16g03ekwe7s"
+    "route": "/admin/listings/cmwounz96002fewzpefx2d4j3"
    },
    {
     "lane": "business",
@@ -602,7 +602,7 @@
     "lane": "customer",
     "label": "Write a review: the stay summary, a 1 to 5 star rating, optional title, the review (20 to 2,000 characters) and the posting guidelines. Next: try to submit with too little.",
     "screen": "j-customer-review-02",
-    "route": "/bookings/journey-kidepo-stay"
+    "route": "/reviews/new"
    },
    {
     "lane": "customer",
@@ -620,7 +620,7 @@
     "lane": "customer",
     "label": "Customer · My booking: Reviewed. The review is published straight away.",
     "screen": "j-customer-review-05",
-    "route": "/reviews/new"
+    "route": "/bookings/journey-kidepo-stay"
    },
    {
     "lane": "customer",
@@ -687,7 +687,7 @@
     "lane": "admin",
     "label": "Admin · Review listing: the approved submission that published it, with the decision, notes and the checks recorded.",
     "screen": "j-admin-business-listings-05",
-    "route": "/admin/listings/cmwork68u00193gholrnmwgts"
+    "route": "/admin/listings/cmwoup8js001973a7qozsfaxz"
    }
   ]
  }

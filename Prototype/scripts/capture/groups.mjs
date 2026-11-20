@@ -3,6 +3,8 @@
 // the captured files read the same. Each route pattern belongs to one group; a
 // page that matches none appears under "Detected automatically · not yet grouped".
 // `shell: true` collects the header, sidebar and account menus.
+// `business` captures that group's pages as another of the demo account's businesses
+// (the default is its first, Nile & Crater Lodges).
 // `legacy` lists the pages the hand-built plugin generates; the captured plugin
 // removes them (they are superseded), except "00 · Design system", which it keeps.
 
@@ -46,7 +48,8 @@ export const GROUPS = {
       { id: "03", name: "Portal shell & navigation", routes: [], shell: true },
       { id: "04", name: "Overview", routes: ["/business/dashboard"] },
       { id: "05", name: "Listings", routes: ["/business/listings", "/business/listings/new", "/business/listings/[id]/edit", "/business/listings/[id]/review", "/business/listings/[id]/preview", "/business/listings/[id]/availability"] },
-      { id: "06", name: "Guides", routes: ["/business/guides", "/business/guides/new"] },
+      // Guides are for tour operators: captured as the demo account's tour company, which has guides.
+      { id: "06", name: "Guides", routes: ["/business/guides", "/business/guides/new"], business: "Uganda Trails Safaris" },
       { id: "07", name: "Bookings", routes: ["/business/bookings", "/business/bookings/[id]", "/business/bookings/calendar"] },
       { id: "08", name: "Messages", routes: ["/business/messages"] },
       { id: "09", name: "Reviews", routes: ["/business/reviews"] },

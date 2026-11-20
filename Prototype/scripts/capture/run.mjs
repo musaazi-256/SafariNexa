@@ -6,6 +6,23 @@ import { mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { BASE, HANDOFF, PORTALS, VIEW, NOT_IDS } from "./config.mjs";
 import { signIn, settle, snap } from "./lib.mjs";
 import { routes } from "./routes.mjs";
+import { GROUPS } from "./groups.mjs";
+
+// Groups that are captured as a particular business (see `business` in groups.mjs).
+const businessFor = (pattern) => (GROUPS[process.argv[2]]?.groups ?? []).find((g) => g.business && g.routes.includes(pattern))?.business;
+let businessIds = null;
+async function useBusiness(page, name) {
+  const ctx = page.context();
+  if (!name) return ctx.clearCookies({ name: "active_business" });
+  if (!businessIds) {
+    const { PrismaClient } = await import("@prisma/client");
+    const db = new PrismaClient();
+    businessIds = Object.fromEntries((await db.businessProfile.findMany({ select: { id: true, name: true } })).map((b) => [b.name, b.id]));
+    await db.$disconnect();
+  }
+  if (!businessIds[name]) throw new Error("No demo business named " + name);
+  await ctx.addCookies([{ name: "active_business", value: businessIds[name], url: BASE }]);
+}
 
 const portal = process.argv[2];
 if (!PORTALS[portal]) throw new Error("Usage: run.mjs <" + Object.keys(PORTALS).join("|") + "> [ids]");
@@ -94,22 +111,33 @@ async function states(page, base, url) {
     await settle(page);
   }
   const triggers = await page.locator("[aria-haspopup=dialog]:visible, [aria-haspopup=menu]:visible").evaluateAll((els) =>
-    els.map((e, i) => ({ i, label: (e.getAttribute("aria-label") || e.getAttribute("title") || e.textContent || "").trim().replace(/\s+/g, " ").slice(0, 60), kind: e.getAttribute("aria-haspopup"), chrome: Boolean(e.closest("header, aside, nav")) })),
+    // innerText keeps the space between stacked lines ("Nile & Crater Lodges 4 businesses");
+    // the sidebar is a div with data-sidebar, not an <aside>, so it is matched explicitly.
+    els.map((e, i) => ({ i, label: (e.getAttribute("aria-label") || e.getAttribute("title") || e.innerText || e.textContent || "").trim().replace(/\s+/g, " ").slice(0, 60), kind: e.getAttribute("aria-haspopup"), chrome: Boolean(e.closest("header, aside, nav, [data-sidebar]")), sidebar: Boolean(e.closest("[data-sidebar]")) })),
   );
   let n = 0;
+  // Row menus repeat per row ("Listing actions", "Actions for booking BK-…"): one of each.
+  const seenHere = new Set();
   for (const t of triggers) {
     if (!t.label || n >= 12) continue;
+    const kindOf = t.label.replace(/\b[A-Z]{2,}-[A-Z0-9]{4,}\b/g, "#").replace(/\d+/g, "#");
+    if (!t.chrome) {
+      if (seenHere.has(kindOf)) continue;
+      seenHere.add(kindOf);
+    }
     // Header and sidebar menus look the same on every page: capture them once.
+    // (The sidebar's business switcher is named after the business in view, so it is keyed by place.)
+    const key = t.sidebar ? "sidebar " + t.kind : t.label;
     if (t.chrome) {
-      if (seenChrome.has(t.label)) continue;
-      seenChrome.add(t.label);
+      if (seenChrome.has(key)) continue;
+      seenChrome.add(key);
     }
     try {
       await page.locator("[aria-haspopup=dialog]:visible, [aria-haspopup=menu]:visible").nth(t.i).click({ timeout: 5000 });
       await page.waitForSelector("[role=dialog],[role=alertdialog],[role=menu]", { timeout: 4000 });
       await page.waitForTimeout(700);
       const kind = t.kind === "menu" ? "menu" : "dialog";
-      save({ ...base, id: base.id + "--" + kind + "-" + slug(t.label), kind, name: (t.chrome ? t.label : base.name + " · " + t.label) + (kind === "menu" ? " menu" : " dialog"), parent: base.id, ...(t.chrome ? { chrome: true } : {}) }, await snap(page, false));
+      save({ ...base, id: base.id + "--" + kind + "-" + slug(t.label), kind, name: (t.chrome ? t.label : base.name + " · " + t.label) + (kind === "menu" ? " menu" : " dialog"), parent: base.id, ...(t.chrome ? { chrome: true } : {}) }, await snap(page, kind === "menu"));
       n++;
     } catch (e) {
       // Not an overlay after all (or disabled): nothing to capture.
@@ -122,12 +150,36 @@ async function states(page, base, url) {
       await settle(page);
     }
   }
+  // First-time guides (business portal): each step of this page's guide, opened from the
+  // header's ? button (guides don't open by themselves during captures; see signIn).
+  const guide = page.locator("header button[aria-label^='Show the']");
+  if (await guide.count()) {
+    try {
+      await guide.first().click();
+      const dialog = page.getByRole("dialog");
+      await dialog.waitFor({ timeout: 5000 });
+      for (let i = 1; i <= 12; i++) {
+        await page.waitForTimeout(600);
+        const where = ((await dialog.locator("p").first().textContent()) || "").trim(); // "Welcome tour · Step 1 of 6"
+        const title = ((await dialog.getByRole("heading").first().textContent().catch(() => "")) || "").trim();
+        save({ ...base, id: base.id + "--guide-" + i, kind: "dialog", name: base.name + " · " + where, purpose: title, parent: base.id }, await snap(page, false));
+        const next = dialog.getByRole("button", { name: "Next", exact: true });
+        if (!(await next.count())) break;
+        await next.click();
+      }
+    } catch (e) {
+      console.log("  ✗ guide", String(e.message || e).split("\n")[0]);
+    }
+    await page.keyboard.press("Escape").catch(() => undefined);
+    await page.waitForTimeout(400);
+  }
 }
 
 for (const r of routes().filter((r) => r.portal === portal)) {
   if (only && !only.has(r.id)) continue;
   try {
     const page = await session(r.signedOut);
+    if (!r.signedOut) await useBusiness(page, businessFor(r.pattern));
     const route = await resolve(page, r.pattern);
     if (!route) {
       console.log("–", r.id, "(no example to open: the list is empty)");
@@ -155,7 +207,7 @@ for (const r of routes().filter((r) => r.portal === portal)) {
     if (!r.signedOut && landed === route) await states(page, base, BASE + route);
   } catch (e) {
     failed.push(r.id);
-    console.log("✗", r.id, String(e.message || e).split("\n")[0]);
+    console.log("✗", r.id, String(e.message || e).split("\n").slice(0, 16).join(" | "));
     const key = r.signedOut ? "out" : "in";
     await sessions[key]?.context().close().catch(() => undefined);
     delete sessions[key];

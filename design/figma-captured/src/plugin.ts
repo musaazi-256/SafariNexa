@@ -328,12 +328,13 @@ async function pageHeader(bundle: any, g: any): Promise<FrameNode> {
       ]),
     );
   }
-  return V({ name: "Flow header", w: 2400, gap: 20 }, [
+  // A white card, like the cover and journey boards, so it reads on a dark canvas too.
+  return V({ name: "Flow header", w: 2400, gap: 20, pad: 64, fill: C.white, stroke: C.border, radius: 32 }, [
     await T(bundle.eyebrow, 24, 600, C.primary),
     await T(g.id + " · " + g.name, 72, 700, C.s900, undefined, 80),
-    g.routes.length ? await T(g.routes.join(" · "), 24, 400, C.s500) : null,
+    g.routes.length ? await T(g.routes.join(" · "), 24, 400, C.s500, 2400 - 128) : null,
     await T(count(g) + " screens & states · captured from the running app on " + new Date(bundle.generatedAt).toLocaleDateString(), 20, 400, C.s500),
-    H({ gap: 16, wrap: true, w: 2400 }, chips),
+    H({ gap: 16, wrap: true, w: 2400 - 128 }, chips),
   ]);
 }
 
