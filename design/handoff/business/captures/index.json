@@ -316,6 +316,18 @@
   "parent": "business-bookings-id"
  },
  {
+  "id": "business-bookings-id--status-refund-processing",
+  "section": "Bookings",
+  "name": "Bookings · details · Refund sent, waiting for the provider",
+  "route": "/business/bookings/capture-st-refproc",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Refund sent, waiting for the provider",
+  "parent": "business-bookings-id"
+ },
+ {
   "id": "business-bookings-calendar",
   "section": "Bookings",
   "name": "Bookings › Calendar",
@@ -1354,7 +1366,7 @@
   "heading": "Revenue & payouts",
   "purpose": "Scrolled",
   "parent": "business-revenue",
-  "scrollY": 659
+  "scrollY": 675
  },
  {
   "id": "business-revenue--table-scrolled",
@@ -1367,7 +1379,7 @@
   "heading": "Revenue & payouts",
   "purpose": "Wide content scrolled sideways",
   "parent": "business-revenue",
-  "scrollY": 645
+  "scrollY": 890
  },
  {
   "id": "business-revenue--menu-payment-outcome-all-transactions",

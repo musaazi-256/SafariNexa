@@ -22,6 +22,7 @@ import { RevenueOverviewChart, PayoutBreakdownChart } from "@/components/busines
 import { cn } from "@/lib/utils";
 
 import Link from "next/link";
+import { FailedPayoutsNotice } from "@/components/failed-payouts-notice";
 
 export default async function RevenuePage({searchParams}:{searchParams:{q?:string;page?:string;status?:string}}) {
  const {businessId}=await requireBusinessSession();
@@ -57,6 +58,7 @@ export default async function RevenuePage({searchParams}:{searchParams:{q?:strin
  const totalCount=rows.length,pageBookings=rows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).map(r=>r.booking);
  const resolveLatestPayment=(booking:typeof pageBookings[number])=>{const row=rows.find(r=>r.booking.id===booking.id);return row?.payment ? {...row.payment,status:row.status}:null;};
  const payouts=await db.payout.findMany({where:{businessId},select:{status:true,amountMinor:true}});
+ const failedPayouts=await db.payout.findMany({where:{businessId,status:"FAILED"},orderBy:{updatedAt:"desc"},take:10,select:{id:true,amountMinor:true,notes:true,providerReference:true,updatedAt:true}});
  const paidMinor=payouts.filter(p=>p.status === "COMPLETED").reduce((s,p)=>s+p.amountMinor,0);
  const processingMinor=payouts.filter(p=>p.status === "PROCESSING").reduce((s,p)=>s+p.amountMinor,0);
  const heldMinor=Math.max(0,netMinor-paidMinor-processingMinor);
@@ -76,6 +78,8 @@ export default async function RevenuePage({searchParams}:{searchParams:{q?:strin
 
         </div>
       </div>
+
+      <FailedPayoutsNotice payouts={failedPayouts} surface="BUSINESS" />
 
       {/* Stat Cards */}
       <StatGrid>

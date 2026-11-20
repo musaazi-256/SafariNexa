@@ -7,7 +7,7 @@ import { chromium } from "playwright";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { BASE, HANDOFF, VIEW } from "./config.mjs";
 import { signIn, settle, snap } from "./lib.mjs";
-import { KIDEPO, OUTCOME, cleanup, disconnect, expireBooking, kidepoCookie, pdf, setup } from "./fixtures.mjs";
+import { KIDEPO, OUTCOME, cleanup, disconnect, expireBooking, kidepoCookie, orderBookings, pdf, setup } from "./fixtures.mjs";
 
 const out = HANDOFF + "journeys/captures/";
 mkdirSync(out, { recursive: true });
@@ -134,6 +134,35 @@ const operate = (name, until) => async (p) => {
   await p.waitForTimeout(1500);
   await p.locator("#payments").getByRole("button", { name, exact: true }).first().click();
   await paymentResult(until)(p);
+};
+// Booking panel on a stay: two consecutive free nights, starting `from` months ahead.
+const pickStayNights = (from = 1) => async (p) => {
+  for (let month = 0; month < 14; month++) {
+    await p.getByRole("button", { name: "Next month" }).first().click();
+    await p.waitForTimeout(400);
+    if (month < from) continue;
+    const days = await p.locator("main button[aria-label]:not([disabled])").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")).filter((l) => /^[A-Z][a-z]+ \d{1,2}, \d{4}$/.test(l)));
+    const t = days.map((d) => Date.parse(d));
+    const i = t.findIndex((x, k) => k + 1 < t.length && t[k + 1] - x === 86400000);
+    if (i < 0) continue;
+    await p.getByRole("button", { name: days[i], exact: true }).click();
+    await p.getByRole("button", { name: days[i + 1], exact: true }).click();
+    return;
+  }
+  throw new Error("No two consecutive free nights in the next 14 months");
+};
+const addToCart = async (p) => {
+  await p.getByRole("button", { name: "Add to cart" }).first().click();
+  await p.waitForTimeout(1200);
+};
+// The reason box inside the Payments & refunds section opened by `summary`.
+const reasonIn = (summary, text) => async (p) =>
+  p.locator("#payments details", { has: p.locator("summary", { hasText: summary }) }).locator("textarea[name=reason]").first().fill(text);
+// The business portal shows one business at a time: switch to the one that owns a booking.
+const asBusinessOf = (pick) => async (p, c) => {
+  const booking = c.vars.bookings.find(pick);
+  await p.context().addCookies([{ name: "active_business", value: booking.businessId, url: BASE }]);
+  await p.goto(BASE + biz(booking.id), { timeout: 180000 });
 };
 // The refund row for a Kidepo booking on the admin Payments page.
 const refundRow = (p, reason) => p.locator("tr").filter({ hasText: "Kidepo Ridge Lodge" }).filter({ hasText: reason }).first();
@@ -298,6 +327,69 @@ const OUTCOME_JOURNEYS = [
       { lane: "admin", act: async (p) => { await p.getByRole("button", { name: /^Settle payouts/ }).click(); await p.waitForURL(/payout=simulated/, { timeout: 120000 }); await settle(p); await top(p); }, label: "Admin · Payouts completed: every eligible payment is settled to its business, less commission." },
       { lane: "system", label: "A payout is recorded per business and payment, and each business's members get a Payout completed notification. No money moves in demo mode." },
       { lane: "business", act: go("/business/revenue"), label: "Business · Revenue & payouts: the payout now shows as paid out." },
+    ],
+  },
+  {
+    id: "refund-provider-failure",
+    fixture: "providerFailures",
+    title: "A refund can't be sent to a live payment provider",
+    summary: "Grace paid Kidepo Ridge Lodge through MTN Mobile Money for real (not a demo payment). The lodge creates a refund and approves it, but the portal can't send refunds to this provider, so nothing is marked refunded. The lodge escalates it to support, and operations sees the same request waiting.",
+    steps: [
+      { lane: "business", act: seq(go(biz(OUTCOME.liveRefund)), async (p) => p.locator("#payments").scrollIntoViewIfNeeded()), label: "Business · Booking, Payments & refunds: paid in full through MTN Mobile Money with a live provider reference. Next: Create a full or partial refund." },
+      { lane: "business", act: seq(expand("Create a full or partial refund"), reasonIn("Create a full or partial refund", "Guest asked to cancel after a family emergency; refunding in full.")), label: "Create a refund: the full amount and a reason. Next: Create refund request." },
+      { lane: "business", act: operate("Create refund request", "Approve refund"), label: "Business · The refund request is listed as Requested. Next: Approve refund." },
+      { lane: "business", act: async (p) => p.locator("#payments").getByRole("button", { name: "Approve refund" }).first().click(), label: "Send this refund? UGX 760,000 through the original payment provider. Next: Approve refund." },
+      { lane: "business", act: async (p) => { await dialog(p).getByRole("button", { name: "Approve refund", exact: true }).click(); await paymentResult("needs reconciliation")(p); }, label: "Business · The provider can't be reached from the portal: \"This provider needs reconciliation. Use Escalate to support; no refund has been marked completed.\" The request stays Requested. Next: Escalate a payment issue to support." },
+      { lane: "business", act: seq(expand("Escalate a payment issue to support"), reasonIn("Escalate a payment issue", "The refund for BK-KIDLIVE1 can't be sent to MTN from the portal. Please refund the guest directly.")), label: "Escalate a payment issue: what needs help, filled in. Next: Send to support." },
+      { lane: "business", act: operate("Send to support", /Support case .* opened/), label: "Business · Support case PAY-BK-KIDLIVE1 opened; admins with payment permissions are notified." },
+      { lane: "admin", act: seq(go(adm(OUTCOME.liveRefund)), async (p) => p.locator("#payments").scrollIntoViewIfNeeded()), label: "Admin · Booking, Payments & refunds: the live MTN payment and the refund still Requested. Approving here hits the same limit; operations refunds the guest with MTN and records it through support." },
+    ],
+  },
+  {
+    id: "payout-failed",
+    fixture: "providerFailures",
+    title: "A payout to the business fails",
+    summary: "A payout to Kidepo Ridge Lodge was rejected by the bank because the account name didn't match the registered business. The lodge sees the failed payout and the reason in Earnings, with the amount on hold, and operations sees it on Payments. (There's no live payout provider yet, so the failed payout comes from demo data.)",
+    steps: [
+      { lane: "business", act: go("/business/revenue"), label: "Business · Revenue & payouts: A payout failed, with the amount, the bank's reason, the reference and Contact support. The amount counts as On hold in the payout breakdown." },
+      { lane: "admin", act: go("/admin/payments"), label: "Admin · Payments, refunds & payouts: the failed payout listed with the business, amount and reason, above the payment totals." },
+      { lane: "business", act: go("/business/support"), label: "Business · Support: where the lodge sends the correct account details so the payout can be sent again." },
+    ],
+  },
+  {
+    id: "cart-order",
+    fixture: "cartOrder",
+    kidepo: false,
+    title: "A customer books two businesses in one cart and pays once",
+    summary: "Grace adds a 3-Day Wildlife Safari (Uganda Trails Safaris) and a night at Murchison River Lodge (Nile & Crater Lodges) to her cart and checks out once. The order waits until both businesses accept; then she pays for both together and each business sees its booking confirmed.",
+    steps: [
+      { lane: "customer", act: go("/tours/demo-safari"), label: "Tour page: 3-Day Wildlife Safari, with the date, participants and Add to cart in the booking panel. Next: choose a date and Add to cart." },
+      { lane: "customer", act: async (p) => { const d = new Date(Date.now() + 75 * 86400000).toISOString().slice(0, 10); await p.locator("input[name=date]").first().fill(d); await addToCart(p); }, label: "Added to cart: the cart in the header now holds the safari." },
+      { lane: "customer", act: seq(go("/accommodation/demo-lodge"), button("Reserve"), pickStayNights(3)), label: "Murchison River Lodge: a room and a night chosen in the booking panel. Next: Add to cart." },
+      { lane: "customer", act: addToCart, label: "Added to cart: two items from two businesses. Next: open the cart." },
+      { lane: "customer", act: go("/cart"), label: "Cart: the safari and the stay, each with its dates, guests and price, and the total. Next: Checkout Now." },
+      { lane: "customer", act: async (p) => { await p.getByRole("button", { name: "Checkout Now" }).click(); await p.waitForURL(/\/checkout\/multi/, { timeout: 120000 }); await settle(p); await p.locator("main input[type=tel]:visible").first().fill("+256772123456"); }, label: "Checkout · Complete your booking: traveller details for the whole order (phone filled in). Next: Continue to payment." },
+      {
+        lane: "customer",
+        act: async (p, c) => {
+          await p.getByRole("button", { name: "Continue to payment" }).click();
+          await p.waitForURL(/\/payments\?orderId=/, { timeout: 180000 });
+          await p.getByRole("heading", { name: "Booking status" }).waitFor({ timeout: 180000 });
+          await settle(p);
+          c.vars.order = new URL(p.url()).searchParams.get("orderId");
+          c.vars.bookings = await orderBookings(c.vars.order);
+        },
+        label: "Booking status: one order with two requests, each awaiting its business. No payment is taken yet.",
+      },
+      { lane: "system", label: "One order holds both bookings. Each business is notified and has until its response deadline to accept; the order can be paid only when both have." },
+      { lane: "business", act: asBusinessOf((b) => b.listingId === "demo-lodge"), label: "Business · Nile & Crater Lodges: the stay request, part of a combined order. Next: Accept request." },
+      { lane: "business", act: press("Accept request — ask customer to pay"), label: "Business · The stay is accepted: Payment required. The order still waits for Uganda Trails." },
+      { lane: "customer", act: go((c) => "/payments?orderId=" + c.vars.order), label: "Customer · Payment: still waiting, with the stay accepted and the safari awaiting confirmation." },
+      { lane: "business", act: asBusinessOf((b) => b.listingId === "demo-safari"), label: "Business · Uganda Trails Safaris (switched business): the safari request from the same order. Next: Accept request." },
+      { lane: "business", act: press("Accept request — ask customer to pay"), label: "Business · The safari is accepted: Payment required." },
+      { lane: "customer", act: seq(go((c) => "/payments?orderId=" + c.vars.order), choosePayment("success")), label: "Customer · Complete payment: both bookings and one total. MTN Mobile Money and Payment succeeds are selected. Next: Pay." },
+      { lane: "customer", act: pay, label: "Payment received: one receipt listing both bookings, Confirmed." },
+      { lane: "business", act: seq(asBusinessOf((b) => b.listingId === "demo-lodge"), async (p) => p.locator("#payments").scrollIntoViewIfNeeded()), label: "Business · Nile & Crater Lodges: the stay is confirmed; Payments & refunds shows its share of the combined payment." },
     ],
   },
 ];
@@ -589,7 +681,7 @@ async function run(j) {
     if (!pages[lane]) {
       const context = await browser.newContext({ viewport: VIEW, deviceScaleFactor: 1 });
       // Journeys on the Kidepo fixture show that business in the business portal.
-      if (j.fixture) await context.addCookies(kidepoCookie(BASE));
+      if (j.fixture && j.kidepo !== false) await context.addCookies(kidepoCookie(BASE));
       pages[lane] = await signIn(context, lane, { guides: Boolean(j.guides) });
     }
     return pages[lane];

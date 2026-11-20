@@ -614,3 +614,12 @@ Started the scenario coverage in `/docs/verification` §8 with bookings and paym
 - The expiry step applies the change that `POST /api/jobs/expire-bookings` makes (`expireBooking` in `scripts/capture/fixtures.mjs`), because local runs don't set `CRON_SECRET`. The payout journey settles every eligible demo payment, so the fixture deletes those payouts afterwards and marks the payments unsettled again.
 - **Scroll inside the page:** baseline pages also get a frame with the first wide table scrolled sideways (`--table-scrolled`) and the first panel that scrolls on its own scrolled down (`--pane-scrolled`) (`innerScrollSnapshots` in `scripts/capture/lib.mjs`).
 
+### Follow-up, same day — provider failures, failed payouts and the cart-to-checkout order
+
+- **Added** a failed-payout notice (`src/components/failed-payouts-notice.tsx`) to business **Revenue & payouts** and admin **Payments, refunds & payouts**: each `FAILED` payout with its amount, the provider's or bank's reason (`Payout.notes`), reference and date, with Contact support for the business. Before, a failed payout was counted as "On hold" with no explanation anywhere. There is still no live payout provider; payouts only fail when a record says so.
+- **Capture:** a "refund sent, waiting for the provider" state on the three booking pages; three journeys:
+  - `refund-provider-failure`: a refund on a live MTN payment (not `DEMO-`) is approved, the portal refuses to send it ("This provider needs reconciliation…"), the request stays Requested, and the business escalates to support.
+  - `payout-failed`: the failed payout on the business and admin pages.
+  - `cart-order`: a tour and a stay from two businesses are added to the cart, checked out once, accepted by each business (the journey switches business), and paid with one payment.
+- The cart journey books two seed listings. `setup.cartOrder` saves their availability first; the run deletes the order and its bookings and restores the availability. Kidepo payouts are deleted with the fixture.
+

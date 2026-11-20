@@ -302,6 +302,18 @@
   "parent": "admin-bookings-id"
  },
  {
+  "id": "admin-bookings-id--status-refund-processing",
+  "section": "Bookings",
+  "name": "Bookings · details · Refund sent, waiting for the provider",
+  "route": "/admin/bookings/capture-st-refproc",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Refund sent, waiting for the provider",
+  "parent": "admin-bookings-id"
+ },
+ {
   "id": "admin-bookings",
   "section": "Bookings",
   "name": "Bookings",
@@ -753,7 +765,7 @@
   "heading": "Payments, refunds & payouts",
   "purpose": "Wide content scrolled sideways",
   "parent": "admin-payments",
-  "scrollY": 1245
+  "scrollY": 1465
  },
  {
   "id": "admin-payments--menu-payment-status-all",

@@ -141,7 +141,7 @@ Entry: `/business` → `requireBusinessSession()`. A business owner first has a 
 
 ### 3.8 Revenue
 **Status: Partial — real totals and allocations, some decorative chrome remains.**
-- `/business/revenue` — the headline stat totals (gross/commission/net/refunded) are real, computed from actual `Payment` rows. **As of 1 Nov 2026**, these now derive from real booking-level payment allocations including multi-business orders, replacing some of the previously simulated revenue-chart data. The comparison percentages, date-range picker, and some line items may still be hardcoded/non-functional — not fully re-audited item-by-item since the 1 Nov remediation; verify against `SAFARINEXA_FIXES_AND_VERIFICATION_2026-11-01.md` before trusting anything beyond the headline totals.
+- `/business/revenue` — the headline stat totals (gross/commission/net/refunded) are real, computed from actual `Payment` rows. **As of 1 Nov 2026**, these now derive from real booking-level payment allocations including multi-business orders, replacing some of the previously simulated revenue-chart data. The comparison percentages, date-range picker, and some line items may still be hardcoded/non-functional — not fully re-audited item-by-item since the 1 Nov remediation; verify against `SAFARINEXA_FIXES_AND_VERIFICATION_2026-11-01.md` before trusting anything beyond the headline totals. **As of 20 Nov 2026**: failed payouts show as a notice with the amount, reason and reference (same on `/admin/payments`).
 
 ### 3.9 Verification
 **Status: Working**, business side. Every page and action in the verification and listing-approval flows is documented in `/docs/verification` (`content/docs/verification.md`), and captured step by step as Figma journeys.

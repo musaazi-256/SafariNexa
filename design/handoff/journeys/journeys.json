@@ -46,7 +46,7 @@
    },
    {
     "lane": "business",
-    "label": "Business · Bookings: BK-59F886E4 is listed as Awaiting confirmation, payment Not started. Next: open it.",
+    "label": "Business · Bookings: BK-F7CAE24B is listed as Awaiting confirmation, payment Not started. Next: open it.",
     "screen": "j-booking-loop-07",
     "route": "/business/bookings"
    },
@@ -54,19 +54,19 @@
     "lane": "business",
     "label": "Business · Booking page: dates, room, traveller and customer details, the response deadline, Accept request — ask customer to pay, and Decline booking. Next: accept.",
     "screen": "j-booking-loop-08",
-    "route": "/business/bookings/cmwpdjx6q00twf66n5nu3y7cw"
+    "route": "/business/bookings/cmwpgpjc70195f66n57z5qhp1"
    },
    {
     "lane": "business",
     "label": "Business · Accepted: the booking now shows Payment required with a payment deadline; the customer is asked to pay.",
     "screen": "j-booking-loop-09",
-    "route": "/business/bookings/cmwpdjx6q00twf66n5nu3y7cw"
+    "route": "/business/bookings/cmwpgpjc70195f66n57z5qhp1"
    },
    {
     "lane": "customer",
     "label": "Customer · My booking: Payment required, the outstanding amount, Complete payment and Cancel booking. Next: Complete payment.",
     "screen": "j-booking-loop-10",
-    "route": "/bookings/cmwpdjx6q00twf66n5nu3y7cw"
+    "route": "/bookings/cmwpgpjc70195f66n57z5qhp1"
    },
    {
     "lane": "customer",
@@ -88,13 +88,13 @@
     "lane": "customer",
     "label": "Customer · My booking: confirmed and paid, with the payment in Payments & refunds.",
     "screen": "j-booking-loop-13",
-    "route": "/bookings/cmwpdjx6q00twf66n5nu3y7cw"
+    "route": "/bookings/cmwpgpjc70195f66n57z5qhp1"
    },
    {
     "lane": "business",
     "label": "Business · Booking page: confirmed and paid; refunds can be issued from Payments & refunds.",
     "screen": "j-booking-loop-14",
-    "route": "/business/bookings/cmwpdjx6q00twf66n5nu3y7cw"
+    "route": "/business/bookings/cmwpgpjc70195f66n57z5qhp1"
    },
    {
     "lane": "admin",
@@ -104,9 +104,9 @@
    },
    {
     "lane": "admin",
-    "label": "Admin · Booking page for BK-59F886E4: customer, business, dates, traveller details, status, and the payment with its DEMO- reference.",
+    "label": "Admin · Booking page for BK-F7CAE24B: customer, business, dates, traveller details, status, and the payment with its DEMO- reference.",
     "screen": "j-booking-loop-16",
-    "route": "/admin/bookings/cmwpdjx6q00twf66n5nu3y7cw"
+    "route": "/admin/bookings/cmwpgpjc70195f66n57z5qhp1"
    }
   ]
  },
@@ -274,19 +274,19 @@
     "lane": "admin",
     "label": "Admin · Verification review: the business information saved with the submission, each supporting document (View document), submission details and the decision form. Next: write notes and Request changes.",
     "screen": "j-business-verification-07",
-    "route": "/admin/verification/cmwpdngcc00uef66n6thlkfhu"
+    "route": "/admin/verification/cmwpgvf4c019nf66n74wg3rdi"
    },
    {
     "lane": "admin",
     "label": "Reviewer notes filled in. Notes are required for every decision and are shown to the business. Next: Request changes.",
     "screen": "j-business-verification-08",
-    "route": "/admin/verification/cmwpdngcc00uef66n6thlkfhu"
+    "route": "/admin/verification/cmwpgvf4c019nf66n74wg3rdi"
    },
    {
     "lane": "admin",
     "label": "Needs changes: the status badge updates and the notes stay on the record.",
     "screen": "j-business-verification-09",
-    "route": "/admin/verification/cmwpdngcc00uef66n6thlkfhu"
+    "route": "/admin/verification/cmwpgvf4c019nf66n74wg3rdi"
    },
    {
     "lane": "system",
@@ -314,25 +314,25 @@
     "lane": "admin",
     "label": "Admin · Verification review: both documents, the earlier notes replaced with new ones. Next: Start review.",
     "screen": "j-business-verification-13",
-    "route": "/admin/verification/cmwpdngcc00uef66n6thlkfhu"
+    "route": "/admin/verification/cmwpgvf4c019nf66n74wg3rdi"
    },
    {
     "lane": "admin",
     "label": "Under review: the business sees that someone is checking it. Next: approve.",
     "screen": "j-business-verification-14",
-    "route": "/admin/verification/cmwpdngcc00uef66n6thlkfhu"
+    "route": "/admin/verification/cmwpgvf4c019nf66n74wg3rdi"
    },
    {
     "lane": "admin",
     "label": "Approval notes written. Approving is refused if the business profile changed after it submitted. Next: Approve business.",
     "screen": "j-business-verification-15",
-    "route": "/admin/verification/cmwpdngcc00uef66n6thlkfhu"
+    "route": "/admin/verification/cmwpgvf4c019nf66n74wg3rdi"
    },
    {
     "lane": "admin",
     "label": "Approved: the business is verified.",
     "screen": "j-business-verification-16",
-    "route": "/admin/verification/cmwpdngcc00uef66n6thlkfhu"
+    "route": "/admin/verification/cmwpgvf4c019nf66n74wg3rdi"
    },
    {
     "lane": "system",
@@ -379,19 +379,19 @@
     "lane": "admin",
     "label": "Admin · Verification review with the reasons written. Next: Reject submission.",
     "screen": "j-business-verification-rejected-04",
-    "route": "/admin/verification/cmwpdov1q00v4f66n5klznygc"
+    "route": "/admin/verification/cmwpgxp5f01adf66nwki2szld"
    },
    {
     "lane": "admin",
     "label": "Reject this submission? Confirms the business name and shows the notes that will be sent. Next: Reject submission.",
     "screen": "j-business-verification-rejected-05",
-    "route": "/admin/verification/cmwpdov1q00v4f66n5klznygc"
+    "route": "/admin/verification/cmwpgxp5f01adf66nwki2szld"
    },
    {
     "lane": "admin",
     "label": "Rejected: the status badge shows Rejected.",
     "screen": "j-business-verification-rejected-06",
-    "route": "/admin/verification/cmwpdov1q00v4f66n5klznygc"
+    "route": "/admin/verification/cmwpgxp5f01adf66nwki2szld"
    },
    {
     "lane": "system",
@@ -448,49 +448,49 @@
     "lane": "admin",
     "label": "Admin · Review listing: every photo (cover, gallery, each room) and the business's documents, then all listing details. The decision panel's photo and evidence checks are locked: Open the remaining photos first. Next: open the cover photo.",
     "screen": "j-listing-verification-05",
-    "route": "/admin/listings/cmwpdpq5s00vgf66nmomxanql"
+    "route": "/admin/listings/cmwpgz1yr01apf66nvcdnlsy2"
    },
    {
     "lane": "admin",
     "label": "Photo viewer: the photo full size, with arrows through every photo of the listing. Opening a photo marks it Viewed. Next: close and open the rest.",
     "screen": "j-listing-verification-06",
-    "route": "/admin/listings/cmwpdpq5s00vgf66nmomxanql"
+    "route": "/admin/listings/cmwpgz1yr01apf66nvcdnlsy2"
    },
    {
     "lane": "admin",
     "label": "Every photo Viewed (progress full); the photo check is now unlocked. Next: open the documents.",
     "screen": "j-listing-verification-07",
-    "route": "/admin/listings/cmwpdpq5s00vgf66nmomxanql"
+    "route": "/admin/listings/cmwpgz1yr01apf66nvcdnlsy2"
    },
    {
     "lane": "admin",
     "label": "Document viewer: the business's certificate shown inside the page, with Open in new tab. Next: close and open the others.",
     "screen": "j-listing-verification-08",
-    "route": "/admin/listings/cmwpdpq5s00vgf66nmomxanql"
+    "route": "/admin/listings/cmwpgz1yr01apf66nvcdnlsy2"
    },
    {
     "lane": "admin",
     "label": "Every document Opened; all four approval checks are now available. Next: Mark as under review.",
     "screen": "j-listing-verification-09",
-    "route": "/admin/listings/cmwpdpq5s00vgf66nmomxanql"
+    "route": "/admin/listings/cmwpgz1yr01apf66nvcdnlsy2"
    },
    {
     "lane": "admin",
     "label": "Under review: the business sees someone is checking its listing. Next: ask for changes.",
     "screen": "j-listing-verification-10",
-    "route": "/admin/listings/cmwpdpq5s00vgf66nmomxanql"
+    "route": "/admin/listings/cmwpgz1yr01apf66nvcdnlsy2"
    },
    {
     "lane": "admin",
     "label": "Reasons written; they are sent to the business. Next: Request changes.",
     "screen": "j-listing-verification-11",
-    "route": "/admin/listings/cmwpdpq5s00vgf66nmomxanql"
+    "route": "/admin/listings/cmwpgz1yr01apf66nvcdnlsy2"
    },
    {
     "lane": "admin",
     "label": "Needs changes: the decision and reasons are recorded on the submission.",
     "screen": "j-listing-verification-12",
-    "route": "/admin/listings/cmwpdpq5s00vgf66nmomxanql"
+    "route": "/admin/listings/cmwpgz1yr01apf66nvcdnlsy2"
    },
    {
     "lane": "system",
@@ -524,19 +524,19 @@
     "lane": "admin",
     "label": "Admin · Review listing (new submission): every photo and document opened, all four checks ticked and approval notes written. Next: Approve and publish.",
     "screen": "j-listing-verification-17",
-    "route": "/admin/listings/cmwpe18ic00vsf66n9omz4ekm"
+    "route": "/admin/listings/cmwphbk9b01b1f66nhvjtqo0n"
    },
    {
     "lane": "admin",
     "label": "Approve and publish? The listing goes live and can be booked straight away; the notes are shown. Next: Approve and publish.",
     "screen": "j-listing-verification-18",
-    "route": "/admin/listings/cmwpe18ic00vsf66n9omz4ekm"
+    "route": "/admin/listings/cmwphbk9b01b1f66nhvjtqo0n"
    },
    {
     "lane": "admin",
     "label": "Approved: the listing is published.",
     "screen": "j-listing-verification-19",
-    "route": "/admin/listings/cmwpe18ic00vsf66n9omz4ekm"
+    "route": "/admin/listings/cmwphbk9b01b1f66nhvjtqo0n"
    },
    {
     "lane": "system",
@@ -589,19 +589,19 @@
     "lane": "admin",
     "label": "Admin · Review listing: reasons written. Rejecting doesn't need the checks. Next: Reject.",
     "screen": "j-listing-withdraw-reject-05",
-    "route": "/admin/listings/cmwpefp2600w5f66n4r69bmsp"
+    "route": "/admin/listings/cmwphr0me01bef66ngemv4l4k"
    },
    {
     "lane": "admin",
     "label": "Reject this listing? It will not be published and the business will see the reasons shown. Next: Reject listing.",
     "screen": "j-listing-withdraw-reject-06",
-    "route": "/admin/listings/cmwpefp2600w5f66n4r69bmsp"
+    "route": "/admin/listings/cmwphr0me01bef66ngemv4l4k"
    },
    {
     "lane": "admin",
     "label": "Rejected: the decision and reasons are recorded.",
     "screen": "j-listing-withdraw-reject-07",
-    "route": "/admin/listings/cmwpefp2600w5f66n4r69bmsp"
+    "route": "/admin/listings/cmwphr0me01bef66ngemv4l4k"
    },
    {
     "lane": "business",
@@ -717,7 +717,7 @@
     "lane": "admin",
     "label": "Admin · Review listing: the approved submission that published it, with the decision, notes and the checks recorded.",
     "screen": "j-admin-business-listings-05",
-    "route": "/admin/listings/cmwpehquj0019v9vtrft8hbam"
+    "route": "/admin/listings/cmwphtxjh00191t2e1h26tte5"
    }
   ]
  },
@@ -1219,6 +1219,187 @@
     "label": "Business · Revenue & payouts: the payout now shows as paid out.",
     "screen": "j-payout-settlement-04",
     "route": "/business/revenue"
+   }
+  ]
+ },
+ {
+  "id": "j-refund-provider-failure",
+  "title": "A refund can't be sent to a live payment provider",
+  "summary": "Grace paid Kidepo Ridge Lodge through MTN Mobile Money for real (not a demo payment). The lodge creates a refund and approves it, but the portal can't send refunds to this provider, so nothing is marked refunded. The lodge escalates it to support, and operations sees the same request waiting.",
+  "steps": [
+   {
+    "lane": "business",
+    "label": "Business · Booking, Payments & refunds: paid in full through MTN Mobile Money with a live provider reference. Next: Create a full or partial refund.",
+    "screen": "j-refund-provider-failure-01",
+    "route": "/business/bookings/jk-live-refund"
+   },
+   {
+    "lane": "business",
+    "label": "Create a refund: the full amount and a reason. Next: Create refund request.",
+    "screen": "j-refund-provider-failure-02",
+    "route": "/business/bookings/jk-live-refund"
+   },
+   {
+    "lane": "business",
+    "label": "Business · The refund request is listed as Requested. Next: Approve refund.",
+    "screen": "j-refund-provider-failure-03",
+    "route": "/business/bookings/jk-live-refund"
+   },
+   {
+    "lane": "business",
+    "label": "Send this refund? UGX 760,000 through the original payment provider. Next: Approve refund.",
+    "screen": "j-refund-provider-failure-04",
+    "route": "/business/bookings/jk-live-refund"
+   },
+   {
+    "lane": "business",
+    "label": "Business · The provider can't be reached from the portal: \"This provider needs reconciliation. Use Escalate to support; no refund has been marked completed.\" The request stays Requested. Next: Escalate a payment issue to support.",
+    "screen": "j-refund-provider-failure-05",
+    "route": "/business/bookings/jk-live-refund"
+   },
+   {
+    "lane": "business",
+    "label": "Escalate a payment issue: what needs help, filled in. Next: Send to support.",
+    "screen": "j-refund-provider-failure-06",
+    "route": "/business/bookings/jk-live-refund"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Support case PAY-BK-KIDLIVE1 opened; admins with payment permissions are notified.",
+    "screen": "j-refund-provider-failure-07",
+    "route": "/business/bookings/jk-live-refund"
+   },
+   {
+    "lane": "admin",
+    "label": "Admin · Booking, Payments & refunds: the live MTN payment and the refund still Requested. Approving here hits the same limit; operations refunds the guest with MTN and records it through support.",
+    "screen": "j-refund-provider-failure-08",
+    "route": "/admin/bookings/jk-live-refund"
+   }
+  ]
+ },
+ {
+  "id": "j-payout-failed",
+  "title": "A payout to the business fails",
+  "summary": "A payout to Kidepo Ridge Lodge was rejected by the bank because the account name didn't match the registered business. The lodge sees the failed payout and the reason in Earnings, with the amount on hold, and operations sees it on Payments. (There's no live payout provider yet, so the failed payout comes from demo data.)",
+  "steps": [
+   {
+    "lane": "business",
+    "label": "Business · Revenue & payouts: A payout failed, with the amount, the bank's reason, the reference and Contact support. The amount counts as On hold in the payout breakdown.",
+    "screen": "j-payout-failed-01",
+    "route": "/business/revenue"
+   },
+   {
+    "lane": "admin",
+    "label": "Admin · Payments, refunds & payouts: the failed payout listed with the business, amount and reason, above the payment totals.",
+    "screen": "j-payout-failed-02",
+    "route": "/admin/payments"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Support: where the lodge sends the correct account details so the payout can be sent again.",
+    "screen": "j-payout-failed-03",
+    "route": "/business/support"
+   }
+  ]
+ },
+ {
+  "id": "j-cart-order",
+  "title": "A customer books two businesses in one cart and pays once",
+  "summary": "Grace adds a 3-Day Wildlife Safari (Uganda Trails Safaris) and a night at Murchison River Lodge (Nile & Crater Lodges) to her cart and checks out once. The order waits until both businesses accept; then she pays for both together and each business sees its booking confirmed.",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Tour page: 3-Day Wildlife Safari, with the date, participants and Add to cart in the booking panel. Next: choose a date and Add to cart.",
+    "screen": "j-cart-order-01",
+    "route": "/tours/demo-safari"
+   },
+   {
+    "lane": "customer",
+    "label": "Added to cart: the cart in the header now holds the safari.",
+    "screen": "j-cart-order-02",
+    "route": "/tours/demo-safari"
+   },
+   {
+    "lane": "customer",
+    "label": "Murchison River Lodge: a room and a night chosen in the booking panel. Next: Add to cart.",
+    "screen": "j-cart-order-03",
+    "route": "/accommodation/demo-lodge"
+   },
+   {
+    "lane": "customer",
+    "label": "Added to cart: two items from two businesses. Next: open the cart.",
+    "screen": "j-cart-order-04",
+    "route": "/cart"
+   },
+   {
+    "lane": "customer",
+    "label": "Cart: the safari and the stay, each with its dates, guests and price, and the total. Next: Checkout Now.",
+    "screen": "j-cart-order-05",
+    "route": "/cart"
+   },
+   {
+    "lane": "customer",
+    "label": "Checkout · Complete your booking: traveller details for the whole order (phone filled in). Next: Continue to payment.",
+    "screen": "j-cart-order-06",
+    "route": "/checkout/multi"
+   },
+   {
+    "lane": "customer",
+    "label": "Booking status: one order with two requests, each awaiting its business. No payment is taken yet.",
+    "screen": "j-cart-order-07",
+    "route": "/payments"
+   },
+   {
+    "lane": "system",
+    "label": "One order holds both bookings. Each business is notified and has until its response deadline to accept; the order can be paid only when both have."
+   },
+   {
+    "lane": "business",
+    "label": "Business · Nile & Crater Lodges: the stay request, part of a combined order. Next: Accept request.",
+    "screen": "j-cart-order-08",
+    "route": "/business/bookings/cmwpiebi901mkf66np0olxqj1"
+   },
+   {
+    "lane": "business",
+    "label": "Business · The stay is accepted: Payment required. The order still waits for Uganda Trails.",
+    "screen": "j-cart-order-09",
+    "route": "/business/bookings/cmwpiebi901mkf66np0olxqj1"
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · Payment: still waiting, with the stay accepted and the safari awaiting confirmation.",
+    "screen": "j-cart-order-10",
+    "route": "/payments"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Uganda Trails Safaris (switched business): the safari request from the same order. Next: Accept request.",
+    "screen": "j-cart-order-11",
+    "route": "/business/bookings/cmwpiebhm01mef66nrqv57svw"
+   },
+   {
+    "lane": "business",
+    "label": "Business · The safari is accepted: Payment required.",
+    "screen": "j-cart-order-12",
+    "route": "/business/bookings/cmwpiebhm01mef66nrqv57svw"
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · Complete payment: both bookings and one total. MTN Mobile Money and Payment succeeds are selected. Next: Pay.",
+    "screen": "j-cart-order-13",
+    "route": "/payments"
+   },
+   {
+    "lane": "customer",
+    "label": "Payment received: one receipt listing both bookings, Confirmed.",
+    "screen": "j-cart-order-14",
+    "route": "/payments/receipt"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Nile & Crater Lodges: the stay is confirmed; Payments & refunds shows its share of the combined payment.",
+    "screen": "j-cart-order-15",
+    "route": "/business/bookings/cmwpiebi901mkf66np0olxqj1"
    }
   ]
  }

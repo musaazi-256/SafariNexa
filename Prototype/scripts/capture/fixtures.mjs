@@ -136,6 +136,7 @@ export async function cleanup() {
     }
   }
   await undoPayouts();
+  await undoCartOrder();
   const bookings = await db.booking.findMany({ where: { OR: [{ businessId: KIDEPO.business }, { orderId: OUTCOME.order }] }, select: { id: true } });
   const ids = bookings.map((b) => b.id);
   await db.review.deleteMany({ where: { OR: [{ businessId: KIDEPO.business }, { bookingId: { in: ids } }] } });
@@ -145,6 +146,7 @@ export async function cleanup() {
   await db.order.deleteMany({ where: { id: OUTCOME.order } });
   await db.listing.deleteMany({ where: { businessId: KIDEPO.business } });
   await db.businessVerification.deleteMany({ where: { businessId: KIDEPO.business } });
+  await db.payout.deleteMany({ where: { businessId: KIDEPO.business } });
   await db.businessProfile.deleteMany({ where: { id: KIDEPO.business } });
 }
 
@@ -153,7 +155,34 @@ export const OUTCOME = {
   request: "jk-request", unpaid: "jk-unpaid", retry: "jk-retry", paidBusiness: "jk-paid-b", paidCustomer: "jk-paid-c",
   lateRequest: "jk-late-req", latePayment: "jk-late-pay", pending: "jk-pending", partial: "jk-partial", declineRefund: "jk-refund-no",
   order: "jk-order", orderStay: "jk-order-stay", orderTour: "jk-order-tour", payout: "jk-payout",
+  liveRefund: "jk-live-refund", failedPayout: "jk-payout-failed",
 };
+
+// The cart journey places a real order on two seed listings (Murchison River Lodge and the
+// 3-Day Wildlife Safari). Their availability is saved first and put back afterwards, and the
+// order and its bookings are deleted.
+const CART_LISTINGS = ["demo-lodge", "demo-safari"];
+let cartSince = null;
+let cartAvailability = [];
+async function undoCartOrder() {
+  if (!cartSince) return;
+  const customer = await db.user.findUniqueOrThrow({ where: { email: "customer@safarinexa.test" } });
+  const orders = await db.order.findMany({ where: { customerId: customer.id, createdAt: { gte: cartSince } }, select: { id: true } });
+  const orderIds = orders.map((o) => o.id);
+  const bookings = await db.booking.findMany({ where: { OR: [{ orderId: { in: orderIds } }, { customerId: customer.id, listingId: { in: CART_LISTINGS }, createdAt: { gte: cartSince } }] }, select: { id: true } });
+  const ids = bookings.map((b) => b.id);
+  await db.notification.deleteMany({ where: { relatedBookingId: { in: ids } } });
+  await db.supportCase.deleteMany({ where: { relatedBookingId: { in: ids } } });
+  await db.messageThread.deleteMany({ where: { bookingId: { in: ids } } });
+  await db.booking.deleteMany({ where: { id: { in: ids } } });
+  await db.order.deleteMany({ where: { id: { in: orderIds } } });
+  const kept = new Set(cartAvailability.map((a) => a.id));
+  for (const a of cartAvailability) await db.availability.update({ where: { id: a.id }, data: { remaining: a.remaining } }).catch(() => undefined);
+  const added = await db.availability.findMany({ where: { listingId: { in: CART_LISTINGS }, createdAt: { gte: cartSince } }, select: { id: true } });
+  await db.availability.deleteMany({ where: { id: { in: added.map((a) => a.id).filter((id) => !kept.has(id)) } } });
+  cartSince = null;
+  cartAvailability = [];
+}
 
 // Payouts the payout journey settles. Settling covers every eligible demo payment, so
 // the run undoes it: those payouts are deleted and their payments marked unsettled again.
@@ -310,6 +339,7 @@ const STATUS_VARIANTS = [
   { key: "partially-refunded", name: "Confirmed, partially refunded", id: "capture-st-partial", create: true },
   { key: "refund-declined", name: "Cancelled, refund declined", id: "capture-st-refdecl", create: true },
   { key: "order", name: "Part of a combined order", id: "capture-st-order-a", create: true },
+  { key: "refund-processing", name: "Refund sent, waiting for the provider", id: "capture-st-refproc", create: true },
 ];
 /** Bookings that belong to the combined-order fixtures but aren't status variants. */
 const ORDER_EXTRA = ["capture-st-order-b", "capture-order-wait-a", "capture-order-wait-b"];
@@ -417,6 +447,9 @@ export async function setupScreens() {
   // Cancelled by the traveller after the free-cancellation window: the refund was declined.
   const declined = await db.booking.create({ data: booking("capture-st-refdecl", "BK-CAPRDEC1", "CANCELLED_BY_CUSTOMER", now + 3 * day, { confirmedAt: new Date(now - 25 * day), cancelledAt: new Date(now - 2 * day), cancelReason: "Cancelled by customer", payments: { create: paid("SUCCESSFUL") } }), include: { payments: true } });
   await db.refund.create({ data: { paymentId: declined.payments[0].id, bookingId: declined.id, amountMinor: amount, reason: "Customer cancellation", status: "REJECTED", requestedByUserId: customer.id, reviewedByAdminId: admin.id } });
+  // A refund approved and sent, which the provider hasn't confirmed yet.
+  const processing = await db.booking.create({ data: booking("capture-st-refproc", "BK-CAPRPRO1", "REFUND_PROCESSING", now + 44 * day, { confirmedAt: new Date(now - 12 * day), cancelledAt: new Date(now - 2 * day), cancelReason: "Cancelled by customer", payments: { create: paid("SUCCESSFUL") } }), include: { payments: true } });
+  await db.refund.create({ data: { paymentId: processing.payments[0].id, bookingId: processing.id, amountMinor: amount, reason: "Customer cancellation", status: "PROCESSING", requestedByUserId: customer.id, reviewedByAdminId: admin.id } });
   // Combined orders: a stay and a tour from two businesses, paid once.
   const safari = await db.listing.findUniqueOrThrow({ where: { id: "demo-safari" } });
   const tour = (id, ref, status, start, extra = {}) => ({
@@ -486,6 +519,39 @@ setup.bookingOutcomes = async () => {
   });
 };
 
+// Kidepo live, with a paid booking whose payment came through a live mobile money
+// provider (not a DEMO- reference), so a refund can't be sent from the portal, and a
+// payout to the lodge that the bank rejected.
+setup.providerFailures = async () => {
+  await setup.completedStay();
+  const customer = await db.user.findUniqueOrThrow({ where: { email: "customer@safarinexa.test" } });
+  const room = await db.roomType.findFirstOrThrow({ where: { accommodationId: KIDEPO.listing, name: "Ridge Cottage" } });
+  const day = 86400000;
+  const now = Date.now();
+  const base = { customerId: customer.id, listingId: KIDEPO.listing, businessId: KIDEPO.business, roomTypeId: room.id, roomTypeName: room.name, participantsCount: 2, totalMinor: 760000, bookingMode: "REQUEST" };
+  await db.booking.create({
+    data: {
+      ...base, id: OUTCOME.liveRefund, bookingRef: "BK-KIDLIVE1", status: "CONFIRMED", startDate: new Date(now + 64 * day), endDate: new Date(now + 66 * day), confirmedAt: new Date(now - 5 * day),
+      payments: { create: { provider: "MTN_MOBILE_MONEY", status: "SUCCESSFUL", amountMinor: 760000, providerReference: "MTN-7731904455", completedAt: new Date(now - 5 * day) } },
+    },
+  });
+  const payout = await db.payout.create({ data: { businessId: KIDEPO.business, amountMinor: 668800, status: "FAILED", providerReference: "PAYOUT-KIDEPO-0001", notes: "The bank rejected the transfer: the account name doesn't match the registered business name." } });
+  await db.booking.create({
+    data: {
+      ...base, id: OUTCOME.failedPayout, bookingRef: "BK-KIDPAYF1", status: "COMPLETED", startDate: new Date(now - 12 * day), endDate: new Date(now - 10 * day), confirmedAt: new Date(now - 30 * day), completedAt: new Date(now - 10 * day),
+      payments: { create: { provider: "MTN_MOBILE_MONEY", status: "SUCCESSFUL", amountMinor: 760000, providerReference: "MTN-7731900021", completedAt: new Date(now - 30 * day), payoutId: payout.id } },
+    },
+  });
+};
+
+// Nothing to prepare beyond Kidepo's cleanup: the cart journey books two seed listings.
+// Saves their availability so the run can put it back.
+setup.cartOrder = async () => {
+  await cleanup();
+  cartSince = new Date();
+  cartAvailability = await db.availability.findMany({ where: { listingId: { in: CART_LISTINGS } }, select: { id: true, remaining: true } });
+};
+
 // Kidepo live with a paid stay that hasn't been settled to the lodge yet.
 setup.payout = async () => {
   await setup.completedStay();
@@ -502,5 +568,8 @@ setup.payout = async () => {
   });
   payoutsSince = new Date();
 };
+
+/** The bookings of an order, for journeys that act on each business's booking. */
+export const orderBookings = (orderId) => db.booking.findMany({ where: { orderId }, select: { id: true, bookingRef: true, listingId: true, businessId: true, bookingMode: true, status: true } });
 
 export const disconnect = () => db.$disconnect();

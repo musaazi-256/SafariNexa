@@ -28,6 +28,7 @@ import { logAuditEvent } from "@/lib/audit";
 import { Button } from "@/components/ui/button";
 import { paymentStatusFilter, stripeAmount } from "@/lib/payment-state";
 import { completeRefund } from "@/lib/refund-service";
+import { FailedPayoutsNotice } from "@/components/failed-payouts-notice";
 import { Prisma } from "@prisma/client";
 
 const TABS = [
@@ -98,6 +99,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
 
 
 
+  const failedPayouts = await db.payout.findMany({ where: { status: "FAILED" }, orderBy: { updatedAt: "desc" }, take: 10, select: { id: true, amountMinor: true, notes: true, providerReference: true, updatedAt: true, business: { select: { id: true, name: true } } } });
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20 font-sans">
       <PageHero
@@ -108,6 +110,8 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
       />
 
       {isDemoMode() && <p role="status" className="text-sm text-muted-foreground leading-relaxed">{searchParams.payout === "simulated" ? "Payouts completed." : "Settle eligible payments to verified businesses. Payments with pending refunds remain on hold."}</p>}
+
+      <FailedPayoutsNotice payouts={failedPayouts} surface="ADMIN" />
 
       {/* Stat Cards */}
       <StatGrid>
