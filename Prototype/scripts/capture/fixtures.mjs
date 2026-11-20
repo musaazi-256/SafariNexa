@@ -145,6 +145,9 @@ export async function cleanup() {
   await db.businessProfile.deleteMany({ where: { id: KIDEPO.business } });
 }
 
+/** Kidepo bookings the booking and payment outcome journeys act on. */
+export const OUTCOME = { request: "jk-request", unpaid: "jk-unpaid", retry: "jk-retry", paidBusiness: "jk-paid-b", paidCustomer: "jk-paid-c" };
+
 /** Starting states, one per journey. */
 export const setup = {
   // A brand-new business: nothing submitted yet.
@@ -215,6 +218,33 @@ export const setup = {
 // setupScreens() replaces them and cleanupScreens() removes them after the run.
 const SCREEN = { pay: "capture-pay", paid: "capture-paid", stay: "capture-stay", trip: "capture-trip", support: "capture-support", help: "capture-help" };
 
+const LISTING_ROWS = [
+  { id: "capture-table-stay", type: "ACCOMMODATION", title: "Lakeview Eco Cottages", city: "Entebbe", basePriceMinor: 280000 },
+  { id: "capture-table-tour", type: "TOUR", title: "Crater Lakes Walking Tour", city: "Fort Portal", basePriceMinor: 95000 },
+  { id: "capture-table-dining", type: "RESTAURANT", title: "Lakeside Kitchen", city: "Entebbe", basePriceMinor: 45000 },
+  { id: "capture-table-ride", type: "TRANSPORT", title: "Private Entebbe Airport Transfer", city: "Entebbe", basePriceMinor: 120000 },
+];
+
+export async function cleanupListingTable() {
+  await db.listing.deleteMany({ where: { id: { in: LISTING_ROWS.map(({ id }) => id) } } });
+}
+
+export async function setupListingTable() {
+  await cleanupListingTable();
+  const lodge = await db.listing.findUniqueOrThrow({ where: { id: "demo-lodge" }, select: { businessId: true } });
+  await db.listing.createMany({
+    data: LISTING_ROWS.map((row) => ({
+      ...row,
+      businessId: lodge.businessId,
+      slug: row.id,
+      description: row.title,
+      status: "DRAFT",
+      images: [],
+    })),
+  });
+  return lodge.businessId;
+}
+
 /** Query strings for pages that need a record or token in the URL to show their real screen.
  * The token pages only check the token when the form is submitted. */
 export const SCREEN_QUERY = {
@@ -228,10 +258,32 @@ export const SCREEN_QUERY = {
   "/admin/auth/accept": "?token=capture-demo-token",
 };
 
+/** One booking per status that changes what the customer, business or admin can do.
+ * Captured on each portal's booking page as states of that page (run.mjs). */
+const STATUS_VARIANTS = [
+  { key: "awaiting", name: "Awaiting confirmation", id: "capture-st-awaiting", create: true },
+  { key: "pending-payment", name: "Payment required", id: SCREEN.pay },
+  { key: "payment-failed", name: "Payment failed", id: "capture-st-failed", create: true },
+  { key: "confirmed", name: "Confirmed and paid", id: SCREEN.paid },
+  { key: "refund-requested", name: "Cancelled, refund requested", id: "capture-st-refund", create: true },
+  { key: "refunded", name: "Refunded", id: "capture-st-refunded", create: true },
+  { key: "cancelled", name: "Cancelled by the customer", id: "capture-st-cancelled", create: true },
+  { key: "declined", name: "Declined by the business", id: "capture-st-declined", create: true },
+  { key: "completed", name: "Completed, ready to review", id: SCREEN.stay },
+  { key: "reviewed", name: "Reviewed", id: "capture-st-reviewed", create: true },
+];
+const variantsAt = (prefix) => STATUS_VARIANTS.map((v) => ({ suffix: "status-" + v.key, name: v.name, path: prefix + v.id }));
+/** Extra captures of a dynamic page, one per record, as states of that page. */
+export const SCREEN_VARIANTS = {
+  "/bookings/[id]": variantsAt("/bookings/"),
+  "/business/bookings/[id]": variantsAt("/business/bookings/"),
+  "/admin/bookings/[id]": variantsAt("/admin/bookings/"),
+};
+
 export async function cleanupScreens() {
   await db.supportCase.deleteMany({ where: { id: { in: [SCREEN.support, SCREEN.help] } } });
   await db.tripPlan.deleteMany({ where: { id: SCREEN.trip } });
-  const ids = [SCREEN.pay, SCREEN.paid, SCREEN.stay];
+  const ids = [SCREEN.pay, SCREEN.paid, SCREEN.stay, ...STATUS_VARIANTS.filter((v) => v.create).map((v) => v.id)];
   await db.review.deleteMany({ where: { bookingId: { in: ids } } });
   await db.booking.deleteMany({ where: { id: { in: ids } } });
 }
@@ -284,6 +336,19 @@ export async function setupScreens() {
       ] },
     },
   });
+  // The other booking statuses (see STATUS_VARIANTS).
+  const amount = (room?.priceMinor ?? lodge.basePriceMinor) * 2;
+  const paid = (status, extra = {}) => ({ provider: "MTN_MOBILE_MONEY", status, amountMinor: amount, providerReference: "DEMO-CAPTURE-" + Math.random().toString(36).slice(2, 8).toUpperCase(), completedAt: new Date(now - 5 * day), ...extra });
+  await db.booking.create({ data: booking("capture-st-awaiting", "BK-CAPAWAIT", "AWAITING_BUSINESS_CONFIRMATION", now + 50 * day, { responseDueAt: new Date(now + 20 * 3600000) }) });
+  await db.booking.create({ data: booking("capture-st-failed", "BK-CAPFAIL1", "PAYMENT_FAILED", now + 45 * day, { paymentDueAt: new Date(now + day), payments: { create: { provider: "MTN_MOBILE_MONEY", status: "FAILED", amountMinor: amount, failureReason: "The mobile money payment was declined.", completedAt: new Date(now - 3600000) } } }) });
+  const refundReq = await db.booking.create({ data: booking("capture-st-refund", "BK-CAPRFND1", "REFUND_REQUESTED", now + 55 * day, { confirmedAt: new Date(now - 10 * day), cancelledAt: new Date(now - day), cancelReason: "Cancelled by customer", payments: { create: paid("SUCCESSFUL") } }), include: { payments: true } });
+  await db.refund.create({ data: { paymentId: refundReq.payments[0].id, bookingId: refundReq.id, amountMinor: amount, reason: "Customer cancellation", status: "REQUESTED", requestedByUserId: customer.id } });
+  const refunded = await db.booking.create({ data: booking("capture-st-refunded", "BK-CAPRFND2", "REFUNDED", now + 35 * day, { confirmedAt: new Date(now - 20 * day), cancelledAt: new Date(now - 6 * day), cancelReason: "Declined by business", payments: { create: paid("REFUNDED") } }), include: { payments: true } });
+  await db.refund.create({ data: { paymentId: refunded.payments[0].id, bookingId: refunded.id, amountMinor: amount, reason: "Business declined booking", status: "COMPLETED", requestedByUserId: owner.id, reviewedByAdminId: admin.id } });
+  await db.booking.create({ data: booking("capture-st-cancelled", "BK-CAPCANC1", "CANCELLED_BY_CUSTOMER", now + 30 * day, { cancelledAt: new Date(now - 2 * day), cancelReason: "Cancelled by customer" }) });
+  await db.booking.create({ data: booking("capture-st-declined", "BK-CAPDECL1", "CANCELLED_BY_BUSINESS", now + 32 * day, { cancelledAt: new Date(now - 3 * day), cancelReason: "Declined by business" }) });
+  const reviewed = await db.booking.create({ data: booking("capture-st-reviewed", "BK-CAPREVW1", "REVIEWED", now - 40 * day, { confirmedAt: new Date(now - 60 * day), completedAt: new Date(now - 38 * day) }) });
+  await db.review.create({ data: { bookingId: reviewed.id, authorUserId: customer.id, listingId: lodge.id, businessId: lodge.businessId, rating: 4, title: "Great base for the falls", body: "Comfortable room and a very helpful team. The boat trip they arranged was the highlight of our week." } });
   // A traveller's support case about a booking (newest, so it's the one captured).
   await db.supportCase.create({
     data: {
@@ -296,5 +361,27 @@ export async function setupScreens() {
     },
   });
 }
+
+// The Kidepo listing live, with a booking in each state the outcome journeys start from.
+setup.bookingOutcomes = async () => {
+  await setup.completedStay();
+  const customer = await db.user.findUniqueOrThrow({ where: { email: "customer@safarinexa.test" } });
+  const room = await db.roomType.findFirstOrThrow({ where: { accommodationId: KIDEPO.listing, name: "Ridge Cottage" } });
+  const day = 86400000;
+  const now = Date.now();
+  const make = (id, ref, status, inDays, extra = {}) =>
+    db.booking.create({
+      data: {
+        id, bookingRef: ref, customerId: customer.id, listingId: KIDEPO.listing, businessId: KIDEPO.business, roomTypeId: room.id, roomTypeName: room.name,
+        startDate: new Date(now + inDays * day), endDate: new Date(now + (inDays + 2) * day), participantsCount: 2, totalMinor: 760000, bookingMode: "REQUEST", status, ...extra,
+      },
+    });
+  const paid = { confirmedAt: new Date(now - 4 * day), payments: { create: { provider: "MTN_MOBILE_MONEY", status: "SUCCESSFUL", amountMinor: 760000, providerReference: "DEMO-KIDEPO-PAID", completedAt: new Date(now - 4 * day) } } };
+  await make(OUTCOME.request, "BK-KIDREQ01", "AWAITING_BUSINESS_CONFIRMATION", 30, { responseDueAt: new Date(now + 20 * 3600000) });
+  await make(OUTCOME.unpaid, "BK-KIDUNP01", "PENDING_PAYMENT", 34, { paymentDueAt: new Date(now + day) });
+  await make(OUTCOME.retry, "BK-KIDRTY01", "PENDING_PAYMENT", 38, { paymentDueAt: new Date(now + day) });
+  await make(OUTCOME.paidBusiness, "BK-KIDPDB01", "CONFIRMED", 42, paid);
+  await make(OUTCOME.paidCustomer, "BK-KIDPDC01", "CONFIRMED", 46, { ...paid, payments: { create: { ...paid.payments.create, providerReference: "DEMO-KIDEPO-PAID2" } } });
+};
 
 export const disconnect = () => db.$disconnect();

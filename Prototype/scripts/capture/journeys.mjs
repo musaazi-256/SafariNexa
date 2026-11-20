@@ -7,7 +7,7 @@ import { chromium } from "playwright";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { BASE, HANDOFF, VIEW } from "./config.mjs";
 import { signIn, settle, snap } from "./lib.mjs";
-import { KIDEPO, cleanup, disconnect, kidepoCookie, pdf, setup } from "./fixtures.mjs";
+import { KIDEPO, OUTCOME, cleanup, disconnect, kidepoCookie, pdf, setup } from "./fixtures.mjs";
 
 const out = HANDOFF + "journeys/captures/";
 mkdirSync(out, { recursive: true });
@@ -101,6 +101,100 @@ const tipButton = (name) => async (p) => {
   await p.locator("[data-feature-tip]").getByRole("button", { name, exact: true }).click();
   await p.waitForTimeout(1200);
 };
+
+// Booking and payment outcome journeys -------------------------------------------------
+const cust = (id) => "/bookings/" + id;
+const biz = (id) => "/business/bookings/" + id;
+const adm = (id) => "/admin/bookings/" + id;
+// Pick a payment method and the demo simulation result on /payments, ready to Pay.
+const choosePayment = (outcome) => async (p) => {
+  await p.locator("input[name=method][value=mtn]").check({ force: true });
+  await p.locator("select[name=outcome]").selectOption(outcome);
+};
+const pay = async (p) => {
+  await p.getByRole("button", { name: /^Pay UGX/ }).click();
+  await p.waitForURL((u) => !/\/payments$/.test(u.pathname) || u.search.includes("status"), { timeout: 120000 }).catch(() => undefined);
+  await p.waitForTimeout(3000);
+  await top(p);
+};
+// The refund row for a Kidepo booking on the admin Payments page.
+const refundRow = (p, reason) => p.locator("tr").filter({ hasText: "Kidepo Ridge Lodge" }).filter({ hasText: reason }).first();
+
+const OUTCOME_JOURNEYS = [
+  {
+    id: "booking-declined",
+    fixture: "bookingOutcomes",
+    title: "The business declines a booking request",
+    summary: "Grace asks to stay at Kidepo Ridge Lodge. The lodge can't host her and declines the request before the deadline. Nothing was charged; Grace sees the booking as declined, and so does operations.",
+    steps: [
+      { lane: "customer", act: go(cust(OUTCOME.request)), label: "Customer · My booking: Awaiting confirmation, with the lodge's response deadline. She can still cancel. Next: the lodge responds." },
+      { lane: "business", act: go(biz(OUTCOME.request)), label: "Business · Booking: the request with Accept request — ask customer to pay, and Decline booking. Next: Decline booking." },
+      { lane: "business", act: press("Decline booking"), label: "Business · Booking: Cancelled by business. No actions remain." },
+      { lane: "system", label: "The booking is cancelled by the business, its dates are released, and the customer is notified. Nothing was paid, so there is no refund." },
+      { lane: "customer", act: go(cust(OUTCOME.request)), label: "Customer · My booking: Cancelled by business, and it can no longer be cancelled here." },
+      { lane: "admin", act: go(adm(OUTCOME.request)), label: "Admin · Booking: Cancelled by business, with no payment." },
+    ],
+  },
+  {
+    id: "booking-cancelled-unpaid",
+    fixture: "bookingOutcomes",
+    title: "A customer cancels a booking before paying",
+    summary: "The lodge accepted Grace's request and is waiting for payment. She changes her plans and cancels; nothing was paid, so the booking is simply cancelled and the dates are freed.",
+    steps: [
+      { lane: "customer", act: go(cust(OUTCOME.unpaid)), label: "Customer · My booking: Payment required, with Complete payment and Cancel booking. Next: Cancel booking." },
+      { lane: "customer", act: press("Cancel booking"), label: "Customer · My booking: Cancelled by you." },
+      { lane: "system", label: "The dates are released and the lodge is notified. No payment was taken, so no refund is needed." },
+      { lane: "business", act: go(biz(OUTCOME.unpaid)), label: "Business · Booking: Cancelled by customer." },
+    ],
+  },
+  {
+    id: "payment-failed-retry",
+    fixture: "bookingOutcomes",
+    title: "A payment is declined, then retried successfully",
+    summary: "Grace's mobile money payment is declined (simulated). The booking shows Payment failed and keeps Complete payment, so she tries again and the booking is confirmed.",
+    steps: [
+      { lane: "customer", act: go(cust(OUTCOME.retry)), label: "Customer · My booking: Payment required. Next: Complete payment." },
+      { lane: "customer", act: seq(link("Complete payment"), choosePayment("failed")), label: "Complete payment: MTN Mobile Money with the simulation set to Payment is declined. Next: Pay." },
+      { lane: "customer", act: pay, label: "Payment not completed: the declined result and what to do next." },
+      { lane: "customer", act: go(cust(OUTCOME.retry)), label: "Customer · My booking: Payment failed, with Complete payment to try again. Next: Complete payment." },
+      { lane: "customer", act: seq(link("Complete payment"), choosePayment("success")), label: "Complete payment again, this time set to Payment succeeds. Next: Pay." },
+      { lane: "customer", act: pay, label: "Payment successful: the receipt." },
+      { lane: "customer", act: go(cust(OUTCOME.retry)), label: "Customer · My booking: Confirmed and paid; both payment attempts are listed." },
+      { lane: "business", act: go(biz(OUTCOME.retry)), label: "Business · Booking: Confirmed, with the successful payment under Payments & refunds." },
+    ],
+  },
+  {
+    id: "refund-business-cancel",
+    fixture: "bookingOutcomes",
+    title: "The business cancels a paid booking and the customer is refunded",
+    summary: "Kidepo Ridge Lodge has to cancel a paid booking. Cancelling creates a refund request; operations approves it in the admin portal and the booking ends as refunded.",
+    steps: [
+      { lane: "business", act: go(biz(OUTCOME.paidBusiness)), label: "Business · Booking: Confirmed and paid, with Cancel booking. Next: Cancel booking." },
+      { lane: "business", act: async (p) => p.getByRole("button", { name: "Cancel booking" }).first().click(), label: "Cancel this booking? The customer will be notified, and as it's paid a refund request is created. Next: Cancel booking." },
+      { lane: "business", act: confirm("Cancel booking"), label: "Business · Booking: Refund requested, with the request under Payments & refunds." },
+      { lane: "system", label: "The booking moves to Refund requested; a refund for the full amount waits for approval. Customer and lodge are notified." },
+      { lane: "customer", act: go(cust(OUTCOME.paidBusiness)), label: "Customer · My booking: Refund requested; the refund isn't complete yet." },
+      { lane: "admin", act: seq(go("/admin/payments"), async (p) => refundRow(p, "Business declined").scrollIntoViewIfNeeded()), label: "Admin · Payments, refunds & payouts: the Kidepo refund request with Approve refund. Next: Approve refund." },
+      { lane: "admin", act: async (p) => refundRow(p, "Business declined").getByRole("button", { name: "Approve refund" }).click(), label: "Approve this refund? The amount goes back to the traveller through the payment provider and can't be undone. Next: Approve refund." },
+      { lane: "admin", act: confirm("Approve refund"), label: "Admin · Payments: the refund is Completed." },
+      { lane: "customer", act: go(cust(OUTCOME.paidBusiness)), label: "Customer · My booking: Refunded." },
+      { lane: "admin", act: go(adm(OUTCOME.paidBusiness)), label: "Admin · Booking: Refunded, with the payment and the completed refund." },
+    ],
+  },
+  {
+    id: "refund-customer-cancel",
+    fixture: "bookingOutcomes",
+    title: "A customer cancels a paid booking and asks for a refund",
+    summary: "Grace cancels a confirmed, paid stay with free cancellation. The booking moves to Refund requested; the lodge sees the request and operations can approve it.",
+    steps: [
+      { lane: "customer", act: go(cust(OUTCOME.paidCustomer)), label: "Customer · My booking: Confirmed and paid, with Cancel booking. Next: Cancel booking." },
+      { lane: "customer", act: press("Cancel booking"), label: "Customer · My booking: Refund requested." },
+      { lane: "system", label: "A refund request for the full amount is created (the room is refundable); the lodge is notified." },
+      { lane: "business", act: go(biz(OUTCOME.paidCustomer)), label: "Business · Booking: Refund requested, with the request under Payments & refunds." },
+      { lane: "admin", act: seq(go("/admin/payments"), async (p) => refundRow(p, "Customer cancellation").scrollIntoViewIfNeeded()), label: "Admin · Payments, refunds & payouts: the request waiting for approval, as in the previous journey." },
+    ],
+  },
+];
 
 const VERIFICATION_JOURNEYS = [
   {
@@ -378,6 +472,7 @@ const JOURNEYS = [
     ],
   },
   ...VERIFICATION_JOURNEYS,
+  ...OUTCOME_JOURNEYS,
 ];
 
 async function run(j) {

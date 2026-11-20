@@ -11,6 +11,32 @@
   "purpose": "Latest 100 recorded platform events. This is not an uptime monitor."
  },
  {
+  "id": "admin-audit--viewport-top",
+  "section": "Audit",
+  "name": "Audit · Top of page",
+  "route": "/admin/audit",
+  "pattern": "/admin/audit",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Audit trail",
+  "purpose": "Top of page",
+  "parent": "admin-audit",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-audit--viewport-scrolled",
+  "section": "Audit",
+  "name": "Audit · Scrolled",
+  "route": "/admin/audit",
+  "pattern": "/admin/audit",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Audit trail",
+  "purpose": "Scrolled",
+  "parent": "admin-audit",
+  "scrollY": 675
+ },
+ {
   "id": "admin-audit--menu-columns-for-audit-trail",
   "section": "Audit",
   "name": "Audit · Columns for Audit trail menu",
@@ -26,12 +52,158 @@
   "id": "admin-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/admin/bookings/capture-stay",
+  "route": "/admin/bookings/capture-st-reviewed",
   "pattern": "/admin/bookings/[id]",
   "kind": "page",
   "signedOut": false,
   "heading": "Murchison River Lodge",
   "purpose": "Review the booking, traveller information and payment history."
+ },
+ {
+  "id": "admin-bookings-id--viewport-top",
+  "section": "Bookings",
+  "name": "Bookings · details · Top of page",
+  "route": "/admin/bookings/capture-st-reviewed",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Top of page",
+  "parent": "admin-bookings-id",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-bookings-id--viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · details · Scrolled",
+  "route": "/admin/bookings/capture-st-reviewed",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Scrolled",
+  "parent": "admin-bookings-id",
+  "scrollY": 80
+ },
+ {
+  "id": "admin-bookings-id--status-awaiting",
+  "section": "Bookings",
+  "name": "Bookings · details · Awaiting confirmation",
+  "route": "/admin/bookings/capture-st-awaiting",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Awaiting confirmation",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-pending-payment",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment required",
+  "route": "/admin/bookings/capture-pay",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment required",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-payment-failed",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment failed",
+  "route": "/admin/bookings/capture-st-failed",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment failed",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-confirmed",
+  "section": "Bookings",
+  "name": "Bookings · details · Confirmed and paid",
+  "route": "/admin/bookings/capture-paid",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Confirmed and paid",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-refund-requested",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled, refund requested",
+  "route": "/admin/bookings/capture-st-refund",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled, refund requested",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-refunded",
+  "section": "Bookings",
+  "name": "Bookings · details · Refunded",
+  "route": "/admin/bookings/capture-st-refunded",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Refunded",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-cancelled",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled by the customer",
+  "route": "/admin/bookings/capture-st-cancelled",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled by the customer",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-declined",
+  "section": "Bookings",
+  "name": "Bookings · details · Declined by the business",
+  "route": "/admin/bookings/capture-st-declined",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Declined by the business",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-completed",
+  "section": "Bookings",
+  "name": "Bookings · details · Completed, ready to review",
+  "route": "/admin/bookings/capture-stay",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Completed, ready to review",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-reviewed",
+  "section": "Bookings",
+  "name": "Bookings · details · Reviewed",
+  "route": "/admin/bookings/capture-st-reviewed",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Reviewed",
+  "parent": "admin-bookings-id"
  },
  {
   "id": "admin-bookings",
@@ -43,6 +215,32 @@
   "signedOut": false,
   "heading": "Bookings oversight",
   "purpose": "Monitor bookings across every business on the platform."
+ },
+ {
+  "id": "admin-bookings--viewport-top",
+  "section": "Bookings",
+  "name": "Bookings · Top of page",
+  "route": "/admin/bookings",
+  "pattern": "/admin/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Bookings oversight",
+  "purpose": "Top of page",
+  "parent": "admin-bookings",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-bookings--viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · Scrolled",
+  "route": "/admin/bookings",
+  "pattern": "/admin/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Bookings oversight",
+  "purpose": "Scrolled",
+  "parent": "admin-bookings",
+  "scrollY": 90
  },
  {
   "id": "admin-bookings--menu-booking-status-all-bookings",
@@ -92,6 +290,32 @@
   "purpose": "The listing's current saved content, review history and booking activity."
  },
  {
+  "id": "admin-businesses-id-listings-listingId--viewport-top",
+  "section": "Businesses",
+  "name": "Listings · details · Top of page",
+  "route": "/admin/businesses/cmw1llagf0019yydz4wwd5i9e/listings/transport-bulk-15",
+  "pattern": "/admin/businesses/[id]/listings/[listingId]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala Special Hire — Sedan or SUV",
+  "purpose": "Top of page",
+  "parent": "admin-businesses-id-listings-listingId",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-businesses-id-listings-listingId--viewport-scrolled",
+  "section": "Businesses",
+  "name": "Listings · details · Scrolled",
+  "route": "/admin/businesses/cmw1llagf0019yydz4wwd5i9e/listings/transport-bulk-15",
+  "pattern": "/admin/businesses/[id]/listings/[listingId]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala Special Hire — Sedan or SUV",
+  "purpose": "Scrolled",
+  "parent": "admin-businesses-id-listings-listingId",
+  "scrollY": 675
+ },
+ {
   "id": "admin-businesses-id-listings-listingId--tab-all-fields",
   "section": "Businesses",
   "name": "Listings · details · All fields tab",
@@ -115,6 +339,32 @@
   "purpose": "Transport"
  },
  {
+  "id": "admin-businesses-id--viewport-top",
+  "section": "Businesses",
+  "name": "Businesses · details · Top of page",
+  "route": "/admin/businesses/cmw1lland00klyydzea7wcern",
+  "pattern": "/admin/businesses/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Northgate Charters",
+  "purpose": "Top of page",
+  "parent": "admin-businesses-id",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-businesses-id--viewport-scrolled",
+  "section": "Businesses",
+  "name": "Businesses · details · Scrolled",
+  "route": "/admin/businesses/cmw1lland00klyydzea7wcern",
+  "pattern": "/admin/businesses/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Northgate Charters",
+  "purpose": "Scrolled",
+  "parent": "admin-businesses-id",
+  "scrollY": 113
+ },
+ {
   "id": "admin-businesses",
   "section": "Businesses",
   "name": "Businesses",
@@ -124,6 +374,32 @@
   "signedOut": false,
   "heading": "Businesses",
   "purpose": "Directory of every business on the platform, with verification state."
+ },
+ {
+  "id": "admin-businesses--viewport-top",
+  "section": "Businesses",
+  "name": "Businesses · Top of page",
+  "route": "/admin/businesses",
+  "pattern": "/admin/businesses",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Businesses",
+  "purpose": "Top of page",
+  "parent": "admin-businesses",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-businesses--viewport-scrolled",
+  "section": "Businesses",
+  "name": "Businesses · Scrolled",
+  "route": "/admin/businesses",
+  "pattern": "/admin/businesses",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Businesses",
+  "purpose": "Scrolled",
+  "parent": "admin-businesses",
+  "scrollY": 84
  },
  {
   "id": "admin-businesses--menu-verification-status-all-verification-sta",
@@ -161,6 +437,32 @@
   "purpose": "Platform overview: bookings, revenue, verification, and support at a glance."
  },
  {
+  "id": "admin-dashboard--viewport-top",
+  "section": "Dashboard",
+  "name": "Dashboard · Top of page",
+  "route": "/admin/dashboard",
+  "pattern": "/admin/dashboard",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Dashboard",
+  "purpose": "Top of page",
+  "parent": "admin-dashboard",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-dashboard--viewport-scrolled",
+  "section": "Dashboard",
+  "name": "Dashboard · Scrolled",
+  "route": "/admin/dashboard",
+  "pattern": "/admin/dashboard",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Dashboard",
+  "purpose": "Scrolled",
+  "parent": "admin-dashboard",
+  "scrollY": 674
+ },
+ {
   "id": "admin-listings-id",
   "section": "Listings",
   "name": "Listings · details",
@@ -170,6 +472,32 @@
   "signedOut": false,
   "heading": "Riverside Glamping (draft)",
   "purpose": "Open every photo and document, check the details, then record your decision. Approval publishes exactly this content."
+ },
+ {
+  "id": "admin-listings-id--viewport-top",
+  "section": "Listings",
+  "name": "Listings · details · Top of page",
+  "route": "/admin/listings/lsub-riverside-glamping",
+  "pattern": "/admin/listings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Riverside Glamping (draft)",
+  "purpose": "Top of page",
+  "parent": "admin-listings-id",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-listings-id--viewport-scrolled",
+  "section": "Listings",
+  "name": "Listings · details · Scrolled",
+  "route": "/admin/listings/lsub-riverside-glamping",
+  "pattern": "/admin/listings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Riverside Glamping (draft)",
+  "purpose": "Scrolled",
+  "parent": "admin-listings-id",
+  "scrollY": 675
  },
  {
   "id": "admin-listings",
@@ -206,6 +534,32 @@
   "purpose": "Operational updates and support activity sent to your admin account."
  },
  {
+  "id": "admin-notifications--viewport-top",
+  "section": "Notifications",
+  "name": "Notifications · Top of page",
+  "route": "/admin/notifications",
+  "pattern": "/admin/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Top of page",
+  "parent": "admin-notifications",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-notifications--viewport-scrolled",
+  "section": "Notifications",
+  "name": "Notifications · Scrolled",
+  "route": "/admin/notifications",
+  "pattern": "/admin/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Scrolled",
+  "parent": "admin-notifications",
+  "scrollY": 45
+ },
+ {
   "id": "admin-notifications--menu-read-status-all-updates",
   "section": "Notifications",
   "name": "Notifications · Read status: All updates menu",
@@ -239,6 +593,32 @@
   "signedOut": false,
   "heading": "Payments, refunds & payouts",
   "purpose": "Support businesses with payment issues, refunds, reconciliation, and platform payouts."
+ },
+ {
+  "id": "admin-payments--viewport-top",
+  "section": "Payments",
+  "name": "Payments · Top of page",
+  "route": "/admin/payments",
+  "pattern": "/admin/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payments, refunds & payouts",
+  "purpose": "Top of page",
+  "parent": "admin-payments",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-payments--viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments · Scrolled",
+  "route": "/admin/payments",
+  "pattern": "/admin/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payments, refunds & payouts",
+  "purpose": "Scrolled",
+  "parent": "admin-payments",
+  "scrollY": 675
  },
  {
   "id": "admin-payments--menu-payment-status-all",
@@ -300,6 +680,32 @@
   "purpose": "Manage your personal admin account details and preferences."
  },
  {
+  "id": "admin-profile--viewport-top",
+  "section": "Profile",
+  "name": "Profile · Top of page",
+  "route": "/admin/profile",
+  "pattern": "/admin/profile",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "My profile",
+  "purpose": "Top of page",
+  "parent": "admin-profile",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-profile--viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile · Scrolled",
+  "route": "/admin/profile",
+  "pattern": "/admin/profile",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "My profile",
+  "purpose": "Scrolled",
+  "parent": "admin-profile",
+  "scrollY": 2
+ },
+ {
   "id": "admin-reviews",
   "section": "Reviews",
   "name": "Reviews",
@@ -309,6 +715,32 @@
   "signedOut": false,
   "heading": "Reviews moderation",
   "purpose": "Moderate flagged reviews and business replies."
+ },
+ {
+  "id": "admin-reviews--viewport-top",
+  "section": "Reviews",
+  "name": "Reviews · Top of page",
+  "route": "/admin/reviews",
+  "pattern": "/admin/reviews",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Reviews moderation",
+  "purpose": "Top of page",
+  "parent": "admin-reviews",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-reviews--viewport-scrolled",
+  "section": "Reviews",
+  "name": "Reviews · Scrolled",
+  "route": "/admin/reviews",
+  "pattern": "/admin/reviews",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Reviews moderation",
+  "purpose": "Scrolled",
+  "parent": "admin-reviews",
+  "scrollY": 507
  },
  {
   "id": "admin-reviews--menu-moderation-status-all",
@@ -343,6 +775,32 @@
   "signedOut": false,
   "heading": "Roles & permissions",
   "purpose": "Permission levels define exactly what an invited admin can do. Changes here apply immediately to everyone holding that level."
+ },
+ {
+  "id": "admin-roles--viewport-top",
+  "section": "Roles",
+  "name": "Roles · Top of page",
+  "route": "/admin/roles",
+  "pattern": "/admin/roles",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Roles & permissions",
+  "purpose": "Top of page",
+  "parent": "admin-roles",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-roles--viewport-scrolled",
+  "section": "Roles",
+  "name": "Roles · Scrolled",
+  "route": "/admin/roles",
+  "pattern": "/admin/roles",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Roles & permissions",
+  "purpose": "Scrolled",
+  "parent": "admin-roles",
+  "scrollY": 675
  },
  {
   "id": "admin-settings",
@@ -391,6 +849,32 @@
   "purpose": "Opened by Grace Nakato. Reply to the customer and keep the case status current."
  },
  {
+  "id": "admin-support-id--viewport-top",
+  "section": "Support",
+  "name": "Support · details · Top of page",
+  "route": "/admin/support/capture-help",
+  "pattern": "/admin/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Can I add a third guest to my stay?",
+  "purpose": "Top of page",
+  "parent": "admin-support-id",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-support-id--viewport-scrolled",
+  "section": "Support",
+  "name": "Support · details · Scrolled",
+  "route": "/admin/support/capture-help",
+  "pattern": "/admin/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Can I add a third guest to my stay?",
+  "purpose": "Scrolled",
+  "parent": "admin-support-id",
+  "scrollY": 348
+ },
+ {
   "id": "admin-support",
   "section": "Support",
   "name": "Support",
@@ -400,6 +884,32 @@
   "signedOut": false,
   "heading": "Support issues",
   "purpose": "Resolve booking, payment, and account issues raised across the platform."
+ },
+ {
+  "id": "admin-support--viewport-top",
+  "section": "Support",
+  "name": "Support · Top of page",
+  "route": "/admin/support",
+  "pattern": "/admin/support",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Support issues",
+  "purpose": "Top of page",
+  "parent": "admin-support",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-support--viewport-scrolled",
+  "section": "Support",
+  "name": "Support · Scrolled",
+  "route": "/admin/support",
+  "pattern": "/admin/support",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Support issues",
+  "purpose": "Scrolled",
+  "parent": "admin-support",
+  "scrollY": 143
  },
  {
   "id": "admin-support--menu-case-status-all",
@@ -448,6 +958,32 @@
   "purpose": "Customer, business, and admin accounts, with admin access control."
  },
  {
+  "id": "admin-users--viewport-top",
+  "section": "Users",
+  "name": "Users · Top of page",
+  "route": "/admin/users",
+  "pattern": "/admin/users",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Users & access",
+  "purpose": "Top of page",
+  "parent": "admin-users",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-users--viewport-scrolled",
+  "section": "Users",
+  "name": "Users · Scrolled",
+  "route": "/admin/users",
+  "pattern": "/admin/users",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Users & access",
+  "purpose": "Scrolled",
+  "parent": "admin-users",
+  "scrollY": 158
+ },
+ {
   "id": "admin-users--menu-account-role-all",
   "section": "Users",
   "name": "Users · Account role: All menu",
@@ -481,6 +1017,32 @@
   "signedOut": false,
   "heading": "Rwenzori Trail Lodges",
   "purpose": "Review the business information and supporting documents before recording your decision."
+ },
+ {
+  "id": "admin-verification-id--viewport-top",
+  "section": "Verification",
+  "name": "Verification · details · Top of page",
+  "route": "/admin/verification/cmw1llana00kdyydzvhb3vtfv-verification",
+  "pattern": "/admin/verification/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Rwenzori Trail Lodges",
+  "purpose": "Top of page",
+  "parent": "admin-verification-id",
+  "scrollY": 0
+ },
+ {
+  "id": "admin-verification-id--viewport-scrolled",
+  "section": "Verification",
+  "name": "Verification · details · Scrolled",
+  "route": "/admin/verification/cmw1llana00kdyydzvhb3vtfv-verification",
+  "pattern": "/admin/verification/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Rwenzori Trail Lodges",
+  "purpose": "Scrolled",
+  "parent": "admin-verification-id",
+  "scrollY": 182
  },
  {
   "id": "admin-verification",

@@ -4,10 +4,10 @@
 import { chromium } from "playwright";
 import { mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { BASE, HANDOFF, PORTALS, VIEW, NOT_IDS } from "./config.mjs";
-import { signIn, settle, snap } from "./lib.mjs";
+import { signIn, settle, snap, scrollSnapshots } from "./lib.mjs";
 import { routes } from "./routes.mjs";
 import { GROUPS } from "./groups.mjs";
-import { SCREEN_QUERY, cleanupScreens, disconnect, setupScreens } from "./fixtures.mjs";
+import { SCREEN_QUERY, SCREEN_VARIANTS, cleanupListingTable, cleanupScreens, disconnect, setupListingTable, setupScreens } from "./fixtures.mjs";
 
 // Groups that are captured as a particular business (see `business` in groups.mjs).
 const businessFor = (pattern) => (GROUPS[process.argv[2]]?.groups ?? []).find((g) => g.business && g.routes.includes(pattern))?.business;
@@ -206,13 +206,19 @@ async function states(page, base, url) {
 }
 
 // Records some pages need (a booking to pay, a trip plan, a support case…); removed after the run.
-await setupScreens();
+const listingTableOnly = only?.size === 1 && only.has("business-listings") && portal === "business";
 try {
+if (!listingTableOnly) await setupScreens();
 for (const r of routes().filter((r) => r.portal === portal)) {
   if (only && !only.has(r.id)) continue;
+  const listingTable = r.pattern === "/business/listings";
   try {
     const page = await session(r.signedOut);
     if (!r.signedOut) await useBusiness(page, businessFor(r.pattern));
+    if (listingTable) {
+      const businessId = await setupListingTable();
+      await page.context().addCookies([{ name: "active_business", value: businessId, url: BASE }]);
+    }
     const resolved = await resolve(page, r.pattern);
     const route = resolved && resolved + (SCREEN_QUERY[r.pattern] ?? "");
     if (!route) {
@@ -239,18 +245,36 @@ for (const r of routes().filter((r) => r.portal === portal)) {
       }),
     );
     save(base, await snap(page));
+    if (landed === path) {
+      for (const { suffix, name, offset, tree } of await scrollSnapshots(page)) {
+        save({ ...base, id: base.id + "--" + suffix, parent: base.id, kind: "state", name: base.name + " · " + name, purpose: name, scrollY: offset }, tree);
+      }
+    }
     if (!r.signedOut && landed === path) await states(page, base, BASE + route);
+    // The same page for other records, one per status that changes what can be done there.
+    for (const v of r.signedOut ? [] : SCREEN_VARIANTS[r.pattern] ?? []) {
+      try {
+        await page.goto(BASE + v.path, { timeout: 180000 });
+        await settle(page);
+        const heading = await page.evaluate(() => document.querySelector("main h1, h1")?.textContent?.replace(/\s+/g, " ").trim());
+        save({ ...base, id: base.id + "--" + v.suffix, kind: "state", name: base.name + " · " + v.name, route: v.path, heading, purpose: v.name, parent: base.id }, await snap(page));
+      } catch (e) {
+        console.log("  ✗ state", v.suffix, String(e.message || e).split("\n")[0]);
+      }
+    }
   } catch (e) {
     failed.push(r.id);
     console.log("✗", r.id, String(e.message || e).split("\n").slice(0, 16).join(" | "));
     const key = r.signedOut ? "out" : "in";
     await sessions[key]?.context().close().catch(() => undefined);
     delete sessions[key];
+  } finally {
+    if (listingTable) await cleanupListingTable();
   }
 }
 
 } finally {
-  await cleanupScreens();
+  if (!listingTableOnly) await cleanupScreens();
   await disconnect();
 }
 

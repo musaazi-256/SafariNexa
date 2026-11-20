@@ -590,3 +590,13 @@ An audit (`node scripts/capture/audit.mjs [--strict]`, added with this change; `
 - **URL scenarios** (`SCREEN_QUERY`): checkout for a stay, payment, receipt and success for those bookings, write-a-review for the completed stay, and a capture token for reset-password and both invitation pages (they check the token on submit).
 - `run.mjs` compares landing paths without the query string, so these pages still get their tabs, menus, guides and tips captured.
 - The plugin cover no longer claims every page, tab, dialog and menu is captured. `/docs/verification` §7 records what's covered and what remains (states, actions and outcomes need a scenario inventory).
+
+### Follow-up, same day — booking and payment states and outcomes captured
+
+Started the scenario coverage in `/docs/verification` §8 with bookings and payments across the three portals.
+
+- **Status states** (`STATUS_VARIANTS` and `SCREEN_VARIANTS` in `scripts/capture/fixtures.mjs`, captured by `run.mjs` as `--status-*` states of each booking page): awaiting confirmation, payment required, payment failed, confirmed and paid, refund requested, refunded, cancelled by the customer, declined by the business, completed, reviewed — on the customer, business and admin booking pages (30 frames). Each shows the actions that status allows.
+- **Outcome journeys** (`journeys.mjs`, on Kidepo Ridge Lodge bookings from `setup.bookingOutcomes`): the business declines a request; the customer cancels before paying; a payment is declined and retried successfully; the business cancels a paid booking, a refund is requested and an admin approves it (ending Refunded); the customer cancels a paid booking and the refund request reaches the business and admin.
+- Remaining for bookings and payments: deadline expiry, pending provider confirmation, partial and rejected refunds, payouts, and multi-item orders.
+
+- Capture baseline pages with vertical overflow at the top and after scrolling. Seed the Business Listings table with all four listing types for the capture.

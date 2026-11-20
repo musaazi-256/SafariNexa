@@ -278,13 +278,13 @@ All reviews by moderation status.
 
 Run `node scripts/capture/audit.mjs` from `Prototype` to compare the app's page inventory, capture indexes, and plugin bundles. Add `--strict` to fail on a detected gap. The audit reads existing files and does not open a browser or change demo records. The UI fingerprint checks freshness of source files. Coverage of states and actions requires explicit scenarios.
 
-| Surface | Indexed page patterns | Page and state frames | Journeys shown in plugin |
-|---|---:|---:|---:|
-| Customer | 42 of 43 | 55 | 3 |
-| Business | 29 of 30 | 92 | 7 |
-| Admin | 25 of 25 | 47 | 7 |
+| Surface | Indexed page patterns | Page and state frames | Top / scrolled pairs | Journeys shown in plugin |
+|---|---:|---:|---:|---:|
+| Customer | 43 of 43 | 137 | 35 | 8 |
+| Business | 30 of 30 | 141 | 19 | 12 |
+| Admin | 25 of 25 | 91 | 17 | 10 |
 
-These counts describe the checked-in bundles, generated on 20 November 2026. The same journey can appear in several plugins. There are eight distinct journeys with 114 steps, including 105 UI frames and nine system steps described in text. The captured branches are stay booking and simulated payment success, first-time business guides, business verification approval and rejection, listing approval and withdrawal/rejection, customer review and business reply with the admin hide confirmation open, and admin inspection of a business listing.
+These counts describe the local bundles generated on 20 November 2026. The same journey can appear in several plugins. The 13 distinct journeys contain 147 steps, including 134 UI frames and 13 system steps. They cover booking and payment success and failure, cancellation and refunds, first-time guides, business verification, listing approval and rejection, customer review and business reply, and admin inspection of a business listing.
 
 ### Coverage gaps and fixture progress
 
@@ -297,7 +297,7 @@ These counts describe the checked-in bundles, generated on 20 November 2026. The
 | Customer review | Write a review for a completed, unreviewed stay. The review journey covers validation, writing, submitting, business reply, and opening the admin hide confirmation. | Entry from My bookings and from each listing type, already reviewed, ineligible booking, completed moderation, and republication |
 | Authentication and invitations | Basic account pages; the reset-password and both invitation forms with a token in the URL (the pages check the token only on submit) | Valid, expired, and invalid links, wrong account, accepted invitations, and password reset completion |
 | Business team and saved items | Team and saved-item aliases land on settings and profile saved items | Record aliases as redirects while capturing their destination states under the canonical route |
-| Booking, verification, listing, and moderation queues | One example record per dynamic route and selected overlay frames | Separate empty and populated fixtures, zero matching filters, each status that changes available actions, role permissions, and confirm/cancel/result states |
+| Booking, verification, listing, and moderation queues | Booking detail has ten status states in all three portals, and six booking and payment outcome journeys; other queues have one example record per dynamic route and selected overlay frames | Separate empty and populated fixtures, zero matching filters, each status that changes available actions, role permissions, and confirm/cancel/result states |
 | Shared states | A desktop snapshot after the page settles | Mobile, tablet, loading, recoverable error, permission variants, and long or scrollable sections |
 
 The runner resolves dynamic routes from links in one demo account per portal. It opens visible ARIA tabs and first-level menus and dialogs, with caps of 10 tabs and 12 overlays per page. Similar row menus and shared header/sidebar controls are deduplicated. That approach cannot establish coverage of differing row actions, menu items that open a second dialog, non-ARIA controls, disabled controls, form submissions, or data and permission variants. The route scan explicitly excludes 12 page patterns for OAuth, demo tools, docs, and the UI kit. Shared loading, error, and not-found files are outside the page scan.
@@ -306,7 +306,7 @@ The Figma plugins fetch the committed bundles from GitHub main. They render stat
 
 ### Capture runner changes on 20 November 2026
 
-The runner addresses the original route-context gaps by creating records the affected pages need (`setupScreens` in `scripts/capture/fixtures.mjs`: a booking awaiting payment, a paid booking with its payment, a completed unreviewed stay, a trip plan with items, a business and a customer support case with replies), passes the URL each page expects (`SCREEN_QUERY`), and removes the records afterwards. The two remaining redirects (`/saved`, `/business/team`) are aliases by design. The checked-in bundles still predate those changes. The strict audit reports 17 findings against the bundles and current indexes, including four indexed frames absent from the bundles.
+The runner addresses the original route-context gaps by creating records the affected pages need (`setupScreens` in `scripts/capture/fixtures.mjs`: a booking awaiting payment, a paid booking with its payment, a completed unreviewed stay, a trip plan with items, a business and a customer support case with replies), passes the URL each page expects (`SCREEN_QUERY`), and removes the records afterwards. The two remaining redirects (`/saved`, `/business/team`) are aliases by design. Commit `a950093` includes the regenerated bundles. The strict audit passes with zero findings across all 98 included route patterns. It checks route and bundle integrity. The scenario checklist in §8 tracks the remaining state and action coverage.
 
 ### Coverage required for a complete handoff
 
@@ -328,6 +328,8 @@ Expand first through account and invitation flows, each bookable listing type, s
 This is the inventory of cases to verify or add. A row can contain both an existing frame and additional capture requirements. Mark a case covered only after locating the frame or journey step and checking that it shows the stated outcome. Record the fixture, role, viewport, and frame ID alongside each verified case. The live file observations in §7 are a separate snapshot. New captures in a working tree become visible in Figma only after bundling, publishing, and importing them.
 
 ### Checks that apply across routes
+
+The screen runner records a **Top of page** and **Scrolled** viewport pair on baseline pages that have vertical document overflow. These frames use the same desktop viewport and record the actual scroll offset. The existing full-page frame remains available. Scroll within nested panes and horizontal tables needs a separate scenario. The business **Listings** table uses four temporary draft fixtures so accommodation, tour, restaurant, and transport are visible together.
 
 - **Lists and queues.** Capture the populated baseline, genuinely empty data, zero matches, reset to results, first and later pages, sort and column controls, and each row status that changes the available actions.
 - **Details and forms.** Capture a valid record or default form, edited values, required and invalid fields, submission in progress where visible, success, recoverable error, stale or missing record, and unauthorized access where implemented. Include nested dialogs, back and cancel paths, and confirm and dismiss outcomes.
@@ -367,7 +369,7 @@ This is the inventory of cases to verify or add. A row can contain both an exist
 | `/payments/success` | Booking or order context forwarding to the receipt, missing context forwarding to bookings. Record the redirect as a flow step. |
 | `/payments/receipt` | Booking and order receipts, amount and status details, links back, missing or inaccessible record. |
 | `/bookings` | Empty and populated history, pagination, different statuses, open details, eligible **Write a review**, already-reviewed booking. |
-| `/bookings/[id]` | Request, payment due or failed, confirmed, cancelled, completed and reviewed views, payment and refund history, cancel and pay actions, chat, review entry. |
+| `/bookings/[id]` | Request, payment due or failed, confirmed, cancelled, completed and reviewed views, payment and refund history, cancel and pay actions, chat, review entry. **Captured:** ten status states (awaiting confirmation, payment required, payment failed, confirmed and paid, refund requested, refunded, cancelled by the customer, declined by the business, completed, reviewed) as `--status-*` frames. Outcomes of cancel and pay are in the journeys below. |
 | `/reviews/new` | Eligible form for each bookable listing type, missing rating, short text, filled form, submission and published result, already reviewed, incomplete or inaccessible booking. |
 | `/profile` | Populated and sparse profile, edit and save, validation, change password and errors, sign-in method differences where visible. |
 | `/profile/preferences` | Default and configured preferences, notification toggles, save result and persistence. |
@@ -401,7 +403,7 @@ This is the inventory of cases to verify or add. A row can contain both an exist
 | `/business/guides` | Empty and populated guide list and add-guide entry. |
 | `/business/guides/new` | Blank and filled profile, validation, submit and return to populated list. |
 | `/business/bookings` | Empty and populated, dates and status filters with results or zero matches, different row menus, open details, guide states. |
-| `/business/bookings/[id]` | Awaiting response, accepted, declined, payment due, paid, cancelled, completed and reviewed where applicable. Capture accept, decline, complete, chat and refund actions and their outcomes. |
+| `/business/bookings/[id]` | Awaiting response, accepted, declined, payment due, paid, cancelled, completed and reviewed where applicable. Capture accept, decline, complete, chat and refund actions and their outcomes. **Captured:** ten status states (awaiting confirmation, payment required, payment failed, confirmed and paid, refund requested, refunded, cancelled by the customer, declined by the business, completed, reviewed) as `--status-*` frames. Accept, decline and cancel outcomes are in the journeys below; complete and chat remain. |
 | `/business/bookings/calendar` | Empty and populated time ranges, calendar navigation and upcoming-booking selection. |
 | `/business/customers` | Empty and populated, filters and columns, customer or message actions currently offered. |
 | `/business/messages` | Empty, unread and selected thread, new-message dialog, customer selection, write and send, resulting conversation. |
@@ -433,7 +435,7 @@ This is the inventory of cases to verify or add. A row can contain both an exist
 | `/admin/listings` | Empty and populated review queue, status filters and navigate to submission. |
 | `/admin/listings/[id]` | Existing and revised content, evidence and checklist, request changes, reject, approve and publish, confirm and cancel, final history. |
 | `/admin/bookings` | Empty and populated, filters by status and date, columns and pagination, different rows and detail navigation. |
-| `/admin/bookings/[id]` | Status variants, travellers, payment attempts, refund history and available operations, inaccessible or missing records. |
+| `/admin/bookings/[id]` | Status variants, travellers, payment attempts, refund history and available operations, inaccessible or missing records. **Captured:** ten status states (awaiting confirmation, payment required, payment failed, confirmed and paid, refund requested, refunded, cancelled by the customer, declined by the business, completed, reviewed) as `--status-*` frames. Missing and inaccessible records remain. |
 | `/admin/payments` | Payments, refunds and payouts. Retain empty, demo, simulated payout and live views. Add filtered states, refund approval and results, permission restrictions and failure cases. |
 | `/admin/users` | Users and invitations, pending and active states, filters, suspension and reactivation with feedback and permission boundaries. |
 | `/admin/users/new` | Choose permission level, invite with valid or invalid data, duplicate or pending invitation, success and return. |
@@ -465,7 +467,7 @@ This is the inventory of cases to verify or add. A row can contain both an exist
 |---|---|
 | Customer access | Registration and verification, reset, invitation handoffs, OAuth success and cancellation, return to a protected entry point. |
 | Discovery and booking | Each listing type from search to selection, availability and form validation, saved-item and inquiry paths, single item and populated multi-item cart. |
-| Booking and payment lifecycle | Request and response, decline and expiry, success, pending, failure, cancel and retry, receipt, refund and payout, with customer, business and admin views. |
+| Booking and payment lifecycle | Request and response, decline and expiry, success, pending, failure, cancel and retry, receipt, refund and payout, with customer, business and admin views. **Captured journeys:** `booking-loop` (request, accept, pay), `booking-declined`, `booking-cancelled-unpaid`, `payment-failed-retry`, `refund-business-cancel` (cancel, refund request, admin approval, refunded), `refund-customer-cancel`. Remaining: expiry of response and payment deadlines, pending provider confirmation, partial refunds, refund rejection, payouts, multi-item orders. |
 | Business and listing lifecycle | First-time and returning onboarding, switch workspace, upload and resubmit verification, reject and hold outcomes, draft, preview, revision, approval, withdrawal and rejection. |
 | Reviews | From My bookings, booking detail and eligible listing, validation and submit, business reply, flag or hide with cancel and confirm, republication and effect on listing feedback. |
 | Messaging and support | Customer inquiry, booking chat, business-initiated message, notifications, open case, reply, resolve and follow-up across the applicable surfaces. |

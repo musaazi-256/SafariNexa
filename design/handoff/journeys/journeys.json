@@ -46,7 +46,7 @@
    },
    {
     "lane": "business",
-    "label": "Business · Bookings: BK-E8A4833E is listed as Awaiting confirmation, payment Not started. Next: open it.",
+    "label": "Business · Bookings: BK-1F4D4CF0 is listed as Awaiting confirmation, payment Not started. Next: open it.",
     "screen": "j-booking-loop-07",
     "route": "/business/bookings"
    },
@@ -54,19 +54,19 @@
     "lane": "business",
     "label": "Business · Booking page: dates, room, traveller and customer details, the response deadline, Accept request — ask customer to pay, and Decline booking. Next: accept.",
     "screen": "j-booking-loop-08",
-    "route": "/business/bookings/cmwp04vwv002vf66njz5fk11r"
+    "route": "/business/bookings/cmwp27a97006rf66nhitxa9qw"
    },
    {
     "lane": "business",
     "label": "Business · Accepted: the booking now shows Payment required with a payment deadline; the customer is asked to pay.",
     "screen": "j-booking-loop-09",
-    "route": "/business/bookings/cmwp04vwv002vf66njz5fk11r"
+    "route": "/business/bookings/cmwp27a97006rf66nhitxa9qw"
    },
    {
     "lane": "customer",
     "label": "Customer · My booking: Payment required, the outstanding amount, Complete payment and Cancel booking. Next: Complete payment.",
     "screen": "j-booking-loop-10",
-    "route": "/bookings/cmwp04vwv002vf66njz5fk11r"
+    "route": "/bookings/cmwp27a97006rf66nhitxa9qw"
    },
    {
     "lane": "customer",
@@ -88,13 +88,13 @@
     "lane": "customer",
     "label": "Customer · My booking: confirmed and paid, with the payment in Payments & refunds.",
     "screen": "j-booking-loop-13",
-    "route": "/bookings/cmwp04vwv002vf66njz5fk11r"
+    "route": "/bookings/cmwp27a97006rf66nhitxa9qw"
    },
    {
     "lane": "business",
     "label": "Business · Booking page: confirmed and paid; refunds can be issued from Payments & refunds.",
     "screen": "j-booking-loop-14",
-    "route": "/business/bookings/cmwp04vwv002vf66njz5fk11r"
+    "route": "/business/bookings/cmwp27a97006rf66nhitxa9qw"
    },
    {
     "lane": "admin",
@@ -104,9 +104,9 @@
    },
    {
     "lane": "admin",
-    "label": "Admin · Booking page for BK-E8A4833E: customer, business, dates, traveller details, status, and the payment with its DEMO- reference.",
+    "label": "Admin · Booking page for BK-1F4D4CF0: customer, business, dates, traveller details, status, and the payment with its DEMO- reference.",
     "screen": "j-booking-loop-16",
-    "route": "/admin/bookings/cmwp04vwv002vf66njz5fk11r"
+    "route": "/admin/bookings/cmwp27a97006rf66nhitxa9qw"
    }
   ]
  },
@@ -274,19 +274,19 @@
     "lane": "admin",
     "label": "Admin · Verification review: the business information saved with the submission, each supporting document (View document), submission details and the decision form. Next: write notes and Request changes.",
     "screen": "j-business-verification-07",
-    "route": "/admin/verification/cmwp06ysu003df66nninu6w5m"
+    "route": "/admin/verification/cmwp29xh20079f66nqmutvlx9"
    },
    {
     "lane": "admin",
     "label": "Reviewer notes filled in. Notes are required for every decision and are shown to the business. Next: Request changes.",
     "screen": "j-business-verification-08",
-    "route": "/admin/verification/cmwp06ysu003df66nninu6w5m"
+    "route": "/admin/verification/cmwp29xh20079f66nqmutvlx9"
    },
    {
     "lane": "admin",
     "label": "Needs changes: the status badge updates and the notes stay on the record.",
     "screen": "j-business-verification-09",
-    "route": "/admin/verification/cmwp06ysu003df66nninu6w5m"
+    "route": "/admin/verification/cmwp29xh20079f66nqmutvlx9"
    },
    {
     "lane": "system",
@@ -314,25 +314,25 @@
     "lane": "admin",
     "label": "Admin · Verification review: both documents, the earlier notes replaced with new ones. Next: Start review.",
     "screen": "j-business-verification-13",
-    "route": "/admin/verification/cmwp06ysu003df66nninu6w5m"
+    "route": "/admin/verification/cmwp29xh20079f66nqmutvlx9"
    },
    {
     "lane": "admin",
     "label": "Under review: the business sees that someone is checking it. Next: approve.",
     "screen": "j-business-verification-14",
-    "route": "/admin/verification/cmwp06ysu003df66nninu6w5m"
+    "route": "/admin/verification/cmwp29xh20079f66nqmutvlx9"
    },
    {
     "lane": "admin",
     "label": "Approval notes written. Approving is refused if the business profile changed after it submitted. Next: Approve business.",
     "screen": "j-business-verification-15",
-    "route": "/admin/verification/cmwp06ysu003df66nninu6w5m"
+    "route": "/admin/verification/cmwp29xh20079f66nqmutvlx9"
    },
    {
     "lane": "admin",
     "label": "Approved: the business is verified.",
     "screen": "j-business-verification-16",
-    "route": "/admin/verification/cmwp06ysu003df66nninu6w5m"
+    "route": "/admin/verification/cmwp29xh20079f66nqmutvlx9"
    },
    {
     "lane": "system",
@@ -379,19 +379,19 @@
     "lane": "admin",
     "label": "Admin · Verification review with the reasons written. Next: Reject submission.",
     "screen": "j-business-verification-rejected-04",
-    "route": "/admin/verification/cmwp07wl80043f66ny09dyt07"
+    "route": "/admin/verification/cmwp2b3wt007zf66n79tw11cq"
    },
    {
     "lane": "admin",
     "label": "Reject this submission? Confirms the business name and shows the notes that will be sent. Next: Reject submission.",
     "screen": "j-business-verification-rejected-05",
-    "route": "/admin/verification/cmwp07wl80043f66ny09dyt07"
+    "route": "/admin/verification/cmwp2b3wt007zf66n79tw11cq"
    },
    {
     "lane": "admin",
     "label": "Rejected: the status badge shows Rejected.",
     "screen": "j-business-verification-rejected-06",
-    "route": "/admin/verification/cmwp07wl80043f66ny09dyt07"
+    "route": "/admin/verification/cmwp2b3wt007zf66n79tw11cq"
    },
    {
     "lane": "system",
@@ -432,7 +432,7 @@
     "lane": "business",
     "label": "Business · Submission & feedback: Submitted, waiting for review, with Withdraw to make changes.",
     "screen": "j-listing-verification-03",
-    "route": "/business/listings/journey-kidepo-lodge/review"
+    "route": "/business/listings/journey-kidepo-lodge/preview"
    },
    {
     "lane": "system",
@@ -448,49 +448,49 @@
     "lane": "admin",
     "label": "Admin · Review listing: every photo (cover, gallery, each room) and the business's documents, then all listing details. The decision panel's photo and evidence checks are locked: Open the remaining photos first. Next: open the cover photo.",
     "screen": "j-listing-verification-05",
-    "route": "/admin/listings/cmwp08hmj004ff66no6l59rg7"
+    "route": "/admin/listings/cmwp2btga008bf66n2jkmedf4"
    },
    {
     "lane": "admin",
     "label": "Photo viewer: the photo full size, with arrows through every photo of the listing. Opening a photo marks it Viewed. Next: close and open the rest.",
     "screen": "j-listing-verification-06",
-    "route": "/admin/listings/cmwp08hmj004ff66no6l59rg7"
+    "route": "/admin/listings/cmwp2btga008bf66n2jkmedf4"
    },
    {
     "lane": "admin",
     "label": "Every photo Viewed (progress full); the photo check is now unlocked. Next: open the documents.",
     "screen": "j-listing-verification-07",
-    "route": "/admin/listings/cmwp08hmj004ff66no6l59rg7"
+    "route": "/admin/listings/cmwp2btga008bf66n2jkmedf4"
    },
    {
     "lane": "admin",
     "label": "Document viewer: the business's certificate shown inside the page, with Open in new tab. Next: close and open the others.",
     "screen": "j-listing-verification-08",
-    "route": "/admin/listings/cmwp08hmj004ff66no6l59rg7"
+    "route": "/admin/listings/cmwp2btga008bf66n2jkmedf4"
    },
    {
     "lane": "admin",
     "label": "Every document Opened; all four approval checks are now available. Next: Mark as under review.",
     "screen": "j-listing-verification-09",
-    "route": "/admin/listings/cmwp08hmj004ff66no6l59rg7"
+    "route": "/admin/listings/cmwp2btga008bf66n2jkmedf4"
    },
    {
     "lane": "admin",
     "label": "Under review: the business sees someone is checking its listing. Next: ask for changes.",
     "screen": "j-listing-verification-10",
-    "route": "/admin/listings/cmwp08hmj004ff66no6l59rg7"
+    "route": "/admin/listings/cmwp2btga008bf66n2jkmedf4"
    },
    {
     "lane": "admin",
     "label": "Reasons written; they are sent to the business. Next: Request changes.",
     "screen": "j-listing-verification-11",
-    "route": "/admin/listings/cmwp08hmj004ff66no6l59rg7"
+    "route": "/admin/listings/cmwp2btga008bf66n2jkmedf4"
    },
    {
     "lane": "admin",
     "label": "Needs changes: the decision and reasons are recorded on the submission.",
     "screen": "j-listing-verification-12",
-    "route": "/admin/listings/cmwp08hmj004ff66no6l59rg7"
+    "route": "/admin/listings/cmwp2btga008bf66n2jkmedf4"
    },
    {
     "lane": "system",
@@ -524,19 +524,19 @@
     "lane": "admin",
     "label": "Admin · Review listing (new submission): every photo and document opened, all four checks ticked and approval notes written. Next: Approve and publish.",
     "screen": "j-listing-verification-17",
-    "route": "/admin/listings/cmwp0jlim004rf66nd0nhn1is"
+    "route": "/admin/listings/cmwp2n569008nf66noytyd4kl"
    },
    {
     "lane": "admin",
     "label": "Approve and publish? The listing goes live and can be booked straight away; the notes are shown. Next: Approve and publish.",
     "screen": "j-listing-verification-18",
-    "route": "/admin/listings/cmwp0jlim004rf66nd0nhn1is"
+    "route": "/admin/listings/cmwp2n569008nf66noytyd4kl"
    },
    {
     "lane": "admin",
     "label": "Approved: the listing is published.",
     "screen": "j-listing-verification-19",
-    "route": "/admin/listings/cmwp0jlim004rf66nd0nhn1is"
+    "route": "/admin/listings/cmwp2n569008nf66noytyd4kl"
    },
    {
     "lane": "system",
@@ -589,19 +589,19 @@
     "lane": "admin",
     "label": "Admin · Review listing: reasons written. Rejecting doesn't need the checks. Next: Reject.",
     "screen": "j-listing-withdraw-reject-05",
-    "route": "/admin/listings/cmwp0xih70054f66n335d7soa"
+    "route": "/admin/listings/cmwp31p4i0090f66nxzaza0id"
    },
    {
     "lane": "admin",
     "label": "Reject this listing? It will not be published and the business will see the reasons shown. Next: Reject listing.",
     "screen": "j-listing-withdraw-reject-06",
-    "route": "/admin/listings/cmwp0xih70054f66n335d7soa"
+    "route": "/admin/listings/cmwp31p4i0090f66nxzaza0id"
    },
    {
     "lane": "admin",
     "label": "Rejected: the decision and reasons are recorded.",
     "screen": "j-listing-withdraw-reject-07",
-    "route": "/admin/listings/cmwp0xih70054f66n335d7soa"
+    "route": "/admin/listings/cmwp31p4i0090f66nxzaza0id"
    },
    {
     "lane": "business",
@@ -717,7 +717,232 @@
     "lane": "admin",
     "label": "Admin · Review listing: the approved submission that published it, with the decision, notes and the checks recorded.",
     "screen": "j-admin-business-listings-05",
-    "route": "/admin/listings/cmwp0yyfr0019gh2roqrczruo"
+    "route": "/admin/listings/cmwp33or20019yyhawi5e3yyq"
+   }
+  ]
+ },
+ {
+  "id": "j-booking-declined",
+  "title": "The business declines a booking request",
+  "summary": "Grace asks to stay at Kidepo Ridge Lodge. The lodge can't host her and declines the request before the deadline. Nothing was charged; Grace sees the booking as declined, and so does operations.",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Awaiting confirmation, with the lodge's response deadline. She can still cancel. Next: the lodge responds.",
+    "screen": "j-booking-declined-01",
+    "route": "/bookings/jk-request"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Booking: the request with Accept request — ask customer to pay, and Decline booking. Next: Decline booking.",
+    "screen": "j-booking-declined-02",
+    "route": "/business/bookings/jk-request"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Booking: Cancelled by business. No actions remain.",
+    "screen": "j-booking-declined-03",
+    "route": "/business/bookings/jk-request"
+   },
+   {
+    "lane": "system",
+    "label": "The booking is cancelled by the business, its dates are released, and the customer is notified. Nothing was paid, so there is no refund."
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Cancelled by business, and it can no longer be cancelled here.",
+    "screen": "j-booking-declined-04",
+    "route": "/bookings/jk-request"
+   },
+   {
+    "lane": "admin",
+    "label": "Admin · Booking: Cancelled by business, with no payment.",
+    "screen": "j-booking-declined-05",
+    "route": "/admin/bookings/jk-request"
+   }
+  ]
+ },
+ {
+  "id": "j-booking-cancelled-unpaid",
+  "title": "A customer cancels a booking before paying",
+  "summary": "The lodge accepted Grace's request and is waiting for payment. She changes her plans and cancels; nothing was paid, so the booking is simply cancelled and the dates are freed.",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Payment required, with Complete payment and Cancel booking. Next: Cancel booking.",
+    "screen": "j-booking-cancelled-unpaid-01",
+    "route": "/bookings/jk-unpaid"
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Cancelled by you.",
+    "screen": "j-booking-cancelled-unpaid-02",
+    "route": "/bookings/jk-unpaid"
+   },
+   {
+    "lane": "system",
+    "label": "The dates are released and the lodge is notified. No payment was taken, so no refund is needed."
+   },
+   {
+    "lane": "business",
+    "label": "Business · Booking: Cancelled by customer.",
+    "screen": "j-booking-cancelled-unpaid-03",
+    "route": "/business/bookings/jk-unpaid"
+   }
+  ]
+ },
+ {
+  "id": "j-payment-failed-retry",
+  "title": "A payment is declined, then retried successfully",
+  "summary": "Grace's mobile money payment is declined (simulated). The booking shows Payment failed and keeps Complete payment, so she tries again and the booking is confirmed.",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Payment required. Next: Complete payment.",
+    "screen": "j-payment-failed-retry-01",
+    "route": "/bookings/jk-retry"
+   },
+   {
+    "lane": "customer",
+    "label": "Complete payment: MTN Mobile Money with the simulation set to Payment is declined. Next: Pay.",
+    "screen": "j-payment-failed-retry-02",
+    "route": "/payments"
+   },
+   {
+    "lane": "customer",
+    "label": "Payment not completed: the declined result and what to do next.",
+    "screen": "j-payment-failed-retry-03",
+    "route": "/payments/receipt"
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Payment failed, with Complete payment to try again. Next: Complete payment.",
+    "screen": "j-payment-failed-retry-04",
+    "route": "/bookings/jk-retry"
+   },
+   {
+    "lane": "customer",
+    "label": "Complete payment again, this time set to Payment succeeds. Next: Pay.",
+    "screen": "j-payment-failed-retry-05",
+    "route": "/payments"
+   },
+   {
+    "lane": "customer",
+    "label": "Payment successful: the receipt.",
+    "screen": "j-payment-failed-retry-06",
+    "route": "/payments/receipt"
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Confirmed and paid; both payment attempts are listed.",
+    "screen": "j-payment-failed-retry-07",
+    "route": "/bookings/jk-retry"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Booking: Confirmed, with the successful payment under Payments & refunds.",
+    "screen": "j-payment-failed-retry-08",
+    "route": "/business/bookings/jk-retry"
+   }
+  ]
+ },
+ {
+  "id": "j-refund-business-cancel",
+  "title": "The business cancels a paid booking and the customer is refunded",
+  "summary": "Kidepo Ridge Lodge has to cancel a paid booking. Cancelling creates a refund request; operations approves it in the admin portal and the booking ends as refunded.",
+  "steps": [
+   {
+    "lane": "business",
+    "label": "Business · Booking: Confirmed and paid, with Cancel booking. Next: Cancel booking.",
+    "screen": "j-refund-business-cancel-01",
+    "route": "/business/bookings/jk-paid-b"
+   },
+   {
+    "lane": "business",
+    "label": "Cancel this booking? The customer will be notified, and as it's paid a refund request is created. Next: Cancel booking.",
+    "screen": "j-refund-business-cancel-02",
+    "route": "/business/bookings/jk-paid-b"
+   },
+   {
+    "lane": "business",
+    "label": "Business · Booking: Refund requested, with the request under Payments & refunds.",
+    "screen": "j-refund-business-cancel-03",
+    "route": "/business/bookings/jk-paid-b"
+   },
+   {
+    "lane": "system",
+    "label": "The booking moves to Refund requested; a refund for the full amount waits for approval. Customer and lodge are notified."
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Refund requested; the refund isn't complete yet.",
+    "screen": "j-refund-business-cancel-04",
+    "route": "/bookings/jk-paid-b"
+   },
+   {
+    "lane": "admin",
+    "label": "Admin · Payments, refunds & payouts: the Kidepo refund request with Approve refund. Next: Approve refund.",
+    "screen": "j-refund-business-cancel-05",
+    "route": "/admin/payments"
+   },
+   {
+    "lane": "admin",
+    "label": "Approve this refund? The amount goes back to the traveller through the payment provider and can't be undone. Next: Approve refund.",
+    "screen": "j-refund-business-cancel-06",
+    "route": "/admin/payments"
+   },
+   {
+    "lane": "admin",
+    "label": "Admin · Payments: the refund is Completed.",
+    "screen": "j-refund-business-cancel-07",
+    "route": "/admin/payments"
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Refunded.",
+    "screen": "j-refund-business-cancel-08",
+    "route": "/bookings/jk-paid-b"
+   },
+   {
+    "lane": "admin",
+    "label": "Admin · Booking: Refunded, with the payment and the completed refund.",
+    "screen": "j-refund-business-cancel-09",
+    "route": "/admin/bookings/jk-paid-b"
+   }
+  ]
+ },
+ {
+  "id": "j-refund-customer-cancel",
+  "title": "A customer cancels a paid booking and asks for a refund",
+  "summary": "Grace cancels a confirmed, paid stay with free cancellation. The booking moves to Refund requested; the lodge sees the request and operations can approve it.",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Confirmed and paid, with Cancel booking. Next: Cancel booking.",
+    "screen": "j-refund-customer-cancel-01",
+    "route": "/bookings/jk-paid-c"
+   },
+   {
+    "lane": "customer",
+    "label": "Customer · My booking: Refund requested.",
+    "screen": "j-refund-customer-cancel-02",
+    "route": "/bookings/jk-paid-c"
+   },
+   {
+    "lane": "system",
+    "label": "A refund request for the full amount is created (the room is refundable); the lodge is notified."
+   },
+   {
+    "lane": "business",
+    "label": "Business · Booking: Refund requested, with the request under Payments & refunds.",
+    "screen": "j-refund-customer-cancel-03",
+    "route": "/business/bookings/jk-paid-c"
+   },
+   {
+    "lane": "admin",
+    "label": "Admin · Payments, refunds & payouts: the request waiting for approval, as in the previous journey.",
+    "screen": "j-refund-customer-cancel-04",
+    "route": "/admin/payments"
    }
   ]
  }

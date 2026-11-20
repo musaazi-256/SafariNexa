@@ -10,6 +10,32 @@
   "heading": "Murchison River Lodge"
  },
  {
+  "id": "customer-accommodation-id--viewport-top",
+  "section": "Accommodation",
+  "name": "Accommodation · details · Top of page",
+  "route": "/accommodation/demo-lodge",
+  "pattern": "/accommodation/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Top of page",
+  "parent": "customer-accommodation-id",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-accommodation-id--viewport-scrolled",
+  "section": "Accommodation",
+  "name": "Accommodation · details · Scrolled",
+  "route": "/accommodation/demo-lodge",
+  "pattern": "/accommodation/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Scrolled",
+  "parent": "customer-accommodation-id",
+  "scrollY": 675
+ },
+ {
   "id": "customer-accommodation-id--menu-account-menu",
   "section": "Accommodation",
   "name": "Account menu menu",
@@ -53,6 +79,32 @@
   "signedOut": false,
   "heading": "Find verified stays",
   "purpose": "Browse lodges, boutique hotels, and tented camps as a guest. Booking starts the protected authentication flow — search and comparison stay open."
+ },
+ {
+  "id": "customer-accommodation--viewport-top",
+  "section": "Accommodation",
+  "name": "Accommodation · Top of page",
+  "route": "/accommodation",
+  "pattern": "/accommodation",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Find verified stays",
+  "purpose": "Top of page",
+  "parent": "customer-accommodation",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-accommodation--viewport-scrolled",
+  "section": "Accommodation",
+  "name": "Accommodation · Scrolled",
+  "route": "/accommodation",
+  "pattern": "/accommodation",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Find verified stays",
+  "purpose": "Scrolled",
+  "parent": "customer-accommodation",
+  "scrollY": 675
  },
  {
   "id": "customer-auth-create-account",
@@ -124,12 +176,158 @@
   "id": "customer-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/bookings/capture-stay",
+  "route": "/bookings/capture-st-reviewed",
   "pattern": "/bookings/[id]",
   "kind": "page",
   "signedOut": false,
   "heading": "Murchison River Lodge",
   "purpose": "Booked with Nile & Crater Lodges"
+ },
+ {
+  "id": "customer-bookings-id--viewport-top",
+  "section": "Bookings",
+  "name": "Bookings · details · Top of page",
+  "route": "/bookings/capture-st-reviewed",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Top of page",
+  "parent": "customer-bookings-id",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-bookings-id--viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · details · Scrolled",
+  "route": "/bookings/capture-st-reviewed",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Scrolled",
+  "parent": "customer-bookings-id",
+  "scrollY": 675
+ },
+ {
+  "id": "customer-bookings-id--status-awaiting",
+  "section": "Bookings",
+  "name": "Bookings · details · Awaiting confirmation",
+  "route": "/bookings/capture-st-awaiting",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Awaiting confirmation",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-pending-payment",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment required",
+  "route": "/bookings/capture-pay",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment required",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-payment-failed",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment failed",
+  "route": "/bookings/capture-st-failed",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment failed",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-confirmed",
+  "section": "Bookings",
+  "name": "Bookings · details · Confirmed and paid",
+  "route": "/bookings/capture-paid",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Confirmed and paid",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-refund-requested",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled, refund requested",
+  "route": "/bookings/capture-st-refund",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled, refund requested",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-refunded",
+  "section": "Bookings",
+  "name": "Bookings · details · Refunded",
+  "route": "/bookings/capture-st-refunded",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Refunded",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-cancelled",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled by the customer",
+  "route": "/bookings/capture-st-cancelled",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled by the customer",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-declined",
+  "section": "Bookings",
+  "name": "Bookings · details · Declined by the business",
+  "route": "/bookings/capture-st-declined",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Declined by the business",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-completed",
+  "section": "Bookings",
+  "name": "Bookings · details · Completed, ready to review",
+  "route": "/bookings/capture-stay",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Completed, ready to review",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-reviewed",
+  "section": "Bookings",
+  "name": "Bookings · details · Reviewed",
+  "route": "/bookings/capture-st-reviewed",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Reviewed",
+  "parent": "customer-bookings-id"
  },
  {
   "id": "customer-bookings",
@@ -143,6 +341,32 @@
   "purpose": "Every booking you've started or confirmed, in one place."
  },
  {
+  "id": "customer-bookings--viewport-top",
+  "section": "Bookings",
+  "name": "Bookings · Top of page",
+  "route": "/bookings",
+  "pattern": "/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "My bookings",
+  "purpose": "Top of page",
+  "parent": "customer-bookings",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-bookings--viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · Scrolled",
+  "route": "/bookings",
+  "pattern": "/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "My bookings",
+  "purpose": "Scrolled",
+  "parent": "customer-bookings",
+  "scrollY": 675
+ },
+ {
   "id": "customer-cart",
   "section": "Cart",
   "name": "Cart",
@@ -151,6 +375,32 @@
   "kind": "page",
   "signedOut": false,
   "heading": "Cart"
+ },
+ {
+  "id": "customer-cart--viewport-top",
+  "section": "Cart",
+  "name": "Cart · Top of page",
+  "route": "/cart",
+  "pattern": "/cart",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Cart",
+  "purpose": "Top of page",
+  "parent": "customer-cart",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-cart--viewport-scrolled",
+  "section": "Cart",
+  "name": "Cart · Scrolled",
+  "route": "/cart",
+  "pattern": "/cart",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Cart",
+  "purpose": "Scrolled",
+  "parent": "customer-cart",
+  "scrollY": 178
  },
  {
   "id": "customer-checkout-multi",
@@ -163,6 +413,32 @@
   "heading": "Complete your booking"
  },
  {
+  "id": "customer-checkout-multi--viewport-top",
+  "section": "Checkout",
+  "name": "Checkout › Multi · Top of page",
+  "route": "/checkout/multi",
+  "pattern": "/checkout/multi",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete your booking",
+  "purpose": "Top of page",
+  "parent": "customer-checkout-multi",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-checkout-multi--viewport-scrolled",
+  "section": "Checkout",
+  "name": "Checkout › Multi · Scrolled",
+  "route": "/checkout/multi",
+  "pattern": "/checkout/multi",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete your booking",
+  "purpose": "Scrolled",
+  "parent": "customer-checkout-multi",
+  "scrollY": 400
+ },
+ {
   "id": "customer-checkout",
   "section": "Checkout",
   "name": "Checkout",
@@ -171,6 +447,32 @@
   "kind": "page",
   "signedOut": false,
   "heading": "Checkout"
+ },
+ {
+  "id": "customer-checkout--viewport-top",
+  "section": "Checkout",
+  "name": "Checkout · Top of page",
+  "route": "/checkout?listingId=demo-lodge&type=accommodation",
+  "pattern": "/checkout",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Checkout",
+  "purpose": "Top of page",
+  "parent": "customer-checkout",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-checkout--viewport-scrolled",
+  "section": "Checkout",
+  "name": "Checkout · Scrolled",
+  "route": "/checkout?listingId=demo-lodge&type=accommodation",
+  "pattern": "/checkout",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Checkout",
+  "purpose": "Scrolled",
+  "parent": "customer-checkout",
+  "scrollY": 675
  },
  {
   "id": "customer-checkout--dialog-more-details",
@@ -193,6 +495,32 @@
   "signedOut": false,
   "heading": "Kampala",
   "purpose": "Kampala is where most itineraries start and end: a hub for dining, culture, craft markets, and reliable airport/city transport connections."
+ },
+ {
+  "id": "customer-destinations-slug--viewport-top",
+  "section": "Destinations",
+  "name": "Destinations · details · Top of page",
+  "route": "/destinations/kampala",
+  "pattern": "/destinations/[slug]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala",
+  "purpose": "Top of page",
+  "parent": "customer-destinations-slug",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-destinations-slug--viewport-scrolled",
+  "section": "Destinations",
+  "name": "Destinations · details · Scrolled",
+  "route": "/destinations/kampala",
+  "pattern": "/destinations/[slug]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala",
+  "purpose": "Scrolled",
+  "parent": "customer-destinations-slug",
+  "scrollY": 675
  },
  {
   "id": "customer-destinations-slug--dialog-view-stay",
@@ -218,6 +546,32 @@
   "purpose": "Destination guides stay open to guests — see accommodation, tours, restaurants, and transport together before you sign up."
  },
  {
+  "id": "customer-destinations--viewport-top",
+  "section": "Destinations",
+  "name": "Destinations · Top of page",
+  "route": "/destinations",
+  "pattern": "/destinations",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Plan around Uganda highlights",
+  "purpose": "Top of page",
+  "parent": "customer-destinations",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-destinations--viewport-scrolled",
+  "section": "Destinations",
+  "name": "Destinations · Scrolled",
+  "route": "/destinations",
+  "pattern": "/destinations",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Plan around Uganda highlights",
+  "purpose": "Scrolled",
+  "parent": "customer-destinations",
+  "scrollY": 568
+ },
+ {
   "id": "customer-explore",
   "section": "Explore",
   "name": "Explore",
@@ -227,6 +581,32 @@
   "signedOut": false,
   "heading": "Explore SafariNexa",
   "purpose": "Guest browsing is open across every category. Booking, saving, paying, messaging, reviewing, and trip management require an account."
+ },
+ {
+  "id": "customer-explore--viewport-top",
+  "section": "Explore",
+  "name": "Explore · Top of page",
+  "route": "/explore",
+  "pattern": "/explore",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Explore SafariNexa",
+  "purpose": "Top of page",
+  "parent": "customer-explore",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-explore--viewport-scrolled",
+  "section": "Explore",
+  "name": "Explore · Scrolled",
+  "route": "/explore",
+  "pattern": "/explore",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Explore SafariNexa",
+  "purpose": "Scrolled",
+  "parent": "customer-explore",
+  "scrollY": 675
  },
  {
   "id": "customer-guides-id",
@@ -240,6 +620,32 @@
   "purpose": "Kampala-born city guide with a focus on craft markets, food culture, and Buganda kingdom history."
  },
  {
+  "id": "customer-guides-id--viewport-top",
+  "section": "Guides",
+  "name": "Guides · details · Top of page",
+  "route": "/guides/guide-daniel",
+  "pattern": "/guides/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Daniel Ssali",
+  "purpose": "Top of page",
+  "parent": "customer-guides-id",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-guides-id--viewport-scrolled",
+  "section": "Guides",
+  "name": "Guides · details · Scrolled",
+  "route": "/guides/guide-daniel",
+  "pattern": "/guides/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Daniel Ssali",
+  "purpose": "Scrolled",
+  "parent": "customer-guides-id",
+  "scrollY": 360
+ },
+ {
   "id": "customer-guides",
   "section": "Guides",
   "name": "Guides",
@@ -251,6 +657,32 @@
   "purpose": "Compare safari itineraries, chimp treks, and city tours — every listing includes a named, verified guide."
  },
  {
+  "id": "customer-guides--viewport-top",
+  "section": "Guides",
+  "name": "Guides · Top of page",
+  "route": "/guides",
+  "pattern": "/guides",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Book verified experiences",
+  "purpose": "Top of page",
+  "parent": "customer-guides",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-guides--viewport-scrolled",
+  "section": "Guides",
+  "name": "Guides · Scrolled",
+  "route": "/guides",
+  "pattern": "/guides",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Book verified experiences",
+  "purpose": "Scrolled",
+  "parent": "customer-guides",
+  "scrollY": 675
+ },
+ {
   "id": "customer-notifications",
   "section": "Notifications",
   "name": "Notifications",
@@ -260,6 +692,32 @@
   "signedOut": false,
   "heading": "Notifications",
   "purpose": "Booking, payment, message and support updates sent to your account."
+ },
+ {
+  "id": "customer-notifications--viewport-top",
+  "section": "Notifications",
+  "name": "Notifications · Top of page",
+  "route": "/notifications",
+  "pattern": "/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Top of page",
+  "parent": "customer-notifications",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-notifications--viewport-scrolled",
+  "section": "Notifications",
+  "name": "Notifications · Scrolled",
+  "route": "/notifications",
+  "pattern": "/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Scrolled",
+  "parent": "customer-notifications",
+  "scrollY": 675
  },
  {
   "id": "customer-notifications--menu-read-status-all-updates",
@@ -297,6 +755,32 @@
   "purpose": "Browse verified stays, restaurants, and rides across Uganda. Compare freely — you only need an account when you're ready to book."
  },
  {
+  "id": "customer-home--viewport-top",
+  "section": "Home",
+  "name": "Home · Top of page",
+  "route": "/",
+  "pattern": "/",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "See it all first. Book only when you're ready.",
+  "purpose": "Top of page",
+  "parent": "customer-home",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-home--viewport-scrolled",
+  "section": "Home",
+  "name": "Home · Scrolled",
+  "route": "/",
+  "pattern": "/",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "See it all first. Book only when you're ready.",
+  "purpose": "Scrolled",
+  "parent": "customer-home",
+  "scrollY": 675
+ },
+ {
   "id": "customer-payments-cancelled",
   "section": "Payments",
   "name": "Payments › Cancelled",
@@ -306,6 +790,32 @@
   "signedOut": false,
   "heading": "Payment cancelled",
   "purpose": "You cancelled the payment process. Your booking is still saved as pending. You can try paying again from your bookings page."
+ },
+ {
+  "id": "customer-payments-cancelled--viewport-top",
+  "section": "Payments",
+  "name": "Payments › Cancelled · Top of page",
+  "route": "/payments/cancelled",
+  "pattern": "/payments/cancelled",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment cancelled",
+  "purpose": "Top of page",
+  "parent": "customer-payments-cancelled",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-payments-cancelled--viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments › Cancelled · Scrolled",
+  "route": "/payments/cancelled",
+  "pattern": "/payments/cancelled",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment cancelled",
+  "purpose": "Scrolled",
+  "parent": "customer-payments-cancelled",
+  "scrollY": 205
  },
  {
   "id": "customer-payments",
@@ -318,6 +828,32 @@
   "heading": "Complete payment"
  },
  {
+  "id": "customer-payments--viewport-top",
+  "section": "Payments",
+  "name": "Payments · Top of page",
+  "route": "/payments?bookingId=capture-pay",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete payment",
+  "purpose": "Top of page",
+  "parent": "customer-payments",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-payments--viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments · Scrolled",
+  "route": "/payments?bookingId=capture-pay",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete payment",
+  "purpose": "Scrolled",
+  "parent": "customer-payments",
+  "scrollY": 574
+ },
+ {
   "id": "customer-payments-receipt",
   "section": "Payments",
   "name": "Payments › Receipt",
@@ -327,6 +863,32 @@
   "signedOut": false,
   "heading": "Payment received",
   "purpose": "Your payment status and booking details are shown below."
+ },
+ {
+  "id": "customer-payments-receipt--viewport-top",
+  "section": "Payments",
+  "name": "Payments › Receipt · Top of page",
+  "route": "/payments/receipt?bookingId=capture-paid",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Top of page",
+  "parent": "customer-payments-receipt",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-payments-receipt--viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments › Receipt · Scrolled",
+  "route": "/payments/receipt?bookingId=capture-paid",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Scrolled",
+  "parent": "customer-payments-receipt",
+  "scrollY": 205
  },
  {
   "id": "customer-payments-success",
@@ -352,6 +914,32 @@
   "purpose": "Communicate directly with businesses about your bookings and inquiries."
  },
  {
+  "id": "customer-profile-messages--viewport-top",
+  "section": "Profile",
+  "name": "Profile › Messages · Top of page",
+  "route": "/profile/messages",
+  "pattern": "/profile/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Top of page",
+  "parent": "customer-profile-messages",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-messages--viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Messages · Scrolled",
+  "route": "/profile/messages",
+  "pattern": "/profile/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Scrolled",
+  "parent": "customer-profile-messages",
+  "scrollY": 488
+ },
+ {
   "id": "customer-profile",
   "section": "Profile",
   "name": "Profile",
@@ -361,6 +949,32 @@
   "signedOut": false,
   "heading": "Profile",
   "purpose": "Your identity, contact details, and account security."
+ },
+ {
+  "id": "customer-profile--viewport-top",
+  "section": "Profile",
+  "name": "Profile · Top of page",
+  "route": "/profile",
+  "pattern": "/profile",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Profile",
+  "purpose": "Top of page",
+  "parent": "customer-profile",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile--viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile · Scrolled",
+  "route": "/profile",
+  "pattern": "/profile",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Profile",
+  "purpose": "Scrolled",
+  "parent": "customer-profile",
+  "scrollY": 675
  },
  {
   "id": "customer-profile-payment-settings",
@@ -374,6 +988,32 @@
   "purpose": "Review payments and receipts for your account."
  },
  {
+  "id": "customer-profile-payment-settings--viewport-top",
+  "section": "Profile",
+  "name": "Profile › Payment settings · Top of page",
+  "route": "/profile/payment-settings",
+  "pattern": "/profile/payment-settings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment Settings",
+  "purpose": "Top of page",
+  "parent": "customer-profile-payment-settings",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-payment-settings--viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Payment settings · Scrolled",
+  "route": "/profile/payment-settings",
+  "pattern": "/profile/payment-settings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment Settings",
+  "purpose": "Scrolled",
+  "parent": "customer-profile-payment-settings",
+  "scrollY": 475
+ },
+ {
   "id": "customer-profile-preferences",
   "section": "Profile",
   "name": "Profile › Preferences",
@@ -383,6 +1023,32 @@
   "signedOut": false,
   "heading": "Preferences",
   "purpose": "Control what SafariNexa notifies you about, and set your default traveller details."
+ },
+ {
+  "id": "customer-profile-preferences--viewport-top",
+  "section": "Profile",
+  "name": "Profile › Preferences · Top of page",
+  "route": "/profile/preferences",
+  "pattern": "/profile/preferences",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Preferences",
+  "purpose": "Top of page",
+  "parent": "customer-profile-preferences",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-preferences--viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Preferences · Scrolled",
+  "route": "/profile/preferences",
+  "pattern": "/profile/preferences",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Preferences",
+  "purpose": "Scrolled",
+  "parent": "customer-profile-preferences",
+  "scrollY": 479
  },
  {
   "id": "customer-profile-saved",
@@ -396,6 +1062,32 @@
   "purpose": "Stays, tours, restaurants, and transport options you've saved for later."
  },
  {
+  "id": "customer-profile-saved--viewport-top",
+  "section": "Profile",
+  "name": "Profile › Saved · Top of page",
+  "route": "/profile/saved",
+  "pattern": "/profile/saved",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Saved items",
+  "purpose": "Top of page",
+  "parent": "customer-profile-saved",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-saved--viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Saved · Scrolled",
+  "route": "/profile/saved",
+  "pattern": "/profile/saved",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Saved items",
+  "purpose": "Scrolled",
+  "parent": "customer-profile-saved",
+  "scrollY": 475
+ },
+ {
   "id": "customer-restaurants-id",
   "section": "Restaurants",
   "name": "Restaurants · details",
@@ -404,6 +1096,32 @@
   "kind": "page",
   "signedOut": false,
   "heading": "Kampala Garden Dining"
+ },
+ {
+  "id": "customer-restaurants-id--viewport-top",
+  "section": "Restaurants",
+  "name": "Restaurants · details · Top of page",
+  "route": "/restaurants/kampala-garden-dining",
+  "pattern": "/restaurants/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala Garden Dining",
+  "purpose": "Top of page",
+  "parent": "customer-restaurants-id",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-restaurants-id--viewport-scrolled",
+  "section": "Restaurants",
+  "name": "Restaurants · details · Scrolled",
+  "route": "/restaurants/kampala-garden-dining",
+  "pattern": "/restaurants/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala Garden Dining",
+  "purpose": "Scrolled",
+  "parent": "customer-restaurants-id",
+  "scrollY": 675
  },
  {
   "id": "customer-restaurants-id--dialog-inquire-contact-host",
@@ -428,6 +1146,32 @@
   "purpose": "Menus, hours, and restaurant profiles are open to guests. Reserving or requesting a table needs an account."
  },
  {
+  "id": "customer-restaurants--viewport-top",
+  "section": "Restaurants",
+  "name": "Restaurants · Top of page",
+  "route": "/restaurants",
+  "pattern": "/restaurants",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Browse places to eat",
+  "purpose": "Top of page",
+  "parent": "customer-restaurants",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-restaurants--viewport-scrolled",
+  "section": "Restaurants",
+  "name": "Restaurants · Scrolled",
+  "route": "/restaurants",
+  "pattern": "/restaurants",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Browse places to eat",
+  "purpose": "Scrolled",
+  "parent": "customer-restaurants",
+  "scrollY": 675
+ },
+ {
   "id": "customer-reviews-new",
   "section": "Reviews",
   "name": "Reviews › New",
@@ -436,6 +1180,32 @@
   "kind": "page",
   "signedOut": false,
   "heading": "Leave a verified review"
+ },
+ {
+  "id": "customer-reviews-new--viewport-top",
+  "section": "Reviews",
+  "name": "Reviews › New · Top of page",
+  "route": "/reviews/new?bookingId=capture-stay",
+  "pattern": "/reviews/new",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Leave a verified review",
+  "purpose": "Top of page",
+  "parent": "customer-reviews-new",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-reviews-new--viewport-scrolled",
+  "section": "Reviews",
+  "name": "Reviews › New · Scrolled",
+  "route": "/reviews/new?bookingId=capture-stay",
+  "pattern": "/reviews/new",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Leave a verified review",
+  "purpose": "Scrolled",
+  "parent": "customer-reviews-new",
+  "scrollY": 438
  },
  {
   "id": "customer-safety",
@@ -447,6 +1217,32 @@
   "signedOut": false,
   "heading": "Travel Safety & SOS",
   "purpose": "Emergency contacts, travel advisories, and immediate support."
+ },
+ {
+  "id": "customer-safety--viewport-top",
+  "section": "Safety",
+  "name": "Safety · Top of page",
+  "route": "/safety",
+  "pattern": "/safety",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Travel Safety & SOS",
+  "purpose": "Top of page",
+  "parent": "customer-safety",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-safety--viewport-scrolled",
+  "section": "Safety",
+  "name": "Safety · Scrolled",
+  "route": "/safety",
+  "pattern": "/safety",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Travel Safety & SOS",
+  "purpose": "Scrolled",
+  "parent": "customer-safety",
+  "scrollY": 23
  },
  {
   "id": "customer-safety--tab-travel-advisories",
@@ -496,6 +1292,32 @@
   "purpose": "Browse freely. Sign in when you're ready to book."
  },
  {
+  "id": "customer-search--viewport-top",
+  "section": "Search",
+  "name": "Search · Top of page",
+  "route": "/search",
+  "pattern": "/search",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "94 results found",
+  "purpose": "Top of page",
+  "parent": "customer-search",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-search--viewport-scrolled",
+  "section": "Search",
+  "name": "Search · Scrolled",
+  "route": "/search",
+  "pattern": "/search",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "94 results found",
+  "purpose": "Scrolled",
+  "parent": "customer-search",
+  "scrollY": 675
+ },
+ {
   "id": "customer-search--dialog-view-stay",
   "section": "Search",
   "name": "Search · View stay dialog",
@@ -519,6 +1341,32 @@
   "purpose": "You"
  },
  {
+  "id": "customer-support-id--viewport-top",
+  "section": "Support",
+  "name": "Support · details · Top of page",
+  "route": "/support/capture-help",
+  "pattern": "/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Can I add a third guest to my stay?",
+  "purpose": "Top of page",
+  "parent": "customer-support-id",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-support-id--viewport-scrolled",
+  "section": "Support",
+  "name": "Support · details · Scrolled",
+  "route": "/support/capture-help",
+  "pattern": "/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Can I add a third guest to my stay?",
+  "purpose": "Scrolled",
+  "parent": "customer-support-id",
+  "scrollY": 373
+ },
+ {
   "id": "customer-support",
   "section": "Support",
   "name": "Support",
@@ -528,6 +1376,32 @@
   "signedOut": false,
   "heading": "Support centre",
   "purpose": "Bookings, payments, refunds, business verification, safety, and account access."
+ },
+ {
+  "id": "customer-support--viewport-top",
+  "section": "Support",
+  "name": "Support · Top of page",
+  "route": "/support",
+  "pattern": "/support",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Support centre",
+  "purpose": "Top of page",
+  "parent": "customer-support",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-support--viewport-scrolled",
+  "section": "Support",
+  "name": "Support · Scrolled",
+  "route": "/support",
+  "pattern": "/support",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Support centre",
+  "purpose": "Scrolled",
+  "parent": "customer-support",
+  "scrollY": 675
  },
  {
   "id": "customer-support--dialog-open-a-new-case",
@@ -553,6 +1427,32 @@
   "purpose": "Queen Elizabeth National Park"
  },
  {
+  "id": "customer-tours-id--viewport-top",
+  "section": "Tours",
+  "name": "Tours · details · Top of page",
+  "route": "/tours/demo-safari",
+  "pattern": "/tours/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Top of page",
+  "parent": "customer-tours-id",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-tours-id--viewport-scrolled",
+  "section": "Tours",
+  "name": "Tours · details · Scrolled",
+  "route": "/tours/demo-safari",
+  "pattern": "/tours/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Scrolled",
+  "parent": "customer-tours-id",
+  "scrollY": 675
+ },
+ {
   "id": "customer-tours-id--dialog-inquire-contact-host",
   "section": "Tours",
   "name": "Tours · details · Inquire / Contact Host dialog",
@@ -576,6 +1476,32 @@
   "purpose": "Compare safari itineraries, chimp treks, and city tours by duration, difficulty, and destination. Every listing includes a named, verified guide — meet them on the Guides page."
  },
  {
+  "id": "customer-tours--viewport-top",
+  "section": "Tours",
+  "name": "Tours · Top of page",
+  "route": "/tours",
+  "pattern": "/tours",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Guided experiences across Uganda",
+  "purpose": "Top of page",
+  "parent": "customer-tours",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-tours--viewport-scrolled",
+  "section": "Tours",
+  "name": "Tours · Scrolled",
+  "route": "/tours",
+  "pattern": "/tours",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Guided experiences across Uganda",
+  "purpose": "Scrolled",
+  "parent": "customer-tours",
+  "scrollY": 675
+ },
+ {
   "id": "customer-transport-id",
   "section": "Transport",
   "name": "Transport · details",
@@ -584,6 +1510,32 @@
   "kind": "page",
   "signedOut": false,
   "heading": "Entebbe Airport Transfer"
+ },
+ {
+  "id": "customer-transport-id--viewport-top",
+  "section": "Transport",
+  "name": "Transport · details · Top of page",
+  "route": "/transport/entebbe-airport-transfer",
+  "pattern": "/transport/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Entebbe Airport Transfer",
+  "purpose": "Top of page",
+  "parent": "customer-transport-id",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-transport-id--viewport-scrolled",
+  "section": "Transport",
+  "name": "Transport · details · Scrolled",
+  "route": "/transport/entebbe-airport-transfer",
+  "pattern": "/transport/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Entebbe Airport Transfer",
+  "purpose": "Scrolled",
+  "parent": "customer-transport-id",
+  "scrollY": 675
  },
  {
   "id": "customer-transport-id--dialog-inquire-contact-host",
@@ -608,6 +1560,32 @@
   "purpose": "Phase 1 covers airport transfers and Kampala special hire — compare fixed fares before creating an account."
  },
  {
+  "id": "customer-transport--viewport-top",
+  "section": "Transport",
+  "name": "Transport · Top of page",
+  "route": "/transport",
+  "pattern": "/transport",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Airport transfers and special hire",
+  "purpose": "Top of page",
+  "parent": "customer-transport",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-transport--viewport-scrolled",
+  "section": "Transport",
+  "name": "Transport · Scrolled",
+  "route": "/transport",
+  "pattern": "/transport",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Airport transfers and special hire",
+  "purpose": "Scrolled",
+  "parent": "customer-transport",
+  "scrollY": 675
+ },
+ {
   "id": "customer-trip-planner-id",
   "section": "Trip planner",
   "name": "Trip planner · details",
@@ -619,6 +1597,32 @@
   "purpose": "Organize your itinerary, dates, and notes."
  },
  {
+  "id": "customer-trip-planner-id--viewport-top",
+  "section": "Trip planner",
+  "name": "Trip planner · details · Top of page",
+  "route": "/trip-planner/capture-trip",
+  "pattern": "/trip-planner/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Trip itinerary",
+  "purpose": "Top of page",
+  "parent": "customer-trip-planner-id",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-trip-planner-id--viewport-scrolled",
+  "section": "Trip planner",
+  "name": "Trip planner · details · Scrolled",
+  "route": "/trip-planner/capture-trip",
+  "pattern": "/trip-planner/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Trip itinerary",
+  "purpose": "Scrolled",
+  "parent": "customer-trip-planner-id",
+  "scrollY": 675
+ },
+ {
   "id": "customer-trip-planner",
   "section": "Trip planner",
   "name": "Trip planner",
@@ -628,5 +1632,31 @@
   "signedOut": false,
   "heading": "Your Saved Itineraries",
   "purpose": "Plan your East African adventure day by day."
+ },
+ {
+  "id": "customer-trip-planner--viewport-top",
+  "section": "Trip planner",
+  "name": "Trip planner · Top of page",
+  "route": "/trip-planner",
+  "pattern": "/trip-planner",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Your Saved Itineraries",
+  "purpose": "Top of page",
+  "parent": "customer-trip-planner",
+  "scrollY": 0
+ },
+ {
+  "id": "customer-trip-planner--viewport-scrolled",
+  "section": "Trip planner",
+  "name": "Trip planner · Scrolled",
+  "route": "/trip-planner",
+  "pattern": "/trip-planner",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Your Saved Itineraries",
+  "purpose": "Scrolled",
+  "parent": "customer-trip-planner",
+  "scrollY": 61
  }
 ]

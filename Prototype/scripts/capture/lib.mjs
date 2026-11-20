@@ -52,3 +52,26 @@ export async function snap(page, full = true) {
   return tree;
 }
 
+export async function scrollSnapshots(page) {
+  const position = await page.evaluate(() => {
+    const distance = document.scrollingElement.scrollHeight - window.innerHeight;
+    return Math.min(distance, Math.round(window.innerHeight * 0.75));
+  });
+  if (position <= 0) return [];
+
+  const scrollTo = (top) => page.evaluate((offset) => window.scrollTo({ top: offset, behavior: "instant" }), top);
+  await scrollTo(0);
+  const top = await snap(page, false);
+  try {
+    await scrollTo(position);
+    await page.waitForFunction(() => window.scrollY > 0);
+    const offset = await page.evaluate(() => window.scrollY);
+    return [
+      { suffix: "viewport-top", name: "Top of page", offset: 0, tree: top },
+      { suffix: "viewport-scrolled", name: "Scrolled", offset, tree: await snap(page, false) },
+    ];
+  } finally {
+    await scrollTo(0);
+  }
+}
+

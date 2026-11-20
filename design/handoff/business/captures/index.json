@@ -3,23 +3,49 @@
   "id": "business-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/business/bookings/capture-stay",
+  "route": "/business/bookings/capture-st-reviewed",
   "pattern": "/business/bookings/[id]",
   "kind": "page",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-CAPSTAY1"
+  "purpose": "Booking BK-CAPREVW1"
+ },
+ {
+  "id": "business-bookings-id--viewport-top",
+  "section": "Bookings",
+  "name": "Bookings · details · Top of page",
+  "route": "/business/bookings/capture-st-reviewed",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Top of page",
+  "parent": "business-bookings-id",
+  "scrollY": 0
+ },
+ {
+  "id": "business-bookings-id--viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · details · Scrolled",
+  "route": "/business/bookings/capture-st-reviewed",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Scrolled",
+  "parent": "business-bookings-id",
+  "scrollY": 675
  },
  {
   "id": "business-bookings-id--menu-nile-crater-lodges-4-businesses",
   "section": "Bookings",
   "name": "Nile & Crater Lodges 4 businesses menu",
-  "route": "/business/bookings/capture-stay",
+  "route": "/business/bookings/capture-st-reviewed",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-CAPSTAY1",
+  "purpose": "Booking BK-CAPREVW1",
   "parent": "business-bookings-id",
   "chrome": true
  },
@@ -27,12 +53,12 @@
   "id": "business-bookings-id--menu-help-for-this-page",
   "section": "Bookings",
   "name": "Help for this page menu",
-  "route": "/business/bookings/capture-stay",
+  "route": "/business/bookings/capture-st-reviewed",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-CAPSTAY1",
+  "purpose": "Booking BK-CAPREVW1",
   "parent": "business-bookings-id",
   "chrome": true
  },
@@ -40,14 +66,134 @@
   "id": "business-bookings-id--menu-account-menu",
   "section": "Bookings",
   "name": "Account menu menu",
-  "route": "/business/bookings/capture-stay",
+  "route": "/business/bookings/capture-st-reviewed",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-CAPSTAY1",
+  "purpose": "Booking BK-CAPREVW1",
   "parent": "business-bookings-id",
   "chrome": true
+ },
+ {
+  "id": "business-bookings-id--status-awaiting",
+  "section": "Bookings",
+  "name": "Bookings · details · Awaiting confirmation",
+  "route": "/business/bookings/capture-st-awaiting",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Awaiting confirmation",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-pending-payment",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment required",
+  "route": "/business/bookings/capture-pay",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment required",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-payment-failed",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment failed",
+  "route": "/business/bookings/capture-st-failed",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment failed",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-confirmed",
+  "section": "Bookings",
+  "name": "Bookings · details · Confirmed and paid",
+  "route": "/business/bookings/capture-paid",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Confirmed and paid",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-refund-requested",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled, refund requested",
+  "route": "/business/bookings/capture-st-refund",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled, refund requested",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-refunded",
+  "section": "Bookings",
+  "name": "Bookings · details · Refunded",
+  "route": "/business/bookings/capture-st-refunded",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Refunded",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-cancelled",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled by the customer",
+  "route": "/business/bookings/capture-st-cancelled",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled by the customer",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-declined",
+  "section": "Bookings",
+  "name": "Bookings · details · Declined by the business",
+  "route": "/business/bookings/capture-st-declined",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Declined by the business",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-completed",
+  "section": "Bookings",
+  "name": "Bookings · details · Completed, ready to review",
+  "route": "/business/bookings/capture-stay",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Completed, ready to review",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-reviewed",
+  "section": "Bookings",
+  "name": "Bookings · details · Reviewed",
+  "route": "/business/bookings/capture-st-reviewed",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Reviewed",
+  "parent": "business-bookings-id"
  },
  {
   "id": "business-bookings-calendar",
@@ -59,6 +205,32 @@
   "signedOut": false,
   "heading": "Upcoming booking calendar",
   "purpose": "Next 100 scheduled bookings, ordered by service date."
+ },
+ {
+  "id": "business-bookings-calendar--viewport-top",
+  "section": "Bookings",
+  "name": "Bookings › Calendar · Top of page",
+  "route": "/business/bookings/calendar",
+  "pattern": "/business/bookings/calendar",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Upcoming booking calendar",
+  "purpose": "Top of page",
+  "parent": "business-bookings-calendar",
+  "scrollY": 0
+ },
+ {
+  "id": "business-bookings-calendar--viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings › Calendar · Scrolled",
+  "route": "/business/bookings/calendar",
+  "pattern": "/business/bookings/calendar",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Upcoming booking calendar",
+  "purpose": "Scrolled",
+  "parent": "business-bookings-calendar",
+  "scrollY": 675
  },
  {
   "id": "business-bookings-calendar--menu-columns-for-upcoming-bookings",
@@ -82,6 +254,32 @@
   "signedOut": false,
   "heading": "Bookings",
   "purpose": "Handle booking requests and confirmations."
+ },
+ {
+  "id": "business-bookings--viewport-top",
+  "section": "Bookings",
+  "name": "Bookings · Top of page",
+  "route": "/business/bookings",
+  "pattern": "/business/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Bookings",
+  "purpose": "Top of page",
+  "parent": "business-bookings",
+  "scrollY": 0
+ },
+ {
+  "id": "business-bookings--viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · Scrolled",
+  "route": "/business/bookings",
+  "pattern": "/business/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Bookings",
+  "purpose": "Scrolled",
+  "parent": "business-bookings",
+  "scrollY": 274
  },
  {
   "id": "business-bookings--menu-booking-status-all-bookings",
@@ -120,9 +318,9 @@
   "parent": "business-bookings"
  },
  {
-  "id": "business-bookings--menu-actions-for-booking-bk-capstay1",
+  "id": "business-bookings--menu-actions-for-booking-bk-caprevw1",
   "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-CAPSTAY1 menu",
+  "name": "Bookings · Actions for booking BK-CAPREVW1 menu",
   "route": "/business/bookings",
   "pattern": "/business/bookings",
   "kind": "menu",
@@ -200,6 +398,32 @@
   "signedOut": false,
   "heading": "Nile & Crater Lodges",
   "purpose": "Here's what's happening with your business today."
+ },
+ {
+  "id": "business-dashboard--viewport-top",
+  "section": "Dashboard",
+  "name": "Dashboard · Top of page",
+  "route": "/business/dashboard",
+  "pattern": "/business/dashboard",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Nile & Crater Lodges",
+  "purpose": "Top of page",
+  "parent": "business-dashboard",
+  "scrollY": 0
+ },
+ {
+  "id": "business-dashboard--viewport-scrolled",
+  "section": "Dashboard",
+  "name": "Dashboard · Scrolled",
+  "route": "/business/dashboard",
+  "pattern": "/business/dashboard",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Nile & Crater Lodges",
+  "purpose": "Scrolled",
+  "parent": "business-dashboard",
+  "scrollY": 675
  },
  {
   "id": "business-dashboard--guide-1",
@@ -296,6 +520,32 @@
   "heading": "Add a new guide"
  },
  {
+  "id": "business-guides-new--viewport-top",
+  "section": "Guides",
+  "name": "Guides › New · Top of page",
+  "route": "/business/guides/new",
+  "pattern": "/business/guides/new",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Add a new guide",
+  "purpose": "Top of page",
+  "parent": "business-guides-new",
+  "scrollY": 0
+ },
+ {
+  "id": "business-guides-new--viewport-scrolled",
+  "section": "Guides",
+  "name": "Guides › New · Scrolled",
+  "route": "/business/guides/new",
+  "pattern": "/business/guides/new",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Add a new guide",
+  "purpose": "Scrolled",
+  "parent": "business-guides-new",
+  "scrollY": 156
+ },
+ {
   "id": "business-guides",
   "section": "Guides",
   "name": "Guides",
@@ -353,6 +603,32 @@
   "purpose": "Update your listing details to keep your information accurate and up to date."
  },
  {
+  "id": "business-listings-id-edit--viewport-top",
+  "section": "Listings",
+  "name": "Listings › Edit · Top of page",
+  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/edit",
+  "pattern": "/business/listings/[id]/edit",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Edit Accommodation listing",
+  "purpose": "Top of page",
+  "parent": "business-listings-id-edit",
+  "scrollY": 0
+ },
+ {
+  "id": "business-listings-id-edit--viewport-scrolled",
+  "section": "Listings",
+  "name": "Listings › Edit · Scrolled",
+  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/edit",
+  "pattern": "/business/listings/[id]/edit",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Edit Accommodation listing",
+  "purpose": "Scrolled",
+  "parent": "business-listings-id-edit",
+  "scrollY": 675
+ },
+ {
   "id": "business-listings-id-edit--guide-1",
   "section": "Listings",
   "name": "Listings › Edit · Listing form guide · Step 1 of 3",
@@ -400,6 +676,32 @@
   "purpose": "Location not added"
  },
  {
+  "id": "business-listings-id-preview--viewport-top",
+  "section": "Listings",
+  "name": "Listings › Preview · Top of page",
+  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/preview",
+  "pattern": "/business/listings/[id]/preview",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "[TEST] Payment workflow fixture",
+  "purpose": "Top of page",
+  "parent": "business-listings-id-preview",
+  "scrollY": 0
+ },
+ {
+  "id": "business-listings-id-preview--viewport-scrolled",
+  "section": "Listings",
+  "name": "Listings › Preview · Scrolled",
+  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/preview",
+  "pattern": "/business/listings/[id]/preview",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "[TEST] Payment workflow fixture",
+  "purpose": "Scrolled",
+  "parent": "business-listings-id-preview",
+  "scrollY": 675
+ },
+ {
   "id": "business-listings-id-review",
   "section": "Listings",
   "name": "Listings › Review",
@@ -409,6 +711,32 @@
   "signedOut": false,
   "heading": "[TEST] Payment workflow fixture",
   "purpose": "Review your saved listing, photos and submission feedback."
+ },
+ {
+  "id": "business-listings-id-review--viewport-top",
+  "section": "Listings",
+  "name": "Listings › Review · Top of page",
+  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/review",
+  "pattern": "/business/listings/[id]/review",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "[TEST] Payment workflow fixture",
+  "purpose": "Top of page",
+  "parent": "business-listings-id-review",
+  "scrollY": 0
+ },
+ {
+  "id": "business-listings-id-review--viewport-scrolled",
+  "section": "Listings",
+  "name": "Listings › Review · Scrolled",
+  "route": "/business/listings/cmw1uftbm000211mqog8q81cj/review",
+  "pattern": "/business/listings/[id]/review",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "[TEST] Payment workflow fixture",
+  "purpose": "Scrolled",
+  "parent": "business-listings-id-review",
+  "scrollY": 157
  },
  {
   "id": "business-listings-new",
@@ -478,6 +806,32 @@
   "signedOut": false,
   "heading": "Listings",
   "purpose": "Create and manage your service offerings."
+ },
+ {
+  "id": "business-listings--viewport-top",
+  "section": "Listings",
+  "name": "Listings · Top of page",
+  "route": "/business/listings",
+  "pattern": "/business/listings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Listings",
+  "purpose": "Top of page",
+  "parent": "business-listings",
+  "scrollY": 0
+ },
+ {
+  "id": "business-listings--viewport-scrolled",
+  "section": "Listings",
+  "name": "Listings · Scrolled",
+  "route": "/business/listings",
+  "pattern": "/business/listings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Listings",
+  "purpose": "Scrolled",
+  "parent": "business-listings",
+  "scrollY": 640
  },
  {
   "id": "business-listings--menu-listing-type-all-listings",
@@ -599,6 +953,32 @@
   "purpose": "Communicate directly with your customers regarding their bookings and inquiries."
  },
  {
+  "id": "business-messages--viewport-top",
+  "section": "Messages",
+  "name": "Messages · Top of page",
+  "route": "/business/messages",
+  "pattern": "/business/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Top of page",
+  "parent": "business-messages",
+  "scrollY": 0
+ },
+ {
+  "id": "business-messages--viewport-scrolled",
+  "section": "Messages",
+  "name": "Messages · Scrolled",
+  "route": "/business/messages",
+  "pattern": "/business/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Scrolled",
+  "parent": "business-messages",
+  "scrollY": 98
+ },
+ {
   "id": "business-messages--dialog-new-message",
   "section": "Messages",
   "name": "Messages · New message dialog",
@@ -634,6 +1014,32 @@
   "purpose": "Updates sent to your account across the businesses you belong to. Opening a business booking selects its business."
  },
  {
+  "id": "business-notifications--viewport-top",
+  "section": "Notifications",
+  "name": "Notifications · Top of page",
+  "route": "/business/notifications",
+  "pattern": "/business/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Top of page",
+  "parent": "business-notifications",
+  "scrollY": 0
+ },
+ {
+  "id": "business-notifications--viewport-scrolled",
+  "section": "Notifications",
+  "name": "Notifications · Scrolled",
+  "route": "/business/notifications",
+  "pattern": "/business/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Scrolled",
+  "parent": "business-notifications",
+  "scrollY": 675
+ },
+ {
   "id": "business-notifications--menu-read-status-all-updates",
   "section": "Notifications",
   "name": "Notifications · Read status: All updates menu",
@@ -667,6 +1073,32 @@
   "signedOut": false,
   "heading": "Payments & refunds",
   "purpose": "Review who has paid, follow up on unpaid bookings, and manage refunds."
+ },
+ {
+  "id": "business-payments--viewport-top",
+  "section": "Payments",
+  "name": "Payments · Top of page",
+  "route": "/business/payments",
+  "pattern": "/business/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payments & refunds",
+  "purpose": "Top of page",
+  "parent": "business-payments",
+  "scrollY": 0
+ },
+ {
+  "id": "business-payments--viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments · Scrolled",
+  "route": "/business/payments",
+  "pattern": "/business/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payments & refunds",
+  "purpose": "Scrolled",
+  "parent": "business-payments",
+  "scrollY": 64
  },
  {
   "id": "business-payments--menu-payment-status-all-bookings",
@@ -727,6 +1159,32 @@
   "purpose": "Track paid bookings, commission, and net payout."
  },
  {
+  "id": "business-revenue--viewport-top",
+  "section": "Revenue",
+  "name": "Revenue · Top of page",
+  "route": "/business/revenue",
+  "pattern": "/business/revenue",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Revenue & payouts",
+  "purpose": "Top of page",
+  "parent": "business-revenue",
+  "scrollY": 0
+ },
+ {
+  "id": "business-revenue--viewport-scrolled",
+  "section": "Revenue",
+  "name": "Revenue · Scrolled",
+  "route": "/business/revenue",
+  "pattern": "/business/revenue",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Revenue & payouts",
+  "purpose": "Scrolled",
+  "parent": "business-revenue",
+  "scrollY": 659
+ },
+ {
   "id": "business-revenue--menu-payment-outcome-all-transactions",
   "section": "Revenue",
   "name": "Revenue · Payment outcome: All transactions menu",
@@ -760,6 +1218,32 @@
   "signedOut": false,
   "heading": "Reviews",
   "purpose": "View verified customer reviews and reply where allowed."
+ },
+ {
+  "id": "business-reviews--viewport-top",
+  "section": "Reviews",
+  "name": "Reviews · Top of page",
+  "route": "/business/reviews",
+  "pattern": "/business/reviews",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Reviews",
+  "purpose": "Top of page",
+  "parent": "business-reviews",
+  "scrollY": 0
+ },
+ {
+  "id": "business-reviews--viewport-scrolled",
+  "section": "Reviews",
+  "name": "Reviews · Scrolled",
+  "route": "/business/reviews",
+  "pattern": "/business/reviews",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Reviews",
+  "purpose": "Scrolled",
+  "parent": "business-reviews",
+  "scrollY": 675
  },
  {
   "id": "business-reviews--menu-review-status-all-reviews",
@@ -809,6 +1293,32 @@
   "purpose": "Manage your business profile, verification documents, staff access, and preferences."
  },
  {
+  "id": "business-settings--viewport-top",
+  "section": "Settings",
+  "name": "Settings · Top of page",
+  "route": "/business/settings",
+  "pattern": "/business/settings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "Top of page",
+  "parent": "business-settings",
+  "scrollY": 0
+ },
+ {
+  "id": "business-settings--viewport-scrolled",
+  "section": "Settings",
+  "name": "Settings · Scrolled",
+  "route": "/business/settings",
+  "pattern": "/business/settings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "Scrolled",
+  "parent": "business-settings",
+  "scrollY": 215
+ },
+ {
   "id": "business-settings-verification",
   "section": "Settings",
   "name": "Settings › Verification",
@@ -818,6 +1328,32 @@
   "signedOut": false,
   "heading": "Settings",
   "purpose": "Manage your business profile, verification documents, staff access, and preferences."
+ },
+ {
+  "id": "business-settings-verification--viewport-top",
+  "section": "Settings",
+  "name": "Settings › Verification · Top of page",
+  "route": "/business/settings/verification",
+  "pattern": "/business/settings/verification",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "Top of page",
+  "parent": "business-settings-verification",
+  "scrollY": 0
+ },
+ {
+  "id": "business-settings-verification--viewport-scrolled",
+  "section": "Settings",
+  "name": "Settings › Verification · Scrolled",
+  "route": "/business/settings/verification",
+  "pattern": "/business/settings/verification",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Settings",
+  "purpose": "Scrolled",
+  "parent": "business-settings-verification",
+  "scrollY": 675
  },
  {
   "id": "business-settings-verification--menu-document-type-incorporation",
@@ -927,6 +1463,32 @@
   "purpose": "Your conversation with the SafariNexa support team."
  },
  {
+  "id": "business-support-id--viewport-top",
+  "section": "Support",
+  "name": "Support · details · Top of page",
+  "route": "/business/support/capture-support",
+  "pattern": "/business/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payout for October hasn't arrived",
+  "purpose": "Top of page",
+  "parent": "business-support-id",
+  "scrollY": 0
+ },
+ {
+  "id": "business-support-id--viewport-scrolled",
+  "section": "Support",
+  "name": "Support · details · Scrolled",
+  "route": "/business/support/capture-support",
+  "pattern": "/business/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payout for October hasn't arrived",
+  "purpose": "Scrolled",
+  "parent": "business-support-id",
+  "scrollY": 118
+ },
+ {
   "id": "business-support",
   "section": "Support",
   "name": "Support",
@@ -971,6 +1533,32 @@
   "signedOut": false,
   "heading": "Verification outcomes",
   "purpose": "See the review decisions for your business and each of your listings, with the reviewer's notes."
+ },
+ {
+  "id": "business-verification--viewport-top",
+  "section": "Verification",
+  "name": "Verification · Top of page",
+  "route": "/business/verification",
+  "pattern": "/business/verification",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Verification outcomes",
+  "purpose": "Top of page",
+  "parent": "business-verification",
+  "scrollY": 0
+ },
+ {
+  "id": "business-verification--viewport-scrolled",
+  "section": "Verification",
+  "name": "Verification · Scrolled",
+  "route": "/business/verification",
+  "pattern": "/business/verification",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Verification outcomes",
+  "purpose": "Scrolled",
+  "parent": "business-verification",
+  "scrollY": 675
  },
  {
   "id": "business-verification--guide-1",
@@ -1075,6 +1663,32 @@
   "signedOut": false,
   "heading": "Join the SafariNexa Partner Programme today",
   "purpose": "Start earning revenue by promoting your travel offerings—register today to reach thousands of global travelers."
+ },
+ {
+  "id": "business-onboarding-setup--viewport-top",
+  "section": "Onboarding",
+  "name": "Onboarding › Setup · Top of page",
+  "route": "/business/onboarding/setup",
+  "pattern": "/business/onboarding/setup",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Join the SafariNexa Partner Programme today",
+  "purpose": "Top of page",
+  "parent": "business-onboarding-setup",
+  "scrollY": 0
+ },
+ {
+  "id": "business-onboarding-setup--viewport-scrolled",
+  "section": "Onboarding",
+  "name": "Onboarding › Setup · Scrolled",
+  "route": "/business/onboarding/setup",
+  "pattern": "/business/onboarding/setup",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Join the SafariNexa Partner Programme today",
+  "purpose": "Scrolled",
+  "parent": "business-onboarding-setup",
+  "scrollY": 64
  },
  {
   "id": "business-home",
