@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { BookingStatusBadge } from "@/components/ui/status-badge";
+import { CancellationNote } from "@/components/cancellation-note";
 import { formatUGX, formatBookingDate } from "@/lib/booking";
 import { requireBusinessSession } from "@/lib/business";
 import { db } from "@/lib/db";
@@ -20,7 +21,7 @@ import { Prisma } from "@prisma/client";
 import { toBookingStatus } from "@/lib/status";
 import { BookingChat } from "@/components/booking-chat";
 
-export default async function BusinessBookingDetailPage({ params }: { params: { id: string } }) {
+export default async function BusinessBookingDetailPage({ params, searchParams }: { params: { id: string }; searchParams?: { error?: string } }) {
   const { business, businessId, session: businessSession } = await requireBusinessSession();
   if (!business || !businessId) redirect("/business/auth/sign-in");
 
@@ -64,6 +65,8 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
   const manager = await db.businessUser.findFirst({where:{businessId,userId:businessSession.user.id,role:{in:["OWNER","MANAGER"]}}});
   const canManage = !!manager;
   const canRespond = canManage && booking.status === "AWAITING_BUSINESS_CONFIRMATION";
+  // A request past its response deadline can't be accepted (the expiry job cancels it); it can still be declined.
+  const requestExpired = booking.status === "AWAITING_BUSINESS_CONFIRMATION" && !!booking.responseDueAt && booking.responseDueAt <= new Date();
 
   async function respond(formData: FormData) {
     "use server";
@@ -78,7 +81,8 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
     if (!["AWAITING_BUSINESS_CONFIRMATION", "CONFIRMED", "PENDING_PAYMENT", "PAYMENT_FAILED"].includes(target.status)) return;
 
     if (!["confirm", "decline", "complete"].includes(decision)) throw new Error("Invalid decision.");
-    await db.$transaction(async tx => {
+    let problem: string | undefined;
+    try { await db.$transaction(async tx => {
       const member = await tx.businessUser.findFirst({ where: { businessId: target.businessId, userId: activeSession.user.id, role: { in: ["OWNER", "MANAGER"] } } });
       if (!member) throw new Error("Only owners and managers can manage bookings.");
       await tx.auditLog.create({data:{actorUserId:activeSession.user.id,surface:"BUSINESS",action:"business_booking_response",outcome:"SUCCESS",metadata:{bookingId:target.id,decision}}});
@@ -94,9 +98,12 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
       if (!updated.count) return;
       await syncOrderStatus(tx, target.orderId);
       await tx.notification.create({ data: { userId: target.customerId, type: decision === "complete" ? "REVIEW_PROMPT" : "BOOKING_UPDATE", title: decision === "complete" ? "How was your experience?" : "Booking confirmed", body: `Booking ${target.bookingRef} has been ${decision === "complete" ? "completed. You can now leave a review" : "confirmed by the business"}.`, relatedBookingId: target.id } });
-    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }); } catch (error) {
+      // Show the reason on the booking (e.g. the request expired while the page was open) instead of an error page.
+      problem = error instanceof Error ? error.message : "The booking could not be updated. Refresh and try again.";
+    }
 
-    redirect(`/business/bookings/${target.id}`);
+    redirect(`/business/bookings/${target.id}${problem ? `?error=${encodeURIComponent(problem.slice(0, 200))}` : ""}`);
   }
 
   return (
@@ -110,6 +117,7 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
             <div>
               <BookingStatusBadge status={toBookingStatus(booking.status)} perspective="staff" />
+              <CancellationNote booking={booking} />
               <PageHeader title={<>{booking.listing.title}</>} description={<>Booking {booking.bookingRef}</>} />
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -200,15 +208,17 @@ export default async function BusinessBookingDetailPage({ params }: { params: { 
                 <Separator />
                 {canManage && ["PENDING_PAYMENT","PAYMENT_FAILED"].includes(booking.status) && <form action={respond}><input type="hidden" name="bookingId" value={booking.id}/><input type="hidden" name="decision" value="decline"/><Button type="submit" variant="outline" className="w-full">Cancel unpaid booking</Button></form>}
                 {canManage && booking.status === "CONFIRMED" && <form action={respond}><input type="hidden" name="bookingId" value={booking.id}/><ConfirmSubmit name="decision" value="decline" title="Cancel this booking?" description="The customer will be notified. If paid, a refund request will be created for you to review." confirmLabel="Cancel booking" trigger={<Button variant="destructive" className="w-full">Cancel booking</Button>}/></form>}
+                {searchParams?.error && <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">{searchParams.error}</p>}
+                {canRespond && requestExpired && <p className="rounded-lg border bg-secondary/40 p-3 text-sm text-muted-foreground">The response deadline passed on {booking.responseDueAt!.toLocaleString("en-GB", { timeZone: "Africa/Kampala", dateStyle: "medium", timeStyle: "short" })} EAT, so this request can no longer be accepted. It will be cancelled automatically; decline it to release the dates now.</p>}
                 {canRespond ? (
                   <>
-                    <form action={respond}>
+                    {!requestExpired && <form action={respond}>
                       <input type="hidden" name="bookingId" value={booking.id} />
                       <input type="hidden" name="decision" value="confirm" />
                       <Button type="submit" size="lg" className="w-full">
                         {booking.bookingMode === "REQUEST" ? "Accept request — ask customer to pay" : "Confirm booking"}
                       </Button>
-                    </form>
+                    </form>}
                     <form action={respond}>
                       <input type="hidden" name="bookingId" value={booking.id} />
                       <input type="hidden" name="decision" value="decline" />

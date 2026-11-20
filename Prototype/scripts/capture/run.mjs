@@ -4,7 +4,7 @@
 import { chromium } from "playwright";
 import { mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { BASE, HANDOFF, PORTALS, VIEW, NOT_IDS } from "./config.mjs";
-import { signIn, settle, snap, scrollSnapshots } from "./lib.mjs";
+import { signIn, settle, snap, scrollSnapshots, innerScrollSnapshots } from "./lib.mjs";
 import { routes } from "./routes.mjs";
 import { GROUPS } from "./groups.mjs";
 import { SCREEN_QUERY, SCREEN_VARIANTS, cleanupListingTable, cleanupScreens, disconnect, setupListingTable, setupScreens } from "./fixtures.mjs";
@@ -246,7 +246,7 @@ for (const r of routes().filter((r) => r.portal === portal)) {
     );
     save(base, await snap(page));
     if (landed === path) {
-      for (const { suffix, name, offset, tree } of await scrollSnapshots(page)) {
+      for (const { suffix, name, offset, tree } of [...(await scrollSnapshots(page)), ...(await innerScrollSnapshots(page))]) {
         save({ ...base, id: base.id + "--" + suffix, parent: base.id, kind: "state", name: base.name + " · " + name, purpose: name, scrollY: offset }, tree);
       }
     }

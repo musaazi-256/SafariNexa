@@ -126,7 +126,7 @@ Entry: `/business` → `requireBusinessSession()`. A business owner first has a 
 
 ### 3.4 Bookings management
 **Status: Working.**
-- `/business/bookings` (list with status tabs), `/business/bookings/[id]` (detail — confirm/decline, room/add-on detail, booking chat). Declining a booking now correctly restores room availability (fixed 9 Sept).
+- `/business/bookings` (list with status tabs), `/business/bookings/[id]` (detail — confirm/decline, room/add-on detail, booking chat). Declining a booking now correctly restores room availability (fixed 9 Sept). **As of 20 Nov 2026**: a request past its response deadline no longer offers Accept (it explains the request will expire; Decline still works), a failed response shows its reason on the booking instead of the error page, and cancelled bookings show the cancellation reason on all three booking pages. Payments & refunds keeps the result of a failed check, a reminder or an escalation on screen. Before, the page refreshed and wiped the message.
 
 ### 3.5 Guides
 **Status: Working.**

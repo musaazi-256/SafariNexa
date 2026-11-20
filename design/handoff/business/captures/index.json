@@ -3,18 +3,18 @@
   "id": "business-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/business/bookings/capture-st-reviewed",
+  "route": "/business/bookings/capture-order-wait-a",
   "pattern": "/business/bookings/[id]",
   "kind": "page",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-CAPREVW1"
+  "purpose": "Booking BK-CAPORD2A"
  },
  {
   "id": "business-bookings-id--viewport-top",
   "section": "Bookings",
   "name": "Bookings · details · Top of page",
-  "route": "/business/bookings/capture-st-reviewed",
+  "route": "/business/bookings/capture-order-wait-a",
   "pattern": "/business/bookings/[id]",
   "kind": "state",
   "signedOut": false,
@@ -27,7 +27,7 @@
   "id": "business-bookings-id--viewport-scrolled",
   "section": "Bookings",
   "name": "Bookings · details · Scrolled",
-  "route": "/business/bookings/capture-st-reviewed",
+  "route": "/business/bookings/capture-order-wait-a",
   "pattern": "/business/bookings/[id]",
   "kind": "state",
   "signedOut": false,
@@ -40,12 +40,12 @@
   "id": "business-bookings-id--menu-nile-crater-lodges-4-businesses",
   "section": "Bookings",
   "name": "Nile & Crater Lodges 4 businesses menu",
-  "route": "/business/bookings/capture-st-reviewed",
+  "route": "/business/bookings/capture-order-wait-a",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-CAPREVW1",
+  "purpose": "Booking BK-CAPORD2A",
   "parent": "business-bookings-id",
   "chrome": true
  },
@@ -53,12 +53,12 @@
   "id": "business-bookings-id--menu-help-for-this-page",
   "section": "Bookings",
   "name": "Help for this page menu",
-  "route": "/business/bookings/capture-st-reviewed",
+  "route": "/business/bookings/capture-order-wait-a",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-CAPREVW1",
+  "purpose": "Booking BK-CAPORD2A",
   "parent": "business-bookings-id",
   "chrome": true
  },
@@ -66,14 +66,38 @@
   "id": "business-bookings-id--menu-account-menu",
   "section": "Bookings",
   "name": "Account menu menu",
-  "route": "/business/bookings/capture-st-reviewed",
+  "route": "/business/bookings/capture-order-wait-a",
   "pattern": "/business/bookings/[id]",
   "kind": "menu",
   "signedOut": false,
   "heading": "Murchison River Lodge",
-  "purpose": "Booking BK-CAPREVW1",
+  "purpose": "Booking BK-CAPORD2A",
   "parent": "business-bookings-id",
   "chrome": true
+ },
+ {
+  "id": "business-bookings-id--tip-1",
+  "section": "Bookings",
+  "name": "Bookings · details · Tip 1 of 2: Accept to get paid",
+  "route": "/business/bookings/capture-order-wait-a",
+  "pattern": "/business/bookings/[id]",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Accepting asks the traveller to pay. Respond before the deadline shown on this booking.",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--tip-2",
+  "section": "Bookings",
+  "name": "Bookings · details · Tip 2 of 2: Can't host them?",
+  "route": "/business/bookings/capture-order-wait-a",
+  "pattern": "/business/bookings/[id]",
+  "kind": "dialog",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Decline the booking so the traveller can book elsewhere.",
+  "parent": "business-bookings-id"
  },
  {
   "id": "business-bookings-id--status-awaiting",
@@ -196,6 +220,102 @@
   "parent": "business-bookings-id"
  },
  {
+  "id": "business-bookings-id--status-processing",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment waiting for the provider",
+  "route": "/business/bookings/capture-st-processing",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment waiting for the provider",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-payment-overdue",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment window passed, not yet expired",
+  "route": "/business/bookings/capture-st-overdue",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment window passed, not yet expired",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-payment-expired",
+  "section": "Bookings",
+  "name": "Bookings · details · Expired: payment window passed",
+  "route": "/business/bookings/capture-st-expired",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Expired: payment window passed",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-request-overdue",
+  "section": "Bookings",
+  "name": "Bookings · details · Response deadline passed, not yet expired",
+  "route": "/business/bookings/capture-st-reqlate",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Response deadline passed, not yet expired",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-request-expired",
+  "section": "Bookings",
+  "name": "Bookings · details · Expired: no response from the business",
+  "route": "/business/bookings/capture-st-reqexp",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Expired: no response from the business",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-partially-refunded",
+  "section": "Bookings",
+  "name": "Bookings · details · Confirmed, partially refunded",
+  "route": "/business/bookings/capture-st-partial",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Confirmed, partially refunded",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-refund-declined",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled, refund declined",
+  "route": "/business/bookings/capture-st-refdecl",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled, refund declined",
+  "parent": "business-bookings-id"
+ },
+ {
+  "id": "business-bookings-id--status-order",
+  "section": "Bookings",
+  "name": "Bookings · details · Part of a combined order",
+  "route": "/business/bookings/capture-st-order-a",
+  "pattern": "/business/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Part of a combined order",
+  "parent": "business-bookings-id"
+ },
+ {
   "id": "business-bookings-calendar",
   "section": "Bookings",
   "name": "Bookings › Calendar",
@@ -282,6 +402,19 @@
   "scrollY": 274
  },
  {
+  "id": "business-bookings--table-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · Wide content scrolled sideways",
+  "route": "/business/bookings",
+  "pattern": "/business/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Bookings",
+  "purpose": "Wide content scrolled sideways",
+  "parent": "business-bookings",
+  "scrollY": 228
+ },
+ {
   "id": "business-bookings--menu-booking-status-all-bookings",
   "section": "Bookings",
   "name": "Bookings · Booking status: All bookings menu",
@@ -318,9 +451,9 @@
   "parent": "business-bookings"
  },
  {
-  "id": "business-bookings--menu-actions-for-booking-bk-caprevw1",
+  "id": "business-bookings--menu-actions-for-booking-bk-capord2a",
   "section": "Bookings",
-  "name": "Bookings · Actions for booking BK-CAPREVW1 menu",
+  "name": "Bookings · Actions for booking BK-CAPORD2A menu",
   "route": "/business/bookings",
   "pattern": "/business/bookings",
   "kind": "menu",
@@ -375,6 +508,19 @@
   "signedOut": false,
   "heading": "Customers",
   "purpose": "Review your customers’ bookings, payment balances, and conversations."
+ },
+ {
+  "id": "business-customers--table-scrolled",
+  "section": "Customers",
+  "name": "Customers · Wide content scrolled sideways",
+  "route": "/business/customers",
+  "pattern": "/business/customers",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Customers",
+  "purpose": "Wide content scrolled sideways",
+  "parent": "business-customers",
+  "scrollY": 0
  },
  {
   "id": "business-customers--menu-columns-for-customers",
@@ -979,6 +1125,19 @@
   "scrollY": 98
  },
  {
+  "id": "business-messages--pane-scrolled",
+  "section": "Messages",
+  "name": "Messages · Panel scrolled",
+  "route": "/business/messages",
+  "pattern": "/business/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Panel scrolled",
+  "parent": "business-messages",
+  "scrollY": 98
+ },
+ {
   "id": "business-messages--dialog-new-message",
   "section": "Messages",
   "name": "Messages · New message dialog",
@@ -1101,6 +1260,19 @@
   "scrollY": 64
  },
  {
+  "id": "business-payments--table-scrolled",
+  "section": "Payments",
+  "name": "Payments · Wide content scrolled sideways",
+  "route": "/business/payments",
+  "pattern": "/business/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payments & refunds",
+  "purpose": "Wide content scrolled sideways",
+  "parent": "business-payments",
+  "scrollY": 64
+ },
+ {
   "id": "business-payments--menu-payment-status-all-bookings",
   "section": "Payments",
   "name": "Payments · Payment status: All bookings menu",
@@ -1183,6 +1355,19 @@
   "purpose": "Scrolled",
   "parent": "business-revenue",
   "scrollY": 659
+ },
+ {
+  "id": "business-revenue--table-scrolled",
+  "section": "Revenue",
+  "name": "Revenue · Wide content scrolled sideways",
+  "route": "/business/revenue",
+  "pattern": "/business/revenue",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Revenue & payouts",
+  "purpose": "Wide content scrolled sideways",
+  "parent": "business-revenue",
+  "scrollY": 645
  },
  {
   "id": "business-revenue--menu-payment-outcome-all-transactions",

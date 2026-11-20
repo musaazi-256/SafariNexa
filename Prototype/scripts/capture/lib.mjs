@@ -75,3 +75,52 @@ export async function scrollSnapshots(page) {
   }
 }
 
+
+/** Content that scrolls inside the page rather than with it: the first wide table (or
+ * other box) that scrolls sideways, scrolled to its far end, and the first panel that
+ * scrolls on its own (a message thread, a list), scrolled down. Each is captured with the
+ * box brought into view, then put back. Sidebars and menus are left out. */
+export async function innerScrollSnapshots(page) {
+  const found = await page.evaluate(() => {
+    const scrolls = (el, axis) => {
+      const cs = getComputedStyle(el);
+      const style = axis === "x" ? cs.overflowX : cs.overflowY;
+      if (style !== "auto" && style !== "scroll") return false;
+      const r = el.getBoundingClientRect();
+      if (r.width < 200 || r.height < 120) return false;
+      return axis === "x" ? el.scrollWidth > el.clientWidth + 24 : el.scrollHeight > el.clientHeight + 24;
+    };
+    const boxes = [...document.querySelectorAll("main *")].filter((el) => !el.closest("[data-sidebar],nav,[role=menu],[role=dialog]"));
+    const pick = (axis) => {
+      const el = boxes.find((e) => scrolls(e, axis));
+      if (!el) return null;
+      el.setAttribute("data-capture-scroll", axis);
+      return axis;
+    };
+    return [pick("x"), pick("y")].filter(Boolean);
+  });
+  const out = [];
+  for (const axis of found) {
+    const sel = `[data-capture-scroll='${axis}']`;
+    try {
+      await page.evaluate(([sel, axis]) => {
+        const el = document.querySelector(sel);
+        el.scrollIntoView({ block: "center", behavior: "instant" });
+        if (axis === "x") el.scrollLeft = el.scrollWidth;
+        else el.scrollTop = Math.min(el.scrollHeight - el.clientHeight, Math.round(el.clientHeight * 0.75));
+      }, [sel, axis]);
+      await page.waitForTimeout(300);
+      const offset = await page.evaluate(() => window.scrollY);
+      out.push(axis === "x"
+        ? { suffix: "table-scrolled", name: "Wide content scrolled sideways", offset, tree: await snap(page, false) }
+        : { suffix: "pane-scrolled", name: "Panel scrolled", offset, tree: await snap(page, false) });
+    } finally {
+      await page.evaluate((sel) => {
+        const el = document.querySelector(sel);
+        if (el) { el.scrollLeft = 0; el.scrollTop = 0; el.removeAttribute("data-capture-scroll"); }
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }, sel);
+    }
+  }
+  return out;
+}

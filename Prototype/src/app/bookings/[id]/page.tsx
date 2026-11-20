@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { Separator } from "@/components/ui/separator";
 import { BookingStatusBadge } from "@/components/ui/status-badge";
+import { CancellationNote } from "@/components/cancellation-note";
 import { BookingChat } from "@/components/booking-chat";
 
 
@@ -87,6 +88,7 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
           <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
             <div>
               <BookingStatusBadge status={toBookingStatus(booking.status)} />
+              <CancellationNote booking={booking} />
               <PageHeader title={<>{booking.listing.title}</>} description={<>Booked with {booking.business.name}</>} />
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">

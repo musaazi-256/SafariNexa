@@ -7,7 +7,7 @@ import { chromium } from "playwright";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { BASE, HANDOFF, VIEW } from "./config.mjs";
 import { signIn, settle, snap } from "./lib.mjs";
-import { KIDEPO, OUTCOME, cleanup, disconnect, kidepoCookie, pdf, setup } from "./fixtures.mjs";
+import { KIDEPO, OUTCOME, cleanup, disconnect, expireBooking, kidepoCookie, pdf, setup } from "./fixtures.mjs";
 
 const out = HANDOFF + "journeys/captures/";
 mkdirSync(out, { recursive: true });
@@ -117,6 +117,24 @@ const pay = async (p) => {
   await p.waitForTimeout(3000);
   await top(p);
 };
+// Open a <details> section (e.g. "Create a full or partial refund") by its summary.
+const expand = (text) => async (p) => {
+  await p.locator("main summary", { hasText: text }).first().click();
+  await p.waitForTimeout(400);
+};
+const fill = (selector, value) => async (p) => p.locator(selector).first().fill(String(value));
+// Payments & refunds forms: submit, then wait until the card shows `until` (text or regex).
+const paymentResult = (until) => async (p) => {
+  await p.locator("#payments").getByText(until).first().waitFor({ timeout: 120000 });
+  await p.waitForTimeout(800);
+  await p.locator("#payments").scrollIntoViewIfNeeded();
+};
+const operate = (name, until) => async (p) => {
+  await p.waitForLoadState("networkidle", { timeout: 60000 }).catch(() => undefined);
+  await p.waitForTimeout(1500);
+  await p.locator("#payments").getByRole("button", { name, exact: true }).first().click();
+  await paymentResult(until)(p);
+};
 // The refund row for a Kidepo booking on the admin Payments page.
 const refundRow = (p, reason) => p.locator("tr").filter({ hasText: "Kidepo Ridge Lodge" }).filter({ hasText: reason }).first();
 
@@ -192,6 +210,94 @@ const OUTCOME_JOURNEYS = [
       { lane: "system", label: "A refund request for the full amount is created (the room is refundable); the lodge is notified." },
       { lane: "business", act: go(biz(OUTCOME.paidCustomer)), label: "Business · Booking: Refund requested, with the request under Payments & refunds." },
       { lane: "admin", act: seq(go("/admin/payments"), async (p) => refundRow(p, "Customer cancellation").scrollIntoViewIfNeeded()), label: "Admin · Payments, refunds & payouts: the request waiting for approval, as in the previous journey." },
+    ],
+  },
+  {
+    id: "booking-deadline-expired",
+    fixture: "bookingOutcomes",
+    title: "Deadlines pass: an unanswered request and an unpaid booking expire",
+    summary: "Kidepo Ridge Lodge didn't answer one request in time, and Grace didn't pay for another booking before its payment window closed. The lodge can no longer accept the late request, and the payment page says the window has passed. The scheduled expiry job then cancels both, releases the dates and tells Grace she can book again.",
+    steps: [
+      { lane: "business", act: go(biz(OUTCOME.lateRequest)), label: "Business · Booking: still Awaiting confirmation, but the response deadline has passed. Accept is gone; a notice says the request will be cancelled automatically, and Decline booking releases the dates now." },
+      { lane: "customer", act: go("/payments?bookingId=" + OUTCOME.latePayment), label: "Customer · Payment: the payment window for this booking has passed, so it can't be paid." },
+      { lane: "system", run: async () => { await expireBooking(OUTCOME.lateRequest); await expireBooking(OUTCOME.latePayment); }, label: "The scheduled expiry job (POST /api/jobs/expire-bookings) cancels bookings past their response or payment deadline that have no payment in progress, releases their dates and notifies the customer. Local captures apply the job's change directly." },
+      { lane: "customer", act: go(cust(OUTCOME.latePayment)), label: "Customer · My booking: Cancelled by admin (the system), with the reason Payment window expired and the date. Nothing was charged." },
+      { lane: "business", act: go(biz(OUTCOME.lateRequest)), label: "Business · Booking: cancelled, with the reason Business response deadline expired. No actions remain." },
+      { lane: "admin", act: go(adm(OUTCOME.latePayment)), label: "Admin · Booking: cancelled, reason Payment window expired, with no payment." },
+    ],
+  },
+  {
+    id: "payment-pending-provider",
+    fixture: "bookingOutcomes",
+    title: "A payment waits for the provider: check it, then ask support",
+    summary: "Grace started a mobile money payment, but the provider hasn't confirmed it. The lodge checks the payment with the provider (demo payments can't be checked, so the portal says so) and escalates it to support, which opens a payment case for operations.",
+    steps: [
+      { lane: "customer", act: go(cust(OUTCOME.pending)), label: "Customer · My booking: the payment is being processed; she doesn't need to pay again." },
+      { lane: "business", act: seq(go(biz(OUTCOME.pending)), async (p) => p.locator("#payments").scrollIntoViewIfNeeded()), label: "Business · Booking, Payments & refunds: the attempt Pending provider confirmation, with Check payment with provider. Next: Check payment with provider." },
+      { lane: "business", act: operate("Check payment with provider", "Provider verification is unavailable"), label: "Business · The check result: this provider can't be verified from the portal, so the payment is unchanged; escalate it to support. Next: Escalate a payment issue to support." },
+      { lane: "business", act: seq(expand("Escalate a payment issue to support"), fill("#payments details textarea[name=reason]", "MTN shows the customer was charged, but the payment is still pending here.")), label: "Escalate a payment issue: what needs help, filled in. Next: Send to support." },
+      { lane: "business", act: operate("Send to support", /Support case .* opened/), label: "Business · Support case PAY-BK-KIDPEND1 opened; admins with payment permissions are notified." },
+      { lane: "admin", act: seq(go("/admin/support"), open("/admin/support/", "BK-KIDPEND1")), label: "Admin · Support case: Payment help for BK-KIDPEND1, with the lodge's message, ready for a reply." },
+    ],
+  },
+  {
+    id: "refund-partial",
+    fixture: "bookingOutcomes",
+    title: "The business refunds part of a paid booking",
+    summary: "One of the two nights Grace paid for couldn't be provided. The lodge creates a refund for one night from the booking, approves it, and the booking stays confirmed with the payment marked partially refunded.",
+    steps: [
+      { lane: "business", act: seq(go(biz(OUTCOME.partial)), async (p) => p.locator("#payments").scrollIntoViewIfNeeded()), label: "Business · Booking, Payments & refunds: paid in full, with Create a full or partial refund. Next: open it." },
+      { lane: "business", act: seq(expand("Create a full or partial refund"), fill("#payments input[name=amount]", 380000), fill("#payments details textarea[name=reason]", "One night refunded: the Ridge Cottage was unavailable on the first night.")), label: "Create a refund: the amount (pre-filled with everything refundable) changed to one night, UGX 380,000, and a reason. Next: Create refund request." },
+      { lane: "business", act: operate("Create refund request", "Approve refund"), label: "Business · The refund request is listed as Requested, with Approve refund and Decline request. Next: Approve refund." },
+      { lane: "business", act: async (p) => p.locator("#payments").getByRole("button", { name: "Approve refund" }).first().click(), label: "Send this refund? UGX 380,000 goes back through the original payment provider. Next: Approve refund." },
+      { lane: "business", act: async (p) => { await dialog(p).getByRole("button", { name: "Approve refund", exact: true }).click(); await paymentResult("Partially refunded")(p); }, label: "Business · Refund Completed: the payment is Partially refunded, Refunded UGX 380,000, and the other UGX 380,000 can still be refunded." },
+      { lane: "customer", act: go(cust(OUTCOME.partial)), label: "Customer · My booking: still confirmed; the payment shows the partial refund." },
+      { lane: "admin", act: go(adm(OUTCOME.partial)), label: "Admin · Booking: confirmed, payment Partially refunded, with the completed refund." },
+    ],
+  },
+  {
+    id: "refund-declined",
+    fixture: "bookingOutcomes",
+    title: "A refund request is declined",
+    summary: "Grace cancels a paid stay and a refund request is created. Operations declines it with a reason from the admin booking page; Grace is notified, and the booking ends as cancelled with the refund declined.",
+    steps: [
+      { lane: "customer", act: go(cust(OUTCOME.declineRefund)), label: "Customer · My booking: Confirmed and paid, with Cancel booking. Next: Cancel booking." },
+      { lane: "customer", act: press("Cancel booking"), label: "Customer · My booking: Refund requested." },
+      { lane: "admin", act: seq(go(adm(OUTCOME.declineRefund)), async (p) => p.locator("#payments").scrollIntoViewIfNeeded()), label: "Admin · Booking, Payments & refunds: the request with Approve refund and Decline request. Next: Decline request." },
+      { lane: "admin", act: seq(expand("Decline request"), fill("#payments details textarea[name=reason]", "The stay was cancelled after the free-cancellation window, so this booking isn't refundable.")), label: "Decline the request: the reason the customer will see, filled in. Next: Decline and notify customer." },
+      { lane: "admin", act: operate("Decline and notify customer", "Rejected"), label: "Admin · Refund Rejected; the booking is Cancelled by customer and nothing is refunded." },
+      { lane: "system", label: "Grace gets a notification: Refund declined, with the reason." },
+      { lane: "customer", act: go(cust(OUTCOME.declineRefund)), label: "Customer · My booking: Cancelled by you; the payment stays Successful and the refund request shows Rejected." },
+      { lane: "business", act: go(biz(OUTCOME.declineRefund)), label: "Business · Booking: cancelled by the customer, with the declined refund under Payments & refunds." },
+    ],
+  },
+  {
+    id: "combined-order",
+    fixture: "bookingOutcomes",
+    title: "A combined order: two businesses, one payment",
+    summary: "Grace's cart had a Kidepo Ridge Lodge stay and a Uganda Trails safari. Uganda Trails has accepted; the order can't be paid until the lodge accepts too. Once it does, Grace pays for both at once and each business sees its booking as confirmed, with its share of the combined payment.",
+    steps: [
+      { lane: "customer", act: go("/payments?orderId=" + OUTCOME.order), label: "Customer · Payment: waiting for a business. One booking still needs to be accepted before the order can be paid." },
+      { lane: "business", act: go(biz(OUTCOME.orderStay)), label: "Business · Booking: the Kidepo request, part of a combined order. Next: Accept request." },
+      { lane: "business", act: press("Accept request — ask customer to pay"), label: "Business · Booking: Payment required. The customer can now pay the whole order." },
+      { lane: "customer", act: seq(go("/payments?orderId=" + OUTCOME.order), choosePayment("success")), label: "Customer · Complete payment: both bookings and one total, with MTN Mobile Money and Payment succeeds selected. Next: Pay." },
+      { lane: "customer", act: pay, label: "Payment successful: one receipt for the combined order." },
+      { lane: "customer", act: go(cust(OUTCOME.orderStay)), label: "Customer · My booking: the Kidepo stay is confirmed and paid." },
+      { lane: "business", act: seq(go(biz(OUTCOME.orderStay)), async (p) => p.locator("#payments").scrollIntoViewIfNeeded()), label: "Business · Booking: confirmed. Payments & refunds shows this booking's share of the combined payment." },
+      { lane: "admin", act: go(adm(OUTCOME.orderTour)), label: "Admin · Booking: the Uganda Trails safari from the same order, also confirmed." },
+    ],
+  },
+  {
+    id: "payout-settlement",
+    fixture: "payout",
+    title: "Operations settles payouts, and the business sees them in Earnings",
+    summary: "Kidepo Ridge Lodge has a paid, completed stay that hasn't been paid out. In the admin portal, operations settles eligible payments to verified businesses (simulated in demo mode). The lodge gets a Payout completed notification and sees the payout in Earnings.",
+    steps: [
+      { lane: "business", act: go("/business/revenue"), label: "Business · Revenue & payouts: earnings from the paid stay, not yet paid out." },
+      { lane: "admin", act: go("/admin/payments"), label: "Admin · Payments, refunds & payouts: Settle payouts, with the total of eligible payments. Payments with pending refunds stay on hold. Next: Settle payouts." },
+      { lane: "admin", act: async (p) => { await p.getByRole("button", { name: /^Settle payouts/ }).click(); await p.waitForURL(/payout=simulated/, { timeout: 120000 }); await settle(p); await top(p); }, label: "Admin · Payouts completed: every eligible payment is settled to its business, less commission." },
+      { lane: "system", label: "A payout is recorded per business and payment, and each business's members get a Payout completed notification. No money moves in demo mode." },
+      { lane: "business", act: go("/business/revenue"), label: "Business · Revenue & payouts: the payout now shows as paid out." },
     ],
   },
 ];
@@ -494,6 +600,8 @@ async function run(j) {
     const label = typeof st.label === "function" ? st.label(ctx) : st.label;
     try {
       if (st.lane === "system") {
+        // A system step can apply what happens off screen (e.g. a scheduled job).
+        if (st.run) await st.run(ctx);
         steps.push({ lane: "system", label });
       } else {
         const p = await page(st.lane);

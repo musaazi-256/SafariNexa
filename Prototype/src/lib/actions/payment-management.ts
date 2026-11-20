@@ -10,6 +10,9 @@ export async function managePayment(surface: "BUSINESS" | "ADMIN", _state: Payme
   let actor: PaymentActor;
   if(surface==="BUSINESS") { const context=await requireBusinessSession();actor={surface,userId:context.session.user.id,email:context.session.user.email??undefined,businessId:context.businessId}; }
   else {const session=await requireAdminSession("payments.manage");actor={surface,userId:session.user.id,email:session.user.email??undefined};}
+  // Refresh the pages only when the payment records changed: a refresh remounts the form and
+  // wipes its message, so an error, a reminder or an escalation keeps its message on screen.
+  let changed = false;
   try {
     const operation=String(form.get("operation")??"");const bookingId=String(form.get("bookingId")??"");const reason=String(form.get("reason")??"");
     let message="Changes saved.";
@@ -20,7 +23,8 @@ export async function managePayment(surface: "BUSINESS" | "ADMIN", _state: Payme
     else if(operation==="remind") {await remindBookingPayment(actor,bookingId);message="Payment reminder sent to the customer’s notifications.";}
     else if(operation==="escalate") {const support=await escalateBookingPayment(actor,bookingId,reason);message=`Support case ${support.caseRef} opened.`;}
     else throw new Error("Unknown payment operation.");
+    changed = !["remind","escalate"].includes(operation);
     return {message};
   } catch(error) {return {error:error instanceof Error ? error.message : "Could not save changes. Please try again."};}
-  finally {for(const path of ["/business","/admin","/bookings","/payments"])revalidatePath(path,"layout");}
+  finally {if(changed)for(const path of ["/business","/admin","/bookings","/payments"])revalidatePath(path,"layout");}
 }

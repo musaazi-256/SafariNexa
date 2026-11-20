@@ -176,22 +176,22 @@
   "id": "customer-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/bookings/capture-st-reviewed",
+  "route": "/bookings/capture-order-wait-b",
   "pattern": "/bookings/[id]",
   "kind": "page",
   "signedOut": false,
-  "heading": "Murchison River Lodge",
-  "purpose": "Booked with Nile & Crater Lodges"
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Booked with Uganda Trails Safaris"
  },
  {
   "id": "customer-bookings-id--viewport-top",
   "section": "Bookings",
   "name": "Bookings · details · Top of page",
-  "route": "/bookings/capture-st-reviewed",
+  "route": "/bookings/capture-order-wait-b",
   "pattern": "/bookings/[id]",
   "kind": "state",
   "signedOut": false,
-  "heading": "Murchison River Lodge",
+  "heading": "3-Day Wildlife Safari",
   "purpose": "Top of page",
   "parent": "customer-bookings-id",
   "scrollY": 0
@@ -200,11 +200,11 @@
   "id": "customer-bookings-id--viewport-scrolled",
   "section": "Bookings",
   "name": "Bookings · details · Scrolled",
-  "route": "/bookings/capture-st-reviewed",
+  "route": "/bookings/capture-order-wait-b",
   "pattern": "/bookings/[id]",
   "kind": "state",
   "signedOut": false,
-  "heading": "Murchison River Lodge",
+  "heading": "3-Day Wildlife Safari",
   "purpose": "Scrolled",
   "parent": "customer-bookings-id",
   "scrollY": 675
@@ -327,6 +327,102 @@
   "signedOut": false,
   "heading": "Murchison River Lodge",
   "purpose": "Reviewed",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-processing",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment waiting for the provider",
+  "route": "/bookings/capture-st-processing",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment waiting for the provider",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-payment-overdue",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment window passed, not yet expired",
+  "route": "/bookings/capture-st-overdue",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment window passed, not yet expired",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-payment-expired",
+  "section": "Bookings",
+  "name": "Bookings · details · Expired: payment window passed",
+  "route": "/bookings/capture-st-expired",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Expired: payment window passed",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-request-overdue",
+  "section": "Bookings",
+  "name": "Bookings · details · Response deadline passed, not yet expired",
+  "route": "/bookings/capture-st-reqlate",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Response deadline passed, not yet expired",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-request-expired",
+  "section": "Bookings",
+  "name": "Bookings · details · Expired: no response from the business",
+  "route": "/bookings/capture-st-reqexp",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Expired: no response from the business",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-partially-refunded",
+  "section": "Bookings",
+  "name": "Bookings · details · Confirmed, partially refunded",
+  "route": "/bookings/capture-st-partial",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Confirmed, partially refunded",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-refund-declined",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled, refund declined",
+  "route": "/bookings/capture-st-refdecl",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled, refund declined",
+  "parent": "customer-bookings-id"
+ },
+ {
+  "id": "customer-bookings-id--status-order",
+  "section": "Bookings",
+  "name": "Bookings · details · Part of a combined order",
+  "route": "/bookings/capture-st-order-a",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Part of a combined order",
   "parent": "customer-bookings-id"
  },
  {
@@ -683,6 +779,19 @@
   "scrollY": 675
  },
  {
+  "id": "customer-guides--table-scrolled",
+  "section": "Guides",
+  "name": "Guides · Wide content scrolled sideways",
+  "route": "/guides",
+  "pattern": "/guides",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Book verified experiences",
+  "purpose": "Wide content scrolled sideways",
+  "parent": "customer-guides",
+  "scrollY": 941
+ },
+ {
   "id": "customer-notifications",
   "section": "Notifications",
   "name": "Notifications",
@@ -781,6 +890,19 @@
   "scrollY": 675
  },
  {
+  "id": "customer-home--table-scrolled",
+  "section": "Home",
+  "name": "Home · Wide content scrolled sideways",
+  "route": "/",
+  "pattern": "/",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "See it all first. Book only when you're ready.",
+  "purpose": "Wide content scrolled sideways",
+  "parent": "customer-home",
+  "scrollY": 458
+ },
+ {
   "id": "customer-payments-cancelled",
   "section": "Payments",
   "name": "Payments › Cancelled",
@@ -854,6 +976,29 @@
   "scrollY": 574
  },
  {
+  "id": "customer-payments--expired",
+  "section": "Payments",
+  "name": "Payments · Payment window passed",
+  "route": "/payments?bookingId=capture-st-overdue",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "purpose": "Payment window passed",
+  "parent": "customer-payments"
+ },
+ {
+  "id": "customer-payments--order-waiting",
+  "section": "Payments",
+  "name": "Payments · Combined order waiting for a business",
+  "route": "/payments?orderId=capture-order-wait",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Booking status",
+  "purpose": "Combined order waiting for a business",
+  "parent": "customer-payments"
+ },
+ {
   "id": "customer-payments-receipt",
   "section": "Payments",
   "name": "Payments › Receipt",
@@ -889,6 +1034,18 @@
   "purpose": "Scrolled",
   "parent": "customer-payments-receipt",
   "scrollY": 205
+ },
+ {
+  "id": "customer-payments-receipt--order",
+  "section": "Payments",
+  "name": "Payments › Receipt · Receipt for a combined order",
+  "route": "/payments/receipt?orderId=capture-order",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Receipt for a combined order",
+  "parent": "customer-payments-receipt"
  },
  {
   "id": "customer-payments-success",

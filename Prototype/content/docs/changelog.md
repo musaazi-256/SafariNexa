@@ -600,3 +600,17 @@ Started the scenario coverage in `/docs/verification` §8 with bookings and paym
 - Remaining for bookings and payments: deadline expiry, pending provider confirmation, partial and rejected refunds, payouts, and multi-item orders.
 
 - Capture baseline pages with vertical overflow at the top and after scrolling. Seed the Business Listings table with all four listing types for the capture.
+
+### Follow-up, same day — remaining booking and payment scenarios, and three fixes they exposed
+
+**Fixes:**
+- **Business booking page, expired requests.** Accepting a request after its response deadline threw past the page into the generic "We couldn't complete that request" screen. The page now hides Accept once the deadline has passed and explains the request will be cancelled automatically (Decline still releases the dates now). If a response fails for another reason, for example the request expired while the page was open, the reason is shown on the booking (`?error=`).
+- **Cancellation reason on booking pages.** Expired bookings showed only "Cancelled by admin". The customer, business and admin booking pages now show the reason and date under the status badge, for example "Payment window expired · 20 Nov 2026" (`src/components/cancellation-note.tsx`).
+- **Payments & refunds messages disappeared.** Every payment operation revalidated the page, which remounted the form and wiped its result, so "Check payment with provider" showed nothing and "Send to support" never confirmed the case. `managePayment` now revalidates only when payment records changed (refunds and payment checks). Errors, reminders and escalations keep their message on screen.
+
+**Capture:**
+- **Eight more booking states** on all three booking pages (24 frames): payment waiting for the provider, payment window passed (before and after the expiry job), response deadline passed (before and after), partially refunded, refund declined, and a booking that's part of a combined order. Also captured: the payment page after its window passed, a combined order waiting for one business, and the receipt for a combined order.
+- **Six journeys**: deadlines pass and the expiry job cancels both bookings; a payment waits for the provider, the business checks it and escalates to support (with the admin case); a partial refund created and approved by the business; a refund request declined by an admin; a combined order across two businesses, accepted then paid once; operations settles payouts and the business sees them in Earnings.
+- The expiry step applies the change that `POST /api/jobs/expire-bookings` makes (`expireBooking` in `scripts/capture/fixtures.mjs`), because local runs don't set `CRON_SECRET`. The payout journey settles every eligible demo payment, so the fixture deletes those payouts afterwards and marks the payments unsettled again.
+- **Scroll inside the page:** baseline pages also get a frame with the first wide table scrolled sideways (`--table-scrolled`) and the first panel that scrolls on its own scrolled down (`--pane-scrolled`) (`innerScrollSnapshots` in `scripts/capture/lib.mjs`).
+

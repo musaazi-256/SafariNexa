@@ -52,22 +52,22 @@
   "id": "admin-bookings-id",
   "section": "Bookings",
   "name": "Bookings · details",
-  "route": "/admin/bookings/capture-st-reviewed",
+  "route": "/admin/bookings/capture-order-wait-b",
   "pattern": "/admin/bookings/[id]",
   "kind": "page",
   "signedOut": false,
-  "heading": "Murchison River Lodge",
+  "heading": "3-Day Wildlife Safari",
   "purpose": "Review the booking, traveller information and payment history."
  },
  {
   "id": "admin-bookings-id--viewport-top",
   "section": "Bookings",
   "name": "Bookings · details · Top of page",
-  "route": "/admin/bookings/capture-st-reviewed",
+  "route": "/admin/bookings/capture-order-wait-b",
   "pattern": "/admin/bookings/[id]",
   "kind": "state",
   "signedOut": false,
-  "heading": "Murchison River Lodge",
+  "heading": "3-Day Wildlife Safari",
   "purpose": "Top of page",
   "parent": "admin-bookings-id",
   "scrollY": 0
@@ -76,14 +76,14 @@
   "id": "admin-bookings-id--viewport-scrolled",
   "section": "Bookings",
   "name": "Bookings · details · Scrolled",
-  "route": "/admin/bookings/capture-st-reviewed",
+  "route": "/admin/bookings/capture-order-wait-b",
   "pattern": "/admin/bookings/[id]",
   "kind": "state",
   "signedOut": false,
-  "heading": "Murchison River Lodge",
+  "heading": "3-Day Wildlife Safari",
   "purpose": "Scrolled",
   "parent": "admin-bookings-id",
-  "scrollY": 80
+  "scrollY": 200
  },
  {
   "id": "admin-bookings-id--status-awaiting",
@@ -206,6 +206,102 @@
   "parent": "admin-bookings-id"
  },
  {
+  "id": "admin-bookings-id--status-processing",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment waiting for the provider",
+  "route": "/admin/bookings/capture-st-processing",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment waiting for the provider",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-payment-overdue",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment window passed, not yet expired",
+  "route": "/admin/bookings/capture-st-overdue",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment window passed, not yet expired",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-payment-expired",
+  "section": "Bookings",
+  "name": "Bookings · details · Expired: payment window passed",
+  "route": "/admin/bookings/capture-st-expired",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Expired: payment window passed",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-request-overdue",
+  "section": "Bookings",
+  "name": "Bookings · details · Response deadline passed, not yet expired",
+  "route": "/admin/bookings/capture-st-reqlate",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Response deadline passed, not yet expired",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-request-expired",
+  "section": "Bookings",
+  "name": "Bookings · details · Expired: no response from the business",
+  "route": "/admin/bookings/capture-st-reqexp",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Expired: no response from the business",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-partially-refunded",
+  "section": "Bookings",
+  "name": "Bookings · details · Confirmed, partially refunded",
+  "route": "/admin/bookings/capture-st-partial",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Confirmed, partially refunded",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-refund-declined",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled, refund declined",
+  "route": "/admin/bookings/capture-st-refdecl",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled, refund declined",
+  "parent": "admin-bookings-id"
+ },
+ {
+  "id": "admin-bookings-id--status-order",
+  "section": "Bookings",
+  "name": "Bookings · details · Part of a combined order",
+  "route": "/admin/bookings/capture-st-order-a",
+  "pattern": "/admin/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Part of a combined order",
+  "parent": "admin-bookings-id"
+ },
+ {
   "id": "admin-bookings",
   "section": "Bookings",
   "name": "Bookings",
@@ -241,6 +337,19 @@
   "purpose": "Scrolled",
   "parent": "admin-bookings",
   "scrollY": 90
+ },
+ {
+  "id": "admin-bookings--table-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · Wide content scrolled sideways",
+  "route": "/admin/bookings",
+  "pattern": "/admin/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Bookings oversight",
+  "purpose": "Wide content scrolled sideways",
+  "parent": "admin-bookings",
+  "scrollY": 76
  },
  {
   "id": "admin-bookings--menu-booking-status-all-bookings",
@@ -463,6 +572,19 @@
   "scrollY": 674
  },
  {
+  "id": "admin-dashboard--pane-scrolled",
+  "section": "Dashboard",
+  "name": "Dashboard · Panel scrolled",
+  "route": "/admin/dashboard",
+  "pattern": "/admin/dashboard",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Dashboard",
+  "purpose": "Panel scrolled",
+  "parent": "admin-dashboard",
+  "scrollY": 674
+ },
+ {
   "id": "admin-listings-id",
   "section": "Listings",
   "name": "Listings · details",
@@ -619,6 +741,19 @@
   "purpose": "Scrolled",
   "parent": "admin-payments",
   "scrollY": 675
+ },
+ {
+  "id": "admin-payments--table-scrolled",
+  "section": "Payments",
+  "name": "Payments · Wide content scrolled sideways",
+  "route": "/admin/payments",
+  "pattern": "/admin/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payments, refunds & payouts",
+  "purpose": "Wide content scrolled sideways",
+  "parent": "admin-payments",
+  "scrollY": 1245
  },
  {
   "id": "admin-payments--menu-payment-status-all",

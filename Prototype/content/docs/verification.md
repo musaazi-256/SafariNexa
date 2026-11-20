@@ -273,18 +273,19 @@ All reviews by moderation status.
 - **Notifications are in-app only.** Business owners (verification) and owners/managers (listings) get in-app notifications; email isn't sent for these decisions.
 - **Demo documents.** Seeded demo businesses have placeholder documents that open a "Document unavailable" page; real uploads (and the journey's Kidepo documents) display.
 - **Review edits.** Customers can't edit or delete a review once posted; moderation is the only way to remove it.
+- **Expiry needs the scheduled job.** Requests and unpaid bookings past their deadline stay in their status until `POST /api/jobs/expire-bookings` runs (it needs `CRON_SECRET`). Until then the business page offers only Decline, and the payment page says the window has passed.
 
 ## 7. Figma capture coverage audit · 20 November 2026
 
 Run `node scripts/capture/audit.mjs` from `Prototype` to compare the app's page inventory, capture indexes, and plugin bundles. Add `--strict` to fail on a detected gap. The audit reads existing files and does not open a browser or change demo records. The UI fingerprint checks freshness of source files. Coverage of states and actions requires explicit scenarios.
 
-| Surface | Indexed page patterns | Page and state frames | Top / scrolled pairs | Journeys shown in plugin |
-|---|---:|---:|---:|---:|
-| Customer | 43 of 43 | 137 | 35 | 8 |
-| Business | 30 of 30 | 141 | 19 | 12 |
-| Admin | 25 of 25 | 91 | 17 | 10 |
+| Surface | Indexed page patterns | Page and state frames | Top / scrolled pairs | Inner scroll frames (table / panel) | Journeys shown in plugin |
+|---|---:|---:|---:|---:|---:|
+| Customer | 43 of 43 | 150 | 35 | 2 / 0 | 13 |
+| Business | 30 of 30 | 156 | 19 | 4 / 1 | 18 |
+| Admin | 25 of 25 | 102 | 17 | 2 / 1 | 16 |
 
-These counts describe the local bundles generated on 20 November 2026. The same journey can appear in several plugins. The 13 distinct journeys contain 147 steps, including 134 UI frames and 13 system steps. They cover booking and payment success and failure, cancellation and refunds, first-time guides, business verification, listing approval and rejection, customer review and business reply, and admin inspection of a business listing.
+These counts describe the local bundles generated on 20 November 2026. The same journey can appear in several plugins. The 19 distinct journeys contain 187 steps, including 171 UI frames and 16 system steps. They cover booking and payment success and failure, deadline expiry, pending provider confirmation, cancellation, full, partial and declined refunds, combined orders, payout settlement, first-time guides, business verification, listing approval and rejection, customer review and business reply, and admin inspection of a business listing.
 
 ### Coverage gaps and fixture progress
 
@@ -292,13 +293,13 @@ These counts describe the local bundles generated on 20 November 2026. The same 
 |---|---|---|
 | Trip planner | List and itinerary detail with three items (capture fixture) | Add/reorder/remove items, delete and failure states |
 | Business support | Queue, open-case dialog, and case detail with a two-message conversation (capture fixture) | Reply, status transitions, empty queue, and access denied |
-| Checkout and payments | Checkout for a stay, Complete payment for a booking awaiting payment, and the receipt for a paid booking; Payment success passes through to that receipt. The stay journey covers a successful single-item path. | Cart-to-checkout cases, failed, cancelled, retry, refund, and payout outcomes |
+| Checkout and payments | Checkout for a stay; Complete payment for a booking awaiting payment, after the payment window passed, and for a combined order waiting for a business; receipts for a paid booking and a combined order. Journeys cover success, failure and retry, pending provider confirmation, cancellation, full, partial and declined refunds, combined-order payment and payout settlement. | Cart-to-checkout for multi-item orders; live provider failures |
 | Cart | Empty cart | Populated cart, multi-item combinations, quantity or add-on changes where supported, and invalid or unavailable items |
 | Customer review | Write a review for a completed, unreviewed stay. The review journey covers validation, writing, submitting, business reply, and opening the admin hide confirmation. | Entry from My bookings and from each listing type, already reviewed, ineligible booking, completed moderation, and republication |
 | Authentication and invitations | Basic account pages; the reset-password and both invitation forms with a token in the URL (the pages check the token only on submit) | Valid, expired, and invalid links, wrong account, accepted invitations, and password reset completion |
 | Business team and saved items | Team and saved-item aliases land on settings and profile saved items | Record aliases as redirects while capturing their destination states under the canonical route |
-| Booking, verification, listing, and moderation queues | Booking detail has ten status states in all three portals, and six booking and payment outcome journeys; other queues have one example record per dynamic route and selected overlay frames | Separate empty and populated fixtures, zero matching filters, each status that changes available actions, role permissions, and confirm/cancel/result states |
-| Shared states | A desktop snapshot after the page settles | Mobile, tablet, loading, recoverable error, permission variants, and long or scrollable sections |
+| Booking, verification, listing, and moderation queues | Booking detail has eighteen status states in all three portals, and twelve booking and payment journeys; other queues have one example record per dynamic route and selected overlay frames | Separate empty and populated fixtures, zero matching filters, each status that changes available actions, role permissions, and confirm/cancel/result states |
+| Shared states | A desktop snapshot after the page settles, plus top and scrolled frames for long pages, the first wide table scrolled sideways and the first self-scrolling panel scrolled down | Mobile, tablet, loading, recoverable error and permission variants |
 
 The runner resolves dynamic routes from links in one demo account per portal. It opens visible ARIA tabs and first-level menus and dialogs, with caps of 10 tabs and 12 overlays per page. Similar row menus and shared header/sidebar controls are deduplicated. That approach cannot establish coverage of differing row actions, menu items that open a second dialog, non-ARIA controls, disabled controls, form submissions, or data and permission variants. The route scan explicitly excludes 12 page patterns for OAuth, demo tools, docs, and the UI kit. Shared loading, error, and not-found files are outside the page scan.
 
@@ -369,7 +370,7 @@ The screen runner records a **Top of page** and **Scrolled** viewport pair on ba
 | `/payments/success` | Booking or order context forwarding to the receipt, missing context forwarding to bookings. Record the redirect as a flow step. |
 | `/payments/receipt` | Booking and order receipts, amount and status details, links back, missing or inaccessible record. |
 | `/bookings` | Empty and populated history, pagination, different statuses, open details, eligible **Write a review**, already-reviewed booking. |
-| `/bookings/[id]` | Request, payment due or failed, confirmed, cancelled, completed and reviewed views, payment and refund history, cancel and pay actions, chat, review entry. **Captured:** ten status states (awaiting confirmation, payment required, payment failed, confirmed and paid, refund requested, refunded, cancelled by the customer, declined by the business, completed, reviewed) as `--status-*` frames. Outcomes of cancel and pay are in the journeys below. |
+| `/bookings/[id]` | Request, payment due or failed, confirmed, cancelled, completed and reviewed views, payment and refund history, cancel and pay actions, chat, review entry. **Captured:** eighteen status states as `--status-*` frames: awaiting confirmation, payment required, payment failed, payment waiting for the provider, payment window passed (before and after expiry), response deadline passed (before and after expiry), confirmed and paid, partially refunded, refund requested, refunded, refund declined, cancelled by the customer, declined by the business, part of a combined order, completed, reviewed. Outcomes of cancel and pay are in the journeys below. |
 | `/reviews/new` | Eligible form for each bookable listing type, missing rating, short text, filled form, submission and published result, already reviewed, incomplete or inaccessible booking. |
 | `/profile` | Populated and sparse profile, edit and save, validation, change password and errors, sign-in method differences where visible. |
 | `/profile/preferences` | Default and configured preferences, notification toggles, save result and persistence. |
@@ -403,7 +404,7 @@ The screen runner records a **Top of page** and **Scrolled** viewport pair on ba
 | `/business/guides` | Empty and populated guide list and add-guide entry. |
 | `/business/guides/new` | Blank and filled profile, validation, submit and return to populated list. |
 | `/business/bookings` | Empty and populated, dates and status filters with results or zero matches, different row menus, open details, guide states. |
-| `/business/bookings/[id]` | Awaiting response, accepted, declined, payment due, paid, cancelled, completed and reviewed where applicable. Capture accept, decline, complete, chat and refund actions and their outcomes. **Captured:** ten status states (awaiting confirmation, payment required, payment failed, confirmed and paid, refund requested, refunded, cancelled by the customer, declined by the business, completed, reviewed) as `--status-*` frames. Accept, decline and cancel outcomes are in the journeys below; complete and chat remain. |
+| `/business/bookings/[id]` | Awaiting response, accepted, declined, payment due, paid, cancelled, completed and reviewed where applicable. Capture accept, decline, complete, chat and refund actions and their outcomes. **Captured:** eighteen status states as `--status-*` frames: awaiting confirmation, payment required, payment failed, payment waiting for the provider, payment window passed (before and after expiry), response deadline passed (before and after expiry), confirmed and paid, partially refunded, refund requested, refunded, refund declined, cancelled by the customer, declined by the business, part of a combined order, completed, reviewed. Accept, decline and cancel outcomes are in the journeys below; complete and chat remain. |
 | `/business/bookings/calendar` | Empty and populated time ranges, calendar navigation and upcoming-booking selection. |
 | `/business/customers` | Empty and populated, filters and columns, customer or message actions currently offered. |
 | `/business/messages` | Empty, unread and selected thread, new-message dialog, customer selection, write and send, resulting conversation. |
@@ -435,7 +436,7 @@ The screen runner records a **Top of page** and **Scrolled** viewport pair on ba
 | `/admin/listings` | Empty and populated review queue, status filters and navigate to submission. |
 | `/admin/listings/[id]` | Existing and revised content, evidence and checklist, request changes, reject, approve and publish, confirm and cancel, final history. |
 | `/admin/bookings` | Empty and populated, filters by status and date, columns and pagination, different rows and detail navigation. |
-| `/admin/bookings/[id]` | Status variants, travellers, payment attempts, refund history and available operations, inaccessible or missing records. **Captured:** ten status states (awaiting confirmation, payment required, payment failed, confirmed and paid, refund requested, refunded, cancelled by the customer, declined by the business, completed, reviewed) as `--status-*` frames. Missing and inaccessible records remain. |
+| `/admin/bookings/[id]` | Status variants, travellers, payment attempts, refund history and available operations, inaccessible or missing records. **Captured:** eighteen status states as `--status-*` frames: awaiting confirmation, payment required, payment failed, payment waiting for the provider, payment window passed (before and after expiry), response deadline passed (before and after expiry), confirmed and paid, partially refunded, refund requested, refunded, refund declined, cancelled by the customer, declined by the business, part of a combined order, completed, reviewed. Missing and inaccessible records remain. |
 | `/admin/payments` | Payments, refunds and payouts. Retain empty, demo, simulated payout and live views. Add filtered states, refund approval and results, permission restrictions and failure cases. |
 | `/admin/users` | Users and invitations, pending and active states, filters, suspension and reactivation with feedback and permission boundaries. |
 | `/admin/users/new` | Choose permission level, invite with valid or invalid data, duplicate or pending invitation, success and return. |
@@ -467,7 +468,7 @@ The screen runner records a **Top of page** and **Scrolled** viewport pair on ba
 |---|---|
 | Customer access | Registration and verification, reset, invitation handoffs, OAuth success and cancellation, return to a protected entry point. |
 | Discovery and booking | Each listing type from search to selection, availability and form validation, saved-item and inquiry paths, single item and populated multi-item cart. |
-| Booking and payment lifecycle | Request and response, decline and expiry, success, pending, failure, cancel and retry, receipt, refund and payout, with customer, business and admin views. **Captured journeys:** `booking-loop` (request, accept, pay), `booking-declined`, `booking-cancelled-unpaid`, `payment-failed-retry`, `refund-business-cancel` (cancel, refund request, admin approval, refunded), `refund-customer-cancel`. Remaining: expiry of response and payment deadlines, pending provider confirmation, partial refunds, refund rejection, payouts, multi-item orders. |
+| Booking and payment lifecycle | Request and response, decline and expiry, success, pending, failure, cancel and retry, receipt, refund and payout, with customer, business and admin views. **Captured journeys:** `booking-loop` (request, accept, pay), `booking-declined`, `booking-cancelled-unpaid`, `payment-failed-retry`, `refund-business-cancel` (cancel, refund request, admin approval, refunded), `refund-customer-cancel`. `booking-deadline-expired` (late request and late payment, then the expiry job), `payment-pending-provider` (check with provider, escalate, admin support case), `refund-partial`, `refund-declined`, `combined-order` (two businesses, one payment), `payout-settlement` (admin settles, business Earnings). Remaining: refunds that reach a live provider and fail, payouts that fail, and cart-to-checkout for multi-item orders (the combined-order journey starts from an order already placed). |
 | Business and listing lifecycle | First-time and returning onboarding, switch workspace, upload and resubmit verification, reject and hold outcomes, draft, preview, revision, approval, withdrawal and rejection. |
 | Reviews | From My bookings, booking detail and eligible listing, validation and submit, business reply, flag or hide with cancel and confirm, republication and effect on listing feedback. |
 | Messaging and support | Customer inquiry, booking chat, business-initiated message, notifications, open case, reply, resolve and follow-up across the applicable surfaces. |
