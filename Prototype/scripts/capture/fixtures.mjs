@@ -318,6 +318,27 @@ export const SCREEN_QUERY = {
   "/admin/auth/accept": "?token=capture-demo-token",
 };
 
+export async function setupResponsiveConversation() {
+  const customer = await db.user.findUniqueOrThrow({ where: { email: "customer@safarinexa.test" }, select: { id: true } });
+  const host = await db.user.findUniqueOrThrow({ where: { email: "business@dev.test" }, select: { id: true } });
+  const booking = await db.booking.findUniqueOrThrow({ where: { id: SCREEN.stay }, select: { id: true, businessId: true } });
+  const content = "Your room is ready. Let us know if you would like to arrange a transfer.";
+  await db.messageThread.create({
+    data: {
+      id: "capture-responsive-conversation",
+      customerId: customer.id,
+      bookingId: booking.id,
+      businessId: booking.businessId,
+      messages: { create: { senderId: host.id, content } },
+    },
+  });
+  return content;
+}
+
+export async function cleanupResponsiveConversation() {
+  await db.messageThread.deleteMany({ where: { id: "capture-responsive-conversation" } });
+}
+
 /** One booking per status that changes what the customer, business or admin can do.
  * Captured on each portal's booking page as states of that page (run.mjs). */
 const STATUS_VARIANTS = [

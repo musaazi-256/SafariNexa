@@ -1827,5 +1827,4621 @@
   "purpose": "Scrolled",
   "parent": "customer-trip-planner",
   "scrollY": 61
+ },
+ {
+  "id": "customer-accommodation-id--phone",
+  "section": "Accommodation",
+  "name": "Accommodation · details · Phone 390px",
+  "route": "/accommodation/demo-lodge",
+  "pattern": "/accommodation/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "parent": "customer-accommodation-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-accommodation-id--phone-viewport-top",
+  "section": "Accommodation",
+  "name": "Accommodation · details · Phone 390px · Top of page",
+  "route": "/accommodation/demo-lodge",
+  "pattern": "/accommodation/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "parent": "customer-accommodation-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-accommodation-id--phone-viewport-scrolled",
+  "section": "Accommodation",
+  "name": "Accommodation · details · Phone 390px · Scrolled",
+  "route": "/accommodation/demo-lodge",
+  "pattern": "/accommodation/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "parent": "customer-accommodation-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-accommodation-id--tablet",
+  "section": "Accommodation",
+  "name": "Accommodation · details · Tablet 768px",
+  "route": "/accommodation/demo-lodge",
+  "pattern": "/accommodation/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "parent": "customer-accommodation-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-accommodation-id--tablet-viewport-top",
+  "section": "Accommodation",
+  "name": "Accommodation · details · Tablet 768px · Top of page",
+  "route": "/accommodation/demo-lodge",
+  "pattern": "/accommodation/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "parent": "customer-accommodation-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-accommodation-id--tablet-viewport-scrolled",
+  "section": "Accommodation",
+  "name": "Accommodation · details · Tablet 768px · Scrolled",
+  "route": "/accommodation/demo-lodge",
+  "pattern": "/accommodation/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "parent": "customer-accommodation-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-accommodation--phone",
+  "section": "Accommodation",
+  "name": "Accommodation · Phone 390px",
+  "route": "/accommodation",
+  "pattern": "/accommodation",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Find verified stays",
+  "purpose": "Browse lodges, boutique hotels, and tented camps as a guest. Booking starts the protected authentication flow — search and comparison stay open.",
+  "parent": "customer-accommodation",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-accommodation--phone-viewport-top",
+  "section": "Accommodation",
+  "name": "Accommodation · Phone 390px · Top of page",
+  "route": "/accommodation",
+  "pattern": "/accommodation",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Find verified stays",
+  "purpose": "Browse lodges, boutique hotels, and tented camps as a guest. Booking starts the protected authentication flow — search and comparison stay open.",
+  "parent": "customer-accommodation",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-accommodation--phone-viewport-scrolled",
+  "section": "Accommodation",
+  "name": "Accommodation · Phone 390px · Scrolled",
+  "route": "/accommodation",
+  "pattern": "/accommodation",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Find verified stays",
+  "purpose": "Browse lodges, boutique hotels, and tented camps as a guest. Booking starts the protected authentication flow — search and comparison stay open.",
+  "parent": "customer-accommodation",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-accommodation--tablet",
+  "section": "Accommodation",
+  "name": "Accommodation · Tablet 768px",
+  "route": "/accommodation",
+  "pattern": "/accommodation",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Find verified stays",
+  "purpose": "Browse lodges, boutique hotels, and tented camps as a guest. Booking starts the protected authentication flow — search and comparison stay open.",
+  "parent": "customer-accommodation",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-accommodation--tablet-viewport-top",
+  "section": "Accommodation",
+  "name": "Accommodation · Tablet 768px · Top of page",
+  "route": "/accommodation",
+  "pattern": "/accommodation",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Find verified stays",
+  "purpose": "Browse lodges, boutique hotels, and tented camps as a guest. Booking starts the protected authentication flow — search and comparison stay open.",
+  "parent": "customer-accommodation",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-accommodation--tablet-viewport-scrolled",
+  "section": "Accommodation",
+  "name": "Accommodation · Tablet 768px · Scrolled",
+  "route": "/accommodation",
+  "pattern": "/accommodation",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Find verified stays",
+  "purpose": "Browse lodges, boutique hotels, and tented camps as a guest. Booking starts the protected authentication flow — search and comparison stay open.",
+  "parent": "customer-accommodation",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-auth-create-account--phone",
+  "section": "Access",
+  "name": "Create account · Phone 390px",
+  "route": "/auth/create-account",
+  "pattern": "/auth/create-account",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "Create your account",
+  "purpose": "Only needed when you book, pay, save, message, or review — browsing stays open.",
+  "parent": "customer-auth-create-account",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-auth-create-account--tablet",
+  "section": "Access",
+  "name": "Create account · Tablet 768px",
+  "route": "/auth/create-account",
+  "pattern": "/auth/create-account",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "Create your account",
+  "purpose": "Only needed when you book, pay, save, message, or review — browsing stays open.",
+  "parent": "customer-auth-create-account",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-auth-forgot-password--phone",
+  "section": "Access",
+  "name": "Forgot password · Phone 390px",
+  "route": "/auth/forgot-password",
+  "pattern": "/auth/forgot-password",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "Reset your password",
+  "purpose": "Request a single-use password reset link for your SafariNexa account.",
+  "parent": "customer-auth-forgot-password",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-auth-forgot-password--tablet",
+  "section": "Access",
+  "name": "Forgot password · Tablet 768px",
+  "route": "/auth/forgot-password",
+  "pattern": "/auth/forgot-password",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "Reset your password",
+  "purpose": "Request a single-use password reset link for your SafariNexa account.",
+  "parent": "customer-auth-forgot-password",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-auth-reset-password--phone",
+  "section": "Access",
+  "name": "Reset password · Phone 390px",
+  "route": "/auth/reset-password?token=capture-demo-token",
+  "pattern": "/auth/reset-password",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "Choose a new password",
+  "purpose": "Enter and confirm your new password to secure your account.",
+  "parent": "customer-auth-reset-password",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-auth-reset-password--tablet",
+  "section": "Access",
+  "name": "Reset password · Tablet 768px",
+  "route": "/auth/reset-password?token=capture-demo-token",
+  "pattern": "/auth/reset-password",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "Choose a new password",
+  "purpose": "Enter and confirm your new password to secure your account.",
+  "parent": "customer-auth-reset-password",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-auth-sign-in--phone",
+  "section": "Access",
+  "name": "Sign in · Phone 390px",
+  "route": "/auth/sign-in",
+  "pattern": "/auth/sign-in",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "Sign in to your customer account",
+  "purpose": "This is a demo. The details below are filled in for you, so just continue.",
+  "parent": "customer-auth-sign-in",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-auth-sign-in--tablet",
+  "section": "Access",
+  "name": "Sign in · Tablet 768px",
+  "route": "/auth/sign-in",
+  "pattern": "/auth/sign-in",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "Sign in to your customer account",
+  "purpose": "This is a demo. The details below are filled in for you, so just continue.",
+  "parent": "customer-auth-sign-in",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-auth-success--phone",
+  "section": "Access",
+  "name": "Success · Phone 390px",
+  "route": "/auth/success",
+  "pattern": "/auth/success",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "You're signed in",
+  "purpose": "Taking you back to where you left off.",
+  "parent": "customer-auth-success",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-auth-success--tablet",
+  "section": "Access",
+  "name": "Success · Tablet 768px",
+  "route": "/auth/success",
+  "pattern": "/auth/success",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "You're signed in",
+  "purpose": "Taking you back to where you left off.",
+  "parent": "customer-auth-success",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-auth-verify--phone",
+  "section": "Access",
+  "name": "Verify · Phone 390px",
+  "route": "/auth/verify",
+  "pattern": "/auth/verify",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "Check your email",
+  "purpose": "Request a single-use email verification link.",
+  "parent": "customer-auth-verify",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-auth-verify--tablet",
+  "section": "Access",
+  "name": "Verify · Tablet 768px",
+  "route": "/auth/verify",
+  "pattern": "/auth/verify",
+  "kind": "state",
+  "signedOut": true,
+  "heading": "Check your email",
+  "purpose": "Request a single-use email verification link.",
+  "parent": "customer-auth-verify",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Phone 390px",
+  "route": "/bookings/capture-order-wait-b",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Booked with Uganda Trails Safaris",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--phone-viewport-top",
+  "section": "Bookings",
+  "name": "Bookings · details · Phone 390px · Top of page",
+  "route": "/bookings/capture-order-wait-b",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Booked with Uganda Trails Safaris",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-bookings-id--phone-viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · details · Phone 390px · Scrolled",
+  "route": "/bookings/capture-order-wait-b",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Booked with Uganda Trails Safaris",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-bookings-id--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Tablet 768px",
+  "route": "/bookings/capture-order-wait-b",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Booked with Uganda Trails Safaris",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--tablet-viewport-top",
+  "section": "Bookings",
+  "name": "Bookings · details · Tablet 768px · Top of page",
+  "route": "/bookings/capture-order-wait-b",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Booked with Uganda Trails Safaris",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-bookings-id--tablet-viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · details · Tablet 768px · Scrolled",
+  "route": "/bookings/capture-order-wait-b",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Booked with Uganda Trails Safaris",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-bookings--phone",
+  "section": "Bookings",
+  "name": "Bookings · Phone 390px",
+  "route": "/bookings",
+  "pattern": "/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "My bookings",
+  "purpose": "Every booking you've started or confirmed, in one place.",
+  "parent": "customer-bookings",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings--phone-viewport-top",
+  "section": "Bookings",
+  "name": "Bookings · Phone 390px · Top of page",
+  "route": "/bookings",
+  "pattern": "/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "My bookings",
+  "purpose": "Every booking you've started or confirmed, in one place.",
+  "parent": "customer-bookings",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-bookings--phone-viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · Phone 390px · Scrolled",
+  "route": "/bookings",
+  "pattern": "/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "My bookings",
+  "purpose": "Every booking you've started or confirmed, in one place.",
+  "parent": "customer-bookings",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-bookings--tablet",
+  "section": "Bookings",
+  "name": "Bookings · Tablet 768px",
+  "route": "/bookings",
+  "pattern": "/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "My bookings",
+  "purpose": "Every booking you've started or confirmed, in one place.",
+  "parent": "customer-bookings",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings--tablet-viewport-top",
+  "section": "Bookings",
+  "name": "Bookings · Tablet 768px · Top of page",
+  "route": "/bookings",
+  "pattern": "/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "My bookings",
+  "purpose": "Every booking you've started or confirmed, in one place.",
+  "parent": "customer-bookings",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-bookings--tablet-viewport-scrolled",
+  "section": "Bookings",
+  "name": "Bookings · Tablet 768px · Scrolled",
+  "route": "/bookings",
+  "pattern": "/bookings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "My bookings",
+  "purpose": "Every booking you've started or confirmed, in one place.",
+  "parent": "customer-bookings",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-cart--phone",
+  "section": "Cart",
+  "name": "Cart · Phone 390px",
+  "route": "/cart",
+  "pattern": "/cart",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Cart",
+  "parent": "customer-cart",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-cart--phone-viewport-top",
+  "section": "Cart",
+  "name": "Cart · Phone 390px · Top of page",
+  "route": "/cart",
+  "pattern": "/cart",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Cart",
+  "parent": "customer-cart",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-cart--phone-viewport-scrolled",
+  "section": "Cart",
+  "name": "Cart · Phone 390px · Scrolled",
+  "route": "/cart",
+  "pattern": "/cart",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Cart",
+  "parent": "customer-cart",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 516
+ },
+ {
+  "id": "customer-cart--tablet",
+  "section": "Cart",
+  "name": "Cart · Tablet 768px",
+  "route": "/cart",
+  "pattern": "/cart",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Cart",
+  "parent": "customer-cart",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-checkout-multi--phone",
+  "section": "Checkout",
+  "name": "Checkout › Multi · Phone 390px",
+  "route": "/checkout/multi",
+  "pattern": "/checkout/multi",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete your booking",
+  "parent": "customer-checkout-multi",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-checkout-multi--phone-viewport-top",
+  "section": "Checkout",
+  "name": "Checkout › Multi · Phone 390px · Top of page",
+  "route": "/checkout/multi",
+  "pattern": "/checkout/multi",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete your booking",
+  "parent": "customer-checkout-multi",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-checkout-multi--phone-viewport-scrolled",
+  "section": "Checkout",
+  "name": "Checkout › Multi · Phone 390px · Scrolled",
+  "route": "/checkout/multi",
+  "pattern": "/checkout/multi",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete your booking",
+  "parent": "customer-checkout-multi",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 614
+ },
+ {
+  "id": "customer-checkout-multi--tablet",
+  "section": "Checkout",
+  "name": "Checkout › Multi · Tablet 768px",
+  "route": "/checkout/multi",
+  "pattern": "/checkout/multi",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete your booking",
+  "parent": "customer-checkout-multi",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-checkout--phone",
+  "section": "Checkout",
+  "name": "Checkout · Phone 390px",
+  "route": "/checkout?listingId=demo-lodge&type=accommodation",
+  "pattern": "/checkout",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Checkout",
+  "parent": "customer-checkout",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-checkout--phone-viewport-top",
+  "section": "Checkout",
+  "name": "Checkout · Phone 390px · Top of page",
+  "route": "/checkout?listingId=demo-lodge&type=accommodation",
+  "pattern": "/checkout",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Checkout",
+  "parent": "customer-checkout",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-checkout--phone-viewport-scrolled",
+  "section": "Checkout",
+  "name": "Checkout · Phone 390px · Scrolled",
+  "route": "/checkout?listingId=demo-lodge&type=accommodation",
+  "pattern": "/checkout",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Checkout",
+  "parent": "customer-checkout",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-checkout--tablet",
+  "section": "Checkout",
+  "name": "Checkout · Tablet 768px",
+  "route": "/checkout?listingId=demo-lodge&type=accommodation",
+  "pattern": "/checkout",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Checkout",
+  "parent": "customer-checkout",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-checkout--tablet-viewport-top",
+  "section": "Checkout",
+  "name": "Checkout · Tablet 768px · Top of page",
+  "route": "/checkout?listingId=demo-lodge&type=accommodation",
+  "pattern": "/checkout",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Checkout",
+  "parent": "customer-checkout",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-checkout--tablet-viewport-scrolled",
+  "section": "Checkout",
+  "name": "Checkout · Tablet 768px · Scrolled",
+  "route": "/checkout?listingId=demo-lodge&type=accommodation",
+  "pattern": "/checkout",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Checkout",
+  "parent": "customer-checkout",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-destinations-slug--phone",
+  "section": "Destinations",
+  "name": "Destinations · details · Phone 390px",
+  "route": "/destinations/kampala",
+  "pattern": "/destinations/[slug]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala",
+  "purpose": "Kampala is where most itineraries start and end: a hub for dining, culture, craft markets, and reliable airport/city transport connections.",
+  "parent": "customer-destinations-slug",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-destinations-slug--phone-viewport-top",
+  "section": "Destinations",
+  "name": "Destinations · details · Phone 390px · Top of page",
+  "route": "/destinations/kampala",
+  "pattern": "/destinations/[slug]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala",
+  "purpose": "Kampala is where most itineraries start and end: a hub for dining, culture, craft markets, and reliable airport/city transport connections.",
+  "parent": "customer-destinations-slug",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-destinations-slug--phone-viewport-scrolled",
+  "section": "Destinations",
+  "name": "Destinations · details · Phone 390px · Scrolled",
+  "route": "/destinations/kampala",
+  "pattern": "/destinations/[slug]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala",
+  "purpose": "Kampala is where most itineraries start and end: a hub for dining, culture, craft markets, and reliable airport/city transport connections.",
+  "parent": "customer-destinations-slug",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-destinations-slug--tablet",
+  "section": "Destinations",
+  "name": "Destinations · details · Tablet 768px",
+  "route": "/destinations/kampala",
+  "pattern": "/destinations/[slug]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala",
+  "purpose": "Kampala is where most itineraries start and end: a hub for dining, culture, craft markets, and reliable airport/city transport connections.",
+  "parent": "customer-destinations-slug",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-destinations-slug--tablet-viewport-top",
+  "section": "Destinations",
+  "name": "Destinations · details · Tablet 768px · Top of page",
+  "route": "/destinations/kampala",
+  "pattern": "/destinations/[slug]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala",
+  "purpose": "Kampala is where most itineraries start and end: a hub for dining, culture, craft markets, and reliable airport/city transport connections.",
+  "parent": "customer-destinations-slug",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-destinations-slug--tablet-viewport-scrolled",
+  "section": "Destinations",
+  "name": "Destinations · details · Tablet 768px · Scrolled",
+  "route": "/destinations/kampala",
+  "pattern": "/destinations/[slug]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala",
+  "purpose": "Kampala is where most itineraries start and end: a hub for dining, culture, craft markets, and reliable airport/city transport connections.",
+  "parent": "customer-destinations-slug",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-destinations--phone",
+  "section": "Destinations",
+  "name": "Destinations · Phone 390px",
+  "route": "/destinations",
+  "pattern": "/destinations",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Plan around Uganda highlights",
+  "purpose": "Destination guides stay open to guests — see accommodation, tours, restaurants, and transport together before you sign up.",
+  "parent": "customer-destinations",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-destinations--phone-viewport-top",
+  "section": "Destinations",
+  "name": "Destinations · Phone 390px · Top of page",
+  "route": "/destinations",
+  "pattern": "/destinations",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Plan around Uganda highlights",
+  "purpose": "Destination guides stay open to guests — see accommodation, tours, restaurants, and transport together before you sign up.",
+  "parent": "customer-destinations",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-destinations--phone-viewport-scrolled",
+  "section": "Destinations",
+  "name": "Destinations · Phone 390px · Scrolled",
+  "route": "/destinations",
+  "pattern": "/destinations",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Plan around Uganda highlights",
+  "purpose": "Destination guides stay open to guests — see accommodation, tours, restaurants, and transport together before you sign up.",
+  "parent": "customer-destinations",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-destinations--tablet",
+  "section": "Destinations",
+  "name": "Destinations · Tablet 768px",
+  "route": "/destinations",
+  "pattern": "/destinations",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Plan around Uganda highlights",
+  "purpose": "Destination guides stay open to guests — see accommodation, tours, restaurants, and transport together before you sign up.",
+  "parent": "customer-destinations",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-destinations--tablet-viewport-top",
+  "section": "Destinations",
+  "name": "Destinations · Tablet 768px · Top of page",
+  "route": "/destinations",
+  "pattern": "/destinations",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Plan around Uganda highlights",
+  "purpose": "Destination guides stay open to guests — see accommodation, tours, restaurants, and transport together before you sign up.",
+  "parent": "customer-destinations",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-destinations--tablet-viewport-scrolled",
+  "section": "Destinations",
+  "name": "Destinations · Tablet 768px · Scrolled",
+  "route": "/destinations",
+  "pattern": "/destinations",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Plan around Uganda highlights",
+  "purpose": "Destination guides stay open to guests — see accommodation, tours, restaurants, and transport together before you sign up.",
+  "parent": "customer-destinations",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-explore--phone",
+  "section": "Explore",
+  "name": "Explore · Phone 390px",
+  "route": "/explore",
+  "pattern": "/explore",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Explore SafariNexa",
+  "purpose": "Guest browsing is open across every category. Booking, saving, paying, messaging, reviewing, and trip management require an account.",
+  "parent": "customer-explore",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-explore--phone-viewport-top",
+  "section": "Explore",
+  "name": "Explore · Phone 390px · Top of page",
+  "route": "/explore",
+  "pattern": "/explore",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Explore SafariNexa",
+  "purpose": "Guest browsing is open across every category. Booking, saving, paying, messaging, reviewing, and trip management require an account.",
+  "parent": "customer-explore",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-explore--phone-viewport-scrolled",
+  "section": "Explore",
+  "name": "Explore · Phone 390px · Scrolled",
+  "route": "/explore",
+  "pattern": "/explore",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Explore SafariNexa",
+  "purpose": "Guest browsing is open across every category. Booking, saving, paying, messaging, reviewing, and trip management require an account.",
+  "parent": "customer-explore",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-explore--tablet",
+  "section": "Explore",
+  "name": "Explore · Tablet 768px",
+  "route": "/explore",
+  "pattern": "/explore",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Explore SafariNexa",
+  "purpose": "Guest browsing is open across every category. Booking, saving, paying, messaging, reviewing, and trip management require an account.",
+  "parent": "customer-explore",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-explore--tablet-viewport-top",
+  "section": "Explore",
+  "name": "Explore · Tablet 768px · Top of page",
+  "route": "/explore",
+  "pattern": "/explore",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Explore SafariNexa",
+  "purpose": "Guest browsing is open across every category. Booking, saving, paying, messaging, reviewing, and trip management require an account.",
+  "parent": "customer-explore",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-explore--tablet-viewport-scrolled",
+  "section": "Explore",
+  "name": "Explore · Tablet 768px · Scrolled",
+  "route": "/explore",
+  "pattern": "/explore",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Explore SafariNexa",
+  "purpose": "Guest browsing is open across every category. Booking, saving, paying, messaging, reviewing, and trip management require an account.",
+  "parent": "customer-explore",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-guides-id--phone",
+  "section": "Guides",
+  "name": "Guides · details · Phone 390px",
+  "route": "/guides/guide-daniel",
+  "pattern": "/guides/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Daniel Ssali",
+  "purpose": "Kampala-born city guide with a focus on craft markets, food culture, and Buganda kingdom history.",
+  "parent": "customer-guides-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-guides-id--phone-viewport-top",
+  "section": "Guides",
+  "name": "Guides · details · Phone 390px · Top of page",
+  "route": "/guides/guide-daniel",
+  "pattern": "/guides/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Daniel Ssali",
+  "purpose": "Kampala-born city guide with a focus on craft markets, food culture, and Buganda kingdom history.",
+  "parent": "customer-guides-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-guides-id--phone-viewport-scrolled",
+  "section": "Guides",
+  "name": "Guides · details · Phone 390px · Scrolled",
+  "route": "/guides/guide-daniel",
+  "pattern": "/guides/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Daniel Ssali",
+  "purpose": "Kampala-born city guide with a focus on craft markets, food culture, and Buganda kingdom history.",
+  "parent": "customer-guides-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-guides-id--tablet",
+  "section": "Guides",
+  "name": "Guides · details · Tablet 768px",
+  "route": "/guides/guide-daniel",
+  "pattern": "/guides/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Daniel Ssali",
+  "purpose": "Kampala-born city guide with a focus on craft markets, food culture, and Buganda kingdom history.",
+  "parent": "customer-guides-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-guides-id--tablet-viewport-top",
+  "section": "Guides",
+  "name": "Guides · details · Tablet 768px · Top of page",
+  "route": "/guides/guide-daniel",
+  "pattern": "/guides/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Daniel Ssali",
+  "purpose": "Kampala-born city guide with a focus on craft markets, food culture, and Buganda kingdom history.",
+  "parent": "customer-guides-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-guides-id--tablet-viewport-scrolled",
+  "section": "Guides",
+  "name": "Guides · details · Tablet 768px · Scrolled",
+  "route": "/guides/guide-daniel",
+  "pattern": "/guides/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Daniel Ssali",
+  "purpose": "Kampala-born city guide with a focus on craft markets, food culture, and Buganda kingdom history.",
+  "parent": "customer-guides-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-guides--phone",
+  "section": "Guides",
+  "name": "Guides · Phone 390px",
+  "route": "/guides",
+  "pattern": "/guides",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Book verified experiences",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours — every listing includes a named, verified guide.",
+  "parent": "customer-guides",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-guides--phone-viewport-top",
+  "section": "Guides",
+  "name": "Guides · Phone 390px · Top of page",
+  "route": "/guides",
+  "pattern": "/guides",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Book verified experiences",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours — every listing includes a named, verified guide.",
+  "parent": "customer-guides",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-guides--phone-viewport-scrolled",
+  "section": "Guides",
+  "name": "Guides · Phone 390px · Scrolled",
+  "route": "/guides",
+  "pattern": "/guides",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Book verified experiences",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours — every listing includes a named, verified guide.",
+  "parent": "customer-guides",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-guides--tablet",
+  "section": "Guides",
+  "name": "Guides · Tablet 768px",
+  "route": "/guides",
+  "pattern": "/guides",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Book verified experiences",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours — every listing includes a named, verified guide.",
+  "parent": "customer-guides",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-guides--tablet-viewport-top",
+  "section": "Guides",
+  "name": "Guides · Tablet 768px · Top of page",
+  "route": "/guides",
+  "pattern": "/guides",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Book verified experiences",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours — every listing includes a named, verified guide.",
+  "parent": "customer-guides",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-guides--tablet-viewport-scrolled",
+  "section": "Guides",
+  "name": "Guides · Tablet 768px · Scrolled",
+  "route": "/guides",
+  "pattern": "/guides",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Book verified experiences",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours — every listing includes a named, verified guide.",
+  "parent": "customer-guides",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-notifications--phone",
+  "section": "Notifications",
+  "name": "Notifications · Phone 390px",
+  "route": "/notifications",
+  "pattern": "/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Booking, payment, message and support updates sent to your account.",
+  "parent": "customer-notifications",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-notifications--phone-viewport-top",
+  "section": "Notifications",
+  "name": "Notifications · Phone 390px · Top of page",
+  "route": "/notifications",
+  "pattern": "/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Booking, payment, message and support updates sent to your account.",
+  "parent": "customer-notifications",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-notifications--phone-viewport-scrolled",
+  "section": "Notifications",
+  "name": "Notifications · Phone 390px · Scrolled",
+  "route": "/notifications",
+  "pattern": "/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Booking, payment, message and support updates sent to your account.",
+  "parent": "customer-notifications",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-notifications--tablet",
+  "section": "Notifications",
+  "name": "Notifications · Tablet 768px",
+  "route": "/notifications",
+  "pattern": "/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Booking, payment, message and support updates sent to your account.",
+  "parent": "customer-notifications",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-notifications--tablet-viewport-top",
+  "section": "Notifications",
+  "name": "Notifications · Tablet 768px · Top of page",
+  "route": "/notifications",
+  "pattern": "/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Booking, payment, message and support updates sent to your account.",
+  "parent": "customer-notifications",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-notifications--tablet-viewport-scrolled",
+  "section": "Notifications",
+  "name": "Notifications · Tablet 768px · Scrolled",
+  "route": "/notifications",
+  "pattern": "/notifications",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Notifications",
+  "purpose": "Booking, payment, message and support updates sent to your account.",
+  "parent": "customer-notifications",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-home--phone",
+  "section": "Home",
+  "name": "Home · Phone 390px",
+  "route": "/",
+  "pattern": "/",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "See it all first. Book only when you're ready.",
+  "purpose": "Browse verified stays, restaurants, and rides across Uganda. Compare freely — you only need an account when you're ready to book.",
+  "parent": "customer-home",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-home--phone-viewport-top",
+  "section": "Home",
+  "name": "Home · Phone 390px · Top of page",
+  "route": "/",
+  "pattern": "/",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "See it all first. Book only when you're ready.",
+  "purpose": "Browse verified stays, restaurants, and rides across Uganda. Compare freely — you only need an account when you're ready to book.",
+  "parent": "customer-home",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-home--phone-viewport-scrolled",
+  "section": "Home",
+  "name": "Home · Phone 390px · Scrolled",
+  "route": "/",
+  "pattern": "/",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "See it all first. Book only when you're ready.",
+  "purpose": "Browse verified stays, restaurants, and rides across Uganda. Compare freely — you only need an account when you're ready to book.",
+  "parent": "customer-home",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-home--tablet",
+  "section": "Home",
+  "name": "Home · Tablet 768px",
+  "route": "/",
+  "pattern": "/",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "See it all first. Book only when you're ready.",
+  "purpose": "Browse verified stays, restaurants, and rides across Uganda. Compare freely — you only need an account when you're ready to book.",
+  "parent": "customer-home",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-home--tablet-viewport-top",
+  "section": "Home",
+  "name": "Home · Tablet 768px · Top of page",
+  "route": "/",
+  "pattern": "/",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "See it all first. Book only when you're ready.",
+  "purpose": "Browse verified stays, restaurants, and rides across Uganda. Compare freely — you only need an account when you're ready to book.",
+  "parent": "customer-home",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-home--tablet-viewport-scrolled",
+  "section": "Home",
+  "name": "Home · Tablet 768px · Scrolled",
+  "route": "/",
+  "pattern": "/",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "See it all first. Book only when you're ready.",
+  "purpose": "Browse verified stays, restaurants, and rides across Uganda. Compare freely — you only need an account when you're ready to book.",
+  "parent": "customer-home",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-payments-cancelled--phone",
+  "section": "Payments",
+  "name": "Payments › Cancelled · Phone 390px",
+  "route": "/payments/cancelled",
+  "pattern": "/payments/cancelled",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment cancelled",
+  "purpose": "You cancelled the payment process. Your booking is still saved as pending. You can try paying again from your bookings page.",
+  "parent": "customer-payments-cancelled",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-payments-cancelled--phone-viewport-top",
+  "section": "Payments",
+  "name": "Payments › Cancelled · Phone 390px · Top of page",
+  "route": "/payments/cancelled",
+  "pattern": "/payments/cancelled",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment cancelled",
+  "purpose": "You cancelled the payment process. Your booking is still saved as pending. You can try paying again from your bookings page.",
+  "parent": "customer-payments-cancelled",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-payments-cancelled--phone-viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments › Cancelled · Phone 390px · Scrolled",
+  "route": "/payments/cancelled",
+  "pattern": "/payments/cancelled",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment cancelled",
+  "purpose": "You cancelled the payment process. Your booking is still saved as pending. You can try paying again from your bookings page.",
+  "parent": "customer-payments-cancelled",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-payments-cancelled--tablet",
+  "section": "Payments",
+  "name": "Payments › Cancelled · Tablet 768px",
+  "route": "/payments/cancelled",
+  "pattern": "/payments/cancelled",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment cancelled",
+  "purpose": "You cancelled the payment process. Your booking is still saved as pending. You can try paying again from your bookings page.",
+  "parent": "customer-payments-cancelled",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-payments-cancelled--tablet-viewport-top",
+  "section": "Payments",
+  "name": "Payments › Cancelled · Tablet 768px · Top of page",
+  "route": "/payments/cancelled",
+  "pattern": "/payments/cancelled",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment cancelled",
+  "purpose": "You cancelled the payment process. Your booking is still saved as pending. You can try paying again from your bookings page.",
+  "parent": "customer-payments-cancelled",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-payments-cancelled--tablet-viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments › Cancelled · Tablet 768px · Scrolled",
+  "route": "/payments/cancelled",
+  "pattern": "/payments/cancelled",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment cancelled",
+  "purpose": "You cancelled the payment process. Your booking is still saved as pending. You can try paying again from your bookings page.",
+  "parent": "customer-payments-cancelled",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 488
+ },
+ {
+  "id": "customer-payments--phone",
+  "section": "Payments",
+  "name": "Payments · Phone 390px",
+  "route": "/payments?bookingId=capture-pay",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete payment",
+  "parent": "customer-payments",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-payments--phone-viewport-top",
+  "section": "Payments",
+  "name": "Payments · Phone 390px · Top of page",
+  "route": "/payments?bookingId=capture-pay",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete payment",
+  "parent": "customer-payments",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-payments--phone-viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments · Phone 390px · Scrolled",
+  "route": "/payments?bookingId=capture-pay",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete payment",
+  "parent": "customer-payments",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-payments--tablet",
+  "section": "Payments",
+  "name": "Payments · Tablet 768px",
+  "route": "/payments?bookingId=capture-pay",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete payment",
+  "parent": "customer-payments",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-payments--tablet-viewport-top",
+  "section": "Payments",
+  "name": "Payments · Tablet 768px · Top of page",
+  "route": "/payments?bookingId=capture-pay",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete payment",
+  "parent": "customer-payments",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-payments--tablet-viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments · Tablet 768px · Scrolled",
+  "route": "/payments?bookingId=capture-pay",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Complete payment",
+  "parent": "customer-payments",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-payments-receipt--phone",
+  "section": "Payments",
+  "name": "Payments › Receipt · Phone 390px",
+  "route": "/payments/receipt?bookingId=capture-paid",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Your payment status and booking details are shown below.",
+  "parent": "customer-payments-receipt",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-payments-receipt--phone-viewport-top",
+  "section": "Payments",
+  "name": "Payments › Receipt · Phone 390px · Top of page",
+  "route": "/payments/receipt?bookingId=capture-paid",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Your payment status and booking details are shown below.",
+  "parent": "customer-payments-receipt",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-payments-receipt--phone-viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments › Receipt · Phone 390px · Scrolled",
+  "route": "/payments/receipt?bookingId=capture-paid",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Your payment status and booking details are shown below.",
+  "parent": "customer-payments-receipt",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-payments-receipt--tablet",
+  "section": "Payments",
+  "name": "Payments › Receipt · Tablet 768px",
+  "route": "/payments/receipt?bookingId=capture-paid",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Your payment status and booking details are shown below.",
+  "parent": "customer-payments-receipt",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-payments-receipt--tablet-viewport-top",
+  "section": "Payments",
+  "name": "Payments › Receipt · Tablet 768px · Top of page",
+  "route": "/payments/receipt?bookingId=capture-paid",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Your payment status and booking details are shown below.",
+  "parent": "customer-payments-receipt",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-payments-receipt--tablet-viewport-scrolled",
+  "section": "Payments",
+  "name": "Payments › Receipt · Tablet 768px · Scrolled",
+  "route": "/payments/receipt?bookingId=capture-paid",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Your payment status and booking details are shown below.",
+  "parent": "customer-payments-receipt",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 488
+ },
+ {
+  "id": "customer-payments-success--phone",
+  "section": "Payments",
+  "name": "Payments › Success · Phone 390px",
+  "route": "/payments/success?bookingId=capture-paid",
+  "pattern": "/payments/success",
+  "kind": "state",
+  "signedOut": false,
+  "redirect": "/payments/receipt",
+  "heading": "Payment received",
+  "purpose": "Your payment status and booking details are shown below.",
+  "parent": "customer-payments-success",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-payments-success--tablet",
+  "section": "Payments",
+  "name": "Payments › Success · Tablet 768px",
+  "route": "/payments/success?bookingId=capture-paid",
+  "pattern": "/payments/success",
+  "kind": "state",
+  "signedOut": false,
+  "redirect": "/payments/receipt",
+  "heading": "Payment received",
+  "purpose": "Your payment status and booking details are shown below.",
+  "parent": "customer-payments-success",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-profile-messages--phone",
+  "section": "Profile",
+  "name": "Profile › Messages · Phone 390px",
+  "route": "/profile/messages",
+  "pattern": "/profile/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Communicate directly with businesses about your bookings and inquiries.",
+  "parent": "customer-profile-messages",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-profile-messages--phone-viewport-top",
+  "section": "Profile",
+  "name": "Profile › Messages · Phone 390px · Top of page",
+  "route": "/profile/messages",
+  "pattern": "/profile/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Communicate directly with businesses about your bookings and inquiries.",
+  "parent": "customer-profile-messages",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-messages--phone-viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Messages · Phone 390px · Scrolled",
+  "route": "/profile/messages",
+  "pattern": "/profile/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Communicate directly with businesses about your bookings and inquiries.",
+  "parent": "customer-profile-messages",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-profile-messages--tablet",
+  "section": "Profile",
+  "name": "Profile › Messages · Tablet 768px",
+  "route": "/profile/messages",
+  "pattern": "/profile/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Communicate directly with businesses about your bookings and inquiries.",
+  "parent": "customer-profile-messages",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-profile-messages--tablet-viewport-top",
+  "section": "Profile",
+  "name": "Profile › Messages · Tablet 768px · Top of page",
+  "route": "/profile/messages",
+  "pattern": "/profile/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Communicate directly with businesses about your bookings and inquiries.",
+  "parent": "customer-profile-messages",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-messages--tablet-viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Messages · Tablet 768px · Scrolled",
+  "route": "/profile/messages",
+  "pattern": "/profile/messages",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Messages",
+  "purpose": "Communicate directly with businesses about your bookings and inquiries.",
+  "parent": "customer-profile-messages",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-profile--phone",
+  "section": "Profile",
+  "name": "Profile · Phone 390px",
+  "route": "/profile",
+  "pattern": "/profile",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Profile",
+  "purpose": "Your identity, contact details, and account security.",
+  "parent": "customer-profile",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-profile--phone-viewport-top",
+  "section": "Profile",
+  "name": "Profile · Phone 390px · Top of page",
+  "route": "/profile",
+  "pattern": "/profile",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Profile",
+  "purpose": "Your identity, contact details, and account security.",
+  "parent": "customer-profile",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile--phone-viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile · Phone 390px · Scrolled",
+  "route": "/profile",
+  "pattern": "/profile",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Profile",
+  "purpose": "Your identity, contact details, and account security.",
+  "parent": "customer-profile",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-profile--tablet",
+  "section": "Profile",
+  "name": "Profile · Tablet 768px",
+  "route": "/profile",
+  "pattern": "/profile",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Profile",
+  "purpose": "Your identity, contact details, and account security.",
+  "parent": "customer-profile",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-profile--tablet-viewport-top",
+  "section": "Profile",
+  "name": "Profile · Tablet 768px · Top of page",
+  "route": "/profile",
+  "pattern": "/profile",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Profile",
+  "purpose": "Your identity, contact details, and account security.",
+  "parent": "customer-profile",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile--tablet-viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile · Tablet 768px · Scrolled",
+  "route": "/profile",
+  "pattern": "/profile",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Profile",
+  "purpose": "Your identity, contact details, and account security.",
+  "parent": "customer-profile",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-profile-payment-settings--phone",
+  "section": "Profile",
+  "name": "Profile › Payment settings · Phone 390px",
+  "route": "/profile/payment-settings",
+  "pattern": "/profile/payment-settings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment Settings",
+  "purpose": "Review payments and receipts for your account.",
+  "parent": "customer-profile-payment-settings",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-profile-payment-settings--phone-viewport-top",
+  "section": "Profile",
+  "name": "Profile › Payment settings · Phone 390px · Top of page",
+  "route": "/profile/payment-settings",
+  "pattern": "/profile/payment-settings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment Settings",
+  "purpose": "Review payments and receipts for your account.",
+  "parent": "customer-profile-payment-settings",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-payment-settings--phone-viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Payment settings · Phone 390px · Scrolled",
+  "route": "/profile/payment-settings",
+  "pattern": "/profile/payment-settings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment Settings",
+  "purpose": "Review payments and receipts for your account.",
+  "parent": "customer-profile-payment-settings",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-profile-payment-settings--tablet",
+  "section": "Profile",
+  "name": "Profile › Payment settings · Tablet 768px",
+  "route": "/profile/payment-settings",
+  "pattern": "/profile/payment-settings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment Settings",
+  "purpose": "Review payments and receipts for your account.",
+  "parent": "customer-profile-payment-settings",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-profile-payment-settings--tablet-viewport-top",
+  "section": "Profile",
+  "name": "Profile › Payment settings · Tablet 768px · Top of page",
+  "route": "/profile/payment-settings",
+  "pattern": "/profile/payment-settings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment Settings",
+  "purpose": "Review payments and receipts for your account.",
+  "parent": "customer-profile-payment-settings",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-payment-settings--tablet-viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Payment settings · Tablet 768px · Scrolled",
+  "route": "/profile/payment-settings",
+  "pattern": "/profile/payment-settings",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment Settings",
+  "purpose": "Review payments and receipts for your account.",
+  "parent": "customer-profile-payment-settings",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-profile-preferences--phone",
+  "section": "Profile",
+  "name": "Profile › Preferences · Phone 390px",
+  "route": "/profile/preferences",
+  "pattern": "/profile/preferences",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Preferences",
+  "purpose": "Control what SafariNexa notifies you about, and set your default traveller details.",
+  "parent": "customer-profile-preferences",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-profile-preferences--phone-viewport-top",
+  "section": "Profile",
+  "name": "Profile › Preferences · Phone 390px · Top of page",
+  "route": "/profile/preferences",
+  "pattern": "/profile/preferences",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Preferences",
+  "purpose": "Control what SafariNexa notifies you about, and set your default traveller details.",
+  "parent": "customer-profile-preferences",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-preferences--phone-viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Preferences · Phone 390px · Scrolled",
+  "route": "/profile/preferences",
+  "pattern": "/profile/preferences",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Preferences",
+  "purpose": "Control what SafariNexa notifies you about, and set your default traveller details.",
+  "parent": "customer-profile-preferences",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-profile-preferences--tablet",
+  "section": "Profile",
+  "name": "Profile › Preferences · Tablet 768px",
+  "route": "/profile/preferences",
+  "pattern": "/profile/preferences",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Preferences",
+  "purpose": "Control what SafariNexa notifies you about, and set your default traveller details.",
+  "parent": "customer-profile-preferences",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-profile-preferences--tablet-viewport-top",
+  "section": "Profile",
+  "name": "Profile › Preferences · Tablet 768px · Top of page",
+  "route": "/profile/preferences",
+  "pattern": "/profile/preferences",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Preferences",
+  "purpose": "Control what SafariNexa notifies you about, and set your default traveller details.",
+  "parent": "customer-profile-preferences",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-preferences--tablet-viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Preferences · Tablet 768px · Scrolled",
+  "route": "/profile/preferences",
+  "pattern": "/profile/preferences",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Preferences",
+  "purpose": "Control what SafariNexa notifies you about, and set your default traveller details.",
+  "parent": "customer-profile-preferences",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-profile-saved--phone",
+  "section": "Profile",
+  "name": "Profile › Saved · Phone 390px",
+  "route": "/profile/saved",
+  "pattern": "/profile/saved",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Saved items",
+  "purpose": "Stays, tours, restaurants, and transport options you've saved for later.",
+  "parent": "customer-profile-saved",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-profile-saved--phone-viewport-top",
+  "section": "Profile",
+  "name": "Profile › Saved · Phone 390px · Top of page",
+  "route": "/profile/saved",
+  "pattern": "/profile/saved",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Saved items",
+  "purpose": "Stays, tours, restaurants, and transport options you've saved for later.",
+  "parent": "customer-profile-saved",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-saved--phone-viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Saved · Phone 390px · Scrolled",
+  "route": "/profile/saved",
+  "pattern": "/profile/saved",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Saved items",
+  "purpose": "Stays, tours, restaurants, and transport options you've saved for later.",
+  "parent": "customer-profile-saved",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-profile-saved--tablet",
+  "section": "Profile",
+  "name": "Profile › Saved · Tablet 768px",
+  "route": "/profile/saved",
+  "pattern": "/profile/saved",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Saved items",
+  "purpose": "Stays, tours, restaurants, and transport options you've saved for later.",
+  "parent": "customer-profile-saved",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-profile-saved--tablet-viewport-top",
+  "section": "Profile",
+  "name": "Profile › Saved · Tablet 768px · Top of page",
+  "route": "/profile/saved",
+  "pattern": "/profile/saved",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Saved items",
+  "purpose": "Stays, tours, restaurants, and transport options you've saved for later.",
+  "parent": "customer-profile-saved",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-profile-saved--tablet-viewport-scrolled",
+  "section": "Profile",
+  "name": "Profile › Saved · Tablet 768px · Scrolled",
+  "route": "/profile/saved",
+  "pattern": "/profile/saved",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Saved items",
+  "purpose": "Stays, tours, restaurants, and transport options you've saved for later.",
+  "parent": "customer-profile-saved",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-restaurants-id--phone",
+  "section": "Restaurants",
+  "name": "Restaurants · details · Phone 390px",
+  "route": "/restaurants/kampala-garden-dining",
+  "pattern": "/restaurants/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala Garden Dining",
+  "parent": "customer-restaurants-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-restaurants-id--phone-viewport-top",
+  "section": "Restaurants",
+  "name": "Restaurants · details · Phone 390px · Top of page",
+  "route": "/restaurants/kampala-garden-dining",
+  "pattern": "/restaurants/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala Garden Dining",
+  "parent": "customer-restaurants-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-restaurants-id--phone-viewport-scrolled",
+  "section": "Restaurants",
+  "name": "Restaurants · details · Phone 390px · Scrolled",
+  "route": "/restaurants/kampala-garden-dining",
+  "pattern": "/restaurants/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala Garden Dining",
+  "parent": "customer-restaurants-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-restaurants-id--tablet",
+  "section": "Restaurants",
+  "name": "Restaurants · details · Tablet 768px",
+  "route": "/restaurants/kampala-garden-dining",
+  "pattern": "/restaurants/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala Garden Dining",
+  "parent": "customer-restaurants-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-restaurants-id--tablet-viewport-top",
+  "section": "Restaurants",
+  "name": "Restaurants · details · Tablet 768px · Top of page",
+  "route": "/restaurants/kampala-garden-dining",
+  "pattern": "/restaurants/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala Garden Dining",
+  "parent": "customer-restaurants-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-restaurants-id--tablet-viewport-scrolled",
+  "section": "Restaurants",
+  "name": "Restaurants · details · Tablet 768px · Scrolled",
+  "route": "/restaurants/kampala-garden-dining",
+  "pattern": "/restaurants/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Kampala Garden Dining",
+  "parent": "customer-restaurants-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-restaurants--phone",
+  "section": "Restaurants",
+  "name": "Restaurants · Phone 390px",
+  "route": "/restaurants",
+  "pattern": "/restaurants",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Browse places to eat",
+  "purpose": "Menus, hours, and restaurant profiles are open to guests. Reserving or requesting a table needs an account.",
+  "parent": "customer-restaurants",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-restaurants--phone-viewport-top",
+  "section": "Restaurants",
+  "name": "Restaurants · Phone 390px · Top of page",
+  "route": "/restaurants",
+  "pattern": "/restaurants",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Browse places to eat",
+  "purpose": "Menus, hours, and restaurant profiles are open to guests. Reserving or requesting a table needs an account.",
+  "parent": "customer-restaurants",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-restaurants--phone-viewport-scrolled",
+  "section": "Restaurants",
+  "name": "Restaurants · Phone 390px · Scrolled",
+  "route": "/restaurants",
+  "pattern": "/restaurants",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Browse places to eat",
+  "purpose": "Menus, hours, and restaurant profiles are open to guests. Reserving or requesting a table needs an account.",
+  "parent": "customer-restaurants",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-reviews-new--phone",
+  "section": "Reviews",
+  "name": "Reviews › New · Phone 390px",
+  "route": "/reviews/new?bookingId=capture-stay",
+  "pattern": "/reviews/new",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Leave a verified review",
+  "parent": "customer-reviews-new",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-reviews-new--phone-viewport-top",
+  "section": "Reviews",
+  "name": "Reviews › New · Phone 390px · Top of page",
+  "route": "/reviews/new?bookingId=capture-stay",
+  "pattern": "/reviews/new",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Leave a verified review",
+  "parent": "customer-reviews-new",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-reviews-new--phone-viewport-scrolled",
+  "section": "Reviews",
+  "name": "Reviews › New · Phone 390px · Scrolled",
+  "route": "/reviews/new?bookingId=capture-stay",
+  "pattern": "/reviews/new",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Leave a verified review",
+  "parent": "customer-reviews-new",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-safety--phone",
+  "section": "Safety",
+  "name": "Safety · Phone 390px",
+  "route": "/safety",
+  "pattern": "/safety",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Travel Safety & SOS",
+  "purpose": "Emergency contacts, travel advisories, and immediate support.",
+  "parent": "customer-safety",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-safety--phone-viewport-top",
+  "section": "Safety",
+  "name": "Safety · Phone 390px · Top of page",
+  "route": "/safety",
+  "pattern": "/safety",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Travel Safety & SOS",
+  "purpose": "Emergency contacts, travel advisories, and immediate support.",
+  "parent": "customer-safety",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-safety--phone-viewport-scrolled",
+  "section": "Safety",
+  "name": "Safety · Phone 390px · Scrolled",
+  "route": "/safety",
+  "pattern": "/safety",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Travel Safety & SOS",
+  "purpose": "Emergency contacts, travel advisories, and immediate support.",
+  "parent": "customer-safety",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-search--phone",
+  "section": "Search",
+  "name": "Search · Phone 390px",
+  "route": "/search",
+  "pattern": "/search",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "94 results found",
+  "purpose": "Browse freely. Sign in when you're ready to book.",
+  "parent": "customer-search",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-search--phone-viewport-top",
+  "section": "Search",
+  "name": "Search · Phone 390px · Top of page",
+  "route": "/search",
+  "pattern": "/search",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "94 results found",
+  "purpose": "Browse freely. Sign in when you're ready to book.",
+  "parent": "customer-search",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-search--phone-viewport-scrolled",
+  "section": "Search",
+  "name": "Search · Phone 390px · Scrolled",
+  "route": "/search",
+  "pattern": "/search",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "94 results found",
+  "purpose": "Browse freely. Sign in when you're ready to book.",
+  "parent": "customer-search",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-saved--phone",
+  "section": "Saved",
+  "name": "Saved · Phone 390px",
+  "route": "/saved",
+  "pattern": "/saved",
+  "kind": "state",
+  "signedOut": false,
+  "redirect": "/profile/saved",
+  "heading": "Saved items",
+  "purpose": "Stays, tours, restaurants, and transport options you've saved for later.",
+  "parent": "customer-saved",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-support--phone",
+  "section": "Support",
+  "name": "Support · Phone 390px",
+  "route": "/support",
+  "pattern": "/support",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Support centre",
+  "purpose": "Bookings, payments, refunds, business verification, safety, and account access.",
+  "parent": "customer-support",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-support--phone-viewport-top",
+  "section": "Support",
+  "name": "Support · Phone 390px · Top of page",
+  "route": "/support",
+  "pattern": "/support",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Support centre",
+  "purpose": "Bookings, payments, refunds, business verification, safety, and account access.",
+  "parent": "customer-support",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-support--phone-viewport-scrolled",
+  "section": "Support",
+  "name": "Support · Phone 390px · Scrolled",
+  "route": "/support",
+  "pattern": "/support",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Support centre",
+  "purpose": "Bookings, payments, refunds, business verification, safety, and account access.",
+  "parent": "customer-support",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-support-id--phone",
+  "section": "Support",
+  "name": "Support · details · Phone 390px",
+  "route": "/support/capture-help",
+  "pattern": "/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Can I add a third guest to my stay?",
+  "purpose": "You",
+  "parent": "customer-support-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-support-id--phone-viewport-top",
+  "section": "Support",
+  "name": "Support · details · Phone 390px · Top of page",
+  "route": "/support/capture-help",
+  "pattern": "/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Can I add a third guest to my stay?",
+  "purpose": "You",
+  "parent": "customer-support-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-support-id--phone-viewport-scrolled",
+  "section": "Support",
+  "name": "Support · details · Phone 390px · Scrolled",
+  "route": "/support/capture-help",
+  "pattern": "/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Can I add a third guest to my stay?",
+  "purpose": "You",
+  "parent": "customer-support-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-tours--phone",
+  "section": "Tours",
+  "name": "Tours · Phone 390px",
+  "route": "/tours",
+  "pattern": "/tours",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Guided experiences across Uganda",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours by duration, difficulty, and destination. Every listing includes a named, verified guide — meet them on the Guides page.",
+  "parent": "customer-tours",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-tours--phone-viewport-top",
+  "section": "Tours",
+  "name": "Tours · Phone 390px · Top of page",
+  "route": "/tours",
+  "pattern": "/tours",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Guided experiences across Uganda",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours by duration, difficulty, and destination. Every listing includes a named, verified guide — meet them on the Guides page.",
+  "parent": "customer-tours",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-tours--phone-viewport-scrolled",
+  "section": "Tours",
+  "name": "Tours · Phone 390px · Scrolled",
+  "route": "/tours",
+  "pattern": "/tours",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Guided experiences across Uganda",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours by duration, difficulty, and destination. Every listing includes a named, verified guide — meet them on the Guides page.",
+  "parent": "customer-tours",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-tours-id--phone",
+  "section": "Tours",
+  "name": "Tours · details · Phone 390px",
+  "route": "/tours/demo-safari",
+  "pattern": "/tours/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Queen Elizabeth National Park",
+  "parent": "customer-tours-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-tours-id--phone-viewport-top",
+  "section": "Tours",
+  "name": "Tours · details · Phone 390px · Top of page",
+  "route": "/tours/demo-safari",
+  "pattern": "/tours/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Queen Elizabeth National Park",
+  "parent": "customer-tours-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-tours-id--phone-viewport-scrolled",
+  "section": "Tours",
+  "name": "Tours · details · Phone 390px · Scrolled",
+  "route": "/tours/demo-safari",
+  "pattern": "/tours/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Queen Elizabeth National Park",
+  "parent": "customer-tours-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-transport-id--phone",
+  "section": "Transport",
+  "name": "Transport · details · Phone 390px",
+  "route": "/transport/entebbe-airport-transfer",
+  "pattern": "/transport/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Entebbe Airport Transfer",
+  "parent": "customer-transport-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-transport--phone",
+  "section": "Transport",
+  "name": "Transport · Phone 390px",
+  "route": "/transport",
+  "pattern": "/transport",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Airport transfers and special hire",
+  "purpose": "Phase 1 covers airport transfers and Kampala special hire — compare fixed fares before creating an account.",
+  "parent": "customer-transport",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-transport-id--phone-viewport-top",
+  "section": "Transport",
+  "name": "Transport · details · Phone 390px · Top of page",
+  "route": "/transport/entebbe-airport-transfer",
+  "pattern": "/transport/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Entebbe Airport Transfer",
+  "parent": "customer-transport-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-transport-id--phone-viewport-scrolled",
+  "section": "Transport",
+  "name": "Transport · details · Phone 390px · Scrolled",
+  "route": "/transport/entebbe-airport-transfer",
+  "pattern": "/transport/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Entebbe Airport Transfer",
+  "parent": "customer-transport-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-transport--phone-viewport-top",
+  "section": "Transport",
+  "name": "Transport · Phone 390px · Top of page",
+  "route": "/transport",
+  "pattern": "/transport",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Airport transfers and special hire",
+  "purpose": "Phase 1 covers airport transfers and Kampala special hire — compare fixed fares before creating an account.",
+  "parent": "customer-transport",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-transport--phone-viewport-scrolled",
+  "section": "Transport",
+  "name": "Transport · Phone 390px · Scrolled",
+  "route": "/transport",
+  "pattern": "/transport",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Airport transfers and special hire",
+  "purpose": "Phase 1 covers airport transfers and Kampala special hire — compare fixed fares before creating an account.",
+  "parent": "customer-transport",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-trip-planner--phone",
+  "section": "Trip planner",
+  "name": "Trip planner · Phone 390px",
+  "route": "/trip-planner",
+  "pattern": "/trip-planner",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Your Saved Itineraries",
+  "purpose": "Plan your East African adventure day by day.",
+  "parent": "customer-trip-planner",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-trip-planner--phone-viewport-top",
+  "section": "Trip planner",
+  "name": "Trip planner · Phone 390px · Top of page",
+  "route": "/trip-planner",
+  "pattern": "/trip-planner",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Your Saved Itineraries",
+  "purpose": "Plan your East African adventure day by day.",
+  "parent": "customer-trip-planner",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-trip-planner--phone-viewport-scrolled",
+  "section": "Trip planner",
+  "name": "Trip planner · Phone 390px · Scrolled",
+  "route": "/trip-planner",
+  "pattern": "/trip-planner",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Your Saved Itineraries",
+  "purpose": "Plan your East African adventure day by day.",
+  "parent": "customer-trip-planner",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-trip-planner-id--phone",
+  "section": "Trip planner",
+  "name": "Trip planner · details · Phone 390px",
+  "route": "/trip-planner/capture-trip",
+  "pattern": "/trip-planner/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Trip itinerary",
+  "purpose": "Organize your itinerary, dates, and notes.",
+  "parent": "customer-trip-planner-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-trip-planner-id--phone-viewport-top",
+  "section": "Trip planner",
+  "name": "Trip planner · details · Phone 390px · Top of page",
+  "route": "/trip-planner/capture-trip",
+  "pattern": "/trip-planner/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Trip itinerary",
+  "purpose": "Organize your itinerary, dates, and notes.",
+  "parent": "customer-trip-planner-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-trip-planner-id--phone-viewport-scrolled",
+  "section": "Trip planner",
+  "name": "Trip planner · details · Phone 390px · Scrolled",
+  "route": "/trip-planner/capture-trip",
+  "pattern": "/trip-planner/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Trip itinerary",
+  "purpose": "Organize your itinerary, dates, and notes.",
+  "parent": "customer-trip-planner-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "scrollY": 633
+ },
+ {
+  "id": "customer-bookings-id--status-pending-payment--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment required · Phone 390px",
+  "route": "/bookings/capture-pay",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment required",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-awaiting--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Awaiting confirmation · Phone 390px",
+  "route": "/bookings/capture-st-awaiting",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Awaiting confirmation",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-payment-failed--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment failed · Phone 390px",
+  "route": "/bookings/capture-st-failed",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment failed",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-confirmed--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Confirmed and paid · Phone 390px",
+  "route": "/bookings/capture-paid",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Confirmed and paid",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-refund-requested--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled, refund requested · Phone 390px",
+  "route": "/bookings/capture-st-refund",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled, refund requested",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-refunded--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Refunded · Phone 390px",
+  "route": "/bookings/capture-st-refunded",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Refunded",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-cancelled--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled by the customer · Phone 390px",
+  "route": "/bookings/capture-st-cancelled",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled by the customer",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-declined--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Declined by the business · Phone 390px",
+  "route": "/bookings/capture-st-declined",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Declined by the business",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-completed--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Completed, ready to review · Phone 390px",
+  "route": "/bookings/capture-stay",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Completed, ready to review",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-reviewed--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Reviewed · Phone 390px",
+  "route": "/bookings/capture-st-reviewed",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Reviewed",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-processing--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment waiting for the provider · Phone 390px",
+  "route": "/bookings/capture-st-processing",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment waiting for the provider",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-payment-overdue--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment window passed, not yet expired · Phone 390px",
+  "route": "/bookings/capture-st-overdue",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment window passed, not yet expired",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-payment-expired--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Expired: payment window passed · Phone 390px",
+  "route": "/bookings/capture-st-expired",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Expired: payment window passed",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-request-overdue--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Response deadline passed, not yet expired · Phone 390px",
+  "route": "/bookings/capture-st-reqlate",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Response deadline passed, not yet expired",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-request-expired--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Expired: no response from the business · Phone 390px",
+  "route": "/bookings/capture-st-reqexp",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Expired: no response from the business",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-partially-refunded--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Confirmed, partially refunded · Phone 390px",
+  "route": "/bookings/capture-st-partial",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Confirmed, partially refunded",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-refund-declined--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled, refund declined · Phone 390px",
+  "route": "/bookings/capture-st-refdecl",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled, refund declined",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-order--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Part of a combined order · Phone 390px",
+  "route": "/bookings/capture-st-order-a",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Part of a combined order",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-refund-processing--phone",
+  "section": "Bookings",
+  "name": "Bookings · details · Refund sent, waiting for the provider · Phone 390px",
+  "route": "/bookings/capture-st-refproc",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Refund sent, waiting for the provider",
+  "parent": "customer-bookings-id",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-payments--expired--phone",
+  "section": "Payments",
+  "name": "Payments · Payment window passed · Phone 390px",
+  "route": "/payments?bookingId=capture-st-overdue",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "purpose": "Payment window passed",
+  "parent": "customer-payments",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-payments--order-waiting--phone",
+  "section": "Payments",
+  "name": "Payments · Combined order waiting for a business · Phone 390px",
+  "route": "/payments?orderId=capture-order-wait",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Booking status",
+  "purpose": "Combined order waiting for a business",
+  "parent": "customer-payments",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-payments-receipt--order--phone",
+  "section": "Payments",
+  "name": "Payments › Receipt · Receipt for a combined order · Phone 390px",
+  "route": "/payments/receipt?orderId=capture-order",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Receipt for a combined order",
+  "parent": "customer-payments-receipt",
+  "device": "phone",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  }
+ },
+ {
+  "id": "customer-restaurants--tablet",
+  "section": "Restaurants",
+  "name": "Restaurants · Tablet 768px",
+  "route": "/restaurants",
+  "pattern": "/restaurants",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Browse places to eat",
+  "purpose": "Menus, hours, and restaurant profiles are open to guests. Reserving or requesting a table needs an account.",
+  "parent": "customer-restaurants",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-restaurants--tablet-viewport-top",
+  "section": "Restaurants",
+  "name": "Restaurants · Tablet 768px · Top of page",
+  "route": "/restaurants",
+  "pattern": "/restaurants",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Browse places to eat",
+  "purpose": "Menus, hours, and restaurant profiles are open to guests. Reserving or requesting a table needs an account.",
+  "parent": "customer-restaurants",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-restaurants--tablet-viewport-scrolled",
+  "section": "Restaurants",
+  "name": "Restaurants · Tablet 768px · Scrolled",
+  "route": "/restaurants",
+  "pattern": "/restaurants",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Browse places to eat",
+  "purpose": "Menus, hours, and restaurant profiles are open to guests. Reserving or requesting a table needs an account.",
+  "parent": "customer-restaurants",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-reviews-new--tablet",
+  "section": "Reviews",
+  "name": "Reviews › New · Tablet 768px",
+  "route": "/reviews/new?bookingId=capture-stay",
+  "pattern": "/reviews/new",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Leave a verified review",
+  "parent": "customer-reviews-new",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-reviews-new--tablet-viewport-top",
+  "section": "Reviews",
+  "name": "Reviews › New · Tablet 768px · Top of page",
+  "route": "/reviews/new?bookingId=capture-stay",
+  "pattern": "/reviews/new",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Leave a verified review",
+  "parent": "customer-reviews-new",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-reviews-new--tablet-viewport-scrolled",
+  "section": "Reviews",
+  "name": "Reviews › New · Tablet 768px · Scrolled",
+  "route": "/reviews/new?bookingId=capture-stay",
+  "pattern": "/reviews/new",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Leave a verified review",
+  "parent": "customer-reviews-new",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-safety--tablet",
+  "section": "Safety",
+  "name": "Safety · Tablet 768px",
+  "route": "/safety",
+  "pattern": "/safety",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Travel Safety & SOS",
+  "purpose": "Emergency contacts, travel advisories, and immediate support.",
+  "parent": "customer-safety",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-safety--tablet-viewport-top",
+  "section": "Safety",
+  "name": "Safety · Tablet 768px · Top of page",
+  "route": "/safety",
+  "pattern": "/safety",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Travel Safety & SOS",
+  "purpose": "Emergency contacts, travel advisories, and immediate support.",
+  "parent": "customer-safety",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-safety--tablet-viewport-scrolled",
+  "section": "Safety",
+  "name": "Safety · Tablet 768px · Scrolled",
+  "route": "/safety",
+  "pattern": "/safety",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Travel Safety & SOS",
+  "purpose": "Emergency contacts, travel advisories, and immediate support.",
+  "parent": "customer-safety",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 5
+ },
+ {
+  "id": "customer-search--tablet",
+  "section": "Search",
+  "name": "Search · Tablet 768px",
+  "route": "/search",
+  "pattern": "/search",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "94 results found",
+  "purpose": "Browse freely. Sign in when you're ready to book.",
+  "parent": "customer-search",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-search--tablet-viewport-top",
+  "section": "Search",
+  "name": "Search · Tablet 768px · Top of page",
+  "route": "/search",
+  "pattern": "/search",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "94 results found",
+  "purpose": "Browse freely. Sign in when you're ready to book.",
+  "parent": "customer-search",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-search--tablet-viewport-scrolled",
+  "section": "Search",
+  "name": "Search · Tablet 768px · Scrolled",
+  "route": "/search",
+  "pattern": "/search",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "94 results found",
+  "purpose": "Browse freely. Sign in when you're ready to book.",
+  "parent": "customer-search",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-saved--tablet",
+  "section": "Saved",
+  "name": "Saved · Tablet 768px",
+  "route": "/saved",
+  "pattern": "/saved",
+  "kind": "state",
+  "signedOut": false,
+  "redirect": "/profile/saved",
+  "heading": "Saved items",
+  "purpose": "Stays, tours, restaurants, and transport options you've saved for later.",
+  "parent": "customer-saved",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-support--tablet",
+  "section": "Support",
+  "name": "Support · Tablet 768px",
+  "route": "/support",
+  "pattern": "/support",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Support centre",
+  "purpose": "Bookings, payments, refunds, business verification, safety, and account access.",
+  "parent": "customer-support",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-support--tablet-viewport-top",
+  "section": "Support",
+  "name": "Support · Tablet 768px · Top of page",
+  "route": "/support",
+  "pattern": "/support",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Support centre",
+  "purpose": "Bookings, payments, refunds, business verification, safety, and account access.",
+  "parent": "customer-support",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-support--tablet-viewport-scrolled",
+  "section": "Support",
+  "name": "Support · Tablet 768px · Scrolled",
+  "route": "/support",
+  "pattern": "/support",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Support centre",
+  "purpose": "Bookings, payments, refunds, business verification, safety, and account access.",
+  "parent": "customer-support",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-support-id--tablet",
+  "section": "Support",
+  "name": "Support · details · Tablet 768px",
+  "route": "/support/capture-help",
+  "pattern": "/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Can I add a third guest to my stay?",
+  "purpose": "You",
+  "parent": "customer-support-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-support-id--tablet-viewport-top",
+  "section": "Support",
+  "name": "Support · details · Tablet 768px · Top of page",
+  "route": "/support/capture-help",
+  "pattern": "/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Can I add a third guest to my stay?",
+  "purpose": "You",
+  "parent": "customer-support-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-support-id--tablet-viewport-scrolled",
+  "section": "Support",
+  "name": "Support · details · Tablet 768px · Scrolled",
+  "route": "/support/capture-help",
+  "pattern": "/support/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Can I add a third guest to my stay?",
+  "purpose": "You",
+  "parent": "customer-support-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 570
+ },
+ {
+  "id": "customer-tours--tablet",
+  "section": "Tours",
+  "name": "Tours · Tablet 768px",
+  "route": "/tours",
+  "pattern": "/tours",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Guided experiences across Uganda",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours by duration, difficulty, and destination. Every listing includes a named, verified guide — meet them on the Guides page.",
+  "parent": "customer-tours",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-tours--tablet-viewport-top",
+  "section": "Tours",
+  "name": "Tours · Tablet 768px · Top of page",
+  "route": "/tours",
+  "pattern": "/tours",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Guided experiences across Uganda",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours by duration, difficulty, and destination. Every listing includes a named, verified guide — meet them on the Guides page.",
+  "parent": "customer-tours",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-tours--tablet-viewport-scrolled",
+  "section": "Tours",
+  "name": "Tours · Tablet 768px · Scrolled",
+  "route": "/tours",
+  "pattern": "/tours",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Guided experiences across Uganda",
+  "purpose": "Compare safari itineraries, chimp treks, and city tours by duration, difficulty, and destination. Every listing includes a named, verified guide — meet them on the Guides page.",
+  "parent": "customer-tours",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-tours-id--tablet",
+  "section": "Tours",
+  "name": "Tours · details · Tablet 768px",
+  "route": "/tours/demo-safari",
+  "pattern": "/tours/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Queen Elizabeth National Park",
+  "parent": "customer-tours-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-tours-id--tablet-viewport-top",
+  "section": "Tours",
+  "name": "Tours · details · Tablet 768px · Top of page",
+  "route": "/tours/demo-safari",
+  "pattern": "/tours/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Queen Elizabeth National Park",
+  "parent": "customer-tours-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-tours-id--tablet-viewport-scrolled",
+  "section": "Tours",
+  "name": "Tours · details · Tablet 768px · Scrolled",
+  "route": "/tours/demo-safari",
+  "pattern": "/tours/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "3-Day Wildlife Safari",
+  "purpose": "Queen Elizabeth National Park",
+  "parent": "customer-tours-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-transport--tablet",
+  "section": "Transport",
+  "name": "Transport · Tablet 768px",
+  "route": "/transport",
+  "pattern": "/transport",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Airport transfers and special hire",
+  "purpose": "Phase 1 covers airport transfers and Kampala special hire — compare fixed fares before creating an account.",
+  "parent": "customer-transport",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-transport--tablet-viewport-top",
+  "section": "Transport",
+  "name": "Transport · Tablet 768px · Top of page",
+  "route": "/transport",
+  "pattern": "/transport",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Airport transfers and special hire",
+  "purpose": "Phase 1 covers airport transfers and Kampala special hire — compare fixed fares before creating an account.",
+  "parent": "customer-transport",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-transport--tablet-viewport-scrolled",
+  "section": "Transport",
+  "name": "Transport · Tablet 768px · Scrolled",
+  "route": "/transport",
+  "pattern": "/transport",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Airport transfers and special hire",
+  "purpose": "Phase 1 covers airport transfers and Kampala special hire — compare fixed fares before creating an account.",
+  "parent": "customer-transport",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-transport-id--tablet",
+  "section": "Transport",
+  "name": "Transport · details · Tablet 768px",
+  "route": "/transport/entebbe-airport-transfer",
+  "pattern": "/transport/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Entebbe Airport Transfer",
+  "parent": "customer-transport-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-transport-id--tablet-viewport-top",
+  "section": "Transport",
+  "name": "Transport · details · Tablet 768px · Top of page",
+  "route": "/transport/entebbe-airport-transfer",
+  "pattern": "/transport/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Entebbe Airport Transfer",
+  "parent": "customer-transport-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-transport-id--tablet-viewport-scrolled",
+  "section": "Transport",
+  "name": "Transport · details · Tablet 768px · Scrolled",
+  "route": "/transport/entebbe-airport-transfer",
+  "pattern": "/transport/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Entebbe Airport Transfer",
+  "parent": "customer-transport-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-trip-planner--tablet",
+  "section": "Trip planner",
+  "name": "Trip planner · Tablet 768px",
+  "route": "/trip-planner",
+  "pattern": "/trip-planner",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Your Saved Itineraries",
+  "purpose": "Plan your East African adventure day by day.",
+  "parent": "customer-trip-planner",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-trip-planner--tablet-viewport-top",
+  "section": "Trip planner",
+  "name": "Trip planner · Tablet 768px · Top of page",
+  "route": "/trip-planner",
+  "pattern": "/trip-planner",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Your Saved Itineraries",
+  "purpose": "Plan your East African adventure day by day.",
+  "parent": "customer-trip-planner",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-trip-planner--tablet-viewport-scrolled",
+  "section": "Trip planner",
+  "name": "Trip planner · Tablet 768px · Scrolled",
+  "route": "/trip-planner",
+  "pattern": "/trip-planner",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Your Saved Itineraries",
+  "purpose": "Plan your East African adventure day by day.",
+  "parent": "customer-trip-planner",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 273
+ },
+ {
+  "id": "customer-trip-planner-id--tablet",
+  "section": "Trip planner",
+  "name": "Trip planner · details · Tablet 768px",
+  "route": "/trip-planner/capture-trip",
+  "pattern": "/trip-planner/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Trip itinerary",
+  "purpose": "Organize your itinerary, dates, and notes.",
+  "parent": "customer-trip-planner-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-trip-planner-id--tablet-viewport-top",
+  "section": "Trip planner",
+  "name": "Trip planner · details · Tablet 768px · Top of page",
+  "route": "/trip-planner/capture-trip",
+  "pattern": "/trip-planner/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Trip itinerary",
+  "purpose": "Organize your itinerary, dates, and notes.",
+  "parent": "customer-trip-planner-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 0
+ },
+ {
+  "id": "customer-trip-planner-id--tablet-viewport-scrolled",
+  "section": "Trip planner",
+  "name": "Trip planner · details · Tablet 768px · Scrolled",
+  "route": "/trip-planner/capture-trip",
+  "pattern": "/trip-planner/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Trip itinerary",
+  "purpose": "Organize your itinerary, dates, and notes.",
+  "parent": "customer-trip-planner-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "scrollY": 768
+ },
+ {
+  "id": "customer-bookings-id--status-awaiting--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Awaiting confirmation · Tablet 768px",
+  "route": "/bookings/capture-st-awaiting",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Awaiting confirmation",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-pending-payment--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment required · Tablet 768px",
+  "route": "/bookings/capture-pay",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment required",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-payment-failed--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment failed · Tablet 768px",
+  "route": "/bookings/capture-st-failed",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment failed",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-confirmed--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Confirmed and paid · Tablet 768px",
+  "route": "/bookings/capture-paid",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Confirmed and paid",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-refund-requested--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled, refund requested · Tablet 768px",
+  "route": "/bookings/capture-st-refund",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled, refund requested",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-refunded--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Refunded · Tablet 768px",
+  "route": "/bookings/capture-st-refunded",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Refunded",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-cancelled--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled by the customer · Tablet 768px",
+  "route": "/bookings/capture-st-cancelled",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled by the customer",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-declined--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Declined by the business · Tablet 768px",
+  "route": "/bookings/capture-st-declined",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Declined by the business",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-completed--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Completed, ready to review · Tablet 768px",
+  "route": "/bookings/capture-stay",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Completed, ready to review",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-reviewed--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Reviewed · Tablet 768px",
+  "route": "/bookings/capture-st-reviewed",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Reviewed",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-processing--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment waiting for the provider · Tablet 768px",
+  "route": "/bookings/capture-st-processing",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment waiting for the provider",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-payment-overdue--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Payment window passed, not yet expired · Tablet 768px",
+  "route": "/bookings/capture-st-overdue",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Payment window passed, not yet expired",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-payment-expired--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Expired: payment window passed · Tablet 768px",
+  "route": "/bookings/capture-st-expired",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Expired: payment window passed",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-request-overdue--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Response deadline passed, not yet expired · Tablet 768px",
+  "route": "/bookings/capture-st-reqlate",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Response deadline passed, not yet expired",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-request-expired--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Expired: no response from the business · Tablet 768px",
+  "route": "/bookings/capture-st-reqexp",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Expired: no response from the business",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-partially-refunded--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Confirmed, partially refunded · Tablet 768px",
+  "route": "/bookings/capture-st-partial",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Confirmed, partially refunded",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-refund-declined--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Cancelled, refund declined · Tablet 768px",
+  "route": "/bookings/capture-st-refdecl",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Cancelled, refund declined",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-order--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Part of a combined order · Tablet 768px",
+  "route": "/bookings/capture-st-order-a",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Part of a combined order",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-bookings-id--status-refund-processing--tablet",
+  "section": "Bookings",
+  "name": "Bookings · details · Refund sent, waiting for the provider · Tablet 768px",
+  "route": "/bookings/capture-st-refproc",
+  "pattern": "/bookings/[id]",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Murchison River Lodge",
+  "purpose": "Refund sent, waiting for the provider",
+  "parent": "customer-bookings-id",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-payments--expired--tablet",
+  "section": "Payments",
+  "name": "Payments · Payment window passed · Tablet 768px",
+  "route": "/payments?bookingId=capture-st-overdue",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "purpose": "Payment window passed",
+  "parent": "customer-payments",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-payments--order-waiting--tablet",
+  "section": "Payments",
+  "name": "Payments · Combined order waiting for a business · Tablet 768px",
+  "route": "/payments?orderId=capture-order-wait",
+  "pattern": "/payments",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Booking status",
+  "purpose": "Combined order waiting for a business",
+  "parent": "customer-payments",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
+ },
+ {
+  "id": "customer-payments-receipt--order--tablet",
+  "section": "Payments",
+  "name": "Payments › Receipt · Receipt for a combined order · Tablet 768px",
+  "route": "/payments/receipt?orderId=capture-order",
+  "pattern": "/payments/receipt",
+  "kind": "state",
+  "signedOut": false,
+  "heading": "Payment received",
+  "purpose": "Receipt for a combined order",
+  "parent": "customer-payments-receipt",
+  "device": "tablet",
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  }
  }
 ]

@@ -416,8 +416,8 @@ async function flowBoard(bundle: any, flow: any, num: string): Promise<FrameNode
     let shot: FrameNode | null = null;
     if (cap) {
       // The screen as the user first sees it (window height).
-      shot = await drawCapture(cap, num + "." + (i + 1) + " — " + st.screen, 900);
-      shot.rescale((CARD_W - 40) / cap.w);
+      shot = await drawCapture(cap, num + "." + (i + 1) + " — " + st.screen, flow.device ? cap.h : 900);
+      shot.rescale(Math.min(1, (CARD_W - 40) / cap.w));
       shot.strokes = [solid(C.border)];
     }
     const card = V({ name: "Step " + (i + 1), w: CARD_W, gap: 14, pad: 20, fill: C.white, stroke: lane.color, radius: 20 }, [
@@ -469,7 +469,7 @@ async function buildCover(bundle: any, page: PageNode, rows: { id: string; name:
       1500,
     ),
     H({ gap: 16 }, [
-      H({ px: 16, py: 10, radius: 999, fill: C.s900 }, [await T("1440 × full-length desktop frames", 16, 500, C.white)]),
+      H({ px: 16, py: 10, radius: 999, fill: C.s900 }, [await T(bundle.portal === "customer" ? "390px phone · 768px tablet · 1440px desktop" : "1440 × full-length desktop frames", 16, 500, C.white)]),
       H({ px: 16, py: 10, radius: 999, fill: C.primary }, [await T("Captured " + new Date(bundle.generatedAt).toLocaleString() + (bundle.commit ? " · commit " + bundle.commit : ""), 16, 500, C.white)]),
     ]),
   ]);

@@ -8,21 +8,26 @@ async (opts) => {
   const px = (v) => Math.round(parseFloat(v) * 100) / 100 || 0;
   const visibleColor = (c) => c && c !== "transparent" && !/rgba\([^)]*,\s*0\)$/.test(c);
   const imgCache = new Map();
-  const toData = async (src) => {
-    if (imgCache.has(src)) return imgCache.get(src);
-    let out = null;
-    try {
-      const blob = await (await fetch(src)).blob();
-      out = await new Promise((r) => {
-        const fr = new FileReader();
-        fr.onload = () => r(fr.result);
-        fr.readAsDataURL(blob);
-      });
-    } catch {
-      out = null;
+  const toData = (src) => {
+    if (!imgCache.has(src)) {
+      const pending = (async () => {
+        try {
+          const response = await fetch(src, { signal: AbortSignal.timeout(3500) });
+          if (!response.ok) return null;
+          const blob = await response.blob();
+          return await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        } catch {
+          return null;
+        }
+      })();
+      imgCache.set(src, pending);
     }
-    imgCache.set(src, out);
-    return out;
+    return imgCache.get(src);
   };
   // Big images (map tiles, photos) are re-encoded as JPEG at 2x their shown size.
   const shrink = async (data, w, h) => {
@@ -43,6 +48,11 @@ async (opts) => {
     }
   };
   const inView = (r) => r.width > 0.5 && r.height > 0.5 && r.right > 0 && r.bottom > 0 && r.left < W && r.top < H;
+  // Start image requests together so a series of unavailable images cannot stall the DOM walk.
+  for (const img of document.images) {
+    const src = img.currentSrc || img.src;
+    if (src && inView(img.getBoundingClientRect())) toData(src);
+  }
 
   const svgMarkup = (svg, color) => {
     const clone = svg.cloneNode(true);

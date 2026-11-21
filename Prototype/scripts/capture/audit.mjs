@@ -1,8 +1,8 @@
 // Read-only inventory of the frames and journeys the generated plugins can load.
 // Usage: node scripts/capture/audit.mjs [--strict]
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { HANDOFF, PORTALS } from "./config.mjs";
+import { CUSTOMER_VIEWPORTS, HANDOFF, PORTALS } from "./config.mjs";
 import { routes } from "./routes.mjs";
 
 const { uiFingerprint } = createRequire(import.meta.url)("./fingerprint.cjs");
@@ -11,6 +11,7 @@ const allRoutes = routes({ includeExcluded: true });
 const included = routes();
 const source = read("source.json");
 const journeys = read("journeys/journeys.json");
+if (existsSync(HANDOFF + "journeys/responsive.json")) journeys.push(...read("journeys/responsive.json"));
 const fingerprintMatches = source.fingerprint === uiFingerprint();
 let gaps = Number(!fingerprintMatches);
 
@@ -38,6 +39,16 @@ for (const portal of Object.keys(PORTALS)) {
   const index = read(`${portal}/captures/index.json`);
   const screens = bundle.groups.flatMap((group) => group.sections.flatMap((section) => section.screens));
   const screenIds = new Set(screens.map(({ id }) => id));
+  const checkResponsive = ({ id }) => {
+    for (const [device, viewport] of Object.entries(CUSTOMER_VIEWPORTS)) {
+      const deviceId = `${id}--${device}`;
+      const frame = bundle.captures[deviceId];
+      if (!screenIds.has(deviceId) || frame?.w !== viewport.width || frame.h < viewport.height) {
+        console.log("  Missing or invalid responsive frame:", deviceId, viewport.width + "px");
+        gaps++;
+      }
+    }
+  };
   const expected = included.filter((route) => route.portal === portal);
   const pages = new Map(screens.filter(({ kind }) => kind === "page").map((screen) => [screen.pattern, screen]));
   console.log(`\n${portal}: ${pages.size}/${expected.length} page patterns, ${screens.length} frames, ${bundle.flows.length} journeys (bundle ${bundle.generatedAt}, source ${bundle.commit})`);
@@ -58,6 +69,14 @@ for (const portal of Object.keys(PORTALS)) {
     if (keys && !keys.some((key) => new URL(screen.route, "http://capture.invalid").searchParams.get(key))) {
       console.log("  Missing scenario parameter:", pattern, keys.join(" or "));
       gaps++;
+    }
+    if (portal === "customer") checkResponsive(screen);
+  }
+
+  if (portal === "customer") {
+    const pageRoutes = new Map([...pages.values()].map((page) => [page.id, page.route]));
+    for (const state of index.filter((entry) => entry.kind === "state" && !entry.device && entry.parent && entry.route !== pageRoutes.get(entry.parent))) {
+      checkResponsive(state);
     }
   }
 
@@ -85,6 +104,14 @@ for (const portal of Object.keys(PORTALS)) {
       if (step.lane !== "system" && (!step.screen || !bundle.captures[step.screen])) {
         console.log("  Journey step missing frame data:", flow.id, index + 1);
         gaps++;
+      }
+      if (flow.device && step.screen) {
+        const viewport = CUSTOMER_VIEWPORTS[flow.device];
+        const frame = bundle.captures[step.screen];
+        if (!viewport || frame?.w !== viewport.width || frame.h !== viewport.height) {
+          console.log("  Responsive journey step has invalid dimensions:", flow.id, index + 1);
+          gaps++;
+        }
       }
     }
   }

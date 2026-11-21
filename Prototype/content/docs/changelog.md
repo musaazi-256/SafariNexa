@@ -623,3 +623,7 @@ Started the scenario coverage in `/docs/verification` §8 with bookings and paym
   - `cart-order`: a tour and a stay from two businesses are added to the cart, checked out once, accepted by each business (the journey switches business), and paid with one payment.
 - The cart journey books two seed listings. `setup.cartOrder` saves their availability first; the run deletes the order and its bookings and restores the availability. Kidepo payouts are deleted with the fixture.
 
+
+## 21 November 2026 — Customer phone and tablet Figma captures
+
+- Added touch viewport captures at 390px and 768px for customer routes and fixture-backed variants, plus scroll states and journeys for filters, navigation, room selection, and conversations.

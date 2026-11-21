@@ -1,0 +1,145 @@
+[
+ {
+  "id": "j-responsive-phone-search",
+  "title": "Phone · Filter listings in a sheet",
+  "device": "phone",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Search results. Open Filters to narrow the list.",
+    "screen": "j-responsive-phone-search-1",
+    "route": "/search"
+   },
+   {
+    "lane": "customer",
+    "label": "The filter sheet opens over the results.",
+    "screen": "j-responsive-phone-search-2",
+    "route": "/search"
+   },
+   {
+    "lane": "customer",
+    "label": "Select a price range. The sheet stays open with the selection checked.",
+    "screen": "j-responsive-phone-search-3",
+    "route": "/search"
+   },
+   {
+    "lane": "customer",
+    "label": "Tap Show results to close the sheet and view the filtered list.",
+    "screen": "j-responsive-phone-search-4",
+    "route": "/search"
+   }
+  ]
+ },
+ {
+  "id": "j-responsive-phone-navigation",
+  "title": "Phone · Go from the mobile menu to the sign-in form",
+  "device": "phone",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Signed-out home with phone navigation.",
+    "screen": "j-responsive-phone-navigation-1",
+    "route": "/"
+   },
+   {
+    "lane": "customer",
+    "label": "Tap Open menu to reveal navigation and account links.",
+    "screen": "j-responsive-phone-navigation-2",
+    "route": "/"
+   },
+   {
+    "lane": "customer",
+    "label": "Tap Log in from the menu to open the sign-in form.",
+    "screen": "j-responsive-phone-navigation-3",
+    "route": "/auth/sign-in"
+   }
+  ]
+ },
+ {
+  "id": "j-responsive-phone-messages",
+  "title": "Phone · Switch between a conversation and the inbox",
+  "device": "phone",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Open Messages. The active conversation occupies the phone screen.",
+    "screen": "j-responsive-phone-messages-1",
+    "route": "/profile/messages"
+   },
+   {
+    "lane": "customer",
+    "label": "Tap Back to conversations to reveal the inbox list.",
+    "screen": "j-responsive-phone-messages-2",
+    "route": "/profile/messages"
+   },
+   {
+    "lane": "customer",
+    "label": "Tap a conversation to reopen its thread.",
+    "screen": "j-responsive-phone-messages-3",
+    "route": "/profile/messages"
+   }
+  ]
+ },
+ {
+  "id": "j-responsive-phone-stay",
+  "title": "Phone · Inspect a room and reach the reservation controls",
+  "device": "phone",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Open the accommodation listing and scroll to the room options.",
+    "screen": "j-responsive-phone-stay-1",
+    "route": "/accommodation/demo-lodge"
+   },
+   {
+    "lane": "customer",
+    "label": "Open More details to inspect the room.",
+    "screen": "j-responsive-phone-stay-2",
+    "route": "/accommodation/demo-lodge"
+   },
+   {
+    "lane": "customer",
+    "label": "Close the room detail and return to the room options.",
+    "screen": "j-responsive-phone-stay-3",
+    "route": "/accommodation/demo-lodge"
+   },
+   {
+    "lane": "customer",
+    "label": "Tap Reserve and reach the date and guest controls further down the phone page.",
+    "screen": "j-responsive-phone-stay-4",
+    "route": "/accommodation/demo-lodge"
+   }
+  ]
+ },
+ {
+  "id": "j-responsive-tablet-search",
+  "title": "Tablet · Filter listings in a sheet",
+  "device": "tablet",
+  "steps": [
+   {
+    "lane": "customer",
+    "label": "Search results. Open Filters to narrow the list.",
+    "screen": "j-responsive-tablet-search-1",
+    "route": "/search"
+   },
+   {
+    "lane": "customer",
+    "label": "The filter sheet opens over the results.",
+    "screen": "j-responsive-tablet-search-2",
+    "route": "/search"
+   },
+   {
+    "lane": "customer",
+    "label": "Select a price range. The sheet stays open with the selection checked.",
+    "screen": "j-responsive-tablet-search-3",
+    "route": "/search"
+   },
+   {
+    "lane": "customer",
+    "label": "Tap Show results to close the sheet and view the filtered list.",
+    "screen": "j-responsive-tablet-search-4",
+    "route": "/search"
+   }
+  ]
+ }
+]

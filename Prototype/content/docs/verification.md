@@ -474,3 +474,22 @@ The screen runner records a **Top of page** and **Scrolled** viewport pair on ba
 | Messaging and support | Customer inquiry, booking chat, business-initiated message, notifications, open case, reply, resolve and follow-up across the applicable surfaces. |
 | Staff and admin access | Invite, accept, wrong recipient, expire, sign in with assigned access, deny a restricted action, suspend and reactivate where implemented. |
 | Personal tools | Save and remove listing, edit profile and preferences, create and manage a trip itinerary, open safety resources and follow notification links. |
+
+## 9. Customer phone and tablet captures
+
+The 21 November customer bundle has 417 page and state frames in total, including 135 phone and 131 tablet frames. Each size covers all 43 customer route patterns and 22 fixture-backed variants. There are 35 phone scroll pairs and 33 tablet scroll pairs, plus five responsive journeys with 18 steps. The strict bundle audit passed with zero findings.
+
+The responsive capture uses touch-enabled 390 × 844 phone and 768 × 1024 tablet viewports. It opens every customer route from the desktop capture index, including routes that require a fixture ID or query parameter. For long pages, it records a page overview up to 6,000px, a top-of-page viewport, and a scrolled viewport. Fixture-backed booking and payment variants each get a phone and tablet frame.
+
+The responsive journey boards use the rendered controls at the target size:
+
+| Journey | Viewports | Captured steps |
+|---|---|---|
+| Search filters | Phone and tablet | Results, open the filter sheet, select a price range with the sheet still open, tap Show results and see the filtered list. |
+| Guest navigation | Phone | Signed-out home, open the navigation sheet, choose Log in and reach the sign-in page. |
+| Room selection | Phone | Scroll to a room, open room details, dismiss the dialog, tap Reserve and reach the date and guest controls. |
+| Messages | Phone | Enter a conversation, tap Back to conversations, select a thread to reopen it. |
+
+Run `npm run capture` for the full refresh. To regenerate the responsive set from an existing customer route index with the demo server running, run `node scripts/capture/responsive.mjs` and then `node scripts/capture/bundle.mjs customer` from `Prototype`. The strict audit checks the phone and tablet frames for every included customer route and indexed fixture-backed variant. The `--journeys-only` option replays interactions against the existing responsive route captures.
+
+These journeys cover the responsive interactions listed above. Additional mobile journey branches, alternate data and permission states, and native OS controls such as the date picker and on-screen keyboard still need their own verification.

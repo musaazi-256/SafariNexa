@@ -34,7 +34,11 @@ try {
 }
 
 const journeysFile = HANDOFF + "journeys/journeys.json";
-const journeys = existsSync(journeysFile) ? read(journeysFile) : [];
+const responsiveJourneys = HANDOFF + "journeys/responsive.json";
+const journeys = [
+  ...(existsSync(journeysFile) ? read(journeysFile) : []),
+  ...(existsSync(responsiveJourneys) ? read(responsiveJourneys) : []),
+];
 
 for (const portal of process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(PORTALS)) {
   const dir = HANDOFF + portal + "/captures/";

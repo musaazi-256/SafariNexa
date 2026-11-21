@@ -441,8 +441,8 @@ async function flowBoard(bundle, flow, num) {
         let shot = null;
         if (cap) {
             // The screen as the user first sees it (window height).
-            shot = await drawCapture(cap, num + "." + (i + 1) + " — " + st.screen, 900);
-            shot.rescale((CARD_W - 40) / cap.w);
+            shot = await drawCapture(cap, num + "." + (i + 1) + " — " + st.screen, flow.device ? cap.h : 900);
+            shot.rescale(Math.min(1, (CARD_W - 40) / cap.w));
             shot.strokes = [solid(C.border)];
         }
         const card = V({ name: "Step " + (i + 1), w: CARD_W, gap: 14, pad: 20, fill: C.white, stroke: lane.color, radius: 20 }, [
@@ -488,7 +488,7 @@ async function buildCover(bundle, page, rows) {
         await T(bundle.cover, 80, 700, C.s900, undefined, 88),
         await T("Captured SafariNexa screens, states and scripted journeys rebuilt as editable layers. " + total + (total === 1 ? " frame" : " frames") + " across " + rows.length + (rows.length === 1 ? " page." : " pages.") + " Run `npm run capture` in Prototype and push to main, then run this plugin again to refresh; it replaces the pages it made and leaves your own pages alone.", 24, 400, C.s600, 1500),
         H({ gap: 16 }, [
-            H({ px: 16, py: 10, radius: 999, fill: C.s900 }, [await T("1440 × full-length desktop frames", 16, 500, C.white)]),
+            H({ px: 16, py: 10, radius: 999, fill: C.s900 }, [await T(bundle.portal === "customer" ? "390px phone · 768px tablet · 1440px desktop" : "1440 × full-length desktop frames", 16, 500, C.white)]),
             H({ px: 16, py: 10, radius: 999, fill: C.primary }, [await T("Captured " + new Date(bundle.generatedAt).toLocaleString() + (bundle.commit ? " · commit " + bundle.commit : ""), 16, 500, C.white)]),
         ]),
     ]);

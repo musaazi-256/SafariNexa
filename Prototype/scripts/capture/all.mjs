@@ -40,6 +40,8 @@ try {
   }
   console.log("\n▶ Replaying the journeys");
   status ||= node("scripts/capture/journeys.mjs");
+  console.log("\n▶ Capturing customer phone and tablet screens and journeys");
+  status ||= node("scripts/capture/responsive.mjs");
   console.log("\n▶ Building the Figma bundles");
   status ||= node("scripts/capture/bundle.mjs");
   if (!status) writeFileSync(HANDOFF + "source.json", JSON.stringify({ fingerprint: uiFingerprint(), capturedAt: new Date().toISOString() }, null, 1) + "\n");

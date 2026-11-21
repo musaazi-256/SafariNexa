@@ -9,6 +9,10 @@ export const HANDOFF = REPO + "design/handoff/";
 export const BASE = process.env.CAPTURE_BASE || "http://localhost:3000";
 
 export const VIEW = { width: 1440, height: 900 };
+export const CUSTOMER_VIEWPORTS = {
+  phone: { width: 390, height: 844 },
+  tablet: { width: 768, height: 1024 },
+};
 // Pages are captured at full length up to this height; dialogs and menus at the window size.
 export const MAX_HEIGHT = 6000;
 
